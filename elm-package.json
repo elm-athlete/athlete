@@ -1,9 +1,14 @@
 {
+<<<<<<< HEAD
     "version": "12.1.0",
+=======
+    "version": "1.0.0",
+>>>>>>> Github pages demo!
     "summary": "Framework for inline CSS",
     "repository": "https://github.com/elm-bodybuilder/elegant.git",
     "license": "MIT",
     "source-directories": [
+<<<<<<< HEAD
         "src/elegant",
         "src/bodybuilder",
         "wysiwyg"
@@ -59,3 +64,19 @@
     },
     "elm-version": "0.18.0 <= v < 0.19.0"
 }
+=======
+        "src"
+    ],
+    "exposed-modules": [
+        "Elegant",
+        "Elegant.Elements"
+    ],
+    "dependencies": {
+        "elm-lang/core": "5.0.0 <= v < 6.0.0",
+        "elm-lang/html": "2.0.0 <= v < 3.0.0",
+        "elm-lang/window": "1.0.1 <= v < 2.0.0",
+        "eskimoblood/elm-color-extra": "5.0.0 <= v < 6.0.0"
+    },
+    "elm-version": "0.18.0 <= v < 0.19.0"
+}
+>>>>>>> Github pages demo!
