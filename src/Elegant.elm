@@ -57,6 +57,16 @@ module Elegant
         , fontStyleNormal
         , fontStyleItalic
         , fontSize
+        , alpha
+        , beta
+        , gamma
+        , delta
+        , epsilon
+        , zeta
+        , eta
+        , theta
+        , iota
+        , kappa
         , textCenter
         , textRight
         , textLeft
@@ -168,6 +178,17 @@ module Elegant
 @docs fontStyleNormal
 @docs fontStyleItalic
 @docs fontSize
+@docs alpha
+@docs alpha
+@docs beta
+@docs gamma
+@docs delta
+@docs epsilon
+@docs zeta
+@docs eta
+@docs theta
+@docs iota
+@docs kappa
 @docs textCenter
 @docs textLeft
 @docs textRight
@@ -398,6 +419,7 @@ type Style
         , height : Maybe SizeUnit
         , maxHeight : Maybe SizeUnit
         , minHeight : Maybe SizeUnit
+        , boxSizing : Maybe String
         }
 
 
@@ -466,6 +488,7 @@ defaultStyle =
         , height = Nothing
         , maxHeight = Nothing
         , minHeight = Nothing
+        , boxSizing = Just "border-box"
         }
 
 
@@ -753,6 +776,7 @@ getStyles (Style styleValues) =
     , ( "height", sizeUnitToString << .height )
     , ( "max-height", sizeUnitToString << .maxHeight )
     , ( "min-height", sizeUnitToString << .minHeight )
+    , ( "box-sizing", .boxSizing )
     ]
         |> List.map
             (\( attrName, fun ) ->
@@ -1147,6 +1171,66 @@ fontStyleItalic =
 fontSize : SizeUnit -> Style -> Style
 fontSize val (Style style) =
     Style { style | fontSize = Just val }
+
+
+{-| -}
+alpha : SizeUnit
+alpha =
+    Em 2.4
+
+
+{-| -}
+beta : SizeUnit
+beta =
+    Em 2.2
+
+
+{-| -}
+gamma : SizeUnit
+gamma =
+    Em 1.6
+
+
+{-| -}
+delta : SizeUnit
+delta =
+    Em 1.5
+
+
+{-| -}
+epsilon : SizeUnit
+epsilon =
+    Em 1.3
+
+
+{-| -}
+zeta : SizeUnit
+zeta =
+    Em 1.1
+
+
+{-| -}
+eta : SizeUnit
+eta =
+    Em 1.05
+
+
+{-| -}
+theta : SizeUnit
+theta =
+    Em 0.85
+
+
+{-| -}
+iota : SizeUnit
+iota =
+    Em 0.8
+
+
+{-| -}
+kappa : SizeUnit
+kappa =
+    Em 0.5
 
 
 textAlign : TextAlign -> Style -> Style
