@@ -4,7 +4,6 @@ import Elegant exposing (..)
 import Elegant.Elements exposing (..)
 import Color exposing (..)
 import Html exposing (text, div, h3)
-import Window
 
 
 type alias Model =
@@ -12,7 +11,7 @@ type alias Model =
 
 
 type Msg
-    = ResizeMessage Window.Size
+    = Elegant Elegant.Msg
 
 
 init : ( Model, Cmd Msg )
@@ -128,7 +127,9 @@ view model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        Elegant msg_ ->
+            ( Elegant.update msg_ model, Cmd.none )
 
 
 main : Program Never Model Msg
@@ -143,4 +144,4 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Window.resizes ResizeMessage
+    Elegant.resizeWindow Elegant

@@ -4,6 +4,7 @@ module Elegant
         , emptyState
         , Msg
         , update
+        , resizeWindow
         , Vector
         , Style
         , SizeUnit(..)
@@ -125,6 +126,7 @@ module Elegant
 # Initializers
 @docs emptyState
 @docs update
+@docs resizeWindow
 
 # Styling
 @docs simpleStyle
@@ -297,6 +299,12 @@ update msg (State state) =
 
         OnResizes size ->
             State { state | windowDimension = size }
+
+
+{-| -}
+resizeWindow : (Msg -> msg) -> Sub msg
+resizeWindow msg =
+    Window.resizes (msg << OnResizes)
 
 
 {-| -}
@@ -1250,37 +1258,37 @@ beta =
 {-| -}
 gamma : SizeUnit
 gamma =
-    Em 2.0
+    Em 1.6
 
 
 {-| -}
 delta : SizeUnit
 delta =
-    Em 1.8
+    Em 1.5
 
 
 {-| -}
 epsilon : SizeUnit
 epsilon =
-    Em 1.6
+    Em 1.3
 
 
 {-| -}
 zeta : SizeUnit
 zeta =
-    Em 1.4
+    Em 1.1
 
 
 {-| -}
 eta : SizeUnit
 eta =
-    Em 1.2
+    Em 1.05
 
 
 {-| -}
 theta : SizeUnit
 theta =
-    Em 1.0
+    Em 0.85
 
 
 {-| -}
@@ -1292,7 +1300,7 @@ iota =
 {-| -}
 kappa : SizeUnit
 kappa =
-    Em 0.6
+    Em 0.5
 
 
 textAlign : TextAlign -> Style -> Style
