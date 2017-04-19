@@ -24,7 +24,7 @@ btn ( paddingVertical_, paddingHorizontal_ ) =
     [ displayInlineBlock
     , verticalAlignMiddle
     , fontInherit
-    , textAlignCenter
+    , textCenter
     , margin (Px 0)
     , paddingVertical paddingVertical_
     , paddingHorizontal paddingHorizontal_

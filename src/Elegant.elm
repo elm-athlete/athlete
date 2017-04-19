@@ -92,8 +92,7 @@ module Elegant
         , transparent
         )
 
-{-| Bla
-
+{-|
 # Types
 @docs State
 @docs Msg
