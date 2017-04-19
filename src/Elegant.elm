@@ -69,6 +69,7 @@ module Elegant
         , displayInlineBlock
         , displayBlock
         , displayFlex
+        , flex
         , displayInline
         , displayNone
         , opacity
@@ -85,6 +86,8 @@ module Elegant
         , roundCorner
         , justifyContentSpaceBetween
         , justifyContentSpaceAround
+        , spaceBetween
+        , spaceAround
         , fontInherit
         , width
         , widthPercent
@@ -177,6 +180,7 @@ module Elegant
 @docs displayBlock
 @docs displayInlineBlock
 @docs displayFlex
+@docs flex
 @docs displayInline
 @docs opacity
 @docs overflowAuto
@@ -193,6 +197,8 @@ module Elegant
 @docs roundCorner
 @docs justifyContentSpaceBetween
 @docs justifyContentSpaceAround
+@docs spaceBetween
+@docs spaceAround
 @docs fontInherit
 @docs width
 @docs widthPercent
@@ -1227,6 +1233,12 @@ displayFlex =
 
 
 {-| -}
+flex : Style -> Style
+flex =
+    displayFlex
+
+
+{-| -}
 displayInline : Style -> Style
 displayInline =
     display DisplayInline
@@ -1332,9 +1344,21 @@ justifyContentSpaceBetween =
 
 
 {-| -}
+spaceBetween : Style -> Style
+spaceBetween =
+    justifyContentSpaceBetween
+
+
+{-| -}
 justifyContentSpaceAround : Style -> Style
 justifyContentSpaceAround =
     justifyContent JustifyContentSpaceAround
+
+
+{-| -}
+spaceAround : Style -> Style
+spaceAround =
+    justifyContentSpaceAround
 
 
 {-| -}
