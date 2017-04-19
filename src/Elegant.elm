@@ -1250,37 +1250,37 @@ beta =
 {-| -}
 gamma : SizeUnit
 gamma =
-    Em 1.6
+    Em 2.0
 
 
 {-| -}
 delta : SizeUnit
 delta =
-    Em 1.5
+    Em 1.8
 
 
 {-| -}
 epsilon : SizeUnit
 epsilon =
-    Em 1.3
+    Em 1.6
 
 
 {-| -}
 zeta : SizeUnit
 zeta =
-    Em 1.1
+    Em 1.4
 
 
 {-| -}
 eta : SizeUnit
 eta =
-    Em 1.05
+    Em 1.2
 
 
 {-| -}
 theta : SizeUnit
 theta =
-    Em 0.85
+    Em 1.0
 
 
 {-| -}
@@ -1292,7 +1292,7 @@ iota =
 {-| -}
 kappa : SizeUnit
 kappa =
-    Em 0.5
+    Em 0.6
 
 
 textAlign : TextAlign -> Style -> Style
