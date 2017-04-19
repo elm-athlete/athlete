@@ -9,6 +9,7 @@ module Elegant
         , SizeUnit(..)
         , small
         , tiny
+        , medium
         , simpleStyle
         , hoverStyle
         , responsiveStyle
@@ -107,6 +108,7 @@ module Elegant
 # Utilities
 @docs small
 @docs tiny
+@docs medium
 
 # Styles
 @docs position
@@ -351,15 +353,21 @@ type alias StyleTransformer =
 
 
 {-| -}
+medium : SizeUnit
+medium =
+    Px 12
+
+
+{-| -}
 small : SizeUnit
 small =
-    Px 12
+    Px 6
 
 
 {-| -}
 tiny : SizeUnit
 tiny =
-    Px 6
+    Px 3
 
 
 defaultStyle : Style
