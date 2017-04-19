@@ -36,6 +36,7 @@ module Elegant
         , paddingTop
         , paddingBottom
         , margin
+        , marginAuto
         , marginHorizontal
         , marginVertical
         , marginTop
@@ -139,6 +140,7 @@ module Elegant
 @docs paddingTop
 @docs paddingBottom
 @docs margin
+@docs marginAuto
 @docs marginHorizontal
 @docs marginVertical
 @docs marginTop
@@ -204,6 +206,15 @@ import Basics
 import Color exposing (Color)
 import Color.Convert
 import Window
+
+
+type Either a b
+    = Left a
+    | Right b
+
+
+type alias Auto =
+    ()
 
 
 {-| -}
@@ -348,10 +359,10 @@ type Style
         , paddingLeft : Maybe SizeUnit
         , paddingBottom : Maybe SizeUnit
         , paddingTop : Maybe SizeUnit
-        , marginRight : Maybe SizeUnit
-        , marginLeft : Maybe SizeUnit
-        , marginBottom : Maybe SizeUnit
-        , marginTop : Maybe SizeUnit
+        , marginRight : Maybe (Either SizeUnit Auto)
+        , marginLeft : Maybe (Either SizeUnit Auto)
+        , marginBottom : Maybe (Either SizeUnit Auto)
+        , marginTop : Maybe (Either SizeUnit Auto)
         , display : Maybe Display
         , opacity : Maybe Float
         , overflow : Maybe Overflow
@@ -517,23 +528,25 @@ concatNumberWithString number str =
     (number |> toString) ++ str
 
 
+sizeUnitToString_ : SizeUnit -> String
+sizeUnitToString_ val =
+    case val of
+        Px x ->
+            concatNumberWithString x "px"
+
+        Pt x ->
+            concatNumberWithString x "pt"
+
+        Percent x ->
+            concatNumberWithString x "%"
+
+        Em x ->
+            concatNumberWithString x "em"
+
+
 sizeUnitToString : Maybe SizeUnit -> Maybe String
 sizeUnitToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                Px x ->
-                    concatNumberWithString x "px"
-
-                Pt x ->
-                    concatNumberWithString x "pt"
-
-                Percent x ->
-                    concatNumberWithString x "%"
-
-                Em x ->
-                    concatNumberWithString x "em"
-        )
+    nothingOrJust sizeUnitToString_
 
 
 listStyleTypeToString : Maybe ListStyleType -> Maybe String
@@ -657,6 +670,19 @@ overflowToString =
         )
 
 
+marginToString : Maybe (Either SizeUnit b) -> Maybe String
+marginToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                Left su ->
+                    sizeUnitToString_ su
+
+                Right auto ->
+                    "auto"
+        )
+
+
 maybeToString : Maybe a -> Maybe String
 maybeToString =
     nothingOrJust
@@ -689,10 +715,10 @@ getStyles (Style styleValues) =
     , ( "padding-right", sizeUnitToString << .paddingRight )
     , ( "padding-top", sizeUnitToString << .paddingTop )
     , ( "padding-bottom", sizeUnitToString << .paddingBottom )
-    , ( "margin-left", sizeUnitToString << .marginLeft )
-    , ( "margin-right", sizeUnitToString << .marginRight )
-    , ( "margin-top", sizeUnitToString << .marginTop )
-    , ( "margin-bottom", sizeUnitToString << .marginBottom )
+    , ( "margin-left", marginToString << .marginLeft )
+    , ( "margin-right", marginToString << .marginRight )
+    , ( "margin-top", marginToString << .marginTop )
+    , ( "margin-bottom", marginToString << .marginBottom )
     , ( "list-style-type", listStyleTypeToString << .listStyleType )
     , ( "align-items", alignItemsToString << .alignItems )
     , ( "justify-content", justifyContentToString << .justifyContent )
@@ -936,9 +962,20 @@ margin size =
 
 
 {-| -}
+marginAuto : Style -> Style
+marginAuto =
+    marginHorizontalAuto
+
+
+{-| -}
 marginHorizontal : SizeUnit -> Style -> Style
 marginHorizontal size =
     marginLeft size << marginRight size
+
+
+marginHorizontalAuto : Style -> Style
+marginHorizontalAuto =
+    marginLeftAuto << marginRightAuto
 
 
 {-| -}
@@ -950,25 +987,35 @@ marginVertical size =
 {-| -}
 marginLeft : SizeUnit -> Style -> Style
 marginLeft size (Style style) =
-    Style { style | marginLeft = Just size }
+    Style { style | marginLeft = Just <| Left size }
+
+
+marginLeftAuto : Style -> Style
+marginLeftAuto (Style style) =
+    Style { style | marginLeft = Just <| Right () }
 
 
 {-| -}
 marginTop : SizeUnit -> Style -> Style
 marginTop size (Style style) =
-    Style { style | marginTop = Just size }
+    Style { style | marginTop = Just <| Left size }
 
 
 {-| -}
 marginRight : SizeUnit -> Style -> Style
 marginRight size (Style style) =
-    Style { style | marginRight = Just size }
+    Style { style | marginRight = Just <| Left size }
+
+
+marginRightAuto : Style -> Style
+marginRightAuto (Style style) =
+    Style { style | marginRight = Just <| Right () }
 
 
 {-| -}
 marginBottom : SizeUnit -> Style -> Style
 marginBottom size (Style style) =
-    Style { style | marginBottom = Just size }
+    Style { style | marginBottom = Just <| Left size }
 
 
 textTransform : TextTransform -> Style -> Style
