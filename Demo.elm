@@ -16,7 +16,7 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    ( Elegant.emptyState, Cmd.none )
+    ( Elegant.emptyState, Elegant.initialSize Elegant )
 
 
 view : Model -> Html.Html Msg

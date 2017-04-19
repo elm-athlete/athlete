@@ -4,6 +4,7 @@ module Elegant
         , emptyState
         , Msg
         , update
+        , initialSize
         , resizeWindow
         , Vector
         , Style
@@ -127,6 +128,7 @@ module Elegant
 @docs emptyState
 @docs update
 @docs resizeWindow
+@docs initialSize
 
 # Styling
 @docs simpleStyle
@@ -249,6 +251,7 @@ import Basics
 import Color exposing (Color)
 import Color.Convert
 import Window
+import Task
 
 
 type Either a b
@@ -305,6 +308,12 @@ update msg (State state) =
 resizeWindow : (Msg -> msg) -> Sub msg
 resizeWindow msg =
     Window.resizes (msg << OnResizes)
+
+
+{-| -}
+initialSize : (Msg -> msg) -> Cmd msg
+initialSize msg =
+    Task.perform (msg << OnResizes) Window.size
 
 
 {-| -}
