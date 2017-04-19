@@ -88,8 +88,12 @@ module Elegant
         , fontInherit
         , width
         , widthPercent
+        , maxWidth
+        , minWidth
         , height
         , heightPercent
+        , maxHeight
+        , minHeight
         , transparent
         )
 
@@ -192,8 +196,12 @@ module Elegant
 @docs fontInherit
 @docs width
 @docs widthPercent
+@docs maxWidth
+@docs minWidth
 @docs height
 @docs heightPercent
+@docs maxHeight
+@docs minHeight
 
 # Constants
 @docs transparent
@@ -379,7 +387,11 @@ type Style
         , alignItems : Maybe AlignItems
         , justifyContent : Maybe JustifyContent
         , width : Maybe SizeUnit
+        , maxWidth : Maybe SizeUnit
+        , minWidth : Maybe SizeUnit
         , height : Maybe SizeUnit
+        , maxHeight : Maybe SizeUnit
+        , minHeight : Maybe SizeUnit
         }
 
 
@@ -443,7 +455,11 @@ defaultStyle =
         , alignItems = Nothing
         , justifyContent = Nothing
         , width = Nothing
+        , maxWidth = Nothing
+        , minWidth = Nothing
         , height = Nothing
+        , maxHeight = Nothing
+        , minHeight = Nothing
         }
 
 
@@ -726,7 +742,11 @@ getStyles (Style styleValues) =
     , ( "font-style", fontStyleToString << .fontStyle )
     , ( "fontSize", sizeUnitToString << .fontSize )
     , ( "width", sizeUnitToString << .width )
+    , ( "max-width", sizeUnitToString << .maxWidth )
+    , ( "min-width", sizeUnitToString << .minWidth )
     , ( "height", sizeUnitToString << .height )
+    , ( "max-height", sizeUnitToString << .maxHeight )
+    , ( "min-height", sizeUnitToString << .minHeight )
     ]
         |> List.map
             (\( attrName, fun ) ->
@@ -1336,8 +1356,32 @@ widthPercent =
 
 
 {-| -}
+maxWidth : SizeUnit -> Style -> Style
+maxWidth value (Style style) =
+    Style { style | maxWidth = Just value }
+
+
+{-| -}
+minWidth : SizeUnit -> Style -> Style
+minWidth value (Style style) =
+    Style { style | maxWidth = Just value }
+
+
+{-| -}
 height : SizeUnit -> Style -> Style
 height value (Style style) =
+    Style { style | height = Just value }
+
+
+{-| -}
+maxHeight : SizeUnit -> Style -> Style
+maxHeight value (Style style) =
+    Style { style | height = Just value }
+
+
+{-| -}
+minHeight : SizeUnit -> Style -> Style
+minHeight value (Style style) =
     Style { style | height = Just value }
 
 
