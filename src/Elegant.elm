@@ -51,13 +51,15 @@ module Elegant
         , lineThrough
         , bold
         , strong
+        , lineHeight
         , fontWeightNormal
         , fontStyleNormal
         , fontStyleItalic
-        , textAlignCenter
-        , textAlignRight
-        , textAlignLeft
-        , textAlignJustify
+        , fontSize
+        , textCenter
+        , textRight
+        , textLeft
+        , textJustify
         , backgroundColor
         , borderColor
         , borderStyle
@@ -68,6 +70,11 @@ module Elegant
         , displayFlex
         , displayInline
         , displayNone
+        , opacity
+        , overflowAuto
+        , overflowVisible
+        , overflowHidden
+        , overflowScroll
         , listStyleNone
         , listStyleDisc
         , listStyleCircle
@@ -148,13 +155,15 @@ module Elegant
 @docs lineThrough
 @docs bold
 @docs strong
+@docs lineHeight
 @docs fontWeightNormal
 @docs fontStyleNormal
 @docs fontStyleItalic
-@docs textAlignCenter
-@docs textAlignLeft
-@docs textAlignRight
-@docs textAlignJustify
+@docs fontSize
+@docs textCenter
+@docs textLeft
+@docs textRight
+@docs textJustify
 @docs backgroundColor
 @docs borderColor
 @docs borderStyle
@@ -164,6 +173,11 @@ module Elegant
 @docs displayInlineBlock
 @docs displayFlex
 @docs displayInline
+@docs opacity
+@docs overflowAuto
+@docs overflowHidden
+@docs overflowScroll
+@docs overflowVisible
 @docs displayNone
 @docs listStyleNone
 @docs listStyleDisc
@@ -309,6 +323,13 @@ type FontStyle
     | FontStyleItalic
 
 
+type Overflow
+    = OverflowVisible
+    | OverflowHidden
+    | OverflowAuto
+    | OverflowScroll
+
+
 {-| Contains all style for an element used with Elegant.
 -}
 type Style
@@ -333,13 +354,17 @@ type Style
         , marginBottom : Maybe SizeUnit
         , marginTop : Maybe SizeUnit
         , display : Maybe Display
+        , opacity : Maybe Float
+        , overflow : Maybe Overflow
         , listStyleType : Maybe ListStyleType
         , verticalAlign : Maybe String
         , textAlign : Maybe TextAlign
         , textTransform : Maybe TextTransform
         , textDecoration : Maybe TextDecoration
+        , lineHeight : Maybe SizeUnit
         , fontWeight : Maybe Int
         , fontStyle : Maybe FontStyle
+        , fontSize : Maybe SizeUnit
         , font : Maybe String
         , alignItems : Maybe AlignItems
         , justifyContent : Maybe JustifyContent
@@ -393,13 +418,17 @@ defaultStyle =
         , marginBottom = Nothing
         , marginTop = Nothing
         , display = Nothing
+        , opacity = Nothing
+        , overflow = Nothing
         , listStyleType = Nothing
         , verticalAlign = Nothing
         , textAlign = Nothing
         , textTransform = Nothing
         , textDecoration = Nothing
+        , lineHeight = Nothing
         , fontWeight = Nothing
         , fontStyle = Nothing
+        , fontSize = Nothing
         , font = Nothing
         , alignItems = Nothing
         , justifyContent = Nothing
@@ -600,13 +629,32 @@ textAlignToString =
                     "center"
 
                 TextAlignLeft ->
-                    "right"
+                    "left"
 
                 TextAlignRight ->
-                    "left"
+                    "right"
 
                 TextAlignJustify ->
                     "justify"
+        )
+
+
+overflowToString : Maybe Overflow -> Maybe String
+overflowToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                OverflowAuto ->
+                    "auto"
+
+                OverflowScroll ->
+                    "scroll"
+
+                OverflowHidden ->
+                    "hidden"
+
+                OverflowVisible ->
+                    "visible"
         )
 
 
@@ -627,9 +675,12 @@ getStyles (Style styleValues) =
     , ( "right", sizeUnitToString << .right )
     , ( "color", colorToString << .textColor )
     , ( "display", displayToString << .display )
+    , ( "opacity", maybeToString << .opacity )
+    , ( "overflow", overflowToString << .overflow )
     , ( "text-align", textAlignToString << .textAlign )
     , ( "text-transform", textTransformToString << .textTransform )
     , ( "text-decoration", textDecorationToString << .textDecoration )
+    , ( "lineHeight", sizeUnitToString << .lineHeight )
     , ( "background-color", colorToString << .backgroundColor )
     , ( "border-radius", sizeUnitToString << .borderRadius )
     , ( "border-color", colorToString << .borderColor )
@@ -648,6 +699,7 @@ getStyles (Style styleValues) =
     , ( "justify-content", justifyContentToString << .justifyContent )
     , ( "font-weight", maybeToString << .fontWeight )
     , ( "font-style", fontStyleToString << .fontStyle )
+    , ( "fontSize", sizeUnitToString << .fontSize )
     , ( "width", sizeUnitToString << .width )
     , ( "height", sizeUnitToString << .height )
     ]
@@ -985,6 +1037,12 @@ strong =
 
 
 {-| -}
+lineHeight : SizeUnit -> Style -> Style
+lineHeight val (Style style) =
+    Style { style | lineHeight = Just val }
+
+
+{-| -}
 fontWeightNormal : Style -> Style
 fontWeightNormal =
     fontWeight 400
@@ -1013,32 +1071,38 @@ fontStyleItalic =
     fontStyle FontStyleItalic
 
 
+{-| -}
+fontSize : SizeUnit -> Style -> Style
+fontSize val (Style style) =
+    Style { style | fontSize = Just val }
+
+
 textAlign : TextAlign -> Style -> Style
 textAlign val (Style style) =
     Style { style | textAlign = Just val }
 
 
 {-| -}
-textAlignCenter : Style -> Style
-textAlignCenter =
+textCenter : Style -> Style
+textCenter =
     textAlign TextAlignCenter
 
 
 {-| -}
-textAlignRight : Style -> Style
-textAlignRight =
+textRight : Style -> Style
+textRight =
     textAlign TextAlignRight
 
 
 {-| -}
-textAlignLeft : Style -> Style
-textAlignLeft =
+textLeft : Style -> Style
+textLeft =
     textAlign TextAlignLeft
 
 
 {-| -}
-textAlignJustify : Style -> Style
-textAlignJustify =
+textJustify : Style -> Style
+textJustify =
     textAlign TextAlignJustify
 
 
@@ -1106,6 +1170,41 @@ displayInline =
 displayNone : Style -> Style
 displayNone =
     display DisplayNone
+
+
+{-| -}
+opacity : Float -> Style -> Style
+opacity val (Style style) =
+    Style { style | opacity = Just val }
+
+
+overflow : Overflow -> Style -> Style
+overflow val (Style style) =
+    Style { style | overflow = Just val }
+
+
+{-| -}
+overflowAuto : Style -> Style
+overflowAuto =
+    overflow OverflowAuto
+
+
+{-| -}
+overflowVisible : Style -> Style
+overflowVisible =
+    overflow OverflowVisible
+
+
+{-| -}
+overflowHidden : Style -> Style
+overflowHidden =
+    overflow OverflowHidden
+
+
+{-| -}
+overflowScroll : Style -> Style
+overflowScroll =
+    overflow OverflowScroll
 
 
 listStyleType : ListStyleType -> Style -> Style
