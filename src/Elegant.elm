@@ -28,6 +28,7 @@ module Elegant
         , alignItemsInherit
         , alignItemsInitial
         , alignItemsStretch
+        , alignSelfCenter
         , padding
         , paddingHorizontal
         , paddingVertical
@@ -70,6 +71,8 @@ module Elegant
         , displayBlock
         , displayFlex
         , flex
+        , flexWrapWrap
+        , flexWrapNoWrap
         , displayInline
         , displayNone
         , opacity
@@ -139,6 +142,7 @@ module Elegant
 @docs alignItemsInherit
 @docs alignItemsInitial
 @docs alignItemsStretch
+@docs alignSelfCenter
 @docs padding
 @docs paddingHorizontal
 @docs paddingVertical
@@ -181,6 +185,8 @@ module Elegant
 @docs displayInlineBlock
 @docs displayFlex
 @docs flex
+@docs flexWrapWrap
+@docs flexWrapNoWrap
 @docs displayInline
 @docs opacity
 @docs overflowAuto
@@ -283,6 +289,7 @@ type SizeUnit
     | Pt Int
     | Percent Float
     | Em Float
+    | Rem Float
 
 
 type Position
@@ -354,6 +361,15 @@ type Overflow
     | OverflowScroll
 
 
+type FlexWrap
+    = FlexWrapWrap
+    | FlexWrapNoWrap
+
+
+type AlignSelf
+    = AlignSelfCenter
+
+
 {-| Contains all style for an element used with Elegant.
 -}
 type Style
@@ -378,6 +394,8 @@ type Style
         , marginBottom : Maybe (Either SizeUnit Auto)
         , marginTop : Maybe (Either SizeUnit Auto)
         , display : Maybe Display
+        , flex : Maybe Int
+        , flexWrap : Maybe FlexWrap
         , opacity : Maybe Float
         , overflow : Maybe Overflow
         , listStyleType : Maybe ListStyleType
@@ -391,6 +409,7 @@ type Style
         , fontSize : Maybe SizeUnit
         , font : Maybe String
         , alignItems : Maybe AlignItems
+        , alignSelf : Maybe AlignSelf
         , justifyContent : Maybe JustifyContent
         , width : Maybe SizeUnit
         , maxWidth : Maybe SizeUnit
@@ -446,6 +465,8 @@ defaultStyle =
         , marginBottom = Nothing
         , marginTop = Nothing
         , display = Nothing
+        , flex = Nothing
+        , flexWrap = Nothing
         , opacity = Nothing
         , overflow = Nothing
         , listStyleType = Nothing
@@ -459,6 +480,7 @@ defaultStyle =
         , fontSize = Nothing
         , font = Nothing
         , alignItems = Nothing
+        , alignSelf = Nothing
         , justifyContent = Nothing
         , width = Nothing
         , maxWidth = Nothing
@@ -564,6 +586,9 @@ sizeUnitToString_ val =
 
         Em x ->
             concatNumberWithString x "em"
+
+        Rem x ->
+            concatNumberWithString x "rem"
 
 
 sizeUnitToString : Maybe SizeUnit -> Maybe String
@@ -705,6 +730,29 @@ marginToString =
         )
 
 
+flexWrapToString : Maybe FlexWrap -> Maybe String
+flexWrapToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                FlexWrapWrap ->
+                    "wrap"
+
+                FlexWrapNoWrap ->
+                    "nowrap"
+        )
+
+
+alignSelfToString : Maybe AlignSelf -> Maybe String
+alignSelfToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                AlignSelfCenter ->
+                    "center"
+        )
+
+
 maybeToString : Maybe a -> Maybe String
 maybeToString =
     nothingOrJust
@@ -722,6 +770,8 @@ getStyles (Style styleValues) =
     , ( "right", sizeUnitToString << .right )
     , ( "color", colorToString << .textColor )
     , ( "display", displayToString << .display )
+    , ( "flex", maybeToString << .flex )
+    , ( "flex-wrap", flexWrapToString << .flexWrap )
     , ( "opacity", maybeToString << .opacity )
     , ( "overflow", overflowToString << .overflow )
     , ( "text-align", textAlignToString << .textAlign )
@@ -743,6 +793,7 @@ getStyles (Style styleValues) =
     , ( "margin-bottom", marginToString << .marginBottom )
     , ( "list-style-type", listStyleTypeToString << .listStyleType )
     , ( "align-items", alignItemsToString << .alignItems )
+    , ( "align-self", alignSelfToString << .alignSelf )
     , ( "justify-content", justifyContentToString << .justifyContent )
     , ( "font-weight", maybeToString << .fontWeight )
     , ( "font-style", fontStyleToString << .fontStyle )
@@ -937,6 +988,17 @@ alignItemsInitial =
 alignItemsStretch : Style -> Style
 alignItemsStretch =
     alignItems AlignItemsStretch
+
+
+alignSelf : AlignSelf -> Style -> Style
+alignSelf value (Style style) =
+    Style { style | alignSelf = Just value }
+
+
+{-| -}
+alignSelfCenter : Style -> Style
+alignSelfCenter =
+    alignSelf AlignSelfCenter
 
 
 {-| -}
@@ -1233,12 +1295,6 @@ displayFlex =
 
 
 {-| -}
-flex : Style -> Style
-flex =
-    displayFlex
-
-
-{-| -}
 displayInline : Style -> Style
 displayInline =
     display DisplayInline
@@ -1248,6 +1304,29 @@ displayInline =
 displayNone : Style -> Style
 displayNone =
     display DisplayNone
+
+
+{-| -}
+flex : Int -> Style -> Style
+flex val (Style style) =
+    Style { style | flex = Just val }
+
+
+flexWrap : FlexWrap -> Style -> Style
+flexWrap val (Style style) =
+    Style { style | flexWrap = Just val }
+
+
+{-| -}
+flexWrapWrap : Style -> Style
+flexWrapWrap =
+    flexWrap FlexWrapWrap
+
+
+{-| -}
+flexWrapNoWrap : Style -> Style
+flexWrapNoWrap =
+    flexWrap FlexWrapNoWrap
 
 
 {-| -}
