@@ -3,7 +3,7 @@ module Demo exposing (..)
 import Elegant exposing (..)
 import Elegant.Elements exposing (..)
 import Color exposing (..)
-import Html exposing (text, div, h3)
+import Html exposing (text, div, h1, h3)
 
 
 type alias Model =
@@ -26,7 +26,41 @@ view model =
             responsiveStyle model
     in
         div (simpleStyle [ maxWidth (Percent 100), width (Px 1024), marginAuto, padding medium ])
-            [ h3
+            [ h1
+                (simpleStyle
+                    [ paddingBottom tiny
+                    , textCenter
+                    , fontSize alpha
+                    ]
+                )
+                [ text "Elegant" ]
+            , h3
+                (simpleStyle
+                    [ paddingBottom tiny
+                    ]
+                )
+                [ text "Responsive" ]
+            , div
+                (windowResponsiveStyle
+                    (\{ width, height } ->
+                        [ textCenter
+                        , backgroundColor
+                            (Color.rgb
+                                ((255 * ((width |> toFloat) / 1024)) |> round)
+                                ((255 * ((height |> toFloat) / 1024)) |> round)
+                                255
+                            )
+                        , textColor
+                            (if width > 612 && height > 612 then
+                                black
+                             else
+                                white
+                            )
+                        ]
+                    )
+                )
+                [ text "My color is responsive, it is function of the window size" ]
+            , h3
                 (simpleStyle
                     [ paddingBottom tiny
                     ]
@@ -126,26 +160,6 @@ view model =
                 [ text "I am the epsilon" ]
             , div (simpleStyle [ textCenter, padding medium, displayInlineBlock, roundCorner, strong, uppercase, border black, padding medium ])
                 [ text "I am round, strong and uppercase" ]
-            , div
-                (windowResponsiveStyle
-                    (\{ width, height } ->
-                        [ textCenter
-                        , backgroundColor
-                            (Color.rgb
-                                ((255 * ((width |> toFloat) / 1024)) |> round)
-                                ((255 * ((height |> toFloat) / 1024)) |> round)
-                                255
-                            )
-                        , textColor
-                            (if width > 612 && height > 612 then
-                                black
-                             else
-                                white
-                            )
-                        ]
-                    )
-                )
-                [ text "My color is responsive, it is function of the window size" ]
             ]
 
 
