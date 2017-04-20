@@ -10,37 +10,102 @@ module Demo exposing (..)
 import Elegant exposing (..)
 import Elegant.Elements exposing (..)
 import Color exposing (..)
-import Html exposing (text, div, h3)
+import Html exposing (text, div, h1, h3)
 
 
 type alias Model =
-    Elegant.State
+    { elegantState : Elegant.State
+    , blueComponent : Int
+    }
 
 
 type Msg
-    = Elegant Elegant.Msg
+    = ElegantMsg Elegant.Msg
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Elegant.emptyState, Elegant.initialSize Elegant )
+    ( Model Elegant.emptyState 240, Elegant.initialSize ElegantMsg )
 
 
 view : Model -> Html.Html Msg
 view model =
     let
-        windowResponsiveStyle =
-            responsiveStyle model
+        ( x, y ) =
+            getWindowSize model.elegantState
+
+        windowHoverStyle id =
+            hoverStyle ( model.elegantState, id, ElegantMsg )
     in
-        div (simpleStyle [ maxWidth (Percent 100), width (Px 1024), marginAuto, padding medium ])
-            [ h3
-                (simpleStyle
+        div (style [ maxWidth (Percent 100), width (Px 1024), marginAuto, padding medium ])
+            [ h1
+                (style
+                    [ paddingBottom tiny
+                    , textCenter
+                    , fontSize alpha
+                    ]
+                )
+                [ text "Elegant" ]
+            , h3
+                (style
+                    [ paddingBottom tiny
+                    ]
+                )
+                [ text "Responsive" ]
+            , div
+                (style
+                    [ textCenter
+                    , backgroundColor
+                        (Color.rgb
+                            ((255 * ((x |> toFloat) / 1024)) |> round)
+                            ((255 * ((y |> toFloat) / 1024)) |> round)
+                            255
+                        )
+                    , textColor
+                        (if x > 612 && y > 612 then
+                            black
+                         else
+                            white
+                        )
+                    ]
+                )
+                [ text "My color is responsive, it is function of the window size" ]
+            , div
+                (windowHoverStyle "first"
+                    (\hover ->
+                        [ textCenter
+                        , backgroundColor
+                            (if hover then
+                                (Color.rgb 40 160 model.blueComponent)
+                             else
+                                (Color.rgb (255 - 40) (255 - 160) (255 - model.blueComponent))
+                            )
+                        ]
+                    )
+                )
+                [ text <| "I'm changing color when hovering" ]
+            , div
+                (windowHoverStyle "second"
+                    (\hover ->
+                        [ textCenter
+                        , backgroundColor
+                            (if hover then
+                                (Color.rgb 40 160 240)
+                             else
+                                (Color.rgb (255 - 40) (255 - 160) (255 - 240))
+                            )
+                        ]
+                    )
+                )
+                [ text "I'm changing color when hovering" ]
+            , h3
+                (style
                     [ paddingBottom tiny
                     ]
                 )
                 [ text "Alignment" ]
             , div
-                (simpleStyle
+                (style
                     [ width (Px 400)
                     , marginAuto
                     , border black
@@ -49,7 +114,7 @@ view model =
                 )
                 [ text "I'm centered with auto margins and a width of 400px" ]
             , div
-                (simpleStyle
+                (style
                     [ width (Px 600)
                     , marginAuto
                     , border black
@@ -58,25 +123,25 @@ view model =
                 )
                 [ text "I'm centered with auto margins and a width of 600px" ]
             , div
-                (simpleStyle
+                (style
                     [ textCenter
                     ]
                 )
                 [ text "I'm centered" ]
             , div
-                (simpleStyle
+                (style
                     [ textRight
                     ]
                 )
                 [ text "I'm right aligned" ]
             , div
-                (simpleStyle
+                (style
                     [ textLeft
                     ]
                 )
                 [ text "I'm left aligned" ]
             , div
-                (simpleStyle
+                (style
                     [ backgroundColor (Color.rgb 40 160 240)
                     , textColor (Color.rgb (255 - 40) (255 - 160) (255 - 240))
                     , padding medium
@@ -84,83 +149,68 @@ view model =
                 )
                 [ text "I'm colored" ]
             , div
-                (simpleStyle
+                (style
                     [ border black
                     , borderWidth 3
                     ]
                 )
                 [ text "I have a big black border" ]
             , h3
-                (simpleStyle
+                (style
                     [ paddingBottom tiny
                     ]
                 )
                 [ text "Flex" ]
-            , div (simpleStyle [ displayFlex, spaceBetween ])
-                [ div (simpleStyle [ padding medium ]) [ text "Some" ]
-                , div (simpleStyle [ padding medium ]) [ text "Flex" ]
-                , div (simpleStyle [ padding medium ]) [ text "Elements" ]
-                , div (simpleStyle [ padding medium ]) [ text "With" ]
-                , div (simpleStyle [ padding medium ]) [ text "Space" ]
-                , div (simpleStyle [ padding medium ]) [ text "Between" ]
+            , div (style [ displayFlex, spaceBetween ])
+                [ div (style [ padding medium ]) [ text "Some" ]
+                , div (style [ padding medium ]) [ text "Flex" ]
+                , div (style [ padding medium ]) [ text "Elements" ]
+                , div (style [ padding medium ]) [ text "With" ]
+                , div (style [ padding medium ]) [ text "Space" ]
+                , div (style [ padding medium ]) [ text "Between" ]
                 ]
-            , div (simpleStyle [ displayFlex, spaceAround ])
-                [ div (simpleStyle [ padding medium ]) [ text "Some" ]
-                , div (simpleStyle [ padding medium ]) [ text "Flex" ]
-                , div (simpleStyle [ padding medium ]) [ text "Elements" ]
-                , div (simpleStyle [ padding medium ]) [ text "With" ]
-                , div (simpleStyle [ padding medium ]) [ text "Space" ]
-                , div (simpleStyle [ padding medium ]) [ text "Around" ]
+            , div (style [ displayFlex, spaceAround ])
+                [ div (style [ padding medium ]) [ text "Some" ]
+                , div (style [ padding medium ]) [ text "Flex" ]
+                , div (style [ padding medium ]) [ text "Elements" ]
+                , div (style [ padding medium ]) [ text "With" ]
+                , div (style [ padding medium ]) [ text "Space" ]
+                , div (style [ padding medium ]) [ text "Around" ]
                 ]
-            , div (simpleStyle [ displayFlex, spaceBetween, alignItemsCenter ])
-                [ div (simpleStyle [ padding medium ]) [ text "Some" ]
-                , div (simpleStyle [ padding medium ]) [ text "Flex" ]
-                , div (simpleStyle [ padding medium ]) [ text "Elements" ]
-                , div (simpleStyle [ padding medium ]) [ text "With" ]
-                , div (simpleStyle [ padding medium ]) [ text "Space" ]
-                , div (simpleStyle [ padding medium ]) [ text "Between" ]
-                , div (simpleStyle [ padding medium, flex 1, textRight ]) [ text "And one element taking the rest of the place" ]
+            , div (style [ displayFlex, spaceBetween, alignItemsCenter ])
+                [ div (style [ padding medium ]) [ text "Some" ]
+                , div (style [ padding medium ]) [ text "Flex" ]
+                , div (style [ padding medium ]) [ text "Elements" ]
+                , div (style [ padding medium ]) [ text "With" ]
+                , div (style [ padding medium ]) [ text "Space" ]
+                , div (style [ padding medium ]) [ text "Between" ]
+                , div (style [ padding medium, flex 1, textRight ]) [ text "And one element taking the rest of the place" ]
                 ]
-            , div (simpleStyle [ textCenter, padding medium, fontSize alpha ])
+            , div (style [ textCenter, padding medium, fontSize alpha ])
                 [ text "I am the alpha" ]
-            , div (simpleStyle [ textCenter, padding medium, fontSize beta ])
+            , div (style [ textCenter, padding medium, fontSize beta ])
                 [ text "I am the beta" ]
-            , div (simpleStyle [ textCenter, padding medium, fontSize gamma ])
+            , div (style [ textCenter, padding medium, fontSize gamma ])
                 [ text "I am the gamma" ]
-            , div (simpleStyle [ textCenter, padding medium, fontSize delta ])
+            , div (style [ textCenter, padding medium, fontSize delta ])
                 [ text "I am the delta" ]
-            , div (simpleStyle [ textCenter, padding medium, fontSize epsilon ])
+            , div (style [ textCenter, padding medium, fontSize epsilon ])
                 [ text "I am the epsilon" ]
-            , div (simpleStyle [ textCenter, padding medium, displayInlineBlock, roundCorner, strong, uppercase, border black, padding medium ])
+            , div (style [ textCenter, padding medium, displayInlineBlock, roundCorner, strong, uppercase, border black, padding medium ])
                 [ text "I am round, strong and uppercase" ]
-            , div
-                (windowResponsiveStyle
-                    (\{ width, height } ->
-                        [ textCenter
-                        , backgroundColor
-                            (Color.rgb
-                                ((255 * ((width |> toFloat) / 1024)) |> round)
-                                ((255 * ((height |> toFloat) / 1024)) |> round)
-                                255
-                            )
-                        , textColor
-                            (if width > 612 && height > 612 then
-                                black
-                             else
-                                white
-                            )
-                        ]
-                    )
-                )
-                [ text "My color is responsive, it is function of the window size" ]
             ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Elegant msg_ ->
-            ( Elegant.update msg_ model, Cmd.none )
+        ElegantMsg msg_ ->
+            ( updateElegantState msg_ model, Cmd.none )
+
+
+updateElegantState : Elegant.Msg -> Model -> Model
+updateElegantState msg model =
+    { model | elegantState = Elegant.update msg model.elegantState }
 
 
 main : Program Never Model Msg
@@ -175,5 +225,5 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Elegant.resizeWindow Elegant
+    Elegant.resizeWindow ElegantMsg
 ```

@@ -2,6 +2,7 @@ module Elegant
     exposing
         ( State
         , emptyState
+        , getWindowSize
         , Msg
         , update
         , initialSize
@@ -12,10 +13,8 @@ module Elegant
         , small
         , tiny
         , medium
-        , simpleStyle
+        , style
         , hoverStyle
-        , responsiveStyle
-        , responsiveHoverStyle
         , position
         , left
         , right
@@ -119,29 +118,27 @@ module Elegant
 # Types
 @docs State
 @docs Msg
-@docs State
 @docs Vector
 @docs Style
 @docs SizeUnit
 
 # Initializers
 @docs emptyState
-@docs update
 @docs resizeWindow
 @docs initialSize
 
-# Styling
-@docs simpleStyle
-@docs hoverStyle
-@docs responsiveStyle
-@docs responsiveHoverStyle
+# Getters
+@docs getWindowSize
 
-# Utilities
-@docs small
-@docs tiny
-@docs medium
+# Update
+@docs update
+
+# Styling
+@docs style
+@docs hoverStyle
 
 # Styles
+## Positions
 @docs position
 @docs left
 @docs right
@@ -149,6 +146,8 @@ module Elegant
 @docs bottom
 @docs absolutelyPositionned
 @docs verticalAlignMiddle
+
+## Align Items
 @docs alignItemsBaseline
 @docs alignItemsCenter
 @docs alignItemsFlexStart
@@ -157,6 +156,8 @@ module Elegant
 @docs alignItemsInitial
 @docs alignItemsStretch
 @docs alignSelfCenter
+
+## Paddings
 @docs padding
 @docs paddingHorizontal
 @docs paddingVertical
@@ -164,6 +165,8 @@ module Elegant
 @docs paddingRight
 @docs paddingTop
 @docs paddingBottom
+
+## Margins
 @docs margin
 @docs marginAuto
 @docs marginHorizontal
@@ -172,6 +175,8 @@ module Elegant
 @docs marginBottom
 @docs marginLeft
 @docs marginRight
+
+## Text Attributes
 @docs textColor
 @docs uppercase
 @docs lowercase
@@ -186,51 +191,62 @@ module Elegant
 @docs fontStyleNormal
 @docs fontStyleItalic
 @docs fontSize
-@docs alpha
-@docs alpha
-@docs beta
-@docs gamma
-@docs delta
-@docs epsilon
-@docs zeta
-@docs eta
-@docs theta
-@docs iota
-@docs kappa
+
+## Text Alignements
 @docs textCenter
 @docs textLeft
 @docs textRight
 @docs textJustify
 @docs backgroundColor
+
+## Border
 @docs borderColor
 @docs borderStyle
 @docs borderWidth
 @docs borderAndTextColor
+
+## Display
 @docs displayBlock
 @docs displayInlineBlock
 @docs displayFlex
+@docs displayInline
+@docs displayNone
+
+## Flex Attributes
 @docs flex
 @docs flexWrapWrap
 @docs flexWrapNoWrap
-@docs displayInline
+
+## Opacity
 @docs opacity
+
+## Overflow
 @docs overflowAuto
 @docs overflowHidden
 @docs overflowScroll
 @docs overflowVisible
-@docs displayNone
+
+## List Style Type
 @docs listStyleNone
 @docs listStyleDisc
 @docs listStyleCircle
 @docs listStyleSquare
 @docs listStyleDecimal
 @docs listStyleGeorgian
+
+## Round
 @docs roundCorner
+
+## Justify Content
 @docs justifyContentSpaceBetween
 @docs justifyContentSpaceAround
+
+## Spacings
 @docs spaceBetween
 @docs spaceAround
 @docs fontInherit
+
+## Width and Height
 @docs width
 @docs widthPercent
 @docs maxWidth
@@ -241,7 +257,26 @@ module Elegant
 @docs minHeight
 
 # Constants
+## Sizes
+@docs small
+@docs tiny
+@docs medium
+
+## Color
 @docs transparent
+
+## Font Sizes
+@docs alpha
+@docs beta
+@docs gamma
+@docs delta
+@docs epsilon
+@docs zeta
+@docs eta
+@docs theta
+@docs iota
+@docs kappa
+
 -}
 
 import Html exposing (Html)
@@ -281,6 +316,17 @@ emptyState =
             , height = 0
             }
         }
+
+
+{-| -}
+getWindowSize : State -> ( Int, Int )
+getWindowSize (State state) =
+    state.windowDimension |> sizeToTuple
+
+
+sizeToTuple : Window.Size -> ( Int, Int )
+sizeToTuple { width, height } =
+    ( width, height )
 
 
 {-| -}
@@ -765,7 +811,7 @@ marginToString =
                 Left su ->
                     sizeUnitToString_ su
 
-                Right auto ->
+                Right _ ->
                     "auto"
         )
 
@@ -883,10 +929,10 @@ convertStyles =
 
 
 {-| -}
-simpleStyle :
+style :
     List StyleTransformer
     -> List (Html.Attribute msg)
-simpleStyle =
+style =
     List.singleton
         << Html.Attributes.style
         << convertStyles
@@ -900,33 +946,7 @@ hoverStyle :
 hoverStyle ( state, id, msg ) styles =
     selectedElement state id
         |> styles
-        |> simpleStyle
-        |> List.append
-            [ Html.Events.onMouseEnter <| msg <| OnMouseEnter id
-            , Html.Events.onMouseLeave <| msg <| OnMouseLeave id
-            ]
-
-
-{-| -}
-responsiveStyle :
-    State
-    -> (Window.Size -> List StyleTransformer)
-    -> List (Html.Attribute msg)
-responsiveStyle (State state) styles =
-    state.windowDimension
-        |> styles
-        |> simpleStyle
-
-
-{-| -}
-responsiveHoverStyle :
-    ( State, String, Msg -> msg )
-    -> (Window.Size -> Bool -> List StyleTransformer)
-    -> List (Html.Attribute msg)
-responsiveHoverStyle ( State state, id, msg ) styles =
-    selectedElement (State state) id
-        |> styles state.windowDimension
-        |> simpleStyle
+        |> style
         |> List.append
             [ Html.Events.onMouseEnter <| msg <| OnMouseEnter id
             , Html.Events.onMouseLeave <| msg <| OnMouseLeave id
