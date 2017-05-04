@@ -18,7 +18,8 @@ compose =
     List.foldr (>>) identity
 
 
-{-| -}
+{-| Create a button
+-}
 btn : ( SizeUnit, SizeUnit ) -> Style -> Style
 btn ( paddingVertical_, paddingHorizontal_ ) =
     [ displayInlineBlock
@@ -32,7 +33,8 @@ btn ( paddingVertical_, paddingHorizontal_ ) =
         |> compose
 
 
-{-| -}
+{-| Create a border style
+-}
 border : Color -> Style -> Style
 border color =
     [ borderColor color
