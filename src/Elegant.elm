@@ -75,13 +75,24 @@ module Elegant
         , whiteSpaceNoWrap
         , backgroundColor
         , borderColor
-        , borderStyle
+        , borderSolid
         , borderWidth
         , borderBottomColor
         , borderBottomWidth
         , borderBottomSolid
+        , borderLeftColor
+        , borderLeftWidth
+        , borderLeftSolid
+        , borderTopColor
+        , borderTopWidth
+        , borderTopSolid
+        , borderRightColor
+        , borderRightWidth
+        , borderRightSolid
         , borderBottomLeftRadius
         , borderBottomRightRadius
+        , borderTopLeftRadius
+        , borderTopRightRadius
         , borderAndTextColor
         , displayInlineBlock
         , displayBlock
@@ -208,14 +219,25 @@ module Elegant
 
 ## Border
 @docs borderColor
-@docs borderStyle
+@docs borderSolid
 @docs borderWidth
 @docs borderBottomColor
 @docs borderBottomWidth
-@docs borderAndTextColor
+@docs borderBottomSolid
+@docs borderLeftColor
+@docs borderLeftWidth
+@docs borderLeftSolid
+@docs borderTopColor
+@docs borderTopWidth
+@docs borderTopSolid
+@docs borderRightColor
+@docs borderRightWidth
+@docs borderRightSolid
 @docs borderBottomLeftRadius
 @docs borderBottomRightRadius
-@docs borderBottomSolid
+@docs borderTopLeftRadius
+@docs borderTopRightRadius
+@docs borderAndTextColor
 
 ## Display
 @docs displayBlock
@@ -429,8 +451,8 @@ type Visibility
     = VisibilityHidden
 
 
-type BorderBottom
-    = BorderBottomSolid
+type Border
+    = BorderSolid
 
 
 type WhiteSpace
@@ -448,15 +470,22 @@ type Style
         , right : Maybe SizeUnit
         , textColor : Maybe Color
         , backgroundColor : Maybe Color
-        , borderColor : Maybe Color
-        , borderWidth : Maybe SizeUnit
-        , borderStyle : Maybe String
         , borderBottomColor : Maybe Color
         , borderBottomWidth : Maybe SizeUnit
-        , borderBottomStyle : Maybe BorderBottom
+        , borderBottomStyle : Maybe Border
+        , borderLeftColor : Maybe Color
+        , borderLeftWidth : Maybe SizeUnit
+        , borderLeftStyle : Maybe Border
+        , borderTopColor : Maybe Color
+        , borderTopWidth : Maybe SizeUnit
+        , borderTopStyle : Maybe Border
+        , borderRightColor : Maybe Color
+        , borderRightWidth : Maybe SizeUnit
+        , borderRightStyle : Maybe Border
         , borderBottomLeftRadius : Maybe SizeUnit
         , borderBottomRightRadius : Maybe SizeUnit
-        , borderRadius : Maybe SizeUnit
+        , borderTopLeftRadius : Maybe SizeUnit
+        , borderTopRightRadius : Maybe SizeUnit
         , paddingRight : Maybe SizeUnit
         , paddingLeft : Maybe SizeUnit
         , paddingBottom : Maybe SizeUnit
@@ -549,15 +578,22 @@ defaultStyle =
         , right = Nothing
         , textColor = Nothing
         , backgroundColor = Nothing
-        , borderColor = Nothing
-        , borderWidth = Nothing
-        , borderStyle = Nothing
         , borderBottomColor = Nothing
         , borderBottomWidth = Nothing
         , borderBottomStyle = Nothing
+        , borderLeftColor = Nothing
+        , borderLeftWidth = Nothing
+        , borderLeftStyle = Nothing
+        , borderTopColor = Nothing
+        , borderTopWidth = Nothing
+        , borderTopStyle = Nothing
+        , borderRightColor = Nothing
+        , borderRightWidth = Nothing
+        , borderRightStyle = Nothing
         , borderBottomLeftRadius = Nothing
         , borderBottomRightRadius = Nothing
-        , borderRadius = Nothing
+        , borderTopLeftRadius = Nothing
+        , borderTopRightRadius = Nothing
         , paddingRight = Nothing
         , paddingLeft = Nothing
         , paddingBottom = Nothing
@@ -898,12 +934,12 @@ visibilityToString =
         )
 
 
-borderBottomToString : Maybe BorderBottom -> Maybe String
-borderBottomToString =
+borderToString : Maybe Border -> Maybe String
+borderToString =
     nothingOrJust
         (\val ->
             case val of
-                BorderBottomSolid ->
+                BorderSolid ->
                     "solid"
         )
 
@@ -937,15 +973,22 @@ getStyles (Style styleValues) =
     , ( "white-space", whiteSpaceToString << .whiteSpace )
     , ( "lineHeight", normalOrSizeUnitToString << .lineHeight )
     , ( "background-color", colorToString << .backgroundColor )
-    , ( "border-radius", sizeUnitToString << .borderRadius )
-    , ( "border-color", colorToString << .borderColor )
-    , ( "border-width", sizeUnitToString << .borderWidth )
-    , ( "border-style", .borderStyle )
     , ( "border-bottom-color", colorToString << .borderBottomColor )
     , ( "border-bottom-width", sizeUnitToString << .borderBottomWidth )
-    , ( "border-bottom-style", borderBottomToString << .borderBottomStyle )
+    , ( "border-bottom-style", borderToString << .borderBottomStyle )
+    , ( "border-left-color", colorToString << .borderLeftColor )
+    , ( "border-left-width", sizeUnitToString << .borderLeftWidth )
+    , ( "border-left-style", borderToString << .borderLeftStyle )
+    , ( "border-top-color", colorToString << .borderTopColor )
+    , ( "border-top-width", sizeUnitToString << .borderTopWidth )
+    , ( "border-top-style", borderToString << .borderTopStyle )
+    , ( "border-right-color", colorToString << .borderRightColor )
+    , ( "border-right-width", sizeUnitToString << .borderRightWidth )
+    , ( "border-right-style", borderToString << .borderRightStyle )
     , ( "border-bottom-left-radius", sizeUnitToString << .borderBottomLeftRadius )
     , ( "border-bottom-right-radius", sizeUnitToString << .borderBottomRightRadius )
+    , ( "border-top-left-radius", sizeUnitToString << .borderTopLeftRadius )
+    , ( "border-top-right-radius", sizeUnitToString << .borderTopRightRadius )
     , ( "padding-left", sizeUnitToString << .paddingLeft )
     , ( "padding-right", sizeUnitToString << .paddingRight )
     , ( "padding-top", sizeUnitToString << .paddingTop )
@@ -1467,20 +1510,29 @@ backgroundColor color (Style style) =
 
 {-| -}
 borderColor : Color -> Style -> Style
-borderColor color (Style style) =
-    Style { style | borderColor = Just color }
+borderColor color =
+    borderBottomColor color
+        << borderLeftColor color
+        << borderTopColor color
+        << borderRightColor color
 
 
 {-| -}
-borderStyle : String -> Style -> Style
-borderStyle style_ (Style style) =
-    Style { style | borderStyle = Just style_ }
+borderSolid : Style -> Style
+borderSolid =
+    borderBottomStyle BorderSolid
+        << borderLeftStyle BorderSolid
+        << borderTopStyle BorderSolid
+        << borderRightStyle BorderSolid
 
 
 {-| -}
 borderWidth : Int -> Style -> Style
-borderWidth size_ (Style style) =
-    Style { style | borderWidth = Just (Px size_) }
+borderWidth size =
+    borderBottomWidth size
+        << borderLeftWidth size
+        << borderTopWidth size
+        << borderRightWidth size
 
 
 {-| -}
@@ -1490,7 +1542,7 @@ borderBottomColor color (Style style) =
 
 
 {-| -}
-borderBottomStyle : BorderBottom -> Style -> Style
+borderBottomStyle : Border -> Style -> Style
 borderBottomStyle style_ (Style style) =
     Style { style | borderBottomStyle = Just style_ }
 
@@ -1498,13 +1550,85 @@ borderBottomStyle style_ (Style style) =
 {-| -}
 borderBottomSolid : Style -> Style
 borderBottomSolid =
-    borderBottomStyle BorderBottomSolid
+    borderBottomStyle BorderSolid
 
 
 {-| -}
 borderBottomWidth : Int -> Style -> Style
 borderBottomWidth size_ (Style style) =
     Style { style | borderBottomWidth = Just (Px size_) }
+
+
+{-| -}
+borderLeftColor : Color -> Style -> Style
+borderLeftColor color (Style style) =
+    Style { style | borderLeftColor = Just color }
+
+
+{-| -}
+borderLeftStyle : Border -> Style -> Style
+borderLeftStyle style_ (Style style) =
+    Style { style | borderLeftStyle = Just style_ }
+
+
+{-| -}
+borderLeftSolid : Style -> Style
+borderLeftSolid =
+    borderLeftStyle BorderSolid
+
+
+{-| -}
+borderLeftWidth : Int -> Style -> Style
+borderLeftWidth size_ (Style style) =
+    Style { style | borderLeftWidth = Just (Px size_) }
+
+
+{-| -}
+borderTopColor : Color -> Style -> Style
+borderTopColor color (Style style) =
+    Style { style | borderTopColor = Just color }
+
+
+{-| -}
+borderTopStyle : Border -> Style -> Style
+borderTopStyle style_ (Style style) =
+    Style { style | borderTopStyle = Just style_ }
+
+
+{-| -}
+borderTopSolid : Style -> Style
+borderTopSolid =
+    borderTopStyle BorderSolid
+
+
+{-| -}
+borderTopWidth : Int -> Style -> Style
+borderTopWidth size_ (Style style) =
+    Style { style | borderTopWidth = Just (Px size_) }
+
+
+{-| -}
+borderRightColor : Color -> Style -> Style
+borderRightColor color (Style style) =
+    Style { style | borderRightColor = Just color }
+
+
+{-| -}
+borderRightStyle : Border -> Style -> Style
+borderRightStyle style_ (Style style) =
+    Style { style | borderRightStyle = Just style_ }
+
+
+{-| -}
+borderRightSolid : Style -> Style
+borderRightSolid =
+    borderRightStyle BorderSolid
+
+
+{-| -}
+borderRightWidth : Int -> Style -> Style
+borderRightWidth size_ (Style style) =
+    Style { style | borderRightWidth = Just (Px size_) }
 
 
 {-| -}
@@ -1517,6 +1641,18 @@ borderBottomLeftRadius size_ (Style style) =
 borderBottomRightRadius : Int -> Style -> Style
 borderBottomRightRadius size_ (Style style) =
     Style { style | borderBottomRightRadius = Just (Px size_) }
+
+
+{-| -}
+borderTopLeftRadius : Int -> Style -> Style
+borderTopLeftRadius size_ (Style style) =
+    Style { style | borderTopLeftRadius = Just (Px size_) }
+
+
+{-| -}
+borderTopRightRadius : Int -> Style -> Style
+borderTopRightRadius size_ (Style style) =
+    Style { style | borderTopRightRadius = Just (Px size_) }
 
 
 {-| Set both text and border in same color.
@@ -1696,8 +1832,11 @@ round =
 
 {-| -}
 roundCorner : Int -> Style -> Style
-roundCorner value (Style style) =
-    Style { style | borderRadius = Just (Px value) }
+roundCorner value =
+    borderBottomLeftRadius value
+        << borderBottomLeftRadius value
+        << borderBottomLeftRadius value
+        << borderBottomLeftRadius value
 
 
 justifyContent : JustifyContent -> Style -> Style

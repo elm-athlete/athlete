@@ -33,7 +33,7 @@ link color =
 border : Color -> Style -> Style
 border color =
     [ borderColor color
-    , borderStyle "solid"
+    , borderSolid
     , borderWidth 1
     ]
         |> compose
