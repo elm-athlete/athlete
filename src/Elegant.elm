@@ -76,19 +76,24 @@ module Elegant
         , backgroundColor
         , borderColor
         , borderSolid
+        , borderDashed
         , borderWidth
         , borderBottomColor
         , borderBottomWidth
         , borderBottomSolid
+        , borderBottomDashed
         , borderLeftColor
         , borderLeftWidth
         , borderLeftSolid
+        , borderLeftDashed
         , borderTopColor
         , borderTopWidth
         , borderTopSolid
+        , borderTopDashed
         , borderRightColor
         , borderRightWidth
         , borderRightSolid
+        , borderRightDashed
         , borderBottomLeftRadius
         , borderBottomRightRadius
         , borderTopLeftRadius
@@ -224,19 +229,24 @@ module Elegant
 ## Border
 @docs borderColor
 @docs borderSolid
+@docs borderDashed
 @docs borderWidth
 @docs borderBottomColor
 @docs borderBottomWidth
 @docs borderBottomSolid
+@docs borderBottomDashed
 @docs borderLeftColor
 @docs borderLeftWidth
 @docs borderLeftSolid
+@docs borderLeftDashed
 @docs borderTopColor
 @docs borderTopWidth
 @docs borderTopSolid
+@docs borderTopDashed
 @docs borderRightColor
 @docs borderRightWidth
 @docs borderRightSolid
+@docs borderRightDashed
 @docs borderBottomLeftRadius
 @docs borderBottomRightRadius
 @docs borderTopLeftRadius
@@ -470,6 +480,7 @@ type Visibility
 
 type Border
     = BorderSolid
+    | BorderDashed
 
 
 type WhiteSpace
@@ -976,6 +987,9 @@ borderToString =
             case val of
                 BorderSolid ->
                     "solid"
+
+                BorderDashed ->
+                    "dashed"
         )
 
 
@@ -1556,10 +1570,19 @@ borderColor color =
 {-| -}
 borderSolid : Style -> Style
 borderSolid =
-    borderBottomStyle BorderSolid
-        << borderLeftStyle BorderSolid
-        << borderTopStyle BorderSolid
-        << borderRightStyle BorderSolid
+    borderBottomSolid
+        << borderLeftSolid
+        << borderTopSolid
+        << borderRightSolid
+
+
+{-| -}
+borderDashed : Style -> Style
+borderDashed =
+    borderBottomDashed
+        << borderLeftDashed
+        << borderTopDashed
+        << borderRightDashed
 
 
 {-| -}
@@ -1590,6 +1613,12 @@ borderBottomSolid =
 
 
 {-| -}
+borderBottomDashed : Style -> Style
+borderBottomDashed =
+    borderBottomStyle BorderDashed
+
+
+{-| -}
 borderBottomWidth : Int -> Style -> Style
 borderBottomWidth size_ (Style style) =
     Style { style | borderBottomWidth = Just (Px size_) }
@@ -1611,6 +1640,12 @@ borderLeftStyle style_ (Style style) =
 borderLeftSolid : Style -> Style
 borderLeftSolid =
     borderLeftStyle BorderSolid
+
+
+{-| -}
+borderLeftDashed : Style -> Style
+borderLeftDashed =
+    borderLeftStyle BorderDashed
 
 
 {-| -}
@@ -1638,6 +1673,12 @@ borderTopSolid =
 
 
 {-| -}
+borderTopDashed : Style -> Style
+borderTopDashed =
+    borderTopStyle BorderDashed
+
+
+{-| -}
 borderTopWidth : Int -> Style -> Style
 borderTopWidth size_ (Style style) =
     Style { style | borderTopWidth = Just (Px size_) }
@@ -1659,6 +1700,12 @@ borderRightStyle style_ (Style style) =
 borderRightSolid : Style -> Style
 borderRightSolid =
     borderRightStyle BorderSolid
+
+
+{-| -}
+borderRightDashed : Style -> Style
+borderRightDashed =
+    borderRightStyle BorderDashed
 
 
 {-| -}
@@ -1887,9 +1934,9 @@ round =
 roundCorner : Int -> Style -> Style
 roundCorner value =
     borderBottomLeftRadius value
-        << borderBottomLeftRadius value
-        << borderBottomLeftRadius value
-        << borderBottomLeftRadius value
+        << borderBottomRightRadius value
+        << borderTopLeftRadius value
+        << borderTopRightRadius value
 
 
 justifyContent : JustifyContent -> Style -> Style
