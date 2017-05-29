@@ -1,44 +1,63 @@
 module Elegant.Elements
     exposing
-        ( btn
-        , border
+        ( border
+        , borderBottom
+        , flexnav
+        , link
         )
 
 {-|
 @docs border
-@docs btn
+@docs flexnav
+@docs borderBottom
+@docs link
 -}
 
 import Elegant exposing (..)
 import Color exposing (Color)
+import Elegant.Helpers exposing (..)
 
 
-compose : List (a -> a) -> (a -> a)
-compose =
-    List.foldr (>>) identity
-
-
-{-| Create a button
+{-| Create a nice looking Link
 -}
-btn : ( SizeUnit, SizeUnit ) -> Style -> Style
-btn ( paddingVertical_, paddingHorizontal_ ) =
-    [ displayInlineBlock
-    , verticalAlignMiddle
-    , fontInherit
-    , textCenter
-    , margin (Px 0)
-    , paddingVertical paddingVertical_
-    , paddingHorizontal paddingHorizontal_
+link : Color -> Style -> Style
+link color =
+    [ textDecorationNone
+    , textColor color
     ]
         |> compose
 
 
-{-| Create a border style
+{-| Create a solid border with 1px of width and the color is a parameter
 -}
 border : Color -> Style -> Style
 border color =
     [ borderColor color
     , borderStyle "solid"
     , borderWidth 1
+    ]
+        |> compose
+
+
+{-| Create a solid border bottom with 1px of width and the color is a parameter
+-}
+borderBottom : Color -> Style -> Style
+borderBottom color =
+    [ borderBottomColor color
+    , borderBottomSolid
+    , borderBottomWidth 1
+    ]
+        |> compose
+
+
+{-| Create a flex navigation
+-}
+flexnav : Style -> Style
+flexnav =
+    [ listStyleNone
+    , displayFlex
+    , alignItemsCenter
+    , justifyContentSpaceBetween
+    , widthPercent 100
     ]
         |> compose

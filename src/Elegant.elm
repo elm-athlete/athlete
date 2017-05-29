@@ -1,21 +1,19 @@
 module Elegant
     exposing
-        ( State
-        , emptyState
-        , getWindowSize
-        , Msg
-        , update
-        , initialSize
-        , resizeWindow
-        , Vector
+        ( Vector
         , Style
         , SizeUnit(..)
+        , huge
+        , large
+        , medium
+        , mediumNumber
         , small
         , tiny
-        , medium
         , style
-        , hoverStyle
-        , position
+        , positionAbsolute
+        , positionRelative
+        , positionFixed
+        , positionStatic
         , left
         , right
         , top
@@ -55,6 +53,7 @@ module Elegant
         , bold
         , strong
         , lineHeight
+        , lineHeightNormal
         , fontWeightNormal
         , fontStyleNormal
         , fontStyleItalic
@@ -73,14 +72,23 @@ module Elegant
         , textRight
         , textLeft
         , textJustify
+        , whiteSpaceNoWrap
         , backgroundColor
         , borderColor
         , borderStyle
         , borderWidth
+        , borderBottomColor
+        , borderBottomWidth
+        , borderBottomSolid
+        , borderBottomLeftRadius
+        , borderBottomRightRadius
         , borderAndTextColor
         , displayInlineBlock
         , displayBlock
         , displayFlex
+        , flexGrow
+        , flexShrink
+        , flexBasis
         , flex
         , flexWrapWrap
         , flexWrapNoWrap
@@ -97,6 +105,7 @@ module Elegant
         , listStyleSquare
         , listStyleDecimal
         , listStyleGeorgian
+        , round
         , roundCorner
         , justifyContentSpaceBetween
         , justifyContentSpaceAround
@@ -104,6 +113,7 @@ module Elegant
         , spaceAround
         , fontInherit
         , width
+        , fullWidth
         , widthPercent
         , maxWidth
         , minWidth
@@ -111,35 +121,28 @@ module Elegant
         , heightPercent
         , maxHeight
         , minHeight
+        , zIndex
+        , cursorPointer
+        , visibilityHidden
         , transparent
         )
 
 {-|
 # Types
-@docs State
-@docs Msg
 @docs Vector
 @docs Style
 @docs SizeUnit
 
-# Initializers
-@docs emptyState
-@docs resizeWindow
-@docs initialSize
-
-# Getters
-@docs getWindowSize
-
-# Update
-@docs update
 
 # Styling
 @docs style
-@docs hoverStyle
 
 # Styles
 ## Positions
-@docs position
+@docs positionStatic
+@docs positionAbsolute
+@docs positionRelative
+@docs positionFixed
 @docs left
 @docs right
 @docs top
@@ -191,6 +194,10 @@ module Elegant
 @docs fontStyleNormal
 @docs fontStyleItalic
 @docs fontSize
+@docs cursorPointer
+@docs lineHeightNormal
+@docs whiteSpaceNoWrap
+
 
 ## Text Alignements
 @docs textCenter
@@ -203,7 +210,12 @@ module Elegant
 @docs borderColor
 @docs borderStyle
 @docs borderWidth
+@docs borderBottomColor
+@docs borderBottomWidth
 @docs borderAndTextColor
+@docs borderBottomLeftRadius
+@docs borderBottomRightRadius
+@docs borderBottomSolid
 
 ## Display
 @docs displayBlock
@@ -216,6 +228,9 @@ module Elegant
 @docs flex
 @docs flexWrapWrap
 @docs flexWrapNoWrap
+@docs flexBasis
+@docs flexGrow
+@docs flexShrink
 
 ## Opacity
 @docs opacity
@@ -236,6 +251,7 @@ module Elegant
 
 ## Round
 @docs roundCorner
+@docs round
 
 ## Justify Content
 @docs justifyContentSpaceBetween
@@ -255,12 +271,22 @@ module Elegant
 @docs heightPercent
 @docs maxHeight
 @docs minHeight
+@docs fullWidth
+
+## Z-Index
+@docs zIndex
+
+## Visibility
+@docs visibilityHidden
 
 # Constants
 ## Sizes
 @docs small
 @docs tiny
 @docs medium
+@docs mediumNumber
+@docs large
+@docs huge
 
 ## Color
 @docs transparent
@@ -279,14 +305,18 @@ module Elegant
 
 -}
 
+import Elegant.Helpers exposing (..)
 import Html exposing (Html)
 import Html.Attributes
-import Html.Events
-import Basics
+
+
+-- import Html.Events
+
 import Color exposing (Color)
 import Color.Convert
-import Window
-import Task
+
+
+-- import Task
 
 
 type Either a b
@@ -294,72 +324,12 @@ type Either a b
     | Right b
 
 
-type alias Auto =
-    ()
+type Auto
+    = Auto
 
 
-{-| -}
-type State
-    = State
-        { selectedElement : Maybe String
-        , windowDimension : Window.Size
-        }
-
-
-{-| -}
-emptyState : State
-emptyState =
-    State
-        { selectedElement = Nothing
-        , windowDimension =
-            { width = 0
-            , height = 0
-            }
-        }
-
-
-{-| -}
-getWindowSize : State -> ( Int, Int )
-getWindowSize (State state) =
-    state.windowDimension |> sizeToTuple
-
-
-sizeToTuple : Window.Size -> ( Int, Int )
-sizeToTuple { width, height } =
-    ( width, height )
-
-
-{-| -}
-type Msg
-    = OnMouseEnter String
-    | OnMouseLeave String
-    | OnResizes Window.Size
-
-
-{-| -}
-update : Msg -> State -> State
-update msg (State state) =
-    case msg of
-        OnMouseEnter s ->
-            State { state | selectedElement = Just s }
-
-        OnMouseLeave s ->
-            State { state | selectedElement = Nothing }
-
-        OnResizes size ->
-            State { state | windowDimension = size }
-
-
-{-| -}
-resizeWindow : (Msg -> msg) -> Sub msg
-resizeWindow msg =
-    Window.resizes (msg << OnResizes)
-
-
-{-| -}
-initialSize : (Msg -> msg) -> Cmd msg
-initialSize msg =
-    Task.perform (msg << OnResizes) Window.size
+type Normal
+    = Normal
 
 
 {-| -}
@@ -380,6 +350,7 @@ type Position
     = PositionAbsolute
     | PositionRelative
     | PositionFixed
+    | PositionStatic
 
 
 type Display
@@ -454,6 +425,18 @@ type AlignSelf
     = AlignSelfCenter
 
 
+type Visibility
+    = VisibilityHidden
+
+
+type BorderBottom
+    = BorderBottomSolid
+
+
+type WhiteSpace
+    = WhiteSpaceNoWrap
+
+
 {-| Contains all style for an element used with Elegant.
 -}
 type Style
@@ -468,6 +451,11 @@ type Style
         , borderColor : Maybe Color
         , borderWidth : Maybe SizeUnit
         , borderStyle : Maybe String
+        , borderBottomColor : Maybe Color
+        , borderBottomWidth : Maybe SizeUnit
+        , borderBottomStyle : Maybe BorderBottom
+        , borderBottomLeftRadius : Maybe SizeUnit
+        , borderBottomRightRadius : Maybe SizeUnit
         , borderRadius : Maybe SizeUnit
         , paddingRight : Maybe SizeUnit
         , paddingLeft : Maybe SizeUnit
@@ -478,7 +466,9 @@ type Style
         , marginBottom : Maybe (Either SizeUnit Auto)
         , marginTop : Maybe (Either SizeUnit Auto)
         , display : Maybe Display
-        , flex : Maybe Int
+        , flexGrow : Maybe Int
+        , flexShrink : Maybe Int
+        , flexBasis : Maybe (Either SizeUnit Auto)
         , flexWrap : Maybe FlexWrap
         , opacity : Maybe Float
         , overflow : Maybe Overflow
@@ -487,7 +477,8 @@ type Style
         , textAlign : Maybe TextAlign
         , textTransform : Maybe TextTransform
         , textDecoration : Maybe TextDecoration
-        , lineHeight : Maybe SizeUnit
+        , whiteSpace : Maybe WhiteSpace
+        , lineHeight : Maybe (Either SizeUnit Normal)
         , fontWeight : Maybe Int
         , fontStyle : Maybe FontStyle
         , fontSize : Maybe SizeUnit
@@ -501,6 +492,9 @@ type Style
         , height : Maybe SizeUnit
         , maxHeight : Maybe SizeUnit
         , minHeight : Maybe SizeUnit
+        , zIndex : Maybe Int
+        , cursor : Maybe String
+        , visibility : Maybe Visibility
         , boxSizing : Maybe String
         }
 
@@ -510,9 +504,27 @@ type alias StyleTransformer =
 
 
 {-| -}
+huge : SizeUnit
+huge =
+    Px 48
+
+
+{-| -}
+large : SizeUnit
+large =
+    Px 24
+
+
+{-| -}
 medium : SizeUnit
 medium =
-    Px 12
+    Px mediumNumber
+
+
+{-| -}
+mediumNumber : Int
+mediumNumber =
+    12
 
 
 {-| -}
@@ -540,6 +552,11 @@ defaultStyle =
         , borderColor = Nothing
         , borderWidth = Nothing
         , borderStyle = Nothing
+        , borderBottomColor = Nothing
+        , borderBottomWidth = Nothing
+        , borderBottomStyle = Nothing
+        , borderBottomLeftRadius = Nothing
+        , borderBottomRightRadius = Nothing
         , borderRadius = Nothing
         , paddingRight = Nothing
         , paddingLeft = Nothing
@@ -550,7 +567,9 @@ defaultStyle =
         , marginBottom = Nothing
         , marginTop = Nothing
         , display = Nothing
-        , flex = Nothing
+        , flexGrow = Nothing
+        , flexShrink = Nothing
+        , flexBasis = Nothing
         , flexWrap = Nothing
         , opacity = Nothing
         , overflow = Nothing
@@ -559,6 +578,7 @@ defaultStyle =
         , textAlign = Nothing
         , textTransform = Nothing
         , textDecoration = Nothing
+        , whiteSpace = Nothing
         , lineHeight = Nothing
         , fontWeight = Nothing
         , fontStyle = Nothing
@@ -573,6 +593,9 @@ defaultStyle =
         , height = Nothing
         , maxHeight = Nothing
         , minHeight = Nothing
+        , zIndex = Nothing
+        , cursor = Nothing
+        , visibility = Nothing
         , boxSizing = Just "border-box"
         }
 
@@ -595,6 +618,9 @@ positionToString =
 
                 PositionFixed ->
                     "fixed"
+
+                PositionStatic ->
+                    "static"
         )
 
 
@@ -752,6 +778,16 @@ textDecorationToString =
         )
 
 
+whiteSpaceToString : Maybe WhiteSpace -> Maybe String
+whiteSpaceToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                WhiteSpaceNoWrap ->
+                    "nowrap"
+        )
+
+
 fontStyleToString : Maybe FontStyle -> Maybe String
 fontStyleToString =
     nothingOrJust
@@ -803,8 +839,8 @@ overflowToString =
         )
 
 
-marginToString : Maybe (Either SizeUnit b) -> Maybe String
-marginToString =
+autoOrSizeUnitToString : Maybe (Either SizeUnit Auto) -> Maybe String
+autoOrSizeUnitToString =
     nothingOrJust
         (\val ->
             case val of
@@ -813,6 +849,19 @@ marginToString =
 
                 Right _ ->
                     "auto"
+        )
+
+
+normalOrSizeUnitToString : Maybe (Either SizeUnit Normal) -> Maybe String
+normalOrSizeUnitToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                Left su ->
+                    sizeUnitToString_ su
+
+                Right _ ->
+                    "normal"
         )
 
 
@@ -839,6 +888,26 @@ alignSelfToString =
         )
 
 
+visibilityToString : Maybe Visibility -> Maybe String
+visibilityToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                VisibilityHidden ->
+                    "hidden"
+        )
+
+
+borderBottomToString : Maybe BorderBottom -> Maybe String
+borderBottomToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                BorderBottomSolid ->
+                    "solid"
+        )
+
+
 maybeToString : Maybe a -> Maybe String
 maybeToString =
     nothingOrJust
@@ -856,27 +925,35 @@ getStyles (Style styleValues) =
     , ( "right", sizeUnitToString << .right )
     , ( "color", colorToString << .textColor )
     , ( "display", displayToString << .display )
-    , ( "flex", maybeToString << .flex )
+    , ( "flex-grow", maybeToString << .flexGrow )
+    , ( "flex-shrink", maybeToString << .flexShrink )
+    , ( "flex-basis", autoOrSizeUnitToString << .flexBasis )
     , ( "flex-wrap", flexWrapToString << .flexWrap )
     , ( "opacity", maybeToString << .opacity )
     , ( "overflow", overflowToString << .overflow )
     , ( "text-align", textAlignToString << .textAlign )
     , ( "text-transform", textTransformToString << .textTransform )
     , ( "text-decoration", textDecorationToString << .textDecoration )
-    , ( "lineHeight", sizeUnitToString << .lineHeight )
+    , ( "white-space", whiteSpaceToString << .whiteSpace )
+    , ( "lineHeight", normalOrSizeUnitToString << .lineHeight )
     , ( "background-color", colorToString << .backgroundColor )
     , ( "border-radius", sizeUnitToString << .borderRadius )
     , ( "border-color", colorToString << .borderColor )
     , ( "border-width", sizeUnitToString << .borderWidth )
     , ( "border-style", .borderStyle )
+    , ( "border-bottom-color", colorToString << .borderBottomColor )
+    , ( "border-bottom-width", sizeUnitToString << .borderBottomWidth )
+    , ( "border-bottom-style", borderBottomToString << .borderBottomStyle )
+    , ( "border-bottom-left-radius", sizeUnitToString << .borderBottomLeftRadius )
+    , ( "border-bottom-right-radius", sizeUnitToString << .borderBottomRightRadius )
     , ( "padding-left", sizeUnitToString << .paddingLeft )
     , ( "padding-right", sizeUnitToString << .paddingRight )
     , ( "padding-top", sizeUnitToString << .paddingTop )
     , ( "padding-bottom", sizeUnitToString << .paddingBottom )
-    , ( "margin-left", marginToString << .marginLeft )
-    , ( "margin-right", marginToString << .marginRight )
-    , ( "margin-top", marginToString << .marginTop )
-    , ( "margin-bottom", marginToString << .marginBottom )
+    , ( "margin-left", autoOrSizeUnitToString << .marginLeft )
+    , ( "margin-right", autoOrSizeUnitToString << .marginRight )
+    , ( "margin-top", autoOrSizeUnitToString << .marginTop )
+    , ( "margin-bottom", autoOrSizeUnitToString << .marginBottom )
     , ( "list-style-type", listStyleTypeToString << .listStyleType )
     , ( "align-items", alignItemsToString << .alignItems )
     , ( "align-self", alignSelfToString << .alignSelf )
@@ -890,17 +967,16 @@ getStyles (Style styleValues) =
     , ( "height", sizeUnitToString << .height )
     , ( "max-height", sizeUnitToString << .maxHeight )
     , ( "min-height", sizeUnitToString << .minHeight )
+    , ( "z-index", maybeToString << .zIndex )
+    , ( "cursor", .cursor )
+    , ( "visibility", visibilityToString << .visibility )
+    , ( "vertical-align", .verticalAlign )
     , ( "box-sizing", .boxSizing )
     ]
         |> List.map
             (\( attrName, fun ) ->
                 ( attrName, fun styleValues )
             )
-
-
-compose : List (a -> a) -> (a -> a)
-compose =
-    List.foldr (>>) identity
 
 
 toHtmlStyles : List ( String, Maybe String ) -> List ( String, String )
@@ -929,39 +1005,39 @@ convertStyles =
 
 
 {-| -}
-style :
-    List StyleTransformer
-    -> List (Html.Attribute msg)
+style : List StyleTransformer -> Html.Attribute msg
 style =
-    List.singleton
-        << Html.Attributes.style
+    Html.Attributes.style
         << convertStyles
 
 
-{-| -}
-hoverStyle :
-    ( State, String, Msg -> msg )
-    -> (Bool -> List StyleTransformer)
-    -> List (Html.Attribute msg)
-hoverStyle ( state, id, msg ) styles =
-    selectedElement state id
-        |> styles
-        |> style
-        |> List.append
-            [ Html.Events.onMouseEnter <| msg <| OnMouseEnter id
-            , Html.Events.onMouseLeave <| msg <| OnMouseLeave id
-            ]
-
-
-selectedElement : State -> String -> Bool
-selectedElement (State state) id =
-    state.selectedElement == Just id
-
-
-{-| -}
 position : Position -> Style -> Style
 position value (Style style) =
     Style { style | position = Just value }
+
+
+{-| -}
+positionAbsolute : Style -> Style
+positionAbsolute =
+    position PositionAbsolute
+
+
+{-| -}
+positionRelative : Style -> Style
+positionRelative =
+    position PositionRelative
+
+
+{-| -}
+positionFixed : Style -> Style
+positionFixed =
+    position PositionFixed
+
+
+{-| -}
+positionStatic : Style -> Style
+positionStatic =
+    position PositionStatic
 
 
 {-| -}
@@ -1141,7 +1217,7 @@ marginLeft size (Style style) =
 
 marginLeftAuto : Style -> Style
 marginLeftAuto (Style style) =
-    Style { style | marginLeft = Just <| Right () }
+    Style { style | marginLeft = Just <| Right Auto }
 
 
 {-| -}
@@ -1158,7 +1234,7 @@ marginRight size (Style style) =
 
 marginRightAuto : Style -> Style
 marginRightAuto (Style style) =
-    Style { style | marginRight = Just <| Right () }
+    Style { style | marginRight = Just <| Right Auto }
 
 
 {-| -}
@@ -1231,10 +1307,21 @@ strong =
     bold
 
 
+lineHeightGeneric : Either SizeUnit Normal -> Style -> Style
+lineHeightGeneric val (Style style) =
+    Style { style | lineHeight = Just val }
+
+
 {-| -}
 lineHeight : SizeUnit -> Style -> Style
-lineHeight val (Style style) =
-    Style { style | lineHeight = Just val }
+lineHeight =
+    lineHeightGeneric << Left
+
+
+{-| -}
+lineHeightNormal : Style -> Style
+lineHeightNormal =
+    lineHeightGeneric <| Right Normal
 
 
 {-| -}
@@ -1361,6 +1448,17 @@ textJustify =
     textAlign TextAlignJustify
 
 
+whiteSpace : WhiteSpace -> Style -> Style
+whiteSpace value (Style style) =
+    Style { style | whiteSpace = Just value }
+
+
+{-| -}
+whiteSpaceNoWrap : Style -> Style
+whiteSpaceNoWrap =
+    whiteSpace WhiteSpaceNoWrap
+
+
 {-| -}
 backgroundColor : Color -> Style -> Style
 backgroundColor color (Style style) =
@@ -1383,6 +1481,42 @@ borderStyle style_ (Style style) =
 borderWidth : Int -> Style -> Style
 borderWidth size_ (Style style) =
     Style { style | borderWidth = Just (Px size_) }
+
+
+{-| -}
+borderBottomColor : Color -> Style -> Style
+borderBottomColor color (Style style) =
+    Style { style | borderBottomColor = Just color }
+
+
+{-| -}
+borderBottomStyle : BorderBottom -> Style -> Style
+borderBottomStyle style_ (Style style) =
+    Style { style | borderBottomStyle = Just style_ }
+
+
+{-| -}
+borderBottomSolid : Style -> Style
+borderBottomSolid =
+    borderBottomStyle BorderBottomSolid
+
+
+{-| -}
+borderBottomWidth : Int -> Style -> Style
+borderBottomWidth size_ (Style style) =
+    Style { style | borderBottomWidth = Just (Px size_) }
+
+
+{-| -}
+borderBottomLeftRadius : Int -> Style -> Style
+borderBottomLeftRadius size_ (Style style) =
+    Style { style | borderBottomLeftRadius = Just (Px size_) }
+
+
+{-| -}
+borderBottomRightRadius : Int -> Style -> Style
+borderBottomRightRadius size_ (Style style) =
+    Style { style | borderBottomRightRadius = Just (Px size_) }
 
 
 {-| Set both text and border in same color.
@@ -1428,9 +1562,37 @@ displayNone =
 
 
 {-| -}
+flexGrow : Int -> Style -> Style
+flexGrow val (Style style) =
+    Style { style | flexGrow = Just val }
+
+
+{-| -}
+flexShrink : Int -> Style -> Style
+flexShrink val (Style style) =
+    Style { style | flexShrink = Just val }
+
+
+{-| -}
+flexBasisGeneric : Either SizeUnit Auto -> Style -> Style
+flexBasisGeneric val (Style style) =
+    Style { style | flexBasis = Just val }
+
+
+{-| -}
+flexBasis : SizeUnit -> Style -> Style
+flexBasis =
+    flexBasisGeneric << Left
+
+
+{-| -}
 flex : Int -> Style -> Style
-flex val (Style style) =
-    Style { style | flex = Just val }
+flex val =
+    [ flexGrow val
+    , flexShrink 1
+    , flexBasis (Px 0)
+    ]
+        |> compose
 
 
 flexWrap : FlexWrap -> Style -> Style
@@ -1527,9 +1689,15 @@ listStyleGeorgian =
 
 
 {-| -}
-roundCorner : Style -> Style
-roundCorner (Style style) =
-    Style { style | borderRadius = Just (Px 300) }
+round : Style -> Style
+round =
+    roundCorner 300
+
+
+{-| -}
+roundCorner : Int -> Style -> Style
+roundCorner value (Style style) =
+    Style { style | borderRadius = Just (Px value) }
 
 
 justifyContent : JustifyContent -> Style -> Style
@@ -1580,6 +1748,12 @@ widthPercent =
 
 
 {-| -}
+fullWidth : Style -> Style
+fullWidth =
+    widthPercent 100
+
+
+{-| -}
 maxWidth : SizeUnit -> Style -> Style
 maxWidth value (Style style) =
     Style { style | maxWidth = Just value }
@@ -1588,7 +1762,7 @@ maxWidth value (Style style) =
 {-| -}
 minWidth : SizeUnit -> Style -> Style
 minWidth value (Style style) =
-    Style { style | maxWidth = Just value }
+    Style { style | minWidth = Just value }
 
 
 {-| -}
@@ -1600,19 +1774,47 @@ height value (Style style) =
 {-| -}
 maxHeight : SizeUnit -> Style -> Style
 maxHeight value (Style style) =
-    Style { style | height = Just value }
+    Style { style | maxHeight = Just value }
 
 
 {-| -}
 minHeight : SizeUnit -> Style -> Style
 minHeight value (Style style) =
-    Style { style | height = Just value }
+    Style { style | minHeight = Just value }
 
 
 {-| -}
 heightPercent : Int -> Style -> Style
 heightPercent =
     height << Px
+
+
+{-| -}
+zIndex : Int -> Style -> Style
+zIndex value (Style style) =
+    Style { style | zIndex = Just value }
+
+
+cursor : String -> Style -> Style
+cursor value (Style style) =
+    Style { style | cursor = Just value }
+
+
+{-| -}
+cursorPointer : Style -> Style
+cursorPointer =
+    cursor "pointer"
+
+
+visibility : Visibility -> Style -> Style
+visibility value (Style style) =
+    Style { style | visibility = Just value }
+
+
+{-| -}
+visibilityHidden : Style -> Style
+visibilityHidden =
+    visibility VisibilityHidden
 
 
 {-| -}

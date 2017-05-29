@@ -1,5 +1,5 @@
 {
-    "version": "1.0.1",
+    "version": "2.0.0",
     "summary": "Framework for inline CSS",
     "repository": "https://github.com/elm-bodybuilder/elegant.git",
     "license": "MIT",
@@ -8,7 +8,9 @@
     ],
     "exposed-modules": [
         "Elegant",
-        "Elegant.Elements"
+        "Elegant.Elements",
+        "Elegant.Grid",
+        "Elegant.Button"
     ],
     "dependencies": {
         "elm-lang/core": "5.0.0 <= v < 6.0.0",
