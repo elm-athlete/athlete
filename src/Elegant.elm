@@ -97,9 +97,11 @@ module Elegant
         , displayInlineBlock
         , displayBlock
         , displayFlex
+        , displayInlineFlex
         , flexGrow
         , flexShrink
         , flexBasis
+        , flexDirectionColumn
         , flex
         , flexWrapWrap
         , flexWrapNoWrap
@@ -120,6 +122,7 @@ module Elegant
         , roundCorner
         , justifyContentSpaceBetween
         , justifyContentSpaceAround
+        , justifyContentCenter
         , spaceBetween
         , spaceAround
         , fontInherit
@@ -139,11 +142,13 @@ module Elegant
         )
 
 {-|
+
+
 # Types
+
 @docs Vector
 @docs Style
 @docs SizeUnit
-
 
 # Styling
 @docs style
@@ -209,7 +214,6 @@ module Elegant
 @docs lineHeightNormal
 @docs whiteSpaceNoWrap
 
-
 ## Text Alignements
 @docs textCenter
 @docs textLeft
@@ -243,6 +247,7 @@ module Elegant
 @docs displayBlock
 @docs displayInlineBlock
 @docs displayFlex
+@docs displayInlineFlex
 @docs displayInline
 @docs displayNone
 
@@ -253,6 +258,7 @@ module Elegant
 @docs flexBasis
 @docs flexGrow
 @docs flexShrink
+@docs flexDirectionColumn
 
 ## Opacity
 @docs opacity
@@ -275,9 +281,12 @@ module Elegant
 @docs roundCorner
 @docs round
 
+
 ## Justify Content
+
 @docs justifyContentSpaceBetween
 @docs justifyContentSpaceAround
+@docs justifyContentCenter
 
 ## Spacings
 @docs spaceBetween
@@ -301,7 +310,9 @@ module Elegant
 ## Visibility
 @docs visibilityHidden
 
+
 # Constants
+
 ## Sizes
 @docs small
 @docs tiny
@@ -376,10 +387,11 @@ type Position
 
 
 type Display
-    = DisplayInlineBlock
-    | DisplayBlock
-    | DisplayFlex
+    = DisplayBlock
     | DisplayInline
+    | DisplayInlineBlock
+    | DisplayFlex
+    | DisplayInlineFlex
     | DisplayNone
 
 
@@ -405,6 +417,7 @@ type AlignItems
 type JustifyContent
     = JustifyContentSpaceBetween
     | JustifyContentSpaceAround
+    | JustifyContentCenter
 
 
 type TextTransform
@@ -441,6 +454,10 @@ type Overflow
 type FlexWrap
     = FlexWrapWrap
     | FlexWrapNoWrap
+
+
+type FlexDirection
+    = FlexDirectionColumn
 
 
 type AlignSelf
@@ -499,6 +516,7 @@ type Style
         , flexShrink : Maybe Int
         , flexBasis : Maybe (Either SizeUnit Auto)
         , flexWrap : Maybe FlexWrap
+        , flexDirection : Maybe FlexDirection
         , opacity : Maybe Float
         , overflow : Maybe Overflow
         , listStyleType : Maybe ListStyleType
@@ -607,6 +625,7 @@ defaultStyle =
         , flexShrink = Nothing
         , flexBasis = Nothing
         , flexWrap = Nothing
+        , flexDirection = Nothing
         , opacity = Nothing
         , overflow = Nothing
         , listStyleType = Nothing
@@ -673,6 +692,9 @@ displayToString =
 
                 DisplayFlex ->
                     "flex"
+
+                DisplayInlineFlex ->
+                    "inline-flex"
 
                 DisplayInline ->
                     "inline"
@@ -779,6 +801,9 @@ justifyContentToString =
 
                 JustifyContentSpaceAround ->
                     "space-around"
+
+                JustifyContentCenter ->
+                    "center"
         )
 
 
@@ -914,6 +939,16 @@ flexWrapToString =
         )
 
 
+flexDirectionToString : Maybe FlexDirection -> Maybe String
+flexDirectionToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                FlexDirectionColumn ->
+                    "column"
+        )
+
+
 alignSelfToString : Maybe AlignSelf -> Maybe String
 alignSelfToString =
     nothingOrJust
@@ -965,6 +1000,7 @@ getStyles (Style styleValues) =
     , ( "flex-shrink", maybeToString << .flexShrink )
     , ( "flex-basis", autoOrSizeUnitToString << .flexBasis )
     , ( "flex-wrap", flexWrapToString << .flexWrap )
+    , ( "flex-direction", flexDirectionToString << .flexDirection )
     , ( "opacity", maybeToString << .opacity )
     , ( "overflow", overflowToString << .overflow )
     , ( "text-align", textAlignToString << .textAlign )
@@ -1686,6 +1722,12 @@ displayFlex =
 
 
 {-| -}
+displayInlineFlex : Style -> Style
+displayInlineFlex =
+    display DisplayInlineFlex
+
+
+{-| -}
 displayInline : Style -> Style
 displayInline =
     display DisplayInline
@@ -1746,6 +1788,17 @@ flexWrapWrap =
 flexWrapNoWrap : Style -> Style
 flexWrapNoWrap =
     flexWrap FlexWrapNoWrap
+
+
+flexDirection : FlexDirection -> Style -> Style
+flexDirection value (Style style) =
+    Style { style | flexDirection = Just value }
+
+
+{-| -}
+flexDirectionColumn : Style -> Style
+flexDirectionColumn =
+    flexDirection FlexDirectionColumn
 
 
 {-| -}
@@ -1866,6 +1919,12 @@ justifyContentSpaceAround =
 spaceAround : Style -> Style
 spaceAround =
     justifyContentSpaceAround
+
+
+{-| -}
+justifyContentCenter : Style -> Style
+justifyContentCenter =
+    justifyContent JustifyContentCenter
 
 
 {-| -}
