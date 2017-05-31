@@ -6,9 +6,10 @@ module Elegant
         , huge
         , large
         , medium
-        , mediumNumber
         , small
         , tiny
+        , zero
+        , opposite
         , style
         , positionAbsolute
         , positionRelative
@@ -181,6 +182,9 @@ module Elegant
 @docs alignItemsStretch
 @docs alignSelfCenter
 
+## SizeUnit operations
+@docs opposite
+
 ## Paddings
 @docs padding
 @docs paddingHorizontal
@@ -324,12 +328,12 @@ module Elegant
 # Constants
 
 ## Sizes
+@docs huge
+@docs large
+@docs medium
 @docs small
 @docs tiny
-@docs medium
-@docs mediumNumber
-@docs large
-@docs huge
+@docs zero
 
 ## Color
 @docs transparent
@@ -385,8 +389,34 @@ type SizeUnit
     = Px Int
     | Pt Int
     | Percent Float
+    | Vh Float
     | Em Float
     | Rem Float
+
+
+{-| Calculate the opposite of a size unit value.
+    Ex : opposite (Px 2) == Px -2
+-}
+opposite : SizeUnit -> SizeUnit
+opposite unit =
+    case unit of
+        Px a ->
+            Px -a
+
+        Pt a ->
+            Pt -a
+
+        Percent a ->
+            Percent -a
+
+        Vh a ->
+            Vh -a
+
+        Em a ->
+            Em -a
+
+        Rem a ->
+            Rem -a
 
 
 type Position
@@ -576,13 +606,7 @@ large =
 {-| -}
 medium : SizeUnit
 medium =
-    Px mediumNumber
-
-
-{-| -}
-mediumNumber : Int
-mediumNumber =
-    12
+    Px 12
 
 
 {-| -}
@@ -595,6 +619,12 @@ small =
 tiny : SizeUnit
 tiny =
     Px 3
+
+
+{-| -}
+zero : SizeUnit
+zero =
+    Px 0
 
 
 defaultStyle : Style
@@ -764,6 +794,9 @@ sizeUnitToString_ val =
 
         Percent x ->
             concatNumberWithString x "%"
+
+        Vh x ->
+            concatNumberWithString x "vh"
 
         Em x ->
             concatNumberWithString x "em"

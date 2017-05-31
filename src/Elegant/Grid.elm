@@ -27,27 +27,27 @@ type alias Column msg =
     }
 
 
-columnStyle : Int -> Int -> Int -> Style -> Style
+columnStyle : SizeUnit -> Int -> Int -> Style -> Style
 columnStyle gutter denominator numerator =
     [ width (((numerator |> toFloat) / (denominator |> toFloat)) * 100 |> Percent)
     , displayInlineBlock
-    , paddingLeft (Px gutter)
+    , paddingLeft gutter
     , fullWidth
     ]
         |> compose
 
 
-layoutStyle : Int -> Style -> Style
+layoutStyle : SizeUnit -> Style -> Style
 layoutStyle gutter =
     [ listStyleNone
     , margin (Px 0)
     , padding (Px 0)
-    , marginLeft (Px (-gutter))
+    , marginLeft (opposite gutter)
     ]
         |> compose
 
 
-columnToHtml : Int -> Column msg -> Html msg
+columnToHtml : SizeUnit -> Column msg -> Html msg
 columnToHtml gutter { denominator, numerator, content } =
     Html.div [ style [ columnStyle gutter denominator numerator ] ] content
 
@@ -66,7 +66,7 @@ example =
             [ col 2 1 [ Html.div [ style [ Elements.border Color.black ] ] [ Html.text "toto" ] ]
             , col 2 1 [ Html.div [] [ Html.text "toto" ] ]
             ]
-        , grid 24
+        , grid large
             [ col 2 1 [ Html.div [ style [ Elements.border Color.black ] ] [ Html.text "toto" ] ]
             , col 2 1 [ Html.div [] [ Html.text "toto" ] ]
             ]
@@ -87,7 +87,7 @@ col =
 
 {-| Creates a grid with a custom gutter and columns
 -}
-grid : Int -> List (Column msg) -> Html msg
+grid : SizeUnit -> List (Column msg) -> Html msg
 grid gutter columns =
     Html.div [ style [ layoutStyle gutter ] ]
         (columns |> List.map (columnToHtml gutter))
@@ -97,11 +97,11 @@ grid gutter columns =
 -}
 standardGrid : List (Column msg) -> Html msg
 standardGrid =
-    grid mediumNumber
+    grid medium
 
 
 {-| Full grid creates a grid with no gutter
 -}
 fullGrid : List (Column msg) -> Html msg
 fullGrid =
-    grid 0
+    grid zero
