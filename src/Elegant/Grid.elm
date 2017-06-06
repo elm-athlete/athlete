@@ -32,17 +32,14 @@ columnStyle gutter denominator numerator =
     [ width (((numerator |> toFloat) / (denominator |> toFloat)) * 100 |> Percent)
     , displayInlineBlock
     , paddingLeft gutter
-    , fullWidth
     ]
         |> compose
 
 
 layoutStyle : SizeUnit -> Style -> Style
 layoutStyle gutter =
-    [ listStyleNone
-    , margin (Px 0)
-    , padding (Px 0)
-    , marginLeft (opposite gutter)
+    [ marginLeft (opposite gutter)
+    , displayBlock
     ]
         |> compose
 
@@ -52,23 +49,34 @@ columnToHtml gutter { denominator, numerator, content } =
     Html.div [ style [ columnStyle gutter denominator numerator ] ] content
 
 
+exampleContent : String -> List (Html msg)
+exampleContent content =
+    [ Html.div [ style [ paddingBottom medium ] ]
+        [ Html.div [ style [ Elements.border Color.black ] ]
+            [ Html.text content
+            ]
+        ]
+    ]
+
+
 example : Html msg
 example =
-    Html.div []
+    Html.div [ style [ fullWidth ] ]
         [ standardGrid
-            [ col 12 3 [ Html.div [] [ Html.text "toto" ] ]
-            , col 12 3 [ Html.div [] [ Html.text "toto" ] ]
-            , col 12 3 [ Html.div [] [ Html.text "toto" ] ]
-            , col 12 3 [ Html.div [] [ Html.text "toto" ] ]
-            , col 12 3 [ Html.div [] [ Html.text "toto" ] ]
+            [ col 12 3 (exampleContent "I")
+            , col 12 3 (exampleContent "am")
+            , col 12 3 (exampleContent "a")
+            , col 12 3 (exampleContent "grid")
+            , col 12 9 (exampleContent "with some asymetric")
+            , col 12 3 (exampleContent "elements")
             ]
         , fullGrid
-            [ col 2 1 [ Html.div [ style [ Elements.border Color.black ] ] [ Html.text "toto" ] ]
-            , col 2 1 [ Html.div [] [ Html.text "toto" ] ]
+            [ col 2 1 (exampleContent "toto")
+            , col 2 1 (exampleContent "toto")
             ]
         , grid large
-            [ col 2 1 [ Html.div [ style [ Elements.border Color.black ] ] [ Html.text "toto" ] ]
-            , col 2 1 [ Html.div [] [ Html.text "toto" ] ]
+            [ col 2 1 (exampleContent "toto")
+            , col 2 1 (exampleContent "toto")
             ]
         ]
 
