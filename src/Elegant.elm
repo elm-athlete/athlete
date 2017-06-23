@@ -420,7 +420,7 @@ type alias BoxShadow =
     { inset : Bool
     , spreadRadius : Maybe SizeUnit
     , blurRadius : Maybe SizeUnit
-    , color : Maybe Color
+    , maybeColor : Maybe Color
     , offset : Offset
     }
 
@@ -1086,12 +1086,15 @@ emptyListOrApply fun val =
 boxShadowToString : Maybe BoxShadow -> Maybe String
 boxShadowToString =
     nothingOrJust
-        (\{ offset, blurRadius, spreadRadius, color, inset } ->
+        (\{ offset, blurRadius, spreadRadius, maybeColor, inset } ->
             List.concat
                 [ offsetToStringList offset
                 , [ blurRadius, spreadRadius ]
                     |> List.map (emptyListOrApply sizeUnitToString_)
                     |> List.concat
+                , colorToString maybeColor
+                    |> Maybe.map (\a -> [ a ])
+                    |> Maybe.withDefault []
                 , if inset then
                     [ "inset" ]
                   else
