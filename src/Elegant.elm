@@ -1,6 +1,8 @@
 module Elegant
     exposing
         ( Vector
+        , BoxShadow
+        , Offset
         , Style
         , SizeUnit(..)
         , huge
@@ -99,7 +101,12 @@ module Elegant
         , borderBottomRightRadius
         , borderTopLeftRadius
         , borderTopRightRadius
+        , borderRadius
         , borderAndTextColor
+        , boxShadow
+        , boxShadowPlain
+        , boxShadowBlurry
+        , boxShadowCenteredBlurry
         , displayInlineBlock
         , displayBlock
         , displayFlex
@@ -155,6 +162,8 @@ module Elegant
 @docs Vector
 @docs Style
 @docs SizeUnit
+@docs BoxShadow
+@docs Offset
 
 # Styling
 @docs style
@@ -255,7 +264,12 @@ module Elegant
 @docs borderBottomRightRadius
 @docs borderTopLeftRadius
 @docs borderTopRightRadius
+@docs borderRadius
 @docs borderAndTextColor
+@docs boxShadow
+@docs boxShadowPlain
+@docs boxShadowBlurry
+@docs boxShadowCenteredBlurry
 
 ## Display
 @docs displayBlock
@@ -392,6 +406,23 @@ type SizeUnit
     | Vh Float
     | Em Float
     | Rem Float
+
+
+{-| Offset type
+-}
+type alias Offset =
+    ( SizeUnit, SizeUnit )
+
+
+{-| BoxShadow type
+-}
+type alias BoxShadow =
+    { inset : Bool
+    , spreadRadius : Maybe SizeUnit
+    , blurRadius : Maybe SizeUnit
+    , color : Maybe Color
+    , offset : Offset
+    }
 
 
 {-| Calculate the opposite of a size unit value.
@@ -544,6 +575,7 @@ type Style
         , borderBottomRightRadius : Maybe SizeUnit
         , borderTopLeftRadius : Maybe SizeUnit
         , borderTopRightRadius : Maybe SizeUnit
+        , boxShadow : Maybe BoxShadow
         , paddingRight : Maybe SizeUnit
         , paddingLeft : Maybe SizeUnit
         , paddingBottom : Maybe SizeUnit
@@ -653,6 +685,7 @@ defaultStyle =
         , borderBottomRightRadius = Nothing
         , borderTopLeftRadius = Nothing
         , borderTopRightRadius = Nothing
+        , boxShadow = Nothing
         , paddingRight = Nothing
         , paddingLeft = Nothing
         , paddingBottom = Nothing
@@ -1034,6 +1067,40 @@ maybeToString =
         )
 
 
+offsetToStringList : ( SizeUnit, SizeUnit ) -> List String
+offsetToStringList ( x, y ) =
+    [ x, y ]
+        |> List.map sizeUnitToString_
+
+
+emptyListOrApply : (a -> b) -> Maybe a -> List b
+emptyListOrApply fun val =
+    case val of
+        Nothing ->
+            []
+
+        Just val_ ->
+            [ fun val_ ]
+
+
+boxShadowToString : Maybe BoxShadow -> Maybe String
+boxShadowToString =
+    nothingOrJust
+        (\{ offset, blurRadius, spreadRadius, color, inset } ->
+            List.concat
+                [ offsetToStringList offset
+                , [ blurRadius, spreadRadius ]
+                    |> List.map (emptyListOrApply sizeUnitToString_)
+                    |> List.concat
+                , if inset then
+                    [ "inset" ]
+                  else
+                    []
+                ]
+                |> String.join " "
+        )
+
+
 getStyles : Style -> List ( String, Maybe String )
 getStyles (Style styleValues) =
     [ ( "position", positionToString << .position )
@@ -1072,6 +1139,7 @@ getStyles (Style styleValues) =
     , ( "border-bottom-right-radius", sizeUnitToString << .borderBottomRightRadius )
     , ( "border-top-left-radius", sizeUnitToString << .borderTopLeftRadius )
     , ( "border-top-right-radius", sizeUnitToString << .borderTopRightRadius )
+    , ( "box-shadow", boxShadowToString << .boxShadow )
     , ( "padding-left", sizeUnitToString << .paddingLeft )
     , ( "padding-right", sizeUnitToString << .paddingRight )
     , ( "padding-top", sizeUnitToString << .paddingTop )
@@ -1771,11 +1839,57 @@ borderTopRightRadius size_ (Style style) =
     Style { style | borderTopRightRadius = Just (Px size_) }
 
 
+{-| -}
+borderRadius : Int -> Style -> Style
+borderRadius size_ =
+    [ borderTopRightRadius size_
+    , borderTopLeftRadius size_
+    , borderBottomLeftRadius size_
+    , borderBottomRightRadius size_
+    ]
+        |> compose
+
+
 {-| Set both text and border in same color.
 -}
 borderAndTextColor : Color -> Style -> Style
 borderAndTextColor val =
     borderColor val << textColor val
+
+
+standardBoxShadow : Maybe SizeUnit -> Maybe Color -> Offset -> BoxShadow
+standardBoxShadow =
+    BoxShadow False Nothing
+
+
+{-| Set the box shadow
+-}
+boxShadow : BoxShadow -> Style -> Style
+boxShadow val (Style style) =
+    Style { style | boxShadow = Just val }
+
+
+{-| Create a plain box shadow
+-}
+boxShadowPlain : Offset -> Color -> Style -> Style
+boxShadowPlain offset color =
+    boxShadow
+        (standardBoxShadow Nothing (Just color) offset)
+
+
+{-| Create a blurry box shadow
+-}
+boxShadowBlurry : Offset -> SizeUnit -> Color -> Style -> Style
+boxShadowBlurry offset blurRadius color =
+    boxShadow
+        (standardBoxShadow (Just blurRadius) (Just color) offset)
+
+
+{-| Create a centered blurry box shadow
+-}
+boxShadowCenteredBlurry : SizeUnit -> Color -> Style -> Style
+boxShadowCenteredBlurry =
+    boxShadowBlurry ( Px 0, Px 0 )
 
 
 display : Display -> Style -> Style

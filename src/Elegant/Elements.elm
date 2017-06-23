@@ -16,6 +16,8 @@ module Elegant.Elements
 import Elegant exposing (..)
 import Color exposing (Color)
 import Elegant.Helpers exposing (..)
+import Html
+import Html.Attributes
 
 
 {-| Create a nice looking Link
@@ -61,3 +63,28 @@ flexnav =
     , widthPercent 100
     ]
         |> compose
+
+
+main : Html.Html msg
+main =
+    Html.div []
+        [ Html.a [ style [ fontSize gamma, paddingRight medium ] ] [ Html.text "Brand" ]
+        , Html.input
+            [ Html.Attributes.type_ "text"
+            , style
+                [ borderRadius 4
+                , border Color.gray
+                , marginRight (Px 4)
+                ]
+            ]
+            []
+        , Html.button
+            [ style
+                [ borderRadius 4
+                , border Color.gray
+                , textColor Color.black
+                , backgroundColor Color.white
+                ]
+            ]
+            [ Html.text "Brand" ]
+        ]
