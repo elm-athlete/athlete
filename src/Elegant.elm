@@ -13,6 +13,7 @@ module Elegant
         , zero
         , opposite
         , style
+        , convertStyles
         , positionAbsolute
         , positionRelative
         , positionFixed
@@ -167,6 +168,8 @@ module Elegant
 
 # Styling
 @docs style
+@docs convertStyles
+
 
 # Styles
 ## Positions
@@ -1196,6 +1199,7 @@ toInlineStyles styleTransformer =
         |> toHtmlStyles
 
 
+{-| -}
 convertStyles : List StyleTransformer -> List ( String, String )
 convertStyles =
     toInlineStyles << compose
