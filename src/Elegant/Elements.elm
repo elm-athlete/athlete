@@ -6,18 +6,18 @@ module Elegant.Elements
         , link
         )
 
-{-|
-@docs border
+{-| @docs border
 @docs flexnav
+@docs border
 @docs borderBottom
 @docs link
 -}
 
 import Elegant exposing (..)
 import Color exposing (Color)
-import Elegant.Helpers exposing (..)
 import Html
 import Html.Attributes
+import Function exposing (..)
 
 
 {-| Create a nice looking Link

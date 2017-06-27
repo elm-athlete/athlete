@@ -95,9 +95,9 @@ content val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | content = val }
 
 
-div : HtmlAttributes -> HtmlAttributes
+div : List (HtmlAttributes -> HtmlAttributes) -> HtmlAttributes
 div =
-    tag "div"
+    node << List.append [ tag "div" ]
 
 
 node : List (HtmlAttributes -> HtmlAttributes) -> HtmlAttributes

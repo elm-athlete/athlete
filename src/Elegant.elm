@@ -381,6 +381,8 @@ module Elegant
 import Html exposing (Html)
 import Html.Attributes
 import Function exposing (compose)
+import Tuple2
+import Char
 
 
 -- import Html.Events
@@ -1185,8 +1187,8 @@ getStyles (Style styleValues) =
             )
 
 
-toHtmlStyles : List ( String, Maybe String ) -> List ( String, String )
-toHtmlStyles =
+removeEmptyStyles : List ( String, Maybe String ) -> List ( String, String )
+removeEmptyStyles =
     List.concatMap <|
         \( attr, maybe_ ) ->
             case maybe_ of
@@ -1202,7 +1204,7 @@ toInlineStyles styleTransformer =
     defaultStyle
         |> styleTransformer
         |> getStyles
-        |> toHtmlStyles
+        |> removeEmptyStyles
 
 
 {-| -}
@@ -2231,19 +2233,82 @@ transparent =
 {-| Generate all the classes of a list of Styles
 -}
 classes : Style -> String
-classes styles =
-    ""
+classes =
+    getStyles
+        >> removeEmptyStyles
+        >> List.map generateClassName
+        >> String.join " "
+
+
+generateClassName : ( String, String ) -> String
+generateClassName ( attribute, value ) =
+    attribute ++ "-" ++ (String.filter isValidCharCssName value)
+
+
+isBetween : Char -> Char -> Char -> Bool
+isBetween low high char =
+    let
+        code =
+            Char.toCode char
+    in
+        (code >= Char.toCode low) && (code <= Char.toCode high)
+
+
+isValidCharCssName : Char -> Bool
+isValidCharCssName char =
+    Char.isDigit char
+        || isBetween 'a' 'z' char
+        || isBetween 'A' 'Z' char
+        || (char == '-')
+
+
+addPrefix : String -> String -> String
+addPrefix prefix =
+    flip (++) prefix
 
 
 {-| Generate all the classes of a list of Hover Styles
 -}
 classesHover : Style -> String
-classesHover styles =
-    ""
+classesHover =
+    getStyles
+        >> removeEmptyStyles
+        >> List.map generateClassName
+        >> List.map (addPrefix "_hover")
+        >> String.join " "
 
 
 {-| Generate all the css from a list of tuple : styles and hover
 -}
 stylesToCss : List ( Style, Style ) -> String
-stylesToCss styles =
-    ""
+stylesToCss =
+    List.map
+        (Tuple.mapFirst (styleToCssClasses { suffix = "" }) >> Tuple.mapSecond (styleToCssClasses { suffix = "hover" }))
+        >> List.map (\( a, b ) -> a ++ "\n" ++ b)
+        >> String.join "\n"
+
+
+styleToCssClasses : { suffix : String } -> Style -> String
+styleToCssClasses { suffix } =
+    getStyles
+        >> removeEmptyStyles
+        >> List.map (compiledStylesToCss suffix)
+        >> String.join "\n"
+
+
+compiledStylesToCss : String -> ( String, String ) -> String
+compiledStylesToCss suffix ( attribute, value ) =
+    "."
+        ++ attribute
+        ++ "-"
+        ++ (String.filter isValidCharCssName value)
+        ++ (if String.isEmpty suffix then
+                ""
+            else
+                "_" ++ suffix ++ ":" ++ suffix
+           )
+        ++ "{"
+        ++ attribute
+        ++ ":"
+        ++ value
+        ++ ";}"
