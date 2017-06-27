@@ -153,6 +153,10 @@ module Elegant
         , cursorPointer
         , visibilityHidden
         , transparent
+        , classes
+        , classesHover
+        , stylesToCss
+        , applyStyle
         )
 
 {-|
@@ -169,7 +173,10 @@ module Elegant
 # Styling
 @docs style
 @docs convertStyles
-
+@docs classes
+@docs classesHover
+@docs stylesToCss
+@docs applyStyle
 
 # Styles
 ## Positions
@@ -369,9 +376,9 @@ module Elegant
 
 -}
 
-import Elegant.Helpers exposing (..)
 import Html exposing (Html)
 import Html.Attributes
+import Function exposing (compose)
 
 
 -- import Html.Events
@@ -1210,6 +1217,12 @@ style : List StyleTransformer -> Html.Attribute msg
 style =
     Html.Attributes.style
         << convertStyles
+
+
+{-| -}
+applyStyle : List (Style -> Style) -> Style
+applyStyle styleTransformer =
+    (compose styleTransformer) defaultStyle
 
 
 position : Position -> Style -> Style
@@ -2220,3 +2233,24 @@ visibilityHidden =
 transparent : Color
 transparent =
     Color.rgba 0 0 0 0.0
+
+
+{-| Generate all the classes of a list of Styles
+-}
+classes : Maybe Style -> String
+classes styles =
+    ""
+
+
+{-| Generate all the classes of a list of Hover Styles
+-}
+classesHover : Maybe Style -> String
+classesHover styles =
+    ""
+
+
+{-| Generate all the css from a list of tuple : styles and hover
+-}
+stylesToCss : List ( Maybe Style, Maybe Style ) -> String
+stylesToCss styles =
+    ""
