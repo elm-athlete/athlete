@@ -12,6 +12,7 @@ module Elegant
         , tiny
         , zero
         , opposite
+        , defaultStyle
         , style
         , convertStyles
         , positionAbsolute
@@ -156,7 +157,6 @@ module Elegant
         , classes
         , classesHover
         , stylesToCss
-        , applyStyle
         )
 
 {-|
@@ -171,12 +171,12 @@ module Elegant
 @docs Offset
 
 # Styling
+@docs defaultStyle
 @docs style
 @docs convertStyles
 @docs classes
 @docs classesHover
 @docs stylesToCss
-@docs applyStyle
 
 # Styles
 ## Positions
@@ -201,7 +201,9 @@ module Elegant
 @docs alignItemsStretch
 @docs alignSelfCenter
 
+
 ## SizeUnit operations
+
 @docs opposite
 
 ## Paddings
@@ -436,7 +438,7 @@ type alias BoxShadow =
 
 
 {-| Calculate the opposite of a size unit value.
-    Ex : opposite (Px 2) == Px -2
+Ex : opposite (Px 2) == Px -2
 -}
 opposite : SizeUnit -> SizeUnit
 opposite unit =
@@ -629,10 +631,6 @@ type Style
         }
 
 
-type alias StyleTransformer =
-    Style -> Style
-
-
 {-| -}
 huge : SizeUnit
 huge =
@@ -669,6 +667,7 @@ zero =
     Px 0
 
 
+{-| -}
 defaultStyle : Style
 defaultStyle =
     Style
@@ -1198,7 +1197,7 @@ toHtmlStyles =
                     [ ( attr, val ) ]
 
 
-toInlineStyles : StyleTransformer -> List ( String, String )
+toInlineStyles : (Style -> Style) -> List ( String, String )
 toInlineStyles styleTransformer =
     defaultStyle
         |> styleTransformer
@@ -1207,22 +1206,16 @@ toInlineStyles styleTransformer =
 
 
 {-| -}
-convertStyles : List StyleTransformer -> List ( String, String )
+convertStyles : List (Style -> Style) -> List ( String, String )
 convertStyles =
     toInlineStyles << compose
 
 
 {-| -}
-style : List StyleTransformer -> Html.Attribute msg
+style : List (Style -> Style) -> Html.Attribute msg
 style =
     Html.Attributes.style
         << convertStyles
-
-
-{-| -}
-applyStyle : List (Style -> Style) -> Style
-applyStyle styleTransformer =
-    (compose styleTransformer) defaultStyle
 
 
 position : Position -> Style -> Style
@@ -2237,20 +2230,20 @@ transparent =
 
 {-| Generate all the classes of a list of Styles
 -}
-classes : Maybe Style -> String
+classes : Style -> String
 classes styles =
     ""
 
 
 {-| Generate all the classes of a list of Hover Styles
 -}
-classesHover : Maybe Style -> String
+classesHover : Style -> String
 classesHover styles =
     ""
 
 
 {-| Generate all the css from a list of tuple : styles and hover
 -}
-stylesToCss : List ( Maybe Style, Maybe Style ) -> String
+stylesToCss : List ( Style, Style ) -> String
 stylesToCss styles =
     ""

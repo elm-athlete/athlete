@@ -1,4 +1,4 @@
-module BodyBuilder exposing (..)
+module BodyBuilder exposing (HtmlAttributes, toHtml, tag, style, hoverStyle, content, div, node)
 
 import Html
 import Html.Attributes
@@ -9,8 +9,8 @@ import Elegant exposing (Style)
 type alias Tree =
     { tag : String
     , content : List HtmlAttributes
-    , style : Maybe Style
-    , hoverStyle : Maybe Style
+    , style : Style
+    , hoverStyle : Style
     }
 
 
@@ -23,32 +23,32 @@ base =
     HtmlAttributes
         { tag = "div"
         , content = []
-        , style = Nothing
-        , hoverStyle = Nothing
+        , style = Elegant.defaultStyle
+        , hoverStyle = Elegant.defaultStyle
         }
 
 
-classes : Maybe Style -> Html.Attribute msg
-classes styles =
-    Html.Attributes.class (Elegant.classes styles)
+classes : Style -> Html.Attribute msg
+classes =
+    Html.Attributes.class << Elegant.classes
 
 
-hoverClasses : Maybe Style -> Html.Attribute msg
-hoverClasses styles =
-    Html.Attributes.class (Elegant.classesHover styles)
+hoverClasses : Style -> Html.Attribute msg
+hoverClasses =
+    Html.Attributes.class << Elegant.classesHover
 
 
-fold : (Tree -> b -> b) -> b -> HtmlAttributes -> b
-fold fun answerSoFar (HtmlAttributes tree) =
+fold : (Tree -> a -> a) -> a -> HtmlAttributes -> a
+fold fun accumulator (HtmlAttributes tree) =
     List.foldr
-        (\e accu -> fold fun accu e)
-        (fun tree answerSoFar)
+        (flip (fold fun))
+        (fun tree accumulator)
         tree.content
 
 
-getAllStyles : HtmlAttributes -> List ( Maybe Style, Maybe Style )
-getAllStyles tree =
-    fold (\e acu -> ( e.style, e.hoverStyle ) :: acu) [] tree
+getAllStyles : HtmlAttributes -> List ( Style, Style )
+getAllStyles =
+    fold (\node accumulator -> ( node.style, node.hoverStyle ) :: accumulator) []
 
 
 htmlAttributesToCss : HtmlAttributes -> Html.Html msg
@@ -80,14 +80,14 @@ tag val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | tag = val }
 
 
-style : List (Elegant.Style -> Elegant.Style) -> HtmlAttributes -> HtmlAttributes
+style : List (Style -> Style) -> HtmlAttributes -> HtmlAttributes
 style val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | style = Just (Elegant.applyStyle val) }
+    HtmlAttributes { attrs | style = (compose val) attrs.style }
 
 
-hoverStyle : List (Elegant.Style -> Elegant.Style) -> HtmlAttributes -> HtmlAttributes
+hoverStyle : List (Style -> Style) -> HtmlAttributes -> HtmlAttributes
 hoverStyle val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | hoverStyle = Just (Elegant.applyStyle val) }
+    HtmlAttributes { attrs | hoverStyle = (compose val) attrs.hoverStyle }
 
 
 content : List HtmlAttributes -> HtmlAttributes -> HtmlAttributes
@@ -101,6 +101,5 @@ div =
 
 
 node : List (HtmlAttributes -> HtmlAttributes) -> HtmlAttributes
-node htmlAttributesModifiers =
-    base
-        |> compose htmlAttributesModifiers
+node htmlAttributesTransformers =
+    base |> compose htmlAttributesTransformers
