@@ -1,7 +1,7 @@
 module BodyBuilderDemo exposing (..)
 
 import BodyBuilder
-import Elegant exposing (SizeUnit(..))
+import Elegant exposing (SizeUnit(..), Style)
 import Html exposing (Html)
 import Color
 
@@ -11,14 +11,33 @@ main =
     BodyBuilder.toHtml view
 
 
+square : Int -> Style -> Style
+square x =
+    Elegant.width (Px x) << Elegant.height (Px x)
+
+
 view : BodyBuilder.HtmlAttributes
 view =
     BodyBuilder.div
         [ BodyBuilder.style
-            [ Elegant.width (Px 100)
-            , Elegant.height (Px 100)
+            [ square 100
             , Elegant.backgroundColor (Color.red)
             ]
         , BodyBuilder.hoverStyle
             [ Elegant.backgroundColor (Color.blue) ]
+        ]
+        [ BodyBuilder.div
+            [ BodyBuilder.style
+                [ square 50
+                , Elegant.backgroundColor (Color.green)
+                ]
+            ]
+            [ BodyBuilder.div
+                [ BodyBuilder.style
+                    [ square 30
+                    , Elegant.backgroundColor (Color.red)
+                    ]
+                ]
+                []
+            ]
         ]

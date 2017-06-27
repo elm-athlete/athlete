@@ -95,11 +95,11 @@ content val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | content = val }
 
 
-div : List (HtmlAttributes -> HtmlAttributes) -> HtmlAttributes
+div : List (HtmlAttributes -> HtmlAttributes) -> List HtmlAttributes -> HtmlAttributes
 div =
     node << List.append [ tag "div" ]
 
 
-node : List (HtmlAttributes -> HtmlAttributes) -> HtmlAttributes
-node htmlAttributesTransformers =
-    base |> compose htmlAttributesTransformers
+node : List (HtmlAttributes -> HtmlAttributes) -> List HtmlAttributes -> HtmlAttributes
+node htmlAttributesTransformers children =
+    base |> compose htmlAttributesTransformers >> content children

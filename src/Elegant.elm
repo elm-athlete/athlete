@@ -381,8 +381,8 @@ module Elegant
 import Html exposing (Html)
 import Html.Attributes
 import Function exposing (compose)
-import Tuple2
-import Char
+import List.Extra
+import Elegant.Helpers as Helpers
 
 
 -- import Html.Events
@@ -1199,12 +1199,17 @@ removeEmptyStyles =
                     [ ( attr, val ) ]
 
 
+compileStyle : Style -> List ( String, String )
+compileStyle =
+    getStyles
+        >> removeEmptyStyles
+
+
 toInlineStyles : (Style -> Style) -> List ( String, String )
 toInlineStyles styleTransformer =
     defaultStyle
         |> styleTransformer
-        |> getStyles
-        |> removeEmptyStyles
+        |> compileStyle
 
 
 {-| -}
@@ -2242,28 +2247,11 @@ classes =
 
 generateClassName : ( String, String ) -> String
 generateClassName ( attribute, value ) =
-    attribute ++ "-" ++ (String.filter isValidCharCssName value)
+    attribute ++ "-" ++ (String.filter Helpers.isValidInCssName value)
 
 
-isBetween : Char -> Char -> Char -> Bool
-isBetween low high char =
-    let
-        code =
-            Char.toCode char
-    in
-        (code >= Char.toCode low) && (code <= Char.toCode high)
-
-
-isValidCharCssName : Char -> Bool
-isValidCharCssName char =
-    Char.isDigit char
-        || isBetween 'a' 'z' char
-        || isBetween 'A' 'Z' char
-        || (char == '-')
-
-
-addPrefix : String -> String -> String
-addPrefix prefix =
+addSuffix : String -> String -> String
+addSuffix prefix =
     flip (++) prefix
 
 
@@ -2274,7 +2262,7 @@ classesHover =
     getStyles
         >> removeEmptyStyles
         >> List.map generateClassName
-        >> List.map (addPrefix "_hover")
+        >> List.map (addSuffix "_hover")
         >> String.join " "
 
 
@@ -2283,30 +2271,60 @@ classesHover =
 stylesToCss : List ( Style, Style ) -> String
 stylesToCss =
     List.map
-        (Tuple.mapFirst (styleToCssClasses { suffix = "" }) >> Tuple.mapSecond (styleToCssClasses { suffix = "hover" }))
-        >> List.map (\( a, b ) -> a ++ "\n" ++ b)
-        >> String.join "\n"
+        (Tuple.mapFirst compileStyle
+            >> Tuple.mapSecond compileStyle
+        )
+        >> mergeNestedList
+        >> Tuple.mapFirst
+            (List.map (compiledStylesToCss { suffix = "" })
+                >> String.join "\n"
+            )
+        >> Tuple.mapSecond
+            (List.map (compiledStylesToCss { suffix = "hover" })
+                >> String.join "\n"
+            )
+        >> joinStyles
 
 
-styleToCssClasses : { suffix : String } -> Style -> String
-styleToCssClasses { suffix } =
-    getStyles
-        >> removeEmptyStyles
-        >> List.map (compiledStylesToCss suffix)
-        >> String.join "\n"
+joinStyles : ( String, String ) -> String
+joinStyles ( styles, hover ) =
+    styles ++ "\n" ++ hover
 
 
-compiledStylesToCss : String -> ( String, String ) -> String
-compiledStylesToCss suffix ( attribute, value ) =
+appendAbsent : List comparable -> List comparable -> List comparable
+appendAbsent first =
+    List.Extra.unique
+        << List.append first
+
+
+{-| Take a list of tuple (containing list), and return a tuple of the list merged
+-}
+mergeNestedList : List ( List comparable, List comparable ) -> ( List comparable, List comparable )
+mergeNestedList =
+    List.foldr
+        (\( styles, hoverStyles ) ( styles_, hoverStyles_ ) ->
+            ( appendAbsent styles styles_
+            , appendAbsent hoverStyles hoverStyles_
+            )
+        )
+        ( [], [] )
+
+
+addSuffixAndSelector : String -> String
+addSuffixAndSelector suffix =
+    if String.isEmpty suffix then
+        ""
+    else
+        "_" ++ suffix ++ ":" ++ suffix
+
+
+compiledStylesToCss : { suffix : String } -> ( String, String ) -> String
+compiledStylesToCss { suffix } ( attribute, value ) =
     "."
         ++ attribute
         ++ "-"
-        ++ (String.filter isValidCharCssName value)
-        ++ (if String.isEmpty suffix then
-                ""
-            else
-                "_" ++ suffix ++ ":" ++ suffix
-           )
+        ++ (String.filter Helpers.isValidInCssName value)
+        ++ addSuffixAndSelector suffix
         ++ "{"
         ++ attribute
         ++ ":"
