@@ -1,6 +1,6 @@
 module BodyBuilderDemo exposing (..)
 
-import BodyBuilder
+import BodyBuilderHtml as BodyBuilder
 import Elegant exposing (SizeUnit(..), Style)
 import Html exposing (Html)
 import Color
@@ -35,12 +35,12 @@ update msg model =
 view : String -> BodyBuilder.HtmlAttributes Msg
 view model =
     BodyBuilder.div []
-        [ BodyBuilder.range
-            { max = "700"
-            , min = "200"
-            , onInput = ChangeWidth
-            }
-            [ BodyBuilder.defaultValue "200" ]
+        [ BodyBuilder.node
+            [ BodyBuilder.range
+                200
+                700
+                ChangeWidth
+            ]
         , BodyBuilder.div
             [ BodyBuilder.style
                 [ model

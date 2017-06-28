@@ -1,4 +1,4 @@
-module BodyBuilder
+module BodyBuilderHtml
     exposing
         ( HtmlAttributes
         , view
@@ -6,6 +6,7 @@ module BodyBuilder
         , hoverStyle
         , content
         , div
+        , tag
         , input
         , range
         , text
@@ -34,6 +35,7 @@ type alias Tree msg =
     , defaultValue : Maybe String
     , style : Style
     , hoverStyle : Style
+    , checked : Bool
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -59,6 +61,7 @@ base =
         , defaultValue = Nothing
         , style = Elegant.defaultStyle
         , hoverStyle = Elegant.defaultStyle
+        , checked = False
 
         -- Html Events
         , onInput = Nothing
@@ -108,6 +111,10 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 (List.concat
                     [ [ classes val.style ]
                     , [ hoverClasses val.hoverStyle ]
+                    , if val.checked then
+                        []
+                      else
+                        [ Html.Attributes.checked True ]
                     , Helpers.emptyListOrApply Html.Attributes.type_ val.type_
                     , Helpers.emptyListOrApply Html.Attributes.max val.max
                     , Helpers.emptyListOrApply Html.Attributes.min val.min
@@ -128,8 +135,8 @@ view val =
         ]
 
 
-tag_ : String -> HtmlAttributes msg -> HtmlAttributes msg
-tag_ val (HtmlAttributes attrs) =
+tag : String -> HtmlAttributes msg -> HtmlAttributes msg
+tag val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | tag = Just val }
 
 
@@ -178,31 +185,47 @@ content val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | content = val }
 
 
+checked : Bool -> HtmlAttributes msg -> HtmlAttributes msg
+checked val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | checked = val }
+
+
 div : List (HtmlAttributes msg -> HtmlAttributes msg) -> List (HtmlAttributes msg) -> HtmlAttributes msg
 div =
-    node "div"
+    node << List.append [ tag "div" ]
 
 
-input : List (HtmlAttributes msg -> HtmlAttributes msg) -> List (HtmlAttributes msg) -> HtmlAttributes msg
+input : HtmlAttributes msg -> HtmlAttributes msg
 input =
-    node "input"
+    tag "input"
 
 
-range :
-    { max : String
-    , min : String
-    , onInput : String -> msg
-    }
-    -> List (HtmlAttributes msg -> HtmlAttributes msg)
-    -> HtmlAttributes msg
-range values attrs =
-    base
-        |> tag_ "input"
-        |> type_ "range"
-        |> max values.max
-        |> min values.min
-        |> onInput values.onInput
-        |> compose attrs
+range : Int -> Int -> (String -> msg) -> HtmlAttributes msg -> HtmlAttributes msg
+range min_ max_ onInput_ =
+    input
+        >> type_ "range"
+        >> max (toString max_)
+        >> min (toString min_)
+        >> onInput onInput_
+
+
+button : HtmlAttributes msg -> HtmlAttributes msg
+button =
+    input
+        >> type_ "button"
+
+
+checkbox : Bool -> HtmlAttributes msg -> HtmlAttributes msg
+checkbox checked_ =
+    input
+        >> type_ "checkbox"
+        >> checked checked_
+
+
+color : HtmlAttributes msg -> HtmlAttributes msg
+color =
+    input
+        >> type_ "color"
 
 
 text : String -> HtmlAttributes msg
@@ -210,9 +233,8 @@ text value =
     text_ value base
 
 
-node : String -> List (HtmlAttributes msg -> HtmlAttributes msg) -> List (HtmlAttributes msg) -> HtmlAttributes msg
-node tag htmlAttributesTransformers children =
+node : List (HtmlAttributes msg -> HtmlAttributes msg) -> List (HtmlAttributes msg) -> HtmlAttributes msg
+node htmlAttributesTransformers children =
     base
-        |> tag_ tag
         |> compose htmlAttributesTransformers
         >> content children
