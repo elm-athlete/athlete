@@ -1,6 +1,6 @@
 module BodyBuilderDemo exposing (..)
 
-import BodyBuilderHtml as BodyBuilder
+import BodyBuilderHtml as BodyBuilder exposing (..)
 import Elegant exposing (SizeUnit(..), Style)
 import Html exposing (Html)
 import Color
@@ -32,54 +32,45 @@ update msg model =
             width
 
 
+coloredSquare : Int -> Color.Color -> HtmlAttributes msg -> HtmlAttributes msg
+coloredSquare size color =
+    style
+        [ square size
+        , Elegant.backgroundColor color
+        , Elegant.textRight
+        , Elegant.paddingRight Elegant.medium
+        ]
+
+
 view : String -> BodyBuilder.HtmlAttributes Msg
 view model =
-    BodyBuilder.div []
-        [ BodyBuilder.node
-            [ BodyBuilder.range
-                200
-                700
-                ChangeWidth
-            ]
-        , BodyBuilder.div
-            [ BodyBuilder.style
-                [ model
-                    |> String.toInt
-                    |> Result.withDefault 200
-                    |> square
+    container
+        [ leaf [ range 200 700 ChangeWidth ]
+        , node
+            [ style
+                [ square
+                    (model
+                        |> String.toInt
+                        |> Result.withDefault 200
+                    )
                 , Elegant.backgroundColor Color.red
                 ]
-            , BodyBuilder.hoverStyle
-                [ Elegant.backgroundColor Color.blue ]
-            ]
-            [ BodyBuilder.div
-                [ BodyBuilder.style
-                    [ square 90
-                    , Elegant.backgroundColor Color.blue
-                    , Elegant.textRight
-                    , Elegant.paddingRight Elegant.medium
-                    ]
+            , hoverStyle
+                [ screenWidthBetween 100 200 [ Elegant.backgroundColor Color.yellow ]
+                , screenWidthGE 200 [ Elegant.backgroundColor Color.blue ]
+                , screenWidthLE 200 [ Elegant.backgroundColor Color.red ]
                 ]
-                [ BodyBuilder.div
-                    [ BodyBuilder.style
-                        [ square 60
-                        , Elegant.backgroundColor Color.green
-                        , Elegant.textRight
-                        , Elegant.paddingRight Elegant.medium
-                        ]
+            ]
+            [ node
+                [ coloredSquare 90 Color.red ]
+                [ node
+                    [ coloredSquare 60 Color.green ]
+                    [ node
+                        [ coloredSquare 30 Color.red ]
+                        [ text "e" ]
+                    , text "l"
                     ]
-                    [ BodyBuilder.div
-                        [ BodyBuilder.style
-                            [ square 30
-                            , Elegant.backgroundColor Color.red
-                            , Elegant.textRight
-                            , Elegant.paddingRight Elegant.medium
-                            ]
-                        ]
-                        [ BodyBuilder.text "e" ]
-                    , BodyBuilder.text "l"
-                    ]
-                , BodyBuilder.text "m"
+                , text "m"
                 ]
             ]
         ]

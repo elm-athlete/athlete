@@ -630,6 +630,27 @@ type Style
         , cursor : Maybe String
         , visibility : Maybe Visibility
         , boxSizing : Maybe String
+        , screenWidths : List ScreenWidth
+        }
+
+
+type alias ScreenWidth =
+    { min : Maybe Int
+    , max : Maybe Int
+    , style : Style
+    }
+
+
+screenWidthBetween : Maybe Int -> Maybe Int -> List (Style -> Style) -> Style -> Style
+screenWidthBetween min max insideStyle (Style style) =
+    Style
+        { style
+            | screenWidths =
+                { min = min
+                , max = max
+                , style = (compose insideStyle) defaultStyle
+                }
+                    :: style.screenWidths
         }
 
 
@@ -737,6 +758,7 @@ defaultStyle =
         , cursor = Nothing
         , visibility = Nothing
         , boxSizing = Just "border-box"
+        , screenWidths = []
         }
 
 
@@ -2266,13 +2288,9 @@ stylesToCss =
         )
         >> mergeNestedList
         >> Tuple.mapFirst
-            (List.map (compiledStylesToCss { suffix = "" })
-                >> String.join "\n"
-            )
+            (List.map (compiledStylesToCss { suffix = "" }) >> String.join "\n")
         >> Tuple.mapSecond
-            (List.map (compiledStylesToCss { suffix = "hover" })
-                >> String.join "\n"
-            )
+            (List.map (compiledStylesToCss { suffix = "hover" }) >> String.join "\n")
         >> joinStyles
 
 

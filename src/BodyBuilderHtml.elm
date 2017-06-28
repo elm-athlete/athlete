@@ -11,6 +11,8 @@ module BodyBuilderHtml
         , range
         , text
         , node
+        , leaf
+        , container
         , type_
         , max
         , min
@@ -131,9 +133,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
 view : HtmlAttributes msg -> Html.Html msg
 view val =
     Html.div []
-        [ Html.node "style"
-            []
-            [ htmlAttributesToCss val ]
+        [ Html.node "style" [] [ htmlAttributesToCss val ]
         , htmlAttributesToHtml val
         ]
 
@@ -193,9 +193,9 @@ checked val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | checked = val }
 
 
-div : List (HtmlAttributes msg -> HtmlAttributes msg) -> HtmlAttributes msg
+div : HtmlAttributes msg -> HtmlAttributes msg
 div =
-    node << List.append [ tag "div" ]
+    tag "div"
 
 
 input : HtmlAttributes msg -> HtmlAttributes msg
@@ -295,7 +295,19 @@ text value =
     text_ value base
 
 
-node : List (HtmlAttributes msg -> HtmlAttributes msg) -> HtmlAttributes msg
-node htmlAttributesTransformers =
+node : List (HtmlAttributes msg -> HtmlAttributes msg) -> List (HtmlAttributes msg) -> HtmlAttributes msg
+node htmlAttributesTransformers children =
     base
+        |> div
         |> compose htmlAttributesTransformers
+        |> content children
+
+
+leaf : List (HtmlAttributes msg -> HtmlAttributes msg) -> HtmlAttributes msg
+leaf =
+    flip node []
+
+
+container : List (HtmlAttributes msg) -> HtmlAttributes msg
+container =
+    node []
