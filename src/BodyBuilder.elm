@@ -7,6 +7,7 @@ module BodyBuilder
         , content
         , div
         , input
+        , range
         , text
         , node
         , type_
@@ -187,9 +188,26 @@ input =
     node "input"
 
 
+range :
+    { max : String
+    , min : String
+    , onInput : String -> msg
+    }
+    -> List (HtmlAttributes msg -> HtmlAttributes msg)
+    -> HtmlAttributes msg
+range values attrs =
+    base
+        |> tag_ "input"
+        |> type_ "range"
+        |> max values.max
+        |> min values.min
+        |> onInput values.onInput
+        |> compose attrs
+
+
 text : String -> HtmlAttributes msg
 text value =
-    base |> text_ value
+    text_ value base
 
 
 node : String -> List (HtmlAttributes msg -> HtmlAttributes msg) -> List (HtmlAttributes msg) -> HtmlAttributes msg

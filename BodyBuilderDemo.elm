@@ -35,14 +35,12 @@ update msg model =
 view : String -> BodyBuilder.HtmlAttributes Msg
 view model =
     BodyBuilder.div []
-        [ BodyBuilder.input
-            [ BodyBuilder.type_ "range"
-            , BodyBuilder.max "700"
-            , BodyBuilder.min "200"
-            , BodyBuilder.defaultValue "200"
-            , BodyBuilder.onInput ChangeWidth
-            ]
-            []
+        [ BodyBuilder.range
+            { max = "700"
+            , min = "200"
+            , onInput = ChangeWidth
+            }
+            [ BodyBuilder.defaultValue "200" ]
         , BodyBuilder.div
             [ BodyBuilder.style
                 [ model
