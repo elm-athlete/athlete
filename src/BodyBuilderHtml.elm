@@ -36,6 +36,7 @@ type alias Tree msg =
     , style : Style
     , hoverStyle : Style
     , checked : Bool
+    , value : Maybe String
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -62,6 +63,7 @@ base =
         , style = Elegant.defaultStyle
         , hoverStyle = Elegant.defaultStyle
         , checked = False
+        , value = Nothing
 
         -- Html Events
         , onInput = Nothing
@@ -120,6 +122,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.min val.min
                     , Helpers.emptyListOrApply Html.Attributes.defaultValue val.defaultValue
                     , Helpers.emptyListOrApply Html.Events.onInput val.onInput
+                    , Helpers.emptyListOrApply Html.Attributes.value val.value
                     ]
                 )
                 (val.content |> List.map htmlAttributesToHtml)
@@ -190,7 +193,7 @@ checked val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | checked = val }
 
 
-div : List (HtmlAttributes msg -> HtmlAttributes msg) -> List (HtmlAttributes msg) -> HtmlAttributes msg
+div : List (HtmlAttributes msg -> HtmlAttributes msg) -> HtmlAttributes msg
 div =
     node << List.append [ tag "div" ]
 
@@ -228,13 +231,71 @@ color =
         >> type_ "color"
 
 
+date : HtmlAttributes msg -> HtmlAttributes msg
+date =
+    input
+        >> type_ "date"
+
+
+datetimeLocal : HtmlAttributes msg -> HtmlAttributes msg
+datetimeLocal =
+    input
+        >> type_ "datetime-local"
+
+
+email : HtmlAttributes msg -> HtmlAttributes msg
+email =
+    input
+        >> type_ "email"
+
+
+file : HtmlAttributes msg -> HtmlAttributes msg
+file =
+    input
+        >> type_ "file"
+
+
+hidden : HtmlAttributes msg -> HtmlAttributes msg
+hidden =
+    input
+        >> type_ "hidden"
+
+
+password : HtmlAttributes msg -> HtmlAttributes msg
+password =
+    input
+        >> type_ "password"
+
+
+radio : HtmlAttributes msg -> HtmlAttributes msg
+radio =
+    input
+        >> type_ "radio"
+
+
+submit : HtmlAttributes msg -> HtmlAttributes msg
+submit =
+    input
+        >> type_ "submit"
+
+
+textField : HtmlAttributes msg -> HtmlAttributes msg
+textField =
+    input
+        >> type_ "text"
+
+
+value : String -> HtmlAttributes msg -> HtmlAttributes msg
+value val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | value = Just val }
+
+
 text : String -> HtmlAttributes msg
 text value =
     text_ value base
 
 
-node : List (HtmlAttributes msg -> HtmlAttributes msg) -> List (HtmlAttributes msg) -> HtmlAttributes msg
-node htmlAttributesTransformers children =
+node : List (HtmlAttributes msg -> HtmlAttributes msg) -> HtmlAttributes msg
+node htmlAttributesTransformers =
     base
         |> compose htmlAttributesTransformers
-        >> content children
