@@ -2377,19 +2377,14 @@ joinStyles ( styles, hover ) =
     styles ++ "\n" ++ hover
 
 
-appendAbsent : List comparable -> List comparable -> List comparable
-appendAbsent first =
-    List.append first
-
-
 {-| Take a list of tuple (containing list), and return a tuple of the list merged
 -}
 mergeNestedList : List ( List comparable, List comparable ) -> ( List comparable, List comparable )
 mergeNestedList =
     List.foldr
         (\( styles, hoverStyles ) ( styles_, hoverStyles_ ) ->
-            ( appendAbsent styles styles_
-            , appendAbsent hoverStyles hoverStyles_
+            ( List.append styles styles_
+            , List.append hoverStyles hoverStyles_
             )
         )
         ( [], [] )
