@@ -2277,7 +2277,7 @@ classes =
 -}
 classesHover : Style -> String
 classesHover =
-    classesAndScreenWidths "_hover"
+    classesAndScreenWidths "hover"
 
 
 classesNameGeneration : String -> Style -> String
@@ -2298,7 +2298,7 @@ classesAndScreenWidths suffix (Style style) =
 
 generateClassName : String -> ( String, String ) -> String
 generateClassName suffix ( attribute, value ) =
-    attribute ++ "-" ++ (String.filter Helpers.isValidInCssName (value ++ suffix))
+    attribute ++ "-" ++ (String.filter Helpers.isValidInCssName (value ++ "_" ++ suffix))
 
 
 addSuffix : String -> String -> String
@@ -2311,41 +2311,40 @@ addSuffix suffix =
 stylesToCss : List ( Style, Style ) -> String
 stylesToCss styles =
     let
-        screenWidths : List ( String, String )
         screenWidths =
             styles
                 |> List.map (Tuple.mapFirst (compileScreenWidths Nothing))
                 |> List.map (Tuple.mapSecond (compileScreenWidths (Just "hover")))
-    in
-        (List.map
-            (Tuple.mapFirst compileStyle
-                >> Tuple.mapSecond compileStyle
-            )
-            >> mergeNestedList
-            >> Tuple.mapFirst
-                (List.map (compiledStylesToCss { suffix = "", selector = Nothing }) >> String.join "\n")
-            >> Tuple.mapSecond
-                (List.map (compiledStylesToCss { suffix = "hover", selector = Just "hover" }) >> String.join "\n")
-            >> joinStyles
-        )
+                |> mergeNestedList
+                |> Tuple.mapFirst (List.concat >> List.Extra.unique >> String.join "\n")
+                |> Tuple.mapSecond (List.concat >> List.Extra.unique >> String.join "\n")
+                |> \( standard, hover ) -> standard ++ hover
+
+        styles_ =
             styles
-            ++ (List.map (\( s1, s2 ) -> s1 ++ s2) screenWidths |> String.join "\n")
+                |> List.map (Tuple.mapFirst compileStyle)
+                |> List.map (Tuple.mapSecond compileStyle)
+                |> mergeNestedList
+                |> Tuple.mapFirst (List.Extra.unique >> List.map (compiledStylesToCss { suffix = "", selector = Nothing }) >> String.join "\n")
+                |> Tuple.mapSecond (List.Extra.unique >> List.map (compiledStylesToCss { suffix = "hover", selector = Just "hover" }) >> String.join "\n")
+                |> joinStyles
+    in
+        styles_ ++ "\n" ++ screenWidths
 
 
-compileScreenWidths : Maybe String -> Style -> String
+compileScreenWidths : Maybe String -> Style -> List (List String)
 compileScreenWidths suffix (Style style) =
     style.screenWidths
         |> List.map (\{ max, min, style } -> ( max, min, compileStyle style ))
         |> List.map
             (\( max, min, styles ) ->
                 (List.map
-                    (compiledStylesToCss { suffix = (String.filter Helpers.isValidInCssName ((suffix ? "") ++ (toString min) ++ (toString max))), selector = suffix })
+                    (compiledStylesToCss { suffix = (String.filter Helpers.isValidInCssName ((suffix ? "") ++ (toString min) ++ (toString max))), selector = suffix }
+                        >> inMediaQuery min max
+                    )
                     styles
                 )
-                    |> String.join "\n"
-                    |> inMediaQuery min max
             )
-        |> String.join "\n\nbla\n"
 
 
 inMediaQuery : Maybe Int -> Maybe Int -> String -> String
@@ -2380,8 +2379,7 @@ joinStyles ( styles, hover ) =
 
 appendAbsent : List comparable -> List comparable -> List comparable
 appendAbsent first =
-    List.Extra.unique
-        << List.append first
+    List.append first
 
 
 {-| Take a list of tuple (containing list), and return a tuple of the list merged
@@ -2397,32 +2395,19 @@ mergeNestedList =
         ( [], [] )
 
 
-addSuffixAndSelector : String -> Maybe String -> String
-addSuffixAndSelector suffix selector =
-    if String.isEmpty suffix then
-        ""
-    else
-        "_"
-            ++ suffix
-            ++ (case selector of
-                    Nothing ->
-                        ""
+addSelector : Maybe String -> String
+addSelector =
+    Maybe.Extra.unwrap "" ((++) ":")
 
-                    Just selec ->
-                        ":" ++ selec
-               )
+
+generateStyle : ( String, String ) -> String
+generateStyle ( attribute, value ) =
+    attribute ++ ": " ++ value ++ ";"
 
 
 compiledStylesToCss : { suffix : String, selector : Maybe String } -> ( String, String ) -> String
-compiledStylesToCss { suffix, selector } ( attribute, value ) =
+compiledStylesToCss { suffix, selector } style =
     "."
-        ++ attribute
-        ++ "-"
-        ++ (String.filter Helpers.isValidInCssName value)
-        ++ addSuffixAndSelector suffix selector
-        ++ Helpers.betweenBraces
-            (attribute
-                ++ ":"
-                ++ value
-                ++ ";"
-            )
+        ++ generateClassName suffix style
+        ++ addSelector selector
+        ++ Helpers.betweenBraces (generateStyle style)
