@@ -15,6 +15,7 @@ module Elegant
         , defaultStyle
         , style
         , convertStyles
+        , screenWidthBetween
         , positionAbsolute
         , positionRelative
         , positionFixed
@@ -177,6 +178,7 @@ module Elegant
 @docs classes
 @docs classesHover
 @docs stylesToCss
+@docs screenWidthBetween
 
 # Styles
 ## Positions
@@ -383,6 +385,7 @@ import Html.Attributes
 import Function exposing (compose)
 import List.Extra
 import Elegant.Helpers as Helpers exposing (emptyListOrApply)
+import Maybe.Extra exposing ((?))
 
 
 -- import Html.Events
@@ -641,13 +644,14 @@ type alias ScreenWidth =
     }
 
 
-screenWidthBetween : Maybe Int -> Maybe Int -> List (Style -> Style) -> Style -> Style
+{-| -}
+screenWidthBetween : Int -> Int -> List (Style -> Style) -> Style -> Style
 screenWidthBetween min max insideStyle (Style style) =
     Style
         { style
             | screenWidths =
-                { min = min
-                , max = max
+                { min = Just min
+                , max = Just max
                 , style = (compose insideStyle) defaultStyle
                 }
                     :: style.screenWidths
@@ -2247,51 +2251,126 @@ transparent =
     Color.rgba 0 0 0 0.0
 
 
+
+{-
+    ███████    ███████    ███████
+   ████████   ████████   ████████
+   ████       █████      █████
+   ███        ████       ████
+   ███        ███████    ███████
+   ███         ███████    ███████
+   ███            ████       ████
+   ████          █████      █████
+   ████████   ████████   ████████
+    ███████   ███████    ███████
+-}
+
+
 {-| Generate all the classes of a list of Styles
 -}
 classes : Style -> String
 classes =
-    getStyles
-        >> removeEmptyStyles
-        >> List.map generateClassName
-        >> String.join " "
-
-
-generateClassName : ( String, String ) -> String
-generateClassName ( attribute, value ) =
-    attribute ++ "-" ++ (String.filter Helpers.isValidInCssName value)
-
-
-addSuffix : String -> String -> String
-addSuffix prefix =
-    flip (++) prefix
+    classesAndScreenWidths ""
 
 
 {-| Generate all the classes of a list of Hover Styles
 -}
 classesHover : Style -> String
 classesHover =
-    getStyles
-        >> removeEmptyStyles
-        >> List.map generateClassName
-        >> List.map (addSuffix "_hover")
+    classesAndScreenWidths "_hover"
+
+
+classesNameGeneration : String -> Style -> String
+classesNameGeneration suffix =
+    compileStyle
+        >> List.map (generateClassName suffix)
         >> String.join " "
+
+
+classesAndScreenWidths : String -> Style -> String
+classesAndScreenWidths suffix (Style style) =
+    style.screenWidths
+        |> List.map (\{ min, max, style } -> classesNameGeneration (suffix ++ (toString min) ++ (toString max)) style)
+        |> String.join " "
+        |> (++) " "
+        |> (++) (classesNameGeneration suffix (Style style))
+
+
+generateClassName : String -> ( String, String ) -> String
+generateClassName suffix ( attribute, value ) =
+    attribute ++ "-" ++ (String.filter Helpers.isValidInCssName (value ++ suffix))
+
+
+addSuffix : String -> String -> String
+addSuffix suffix =
+    flip (++) suffix
 
 
 {-| Generate all the css from a list of tuple : styles and hover
 -}
 stylesToCss : List ( Style, Style ) -> String
-stylesToCss =
-    List.map
-        (Tuple.mapFirst compileStyle
-            >> Tuple.mapSecond compileStyle
+stylesToCss styles =
+    let
+        screenWidths : List ( String, String )
+        screenWidths =
+            styles
+                |> List.map (Tuple.mapFirst (compileScreenWidths Nothing))
+                |> List.map (Tuple.mapSecond (compileScreenWidths (Just "hover")))
+    in
+        (List.map
+            (Tuple.mapFirst compileStyle
+                >> Tuple.mapSecond compileStyle
+            )
+            >> mergeNestedList
+            >> Tuple.mapFirst
+                (List.map (compiledStylesToCss { suffix = "", selector = Nothing }) >> String.join "\n")
+            >> Tuple.mapSecond
+                (List.map (compiledStylesToCss { suffix = "hover", selector = Just "hover" }) >> String.join "\n")
+            >> joinStyles
         )
-        >> mergeNestedList
-        >> Tuple.mapFirst
-            (List.map (compiledStylesToCss { suffix = "" }) >> String.join "\n")
-        >> Tuple.mapSecond
-            (List.map (compiledStylesToCss { suffix = "hover" }) >> String.join "\n")
-        >> joinStyles
+            styles
+            ++ (List.map (\( s1, s2 ) -> s1 ++ s2) screenWidths |> String.join "\n")
+
+
+compileScreenWidths : Maybe String -> Style -> String
+compileScreenWidths suffix (Style style) =
+    style.screenWidths
+        |> List.map (\{ max, min, style } -> ( max, min, compileStyle style ))
+        |> List.map
+            (\( max, min, styles ) ->
+                (List.map
+                    (compiledStylesToCss { suffix = (String.filter Helpers.isValidInCssName ((suffix ? "") ++ (toString min) ++ (toString max))), selector = suffix })
+                    styles
+                )
+                    |> String.join "\n"
+                    |> inMediaQuery min max
+            )
+        |> String.join "\n\nbla\n"
+
+
+inMediaQuery : Maybe Int -> Maybe Int -> String -> String
+inMediaQuery min max classes =
+    "@media " ++ mediaQuerySelector min max ++ Helpers.betweenBraces classes
+
+
+mediaQuerySelector : Maybe Int -> Maybe Int -> String
+mediaQuerySelector min max =
+    case min of
+        Nothing ->
+            case max of
+                Nothing ->
+                    ""
+
+                Just max_ ->
+                    "(max-width: " ++ toString max_ ++ "px)"
+
+        Just min_ ->
+            case max of
+                Nothing ->
+                    "(min-width: " ++ toString min_ ++ "px)"
+
+                Just max_ ->
+                    "(min-width: " ++ toString min_ ++ "px) and (max-width: " ++ toString max_ ++ "px)"
 
 
 joinStyles : ( String, String ) -> String
@@ -2318,23 +2397,32 @@ mergeNestedList =
         ( [], [] )
 
 
-addSuffixAndSelector : String -> String
-addSuffixAndSelector suffix =
+addSuffixAndSelector : String -> Maybe String -> String
+addSuffixAndSelector suffix selector =
     if String.isEmpty suffix then
         ""
     else
-        "_" ++ suffix ++ ":" ++ suffix
+        "_"
+            ++ suffix
+            ++ (case selector of
+                    Nothing ->
+                        ""
+
+                    Just selec ->
+                        ":" ++ selec
+               )
 
 
-compiledStylesToCss : { suffix : String } -> ( String, String ) -> String
-compiledStylesToCss { suffix } ( attribute, value ) =
+compiledStylesToCss : { suffix : String, selector : Maybe String } -> ( String, String ) -> String
+compiledStylesToCss { suffix, selector } ( attribute, value ) =
     "."
         ++ attribute
         ++ "-"
         ++ (String.filter Helpers.isValidInCssName value)
-        ++ addSuffixAndSelector suffix
-        ++ "{"
-        ++ attribute
-        ++ ":"
-        ++ value
-        ++ ";}"
+        ++ addSuffixAndSelector suffix selector
+        ++ Helpers.betweenBraces
+            (attribute
+                ++ ":"
+                ++ value
+                ++ ";"
+            )

@@ -56,9 +56,11 @@ view model =
                 , Elegant.backgroundColor Color.red
                 ]
             , hoverStyle
-                [ screenWidthBetween 100 200 [ Elegant.backgroundColor Color.yellow ]
-                , screenWidthGE 200 [ Elegant.backgroundColor Color.blue ]
-                , screenWidthLE 200 [ Elegant.backgroundColor Color.red ]
+                [ Elegant.backgroundColor Color.yellow
+                , Elegant.screenWidthBetween 100 200 [ Elegant.opacity 0.5 ]
+
+                -- , screenWidthGE 200 [ Elegant.backgroundColor Color.blue ]
+                -- , screenWidthLE 200 [ Elegant.backgroundColor Color.red ]
                 ]
             ]
             [ node
