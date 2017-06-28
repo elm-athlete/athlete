@@ -4,11 +4,20 @@ import BodyBuilder
 import Elegant exposing (SizeUnit(..), Style)
 import Html exposing (Html)
 import Color
+import Html exposing (Html)
 
 
-main : Html msg
+type Msg
+    = ChangeWidth String
+
+
+main : Program Never String Msg
 main =
-    BodyBuilder.toHtml view
+    Html.beginnerProgram
+        { model = "200"
+        , update = update
+        , view = BodyBuilder.view << view
+        }
 
 
 square : Int -> Style -> Style
@@ -16,28 +25,63 @@ square x =
     Elegant.width (Px x) << Elegant.height (Px x)
 
 
-view : BodyBuilder.HtmlAttributes
-view =
-    BodyBuilder.div
-        [ BodyBuilder.style
-            [ square 100
-            , Elegant.backgroundColor (Color.red)
+update : Msg -> String -> String
+update msg model =
+    case msg of
+        ChangeWidth width ->
+            width
+
+
+view : String -> BodyBuilder.HtmlAttributes Msg
+view model =
+    BodyBuilder.div []
+        [ BodyBuilder.input
+            [ BodyBuilder.type_ "range"
+            , BodyBuilder.max "700"
+            , BodyBuilder.min "200"
+            , BodyBuilder.defaultValue "200"
+            , BodyBuilder.onInput ChangeWidth
             ]
-        , BodyBuilder.hoverStyle
-            [ Elegant.backgroundColor (Color.blue) ]
-        ]
-        [ BodyBuilder.div
+            []
+        , BodyBuilder.div
             [ BodyBuilder.style
-                [ square 50
-                , Elegant.backgroundColor (Color.green)
+                [ model
+                    |> String.toInt
+                    |> Result.withDefault 200
+                    |> square
+                , Elegant.backgroundColor Color.red
                 ]
+            , BodyBuilder.hoverStyle
+                [ Elegant.backgroundColor Color.blue ]
             ]
             [ BodyBuilder.div
                 [ BodyBuilder.style
-                    [ square 30
-                    , Elegant.backgroundColor (Color.red)
+                    [ square 90
+                    , Elegant.backgroundColor Color.blue
+                    , Elegant.textRight
+                    , Elegant.paddingRight Elegant.medium
                     ]
                 ]
-                []
+                [ BodyBuilder.div
+                    [ BodyBuilder.style
+                        [ square 60
+                        , Elegant.backgroundColor Color.green
+                        , Elegant.textRight
+                        , Elegant.paddingRight Elegant.medium
+                        ]
+                    ]
+                    [ BodyBuilder.div
+                        [ BodyBuilder.style
+                            [ square 30
+                            , Elegant.backgroundColor Color.red
+                            , Elegant.textRight
+                            , Elegant.paddingRight Elegant.medium
+                            ]
+                        ]
+                        [ BodyBuilder.text "e" ]
+                    , BodyBuilder.text "l"
+                    ]
+                , BodyBuilder.text "m"
+                ]
             ]
         ]

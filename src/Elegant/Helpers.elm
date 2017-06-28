@@ -1,4 +1,4 @@
-module Elegant.Helpers exposing (..)
+module Elegant.Helpers exposing (isValidInCssName, emptyListOrApply)
 
 import Char
 
@@ -18,3 +18,9 @@ isValidInCssName char =
         || isBetween 'a' 'z' char
         || isBetween 'A' 'Z' char
         || (char == '-')
+
+
+emptyListOrApply : (a -> b) -> Maybe a -> List b
+emptyListOrApply fun =
+    Maybe.map (fun >> List.singleton)
+        >> Maybe.withDefault []

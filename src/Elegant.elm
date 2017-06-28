@@ -382,7 +382,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Function exposing (compose)
 import List.Extra
-import Elegant.Helpers as Helpers
+import Elegant.Helpers as Helpers exposing (emptyListOrApply)
 
 
 -- import Html.Events
@@ -1082,16 +1082,6 @@ offsetToStringList : ( SizeUnit, SizeUnit ) -> List String
 offsetToStringList ( x, y ) =
     [ x, y ]
         |> List.map sizeUnitToString_
-
-
-emptyListOrApply : (a -> b) -> Maybe a -> List b
-emptyListOrApply fun val =
-    case val of
-        Nothing ->
-            []
-
-        Just val_ ->
-            [ fun val_ ]
 
 
 boxShadowToString : Maybe BoxShadow -> Maybe String
