@@ -2318,20 +2318,25 @@ classesHover =
     classesAndScreenWidths "hover"
 
 
-classesNameGeneration : String -> Style -> String
+classesNameGeneration : String -> Style -> List String
 classesNameGeneration suffix =
     compileStyle
         >> List.map (generateClassName suffix)
-        >> String.join " "
 
 
 classesAndScreenWidths : String -> Style -> String
 classesAndScreenWidths suffix (Style style) =
-    style.screenWidths
-        |> List.map (\{ min, max, style } -> classesNameGeneration (suffix ++ (toString min) ++ (toString max)) style)
-        |> String.join " "
-        |> (++) " "
-        |> (++) (classesNameGeneration suffix (Style style))
+    let
+        standardClassesNames =
+            classesNameGeneration suffix (Style style)
+
+        mediaQueriesClassesNames =
+            style.screenWidths
+                |> List.map (\{ min, max, style } -> classesNameGeneration (suffix ++ (toString min) ++ (toString max)) style)
+                |> List.concat
+    in
+        List.append standardClassesNames mediaQueriesClassesNames
+            |> String.join " "
 
 
 generateClassName : String -> ( String, String ) -> String
@@ -2363,8 +2368,8 @@ stylesToCss styles =
                 |> List.map (Tuple.mapFirst compileStyle)
                 |> List.map (Tuple.mapSecond compileStyle)
                 |> mergeNestedList
-                |> Tuple.mapFirst (List.Extra.unique >> List.map (compiledStylesToCss { suffix = "", selector = Nothing }) >> String.join "\n")
-                |> Tuple.mapSecond (List.Extra.unique >> List.map (compiledStylesToCss { suffix = "hover", selector = Just "hover" }) >> String.join "\n")
+                |> Tuple.mapFirst (List.Extra.unique >> List.map (compileStyleToCss { suffix = "", selector = Nothing }) >> String.join "\n")
+                |> Tuple.mapSecond (List.Extra.unique >> List.map (compileStyleToCss { suffix = "hover", selector = Just "hover" }) >> String.join "\n")
                 |> joinStyles
     in
         boxSizingCss ++ styles_ ++ "\n" ++ screenWidths
@@ -2382,7 +2387,7 @@ compileScreenWidths suffix (Style style) =
         |> List.map
             (\( max, min, styles ) ->
                 (List.map
-                    (compiledStylesToCss { suffix = (String.filter Helpers.isValidInCssName ((suffix ? "") ++ (toString min) ++ (toString max))), selector = suffix }
+                    (compileStyleToCss { suffix = (String.filter Helpers.isValidInCssName ((suffix ? "") ++ (toString min) ++ (toString max))), selector = suffix }
                         >> inMediaQuery min max
                     )
                     styles
@@ -2443,8 +2448,8 @@ generateStyle ( attribute, value ) =
     attribute ++ ": " ++ value ++ ";"
 
 
-compiledStylesToCss : { suffix : String, selector : Maybe String } -> ( String, String ) -> String
-compiledStylesToCss { suffix, selector } style =
+compileStyleToCss : { suffix : String, selector : Maybe String } -> ( String, String ) -> String
+compileStyleToCss { suffix, selector } style =
     "."
         ++ generateClassName suffix style
         ++ addSelector selector

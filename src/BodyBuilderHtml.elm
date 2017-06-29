@@ -76,14 +76,26 @@ base =
         }
 
 
-classes : Style -> Html.Attribute msg
+classesToAttributes : (Style -> String) -> Style -> List (Html.Attribute msg)
+classesToAttributes fun style =
+    let
+        classes_ =
+            fun style
+    in
+        if String.isEmpty classes_ then
+            []
+        else
+            [ Html.Attributes.class classes_ ]
+
+
+classes : Style -> List (Html.Attribute msg)
 classes =
-    Html.Attributes.class << Elegant.classes
+    classesToAttributes Elegant.classes
 
 
-hoverClasses : Style -> Html.Attribute msg
+hoverClasses : Style -> List (Html.Attribute msg)
 hoverClasses =
-    Html.Attributes.class << Elegant.classesHover
+    classesToAttributes Elegant.classesHover
 
 
 fold : (Tree msg -> a -> a) -> a -> HtmlAttributes msg -> a
@@ -113,8 +125,8 @@ htmlAttributesToHtml (HtmlAttributes val) =
         Just tag_ ->
             Html.node tag_
                 (List.concat
-                    [ [ classes val.style ]
-                    , [ hoverClasses val.hoverStyle ]
+                    [ classes val.style
+                    , hoverClasses val.hoverStyle
                     , if val.checked then
                         []
                       else
