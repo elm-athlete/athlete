@@ -16,6 +16,8 @@ module Elegant
         , style
         , convertStyles
         , screenWidthBetween
+        , screenWidthGE
+        , screenWidthLE
         , positionAbsolute
         , positionRelative
         , positionFixed
@@ -179,6 +181,8 @@ module Elegant
 @docs classesHover
 @docs stylesToCss
 @docs screenWidthBetween
+@docs screenWidthGE
+@docs screenWidthLE
 
 # Styles
 ## Positions
@@ -659,6 +663,34 @@ screenWidthBetween min max insideStyle (Style style) =
 
 
 {-| -}
+screenWidthGE : Int -> List (Style -> Style) -> Style -> Style
+screenWidthGE min insideStyle (Style style) =
+    Style
+        { style
+            | screenWidths =
+                { min = Just min
+                , max = Nothing
+                , style = (compose insideStyle) defaultStyle
+                }
+                    :: style.screenWidths
+        }
+
+
+{-| -}
+screenWidthLE : Int -> List (Style -> Style) -> Style -> Style
+screenWidthLE max insideStyle (Style style) =
+    Style
+        { style
+            | screenWidths =
+                { min = Nothing
+                , max = Just max
+                , style = (compose insideStyle) defaultStyle
+                }
+                    :: style.screenWidths
+        }
+
+
+{-| -}
 huge : SizeUnit
 huge =
     Px 48
@@ -761,7 +793,7 @@ defaultStyle =
         , zIndex = Nothing
         , cursor = Nothing
         , visibility = Nothing
-        , boxSizing = Just "border-box"
+        , boxSizing = Nothing
         , screenWidths = []
         }
 
@@ -1224,6 +1256,7 @@ compileStyle =
 toInlineStyles : (Style -> Style) -> List ( String, String )
 toInlineStyles styleTransformer =
     defaultStyle
+        |> boxSizing "border-box"
         |> styleTransformer
         |> compileStyle
 
@@ -1893,6 +1926,11 @@ borderAndTextColor val =
     borderColor val << textColor val
 
 
+boxSizing : String -> Style -> Style
+boxSizing val (Style style) =
+    Style { style | boxSizing = Just val }
+
+
 standardBoxShadow : Maybe SizeUnit -> Maybe Color -> Offset -> BoxShadow
 standardBoxShadow =
     BoxShadow False Nothing
@@ -2329,7 +2367,12 @@ stylesToCss styles =
                 |> Tuple.mapSecond (List.Extra.unique >> List.map (compiledStylesToCss { suffix = "hover", selector = Just "hover" }) >> String.join "\n")
                 |> joinStyles
     in
-        styles_ ++ "\n" ++ screenWidths
+        boxSizingCss ++ styles_ ++ "\n" ++ screenWidths
+
+
+boxSizingCss : String
+boxSizingCss =
+    "*{box-sizing: border-box;}\n"
 
 
 compileScreenWidths : Maybe String -> Style -> List (List String)

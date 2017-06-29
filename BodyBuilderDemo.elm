@@ -54,13 +54,15 @@ view model =
                         |> Result.withDefault 200
                     )
                 , Elegant.backgroundColor Color.red
+                , Elegant.screenWidthBetween 300 700 [ Elegant.backgroundColor Color.blue ]
+                , Elegant.screenWidthGE 700 [ Elegant.backgroundColor Color.green ]
+                , Elegant.screenWidthLE 300 [ Elegant.backgroundColor Color.purple ]
                 ]
             , hoverStyle
                 [ Elegant.backgroundColor Color.yellow
-                , Elegant.screenWidthBetween 100 200 [ Elegant.opacity 0.5 ]
-
-                -- , screenWidthGE 200 [ Elegant.backgroundColor Color.blue ]
-                -- , screenWidthLE 200 [ Elegant.backgroundColor Color.red ]
+                , Elegant.screenWidthBetween 300 700 [ Elegant.opacity 0.5 ]
+                , Elegant.screenWidthGE 700 [ Elegant.backgroundColor Color.charcoal ]
+                , Elegant.screenWidthLE 300 [ Elegant.backgroundColor Color.lightRed ]
                 ]
             ]
             [ node
