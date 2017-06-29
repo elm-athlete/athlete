@@ -2308,23 +2308,23 @@ transparent =
 -}
 classes : Style -> String
 classes =
-    classesAndScreenWidths ""
+    classesAndScreenWidths Nothing
 
 
 {-| Generate all the classes of a list of Hover Styles
 -}
 classesHover : Style -> String
 classesHover =
-    classesAndScreenWidths "hover"
+    classesAndScreenWidths (Just "hover")
 
 
-classesNameGeneration : String -> Style -> List String
+classesNameGeneration : Maybe String -> Style -> List String
 classesNameGeneration suffix =
     compileStyle
         >> List.map (generateClassName suffix)
 
 
-classesAndScreenWidths : String -> Style -> String
+classesAndScreenWidths : Maybe String -> Style -> String
 classesAndScreenWidths suffix (Style style) =
     let
         standardClassesNames =
@@ -2332,47 +2332,101 @@ classesAndScreenWidths suffix (Style style) =
 
         mediaQueriesClassesNames =
             style.screenWidths
-                |> List.map (\{ min, max, style } -> classesNameGeneration (suffix ++ (toString min) ++ (toString max)) style)
+                |> List.map (screenWidthToClassNames suffix)
                 |> List.concat
     in
         List.append standardClassesNames mediaQueriesClassesNames
             |> String.join " "
 
 
-generateClassName : String -> ( String, String ) -> String
-generateClassName suffix ( attribute, value ) =
-    attribute ++ "-" ++ (String.filter Helpers.isValidInCssName (value ++ "_" ++ suffix))
+screenWidthToClassNames : Maybe String -> ScreenWidth -> List String
+screenWidthToClassNames suffix { min, max, style } =
+    List.map
+        (addMediaQueryId min max)
+        (classesNameGeneration suffix style)
+
+
+addMediaQueryId : Maybe Int -> Maybe Int -> String -> String
+addMediaQueryId min max =
+    flip (++) (String.filter Helpers.isValidInCssName (toString min ++ toString max))
+
+
+generateClassName : Maybe String -> ( String, String ) -> String
+generateClassName maybeSuffix ( attribute, value ) =
+    attribute ++ "-" ++ (String.filter Helpers.isValidInCssName (value ++ generateSuffix maybeSuffix))
+
+
+generateSuffix : Maybe String -> String
+generateSuffix =
+    Maybe.map (\suffix -> "_" ++ suffix)
+        >> Maybe.withDefault ""
+
+
+generateSelector : Maybe String -> Maybe String
+generateSelector =
+    Maybe.map ((++) ":")
 
 
 addSuffix : String -> String -> String
-addSuffix suffix =
-    flip (++) suffix
+addSuffix =
+    flip (++)
+
+
+type alias ConditionalStyle =
+    { style : Style
+    , suffix : Maybe String
+    , mediaQuery : Maybe ( Maybe Int, Maybe Int )
+    }
+
+
+type alias AtomicClass =
+    { mediaQuery : Maybe String
+    , className : String
+    , mediaQueryId : Maybe String
+    , selector : Maybe String
+    , property : String
+    }
+
+
+generateMediaQueryId : ( Maybe Int, Maybe Int ) -> String
+generateMediaQueryId ( min, max ) =
+    String.filter Helpers.isValidInCssName (toString min ++ toString max)
+
+
+coupleToAtomicClass : Maybe String -> Maybe ( Maybe Int, Maybe Int ) -> ( String, String ) -> AtomicClass
+coupleToAtomicClass suffix mediaQuery property =
+    { mediaQuery = Maybe.map generateMediaQuery mediaQuery
+    , className = generateClassName suffix property
+    , mediaQueryId = Maybe.map generateMediaQueryId mediaQuery
+    , selector = generateSelector suffix
+    , property = generateProperty property
+    }
+
+
+compileConditionalStyle : ConditionalStyle -> List AtomicClass
+compileConditionalStyle { style, suffix, mediaQuery } =
+    List.map (coupleToAtomicClass suffix mediaQuery) (compileStyle style)
+
+
+compileAtomicClass : AtomicClass -> String
+compileAtomicClass { mediaQuery, className, mediaQueryId, selector, property } =
+    inMediaQuery mediaQuery
+        (compileStyleToCss className mediaQueryId selector property)
 
 
 {-| Generate all the css from a list of tuple : styles and hover
 -}
-stylesToCss : List ( Style, Style ) -> String
+stylesToCss : List ConditionalStyle -> String
 stylesToCss styles =
-    let
-        screenWidths =
-            styles
-                |> List.map (Tuple.mapFirst (compileScreenWidths Nothing))
-                |> List.map (Tuple.mapSecond (compileScreenWidths (Just "hover")))
-                |> mergeNestedList
-                |> Tuple.mapFirst (List.concat >> List.Extra.unique >> String.join "\n")
-                |> Tuple.mapSecond (List.concat >> List.Extra.unique >> String.join "\n")
-                |> \( standard, hover ) -> standard ++ hover
-
-        styles_ =
-            styles
-                |> List.map (Tuple.mapFirst compileStyle)
-                |> List.map (Tuple.mapSecond compileStyle)
-                |> mergeNestedList
-                |> Tuple.mapFirst (List.Extra.unique >> List.map (compileStyleToCss { suffix = "", selector = Nothing }) >> String.join "\n")
-                |> Tuple.mapSecond (List.Extra.unique >> List.map (compileStyleToCss { suffix = "hover", selector = Just "hover" }) >> String.join "\n")
-                |> joinStyles
-    in
-        boxSizingCss ++ styles_ ++ "\n" ++ screenWidths
+    styles
+        |> List.concatMap compileScreenWidths
+        |> Debug.log "1e"
+        |> List.concatMap compileConditionalStyle
+        |> Debug.log "test"
+        |> List.map compileAtomicClass
+        |> List.Extra.unique
+        |> String.join "\n"
+        |> (++) boxSizingCss
 
 
 boxSizingCss : String
@@ -2380,24 +2434,36 @@ boxSizingCss =
     "*{box-sizing: border-box;}\n"
 
 
-compileScreenWidths : Maybe String -> Style -> List (List String)
-compileScreenWidths suffix (Style style) =
-    style.screenWidths
-        |> List.map (\{ max, min, style } -> ( max, min, compileStyle style ))
-        |> List.map
-            (\( max, min, styles ) ->
-                (List.map
-                    (compileStyleToCss { suffix = (String.filter Helpers.isValidInCssName ((suffix ? "") ++ (toString min) ++ (toString max))), selector = suffix }
-                        >> inMediaQuery min max
-                    )
-                    styles
-                )
-            )
+screenWidthToCompiledStyle :
+    Maybe String
+    -> ScreenWidth
+    -> ConditionalStyle
+screenWidthToCompiledStyle suffix { min, max, style } =
+    ConditionalStyle style suffix (Just ( min, max ))
 
 
-inMediaQuery : Maybe Int -> Maybe Int -> String -> String
-inMediaQuery min max classes =
-    "@media " ++ mediaQuerySelector min max ++ Helpers.betweenBraces classes
+compileScreenWidths : ConditionalStyle -> List ConditionalStyle
+compileScreenWidths ({ suffix, style } as style_) =
+    let
+        (Style { screenWidths }) =
+            style
+    in
+        style_ :: List.map (screenWidthToCompiledStyle suffix) screenWidths
+
+
+generateMediaQuery : ( Maybe Int, Maybe Int ) -> String
+generateMediaQuery ( min, max ) =
+    "@media " ++ mediaQuerySelector min max
+
+
+inMediaQuery : Maybe String -> String -> String
+inMediaQuery mediaQuery content =
+    case mediaQuery of
+        Nothing ->
+            content
+
+        Just queries ->
+            queries ++ Helpers.betweenBraces content
 
 
 mediaQuerySelector : Maybe Int -> Maybe Int -> String
@@ -2420,37 +2486,15 @@ mediaQuerySelector min max =
                     "(min-width: " ++ toString min_ ++ "px) and (max-width: " ++ toString max_ ++ "px)"
 
 
-joinStyles : ( String, String ) -> String
-joinStyles ( styles, hover ) =
-    styles ++ "\n" ++ hover
+generateProperty : ( String, String ) -> String
+generateProperty ( attribute, value ) =
+    attribute ++ ":" ++ value
 
 
-{-| Take a list of tuple (containing list), and return a tuple of the list merged
--}
-mergeNestedList : List ( List comparable, List comparable ) -> ( List comparable, List comparable )
-mergeNestedList =
-    List.foldr
-        (\( styles, hoverStyles ) ( styles_, hoverStyles_ ) ->
-            ( List.append styles styles_
-            , List.append hoverStyles hoverStyles_
-            )
-        )
-        ( [], [] )
-
-
-addSelector : Maybe String -> String
-addSelector =
-    Maybe.Extra.unwrap "" ((++) ":")
-
-
-generateStyle : ( String, String ) -> String
-generateStyle ( attribute, value ) =
-    attribute ++ ": " ++ value ++ ";"
-
-
-compileStyleToCss : { suffix : String, selector : Maybe String } -> ( String, String ) -> String
-compileStyleToCss { suffix, selector } style =
+compileStyleToCss : String -> Maybe String -> Maybe String -> String -> String
+compileStyleToCss className mediaQueryId selector property =
     "."
-        ++ generateClassName suffix style
-        ++ addSelector selector
-        ++ Helpers.betweenBraces (generateStyle style)
+        ++ className
+        ++ (mediaQueryId ? "")
+        ++ (selector ? "")
+        ++ Helpers.betweenBraces property

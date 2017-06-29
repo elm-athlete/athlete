@@ -106,9 +106,21 @@ fold fun accumulator (HtmlAttributes tree) =
         tree.content
 
 
-getAllStyles : HtmlAttributes msg -> List ( Style, Style )
+getAllStyles : HtmlAttributes msg -> List { style : Style, suffix : Maybe String, mediaQuery : Maybe ( Maybe Int, Maybe Int ) }
 getAllStyles =
-    fold (\node accumulator -> ( node.style, node.hoverStyle ) :: accumulator) []
+    fold
+        (\node accumulator ->
+            { style = node.style
+            , suffix = Nothing
+            , mediaQuery = Nothing
+            }
+                :: { style = node.hoverStyle
+                   , suffix = Just "hover"
+                   , mediaQuery = Nothing
+                   }
+                :: accumulator
+        )
+        []
 
 
 htmlAttributesToCss : HtmlAttributes msg -> Html.Html msg
