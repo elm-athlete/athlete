@@ -242,7 +242,7 @@ type Node insideInteractive insideP insideSpan insideHeading insideList
     | Div FlowAttributes (List (Node insideInteractive insideP OutsideSpan insideHeading insideList))
     | P FlowAttributes (List (Node insideInteractive InsideP insideSpan insideHeading insideList))
     | Span FlowAttributes (List (Node insideInteractive InsideP InsideSpan insideHeading insideList))
-    | H1 FlowAttributes (List (Node insideInteractive InsideP OutsideSpan InsideHeading insideList))
+    | H Int FlowAttributes (List (Node insideInteractive InsideP OutsideSpan InsideHeading insideList))
     | Ul FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading InsideList))
     | Ol FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading InsideList))
     | Li FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading OutsideList))
@@ -267,30 +267,7 @@ type Node insideInteractive insideP insideSpan insideHeading insideList
     | InputSubmit InputSubmitAttributes
     | InputUrl InputUrlAttributes
     | Select SelectAttributes
-
-
-h1 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h1 attrs =
-    H1 (flowDefaultsComposedToAttrs attrs)
-
-
-a : List (AAttributes -> AAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-a attrs =
-    let
-        defaults =
-            { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] }
-    in
-        A (defaults |> (attrs |> compose))
-
-
-button : List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-button =
-    Button
-
-
-div : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-div attrs =
-    Div (flowDefaultsComposedToAttrs attrs)
+    | Text String
 
 
 defaultsComposedToAttrs : a -> List (a -> a) -> a
@@ -311,6 +288,55 @@ flowDefaultsComposedToAttrs :
     -> { class : List b, hoverStyle : List c, id : Maybe a, style : List d }
 flowDefaultsComposedToAttrs =
     defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
+
+
+h1 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h1 attrs =
+    H 1 (flowDefaultsComposedToAttrs attrs)
+
+
+h2 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h2 attrs =
+    H 2 (flowDefaultsComposedToAttrs attrs)
+
+
+h3 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h3 attrs =
+    H 3 (flowDefaultsComposedToAttrs attrs)
+
+
+h4 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h4 attrs =
+    H 4 (flowDefaultsComposedToAttrs attrs)
+
+
+h5 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h5 attrs =
+    H 5 (flowDefaultsComposedToAttrs attrs)
+
+
+h6 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h6 attrs =
+    H 6 (flowDefaultsComposedToAttrs attrs)
+
+
+a : List (AAttributes -> AAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+a attrs =
+    let
+        defaults =
+            { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] }
+    in
+        A (defaults |> (attrs |> compose))
+
+
+button : List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+button =
+    Button
+
+
+div : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+div attrs =
+    Div (flowDefaultsComposedToAttrs attrs)
 
 
 ul : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
@@ -369,6 +395,11 @@ table :
     -> Node insideInteractive insideP insideSpan insideHeading OutsideList
 table =
     Table
+
+
+text : String -> Node insideInteractive insideP insideSpan insideHeading OutsideList
+text str =
+    Text str
 
 
 href : String -> HrefAttribute a -> HrefAttribute a
@@ -447,8 +478,8 @@ blah =
         [ a [ style [], href "blah", class [ "toto" ], id "titi" ]
             [ container
                 [ container
-                    [ h1 [ style [ Elegant.fontSize (Elegant.Px 1) ] ]
-                        [ span [] []
+                    [ h1 [ style [ Elegant.fontSize (Elegant.Px 1) ], hoverStyle [ Elegant.fontSize (Elegant.Px 3) ] ]
+                        [ span [] [ text "Toto" ]
                         , span [] [ img "alt" "toto" [] ]
                         , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
                         ]
@@ -484,7 +515,8 @@ handleAlt { alt } =
 
 handleStyle : StyleAttribute a -> List (Html.Attribute msg)
 handleStyle { style, hoverStyle } =
-    classes ((style |> compose) Elegant.defaultStyle)
+    (classes ((style |> compose) Elegant.defaultStyle))
+        |> List.append (hoverClasses ((hoverStyle |> compose) Elegant.defaultStyle))
 
 
 classesToAttributes : (Style -> String) -> Style -> List (Html.Attribute msg)
@@ -533,36 +565,40 @@ childToHtml attributes tag toHtmlAttributesList =
     Html.node tag (applyAttributes attributes toHtmlAttributesList) []
 
 
+baseHandling : List (StyleAttribute a -> List (Html.Attribute msg))
+baseHandling =
+    [ handleStyle ]
+
+
 toHtml : Node insideInteractive insideP insideSpan insideHeading insideList -> Html.Html msg
 toHtml node =
-    let
-        baseHandling =
-            [ handleStyle ]
-    in
-        case node of
-            A attributes children ->
-                parentToHtml attributes children "a" (baseHandling |> List.append [ handleHref ])
+    case node of
+        A attributes children ->
+            parentToHtml attributes children "a" (baseHandling |> List.append [ handleHref ])
 
-            Ul attributes children ->
-                parentToHtml attributes children "ul" baseHandling
+        Ul attributes children ->
+            parentToHtml attributes children "ul" baseHandling
 
-            Li attributes children ->
-                parentToHtml attributes children "li" baseHandling
+        Li attributes children ->
+            parentToHtml attributes children "li" baseHandling
 
-            Div attributes children ->
-                parentToHtml attributes children "div" baseHandling
+        Div attributes children ->
+            parentToHtml attributes children "div" baseHandling
 
-            Span attributes children ->
-                parentToHtml attributes children "span" baseHandling
+        Span attributes children ->
+            parentToHtml attributes children "span" baseHandling
 
-            H1 attributes children ->
-                parentToHtml attributes children "h1" baseHandling
+        H number attributes children ->
+            parentToHtml attributes children ("h" ++ (number |> toString)) baseHandling
 
-            Img attributes ->
-                childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
+        Img attributes ->
+            childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
 
-            _ ->
-                Html.div [] []
+        Text str ->
+            Html.text str
+
+        _ ->
+            Html.div [] []
 
 
 
