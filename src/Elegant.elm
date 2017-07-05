@@ -2424,6 +2424,7 @@ stylesToCss styles =
         |> List.concatMap compileConditionalStyle
         |> Debug.log "test"
         |> List.map compileAtomicClass
+        |> Debug.log "test2"
         |> List.Extra.unique
         |> String.join "\n"
         |> (++) boxSizingCss

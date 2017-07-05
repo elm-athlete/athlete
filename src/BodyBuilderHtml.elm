@@ -125,7 +125,8 @@ getAllStyles =
 
 htmlAttributesToCss : HtmlAttributes msg -> Html.Html msg
 htmlAttributesToCss val =
-    Html.text (Elegant.stylesToCss (getAllStyles val))
+    Html.text
+        (Elegant.stylesToCss (getAllStyles val))
 
 
 htmlAttributesToHtml : HtmlAttributes msg -> Html.Html msg
