@@ -447,7 +447,7 @@ blah =
         [ a [ style [], href "blah", class [ "toto" ], id "titi" ]
             [ container
                 [ container
-                    [ h1 []
+                    [ h1 [ style [ Elegant.fontSize (Elegant.Px 1) ] ]
                         [ span [] []
                         , span [] [ img "alt" "toto" [] ]
                         , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
