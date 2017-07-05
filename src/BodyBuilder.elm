@@ -322,11 +322,7 @@ h6 attrs =
 
 a : List (AAttributes -> AAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
 a attrs =
-    let
-        defaults =
-            { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] }
-    in
-        A (defaults |> (attrs |> compose))
+    A (defaultsComposedToAttrs { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] } attrs)
 
 
 button : List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
@@ -402,31 +398,6 @@ text str =
     Text str
 
 
-href : String -> HrefAttribute a -> HrefAttribute a
-href val attrs =
-    { attrs | href = Just val }
-
-
-style : List (Style -> Style) -> StyleAttribute a -> StyleAttribute a
-style val attrs =
-    { attrs | style = val }
-
-
-hoverStyle : List (Style -> Style) -> StyleAttribute a -> StyleAttribute a
-hoverStyle val attrs =
-    { attrs | hoverStyle = val }
-
-
-class : List String -> ClassAttribute a -> ClassAttribute a
-class val attrs =
-    { attrs | class = val }
-
-
-id : String -> IdAttribute a -> IdAttribute a
-id val attrs =
-    { attrs | id = Just val }
-
-
 node :
     List (FlowAttributes -> FlowAttributes)
     -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
@@ -470,6 +441,31 @@ ulLi :
     -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
 ulLi attributes insideLis =
     ul attributes (mapLis insideLis)
+
+
+href : String -> HrefAttribute a -> HrefAttribute a
+href val attrs =
+    { attrs | href = Just val }
+
+
+style : List (Style -> Style) -> StyleAttribute a -> StyleAttribute a
+style val attrs =
+    { attrs | style = val }
+
+
+hoverStyle : List (Style -> Style) -> StyleAttribute a -> StyleAttribute a
+hoverStyle val attrs =
+    { attrs | hoverStyle = val }
+
+
+class : List String -> ClassAttribute a -> ClassAttribute a
+class val attrs =
+    { attrs | class = val }
+
+
+id : String -> IdAttribute a -> IdAttribute a
+id val attrs =
+    { attrs | id = Just val }
 
 
 blah : Node OutsideInteractive OutsideP OutsideSpan OutsideHeading OutsideList
@@ -605,17 +601,8 @@ toHtml node =
 -- P _ _ ->
 --     "p"
 --
--- H1 _ _ ->
---     "h1"
---
--- Ul _ _ ->
---     "ul"
---
 -- Ol _ _ ->
 --     "ol"
---
--- Li _ _ ->
---     "li"
 --
 -- Table _ _ ->
 --     "table"
