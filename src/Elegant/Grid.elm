@@ -16,8 +16,8 @@ module Elegant.Grid
 import Elegant exposing (..)
 import Elegant.Elements as Elements
 import Color
-import Elegant.Helpers exposing (..)
 import Html exposing (Html)
+import Function exposing (compose)
 
 
 type alias Column msg =

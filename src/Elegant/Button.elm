@@ -10,6 +10,7 @@ import Elegant exposing (..)
 import Elegant.Elements exposing (..)
 import Elegant.Helpers exposing (..)
 import Color exposing (Color)
+import Function exposing (compose)
 
 
 {-| Create a nice looking button
