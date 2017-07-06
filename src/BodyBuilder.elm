@@ -5,65 +5,7 @@ import Html
 import Function exposing (..)
 import BodyBuilderHtml exposing (..)
 import Color
-
-
-type Language
-    = English
-    | French
-
-
-type Country
-    = Us
-    | Uk
-    | France
-
-
-type Charset
-    = UTF8
-
-
-type alias Lang =
-    ( Language, Country )
-
-
-type alias Html =
-    { head : Maybe Head
-    , body : Maybe Body
-    , lang : Lang
-    }
-
-
-type alias Head =
-    { title : Maybe String
-    , charset : Maybe Charset
-    , description : Maybe String
-    , keywords : List String
-    , author : String
-    , otherMeta : List ( String, String )
-    }
-
-
-type alias MimeType =
-    String
-
-
-type alias Source =
-    { mime : MimeType
-    , src : Url
-    }
-
-
-
--- type InsideForm
---     = InsideForm
-
-
-type alias Url =
-    String
-
-
-type NodeInsideA
-    = NodeInsideA
+import Maybe.Extra as Maybe
 
 
 type OutsideInteractive
@@ -82,12 +24,12 @@ type OutsideP
     = OutsideP
 
 
-type InsideSpan
-    = InsideSpan
-
-
 type OutsideSpan
     = OutsideSpan
+
+
+type InsideSpan
+    = InsideSpan
 
 
 type InsideHeading
@@ -127,6 +69,10 @@ type alias ClassAttribute a =
 
 type alias TargetAttribute a =
     { a | target : Maybe String }
+
+
+type alias Url =
+    String
 
 
 type alias HrefAttribute a =
@@ -316,98 +262,98 @@ flowDefaultsComposedToAttrs =
 
 
 h1 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h1 attrs =
-    H 1 (flowDefaultsComposedToAttrs attrs)
+h1 =
+    H 1 << flowDefaultsComposedToAttrs
 
 
 h2 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h2 attrs =
-    H 2 (flowDefaultsComposedToAttrs attrs)
+h2 =
+    H 2 << flowDefaultsComposedToAttrs
 
 
 h3 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h3 attrs =
-    H 3 (flowDefaultsComposedToAttrs attrs)
+h3 =
+    H 3 << flowDefaultsComposedToAttrs
 
 
 h4 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h4 attrs =
-    H 4 (flowDefaultsComposedToAttrs attrs)
+h4 =
+    H 4 << flowDefaultsComposedToAttrs
 
 
 h5 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h5 attrs =
-    H 5 (flowDefaultsComposedToAttrs attrs)
+h5 =
+    H 5 << flowDefaultsComposedToAttrs
 
 
 h6 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h6 attrs =
-    H 6 (flowDefaultsComposedToAttrs attrs)
+h6 =
+    H 6 << flowDefaultsComposedToAttrs
 
 
 a : List (AAttributes -> AAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-a attrs =
-    A (defaultsComposedToAttrs { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] } attrs)
+a =
+    A << defaultsComposedToAttrs { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] }
 
 
 button : List (ButtonAttributes -> ButtonAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-button attrs =
-    Button (defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] } attrs)
+button =
+    Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
 div : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-div attrs =
-    Div (flowDefaultsComposedToAttrs attrs)
+div =
+    Div << flowDefaultsComposedToAttrs
 
 
 ul : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-ul attrs =
-    Ul (flowDefaultsComposedToAttrs attrs)
+ul =
+    Ul << flowDefaultsComposedToAttrs
 
 
 ol : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-ol attrs =
-    Ol (flowDefaultsComposedToAttrs attrs)
+ol =
+    Ol << flowDefaultsComposedToAttrs
 
 
 li : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading InsideList
-li attrs =
-    Li (flowDefaultsComposedToAttrs attrs)
+li =
+    Li << flowDefaultsComposedToAttrs
 
 
 p : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP insideSpan insideHeading OutsideList) -> Node insideInteractive OutsideP insideSpan insideHeading OutsideList
-p attrs =
-    P (flowDefaultsComposedToAttrs attrs)
+p =
+    P << flowDefaultsComposedToAttrs
 
 
 br : List (FlowAttributes -> FlowAttributes) -> Node insideInteractive InsideP insideSpan insideHeading OutsideList
-br attrs =
-    Br (flowDefaultsComposedToAttrs attrs)
+br =
+    Br << flowDefaultsComposedToAttrs
 
 
 span : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP InsideSpan insideHeading OutsideList) -> Node insideInteractive insideP insideSpan insideHeading OutsideList
-span attrs =
-    Span (flowDefaultsComposedToAttrs attrs)
+span =
+    Span << flowDefaultsComposedToAttrs
 
 
 textarea : List (TextareaAttributes -> TextareaAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-textarea attrs =
-    Textarea (defaultsComposedToAttrs { value = Nothing, class = [], id = Nothing, style = [], hoverStyle = [] } attrs)
+textarea =
+    Textarea << defaultsComposedToAttrs { value = Nothing, class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
 img : String -> String -> List (ImgAttributes -> ImgAttributes) -> Node insideInteractive insideP insideSpan insideHeading OutsideList
-img alt src attrs =
-    Img (defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [] } attrs)
+img alt src =
+    Img << defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
 audio : List (AudioAttributes -> AudioAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-audio attrs =
-    Audio (defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] } attrs)
+audio =
+    Audio << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
 progress : List (ProgressAttributes -> ProgressAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-progress attrs =
-    Progress (defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] } attrs)
+progress =
+    Progress << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
 table :
@@ -419,8 +365,8 @@ table =
 
 
 text : String -> Node insideInteractive insideP insideSpan insideHeading OutsideList
-text str =
-    Text str
+text =
+    Text
 
 
 node :
@@ -448,8 +394,8 @@ container =
 mapLis :
     List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
     -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList)
-mapLis insideLis =
-    insideLis |> List.map (\e -> li [] [ e ])
+mapLis =
+    List.map (\content -> li [] [ content ])
 
 
 olLi :
@@ -498,39 +444,13 @@ main =
     nodeToHtml blah
 
 
-
--- handleHref : HrefAttribute a -> List (Html.Attribute msg)
--- handleHref { href } =
---     href
---         |> Maybe.map (\e -> [ Html.Attributes.href e ])
---         |> Maybe.withDefault []
---
---
--- handleSrc : SrcAttribute a -> List (Html.Attribute msg)
--- handleSrc { src } =
---     [ Html.Attributes.src src ]
---
---
--- handleAlt : AltAttribute a -> List (Html.Attribute msg)
--- handleAlt { alt } =
---     [ Html.Attributes.alt alt ]
---
---
--- handleStyle : StyleAttribute a -> List (Html.Attribute msg)
--- handleStyle { style, hoverStyle } =
---     []
---     (classes ((style |> compose) Elegant.defaultStyle))
---         |> List.append (hoverClasses ((hoverStyle |> compose) Elegant.defaultStyle))
-
-
 handleHref :
     { a | href : Maybe String }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleHref { href } =
     href
-        |> Maybe.map BodyBuilderHtml.href
-        |> Maybe.withDefault identity
+        |> Maybe.unwrap identity BodyBuilderHtml.href
 
 
 handleStyle :
@@ -559,8 +479,7 @@ handleClass { class } =
 handleId : { a | id : Maybe String } -> HtmlAttributes msg -> HtmlAttributes msg
 handleId { id } =
     id
-        |> Maybe.map BodyBuilderHtml.id
-        |> Maybe.withDefault identity
+        |> Maybe.unwrap identity BodyBuilderHtml.id
 
 
 buildNode :
@@ -733,105 +652,3 @@ nodeToHtml node =
 --
 -- shouldWork =
 --     a [ div [] ]
--- type alias Url =
---     String
---
--- type InsideA
---     = InsideA
---
---
--- type Node insideA
---     = A Url (List (Node InsideA))
---
---
--- nested : Node InsideA
--- nested =
---     A "toto" [ A "titi" [ A "titi" [] ] ]
--- | Button (List (Node InsideA))
--- | Div (List (Node insideA))
--- | Span (List (Node insideA))
--- | H Int (List (Node insideA))
--- | Audio (List Source)
--- | Video (List Source)
--- | Text String
-
-
-type alias Body =
-    { nodes : List Node
-    }
-
-
-type alias Caption =
-    Node
-
-
-type alias Thead =
-    Node
-
-
-type alias Tbody =
-    Node
-
-
-type alias Tfoot =
-    Node
-
-
-type alias TableNode =
-    { caption : Maybe Caption
-    , thead : Maybe Thead
-    , tbody : Maybe Tbody
-    , tfoot : Maybe Tfoot
-    }
-
-
-
--- Html
---
---   ,   <meta name="description" content="Free Web tutorials">
---   <meta name="keywords" content="HTML,CSS,XML,JavaScript">
---   <meta name="author" content="John Doe">
--- }
---
---
---
--- <div>
---   <a>
---     <div>
---       <a>
---       </a>
---     </div>
---   </a>
--- </div>
---
---
--- type Node =
---   A (List InsideLink)
---
--- type InsideLink =
---   InsideDiv (List InsideLink)
---
---
--- type Html =
---   Html Head Body
---
--- type Head =
---   Head (List InsideHead)
---
---
---   <meta charset="UTF-8">
---   <meta name="description" content="Free Web tutorials">
---   <meta name="keywords" content="HTML,CSS,XML,JavaScript">
---   <meta name="author" content="John Doe">
---   <meta name="viewport" content="width=device-width, initial-scale=1.0">
---
--- type InsideHead =
---   Title String
---   | Meta
---   title> (this element is required in an HTML document)
---   <style>
---   <base>
---   <link>
---   <meta>
---   <script>
---   <noscript>
