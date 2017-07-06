@@ -22,6 +22,8 @@ module BodyBuilderHtml
         , onInput
         , href
         , none
+        , id
+        , class
         )
 
 import Html
@@ -46,6 +48,8 @@ type alias Tree msg =
     , href : Maybe String
     , src : Maybe String
     , alt : Maybe String
+    , class : List String
+    , id : Maybe String
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -76,6 +80,8 @@ base =
         , href = Nothing
         , src = Nothing
         , alt = Nothing
+        , class = []
+        , id = Nothing
 
         -- Html Events
         , onInput = Nothing
@@ -157,6 +163,15 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.type_ val.type_
                     , Helpers.emptyListOrApply Html.Attributes.max val.max
                     , Helpers.emptyListOrApply Html.Attributes.min val.min
+                    , Helpers.emptyListOrApply Html.Attributes.src val.src
+                    , Helpers.emptyListOrApply Html.Attributes.alt val.alt
+                    , Helpers.emptyListOrApply Html.Attributes.class
+                        (if val.class |> List.isEmpty then
+                            Nothing
+                         else
+                            Just (val.class |> String.join " ")
+                        )
+                    , Helpers.emptyListOrApply Html.Attributes.id val.id
                     , Helpers.emptyListOrApply Html.Attributes.defaultValue val.defaultValue
                     , Helpers.emptyListOrApply Html.Events.onInput val.onInput
                     , Helpers.emptyListOrApply Html.Attributes.value val.value
@@ -196,6 +211,16 @@ max val (HtmlAttributes attrs) =
 href : String -> HtmlAttributes msg -> HtmlAttributes msg
 href val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | href = Just val }
+
+
+id : String -> HtmlAttributes msg -> HtmlAttributes msg
+id val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | id = Just val }
+
+
+class : List String -> HtmlAttributes msg -> HtmlAttributes msg
+class val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | class = val }
 
 
 maybeHref : Maybe String -> HtmlAttributes msg -> HtmlAttributes msg

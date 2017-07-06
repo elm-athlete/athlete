@@ -4,6 +4,7 @@ import Elegant exposing (Style)
 import Html
 import Function exposing (..)
 import BodyBuilderHtml exposing (..)
+import Color
 
 
 type Language
@@ -273,10 +274,10 @@ type Node insideInteractive insideP insideSpan insideHeading insideList
 blah : Node OutsideInteractive OutsideP OutsideSpan OutsideHeading OutsideList
 blah =
     container
-        [ a [ style [], href "blah", class [ "toto" ], id "titi" ]
+        [ a [ style [ Elegant.textColor Color.grey ], href "blah", class [ "toto" ], id "titi" ]
             [ container
                 [ container
-                    [ h1 [ style [ Elegant.fontSize (Elegant.Px 1) ], hoverStyle [ Elegant.fontSize (Elegant.Px 3) ] ]
+                    [ h1 [ style [ Elegant.textColor Color.green ], hoverStyle [ Elegant.textColor Color.red ] ]
                         [ span [] [ text "Toto" ]
                         , span [] [ img "alt" "toto" [] ]
                         , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
@@ -545,6 +546,18 @@ handleAlt { alt } =
     BodyBuilderHtml.alt alt
 
 
+handleClass : { a | class : List String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleClass { class } =
+    BodyBuilderHtml.class class
+
+
+handleId : { a | id : Maybe String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleId { id } =
+    id
+        |> Maybe.map BodyBuilderHtml.id
+        |> Maybe.withDefault identity
+
+
 buildNode :
     List (Node insideInteractive insideP insideSpan insideHeading insideList)
     -> a
@@ -565,8 +578,8 @@ parentToHtml :
     -> String
     -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
     -> HtmlAttributes msg
-parentToHtml children attributes tag usedBodyToBodyHtmlFunctions =
-    buildNode children attributes tag usedBodyToBodyHtmlFunctions
+parentToHtml =
+    buildNode
 
 
 childToHtml :
@@ -574,21 +587,12 @@ childToHtml :
     -> String
     -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
     -> HtmlAttributes msg
-childToHtml attributes tag usedBodyToBodyHtmlFunctions =
-    buildNode [] attributes tag usedBodyToBodyHtmlFunctions
+childToHtml attributes =
+    buildNode [] attributes
 
 
-baseHandling :
-    List
-        ({ a
-            | hoverStyle : List (Style -> Style)
-            , style : List (Style -> Style)
-         }
-         -> HtmlAttributes msg
-         -> HtmlAttributes msg
-        )
 baseHandling =
-    [ handleStyle ]
+    [ handleStyle, handleClass, handleId ]
 
 
 toTree : Node insideInteractive insideP insideSpan insideHeading insideList -> BodyBuilderHtml.HtmlAttributes msg
@@ -616,7 +620,7 @@ toTree node =
             childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
 
         Text str ->
-            BodyBuilderHtml.none
+            BodyBuilderHtml.text str
 
         _ ->
             BodyBuilderHtml.none
