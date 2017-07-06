@@ -160,6 +160,8 @@ module Elegant
         , classes
         , classesHover
         , stylesToCss
+        , userSelectNone
+        , userSelectAll
         )
 
 {-|
@@ -183,6 +185,8 @@ module Elegant
 @docs screenWidthBetween
 @docs screenWidthGE
 @docs screenWidthLE
+@docs userSelectNone
+@docs userSelectAll
 
 # Styles
 ## Positions
@@ -569,6 +573,11 @@ type WhiteSpace
     = WhiteSpaceNoWrap
 
 
+type UserSelect
+    = UserSelectNone
+    | UserSelectAll
+
+
 {-| Contains all style for an element used with Elegant.
 -}
 type Style
@@ -638,6 +647,7 @@ type Style
         , visibility : Maybe Visibility
         , boxSizing : Maybe String
         , screenWidths : List ScreenWidth
+        , userSelect : Maybe UserSelect
         }
 
 
@@ -795,6 +805,7 @@ defaultStyle =
         , visibility = Nothing
         , boxSizing = Nothing
         , screenWidths = []
+        , userSelect = Nothing
         }
 
 
@@ -1163,6 +1174,19 @@ boxShadowToString =
         )
 
 
+userSelectToString : Maybe UserSelect -> Maybe String
+userSelectToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                UserSelectNone ->
+                    "none"
+
+                UserSelectAll ->
+                    "all"
+        )
+
+
 getStyles : Style -> List ( String, Maybe String )
 getStyles (Style styleValues) =
     [ ( "position", positionToString << .position )
@@ -1172,6 +1196,7 @@ getStyles (Style styleValues) =
     , ( "right", sizeUnitToString << .right )
     , ( "color", colorToString << .textColor )
     , ( "display", displayToString << .display )
+    , ( "userSelect", userSelectToString << .userSelect )
     , ( "flex-grow", maybeToString << .flexGrow )
     , ( "flex-shrink", maybeToString << .flexShrink )
     , ( "flex-basis", autoOrSizeUnitToString << .flexBasis )
@@ -2287,6 +2312,23 @@ visibilityHidden =
 transparent : Color
 transparent =
     Color.rgba 0 0 0 0.0
+
+
+userSelect : UserSelect -> Style -> Style
+userSelect val (Style style) =
+    Style { style | userSelect = Just val }
+
+
+{-| -}
+userSelectNone : Style -> Style
+userSelectNone =
+    userSelect UserSelectNone
+
+
+{-| -}
+userSelectAll : Style -> Style
+userSelectAll =
+    userSelect UserSelectAll
 
 
 

@@ -117,6 +117,10 @@ view =
             [ text "I am the epsilon" ]
         , div [ style [ textCenter, padding medium, displayInlineBlock, Elegant.round, strong, uppercase, border black, padding medium ] ]
             [ text "I am round, strong and uppercase" ]
+        , div [ style [ textCenter, padding medium, userSelectNone ] ]
+            [ text "I can't be selected" ]
+        , div [ style [ textCenter, padding medium, userSelectAll ] ]
+            [ text "I will be selected when clicked" ]
         ]
 
 
