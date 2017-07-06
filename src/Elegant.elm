@@ -1216,7 +1216,7 @@ getStyles (Style styleValues) =
     , ( "justify-content", justifyContentToString << .justifyContent )
     , ( "font-weight", maybeToString << .fontWeight )
     , ( "font-style", fontStyleToString << .fontStyle )
-    , ( "fontSize", sizeUnitToString << .fontSize )
+    , ( "font-size", sizeUnitToString << .fontSize )
     , ( "width", sizeUnitToString << .width )
     , ( "max-width", sizeUnitToString << .maxWidth )
     , ( "min-width", sizeUnitToString << .minWidth )

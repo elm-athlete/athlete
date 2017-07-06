@@ -8,7 +8,6 @@ import Html exposing (Html)
 import Html.Attributes
 import Elegant exposing (..)
 import Elegant.Elements exposing (..)
-import Elegant.Helpers exposing (..)
 import Color exposing (Color)
 import Function exposing (compose)
 

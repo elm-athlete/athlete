@@ -556,7 +556,7 @@ buildNode children attributes tag usedBodyToBodyHtmlFunctions =
         newAttrs =
             usedBodyToBodyHtmlFunctions |> List.map (\fun -> fun attributes)
     in
-        BodyBuilderHtml.node ([ BodyBuilderHtml.tag tag ] |> List.append newAttrs) (List.map toTree children)
+        BodyBuilderHtml.node ([ BodyBuilderHtml.tag tag ] |> List.append newAttrs) (List.map (\x -> toTree x) children)
 
 
 parentToHtml :
@@ -565,8 +565,8 @@ parentToHtml :
     -> String
     -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
     -> HtmlAttributes msg
-parentToHtml =
-    buildNode
+parentToHtml children attributes tag usedBodyToBodyHtmlFunctions =
+    buildNode children attributes tag usedBodyToBodyHtmlFunctions
 
 
 childToHtml :
@@ -574,10 +574,19 @@ childToHtml :
     -> String
     -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
     -> HtmlAttributes msg
-childToHtml =
-    buildNode []
+childToHtml attributes tag usedBodyToBodyHtmlFunctions =
+    buildNode [] attributes tag usedBodyToBodyHtmlFunctions
 
 
+baseHandling :
+    List
+        ({ a
+            | hoverStyle : List (Style -> Style)
+            , style : List (Style -> Style)
+         }
+         -> HtmlAttributes msg
+         -> HtmlAttributes msg
+        )
 baseHandling =
     [ handleStyle ]
 
