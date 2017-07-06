@@ -177,6 +177,10 @@ type alias TextareaAttributes =
     InputTextAttributes
 
 
+type alias ButtonAttributes =
+    VisibleAttributes {}
+
+
 type alias InputNumberAttributes =
     ValueAttribute Int {}
 
@@ -239,7 +243,6 @@ type alias CanvasAttributes =
 
 type Node insideInteractive insideP insideSpan insideHeading insideList
     = A AAttributes (List (Node InsideInteractive insideP insideSpan insideHeading insideList))
-    | Button (List (Node InsideInteractive insideP insideSpan insideHeading insideList))
     | Div FlowAttributes (List (Node insideInteractive insideP OutsideSpan insideHeading insideList))
     | P FlowAttributes (List (Node insideInteractive InsideP insideSpan insideHeading insideList))
     | Span FlowAttributes (List (Node insideInteractive InsideP InsideSpan insideHeading insideList))
@@ -249,6 +252,7 @@ type Node insideInteractive insideP insideSpan insideHeading insideList
     | Li FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading OutsideList))
     | Br FlowAttributes
     | Table (List (Node insideInteractive insideP insideSpan insideHeading insideList)) (List (List (Node insideInteractive insideP insideSpan insideHeading insideList)))
+    | Button ButtonAttributes (List (Node InsideInteractive insideP insideSpan insideHeading insideList))
     | Progress ProgressAttributes
     | Audio AudioAttributes
     | Video VideoAttributes
@@ -284,9 +288,10 @@ blah =
                         ]
                     ]
                 ]
-            , olLi [] [ p [] [] ]
-            , ulLi [] [ p [] [] ]
+            , olLi [] [ p [] [ text "1" ], p [] [ text "2" ] ]
+            , ulLi [] [ p [] [ text "blahblah" ], text "toto" ]
             ]
+        , button [] [ text "toto" ]
         ]
 
 
@@ -345,9 +350,9 @@ a attrs =
     A (defaultsComposedToAttrs { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] } attrs)
 
 
-button : List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-button =
-    Button
+button : List (ButtonAttributes -> ButtonAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+button attrs =
+    Button (defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] } attrs)
 
 
 div : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
@@ -604,11 +609,17 @@ toTree node =
         Ul attributes children ->
             parentToHtml children attributes "ul" baseHandling
 
+        Ol attributes children ->
+            parentToHtml children attributes "ol" baseHandling
+
         Li attributes children ->
             parentToHtml children attributes "li" baseHandling
 
         Div attributes children ->
             parentToHtml children attributes "div" baseHandling
+
+        P attributes children ->
+            parentToHtml children attributes "p" baseHandling
 
         Span attributes children ->
             parentToHtml children attributes "span" baseHandling
@@ -619,6 +630,9 @@ toTree node =
         Img attributes ->
             childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
 
+        Button attributes children ->
+            parentToHtml children attributes "button" baseHandling
+
         Text str ->
             BodyBuilderHtml.text str
 
@@ -627,17 +641,8 @@ toTree node =
 
 
 
--- P _ _ ->
---     "p"
---
--- Ol _ _ ->
---     "ol"
---
 -- Table _ _ ->
 --     "table"
---
--- Button _ ->
---     "button"
 --
 -- Progress _ ->
 --     "progress"
