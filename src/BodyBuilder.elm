@@ -1,9 +1,9 @@
-module Html2 exposing (..)
+module BodyBuilder exposing (..)
 
 import Elegant exposing (Style)
 import Html
-import Html.Attributes
 import Function exposing (..)
+import BodyBuilderHtml exposing (..)
 
 
 type Language
@@ -270,6 +270,25 @@ type Node insideInteractive insideP insideSpan insideHeading insideList
     | Text String
 
 
+blah : Node OutsideInteractive OutsideP OutsideSpan OutsideHeading OutsideList
+blah =
+    container
+        [ a [ style [], href "blah", class [ "toto" ], id "titi" ]
+            [ container
+                [ container
+                    [ h1 [ style [ Elegant.fontSize (Elegant.Px 1) ], hoverStyle [ Elegant.fontSize (Elegant.Px 3) ] ]
+                        [ span [] [ text "Toto" ]
+                        , span [] [ img "alt" "toto" [] ]
+                        , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
+                        ]
+                    ]
+                ]
+            , olLi [] [ p [] [] ]
+            , ulLi [] [ p [] [] ]
+            ]
+        ]
+
+
 defaultsComposedToAttrs : a -> List (a -> a) -> a
 defaultsComposedToAttrs defaults attrs =
     (defaults |> (attrs |> compose))
@@ -468,133 +487,130 @@ id val attrs =
     { attrs | id = Just val }
 
 
-blah : Node OutsideInteractive OutsideP OutsideSpan OutsideHeading OutsideList
-blah =
-    container
-        [ a [ style [], href "blah", class [ "toto" ], id "titi" ]
-            [ container
-                [ container
-                    [ h1 [ style [ Elegant.fontSize (Elegant.Px 1) ], hoverStyle [ Elegant.fontSize (Elegant.Px 3) ] ]
-                        [ span [] [ text "Toto" ]
-                        , span [] [ img "alt" "toto" [] ]
-                        , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
-                        ]
-                    ]
-                ]
-            , olLi [] [ p [] [] ]
-            , ulLi [] [ p [] [] ]
-            ]
-        ]
-
-
 main : Html.Html msg
 main =
     nodeToHtml blah
 
 
-handleHref : HrefAttribute a -> List (Html.Attribute msg)
+
+-- handleHref : HrefAttribute a -> List (Html.Attribute msg)
+-- handleHref { href } =
+--     href
+--         |> Maybe.map (\e -> [ Html.Attributes.href e ])
+--         |> Maybe.withDefault []
+--
+--
+-- handleSrc : SrcAttribute a -> List (Html.Attribute msg)
+-- handleSrc { src } =
+--     [ Html.Attributes.src src ]
+--
+--
+-- handleAlt : AltAttribute a -> List (Html.Attribute msg)
+-- handleAlt { alt } =
+--     [ Html.Attributes.alt alt ]
+--
+--
+-- handleStyle : StyleAttribute a -> List (Html.Attribute msg)
+-- handleStyle { style, hoverStyle } =
+--     []
+--     (classes ((style |> compose) Elegant.defaultStyle))
+--         |> List.append (hoverClasses ((hoverStyle |> compose) Elegant.defaultStyle))
+
+
+handleHref :
+    { a | href : Maybe String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleHref { href } =
     href
-        |> Maybe.map (\e -> [ Html.Attributes.href e ])
-        |> Maybe.withDefault []
+        |> Maybe.map BodyBuilderHtml.href
+        |> Maybe.withDefault identity
 
 
-handleSrc : SrcAttribute a -> List (Html.Attribute msg)
-handleSrc { src } =
-    [ Html.Attributes.src src ]
-
-
-handleAlt : AltAttribute a -> List (Html.Attribute msg)
-handleAlt { alt } =
-    [ Html.Attributes.alt alt ]
-
-
-handleStyle : StyleAttribute a -> List (Html.Attribute msg)
+handleStyle :
+    { a | hoverStyle : List (Style -> Style), style : List (Style -> Style) }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleStyle { style, hoverStyle } =
-    (classes ((style |> compose) Elegant.defaultStyle))
-        |> List.append (hoverClasses ((hoverStyle |> compose) Elegant.defaultStyle))
+    BodyBuilderHtml.style style << BodyBuilderHtml.hoverStyle hoverStyle
 
 
-classesToAttributes : (Style -> String) -> Style -> List (Html.Attribute msg)
-classesToAttributes fun style =
+handleSrc : { a | src : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleSrc { src } =
+    BodyBuilderHtml.src src
+
+
+handleAlt : { a | alt : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleAlt { alt } =
+    BodyBuilderHtml.alt alt
+
+
+buildNode :
+    List (Node insideInteractive insideP insideSpan insideHeading insideList)
+    -> a
+    -> String
+    -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
+    -> HtmlAttributes msg
+buildNode children attributes tag usedBodyToBodyHtmlFunctions =
     let
-        classes_ =
-            fun style
+        newAttrs =
+            usedBodyToBodyHtmlFunctions |> List.map (\fun -> fun attributes)
     in
-        if String.isEmpty classes_ then
-            []
-        else
-            [ Html.Attributes.class classes_ ]
-
-
-classes : Style -> List (Html.Attribute msg)
-classes =
-    classesToAttributes Elegant.classes
-
-
-hoverClasses : Style -> List (Html.Attribute msg)
-hoverClasses =
-    classesToAttributes Elegant.classesHover
-
-
-applyAttributes : attributes -> List (attributes -> List (Html.Attribute msg)) -> List (Html.Attribute msg)
-applyAttributes attributes listFun =
-    List.concatMap (\fun -> fun attributes) listFun
+        BodyBuilderHtml.node ([ BodyBuilderHtml.tag tag ] |> List.append newAttrs) (List.map toTree children)
 
 
 parentToHtml :
-    attributes
-    -> List (Node insideInteractive insideP insideSpan insideHeading insideList)
+    List (Node insideInteractive insideP insideSpan insideHeading insideList)
+    -> a
     -> String
-    -> List (attributes -> List (Html.Attribute msg))
-    -> Html.Html msg
-parentToHtml attributes children tag toHtmlAttributesList =
-    Html.node tag (applyAttributes attributes toHtmlAttributesList) (List.map toHtml children)
+    -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
+    -> HtmlAttributes msg
+parentToHtml =
+    buildNode
 
 
 childToHtml :
-    attributes
+    a
     -> String
-    -> List (attributes -> List (Html.Attribute msg))
-    -> Html.Html msg
-childToHtml attributes tag toHtmlAttributesList =
-    Html.node tag (applyAttributes attributes toHtmlAttributesList) []
+    -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
+    -> HtmlAttributes msg
+childToHtml =
+    buildNode []
 
 
-baseHandling : List (StyleAttribute a -> List (Html.Attribute msg))
 baseHandling =
     [ handleStyle ]
 
 
-toHtml : Node insideInteractive insideP insideSpan insideHeading insideList -> Html.Html msg
-toHtml node =
+toTree : Node insideInteractive insideP insideSpan insideHeading insideList -> BodyBuilderHtml.HtmlAttributes msg
+toTree node =
     case node of
         A attributes children ->
-            parentToHtml attributes children "a" (baseHandling |> List.append [ handleHref ])
+            parentToHtml children attributes "a" (baseHandling |> List.append [ handleHref ])
 
         Ul attributes children ->
-            parentToHtml attributes children "ul" baseHandling
+            parentToHtml children attributes "ul" baseHandling
 
         Li attributes children ->
-            parentToHtml attributes children "li" baseHandling
+            parentToHtml children attributes "li" baseHandling
 
         Div attributes children ->
-            parentToHtml attributes children "div" baseHandling
+            parentToHtml children attributes "div" baseHandling
 
         Span attributes children ->
-            parentToHtml attributes children "span" baseHandling
+            parentToHtml children attributes "span" baseHandling
 
         H number attributes children ->
-            parentToHtml attributes children ("h" ++ (number |> toString)) baseHandling
+            parentToHtml children attributes ("h" ++ (number |> toString)) baseHandling
 
         Img attributes ->
             childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
 
         Text str ->
-            Html.text str
+            BodyBuilderHtml.none
 
         _ ->
-            Html.div [] []
+            BodyBuilderHtml.none
 
 
 
@@ -673,7 +689,7 @@ toHtml node =
 
 nodeToHtml : Node insideInteractive insideP insideSpan insideHeading insideList -> Html.Html msg
 nodeToHtml node =
-    node |> toHtml
+    node |> toTree |> BodyBuilderHtml.view
 
 
 

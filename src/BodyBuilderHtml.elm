@@ -16,8 +16,12 @@ module BodyBuilderHtml
         , type_
         , max
         , min
+        , src
+        , alt
         , defaultValue
         , onInput
+        , href
+        , none
         )
 
 import Html
@@ -39,6 +43,9 @@ type alias Tree msg =
     , hoverStyle : Style
     , checked : Bool
     , value : Maybe String
+    , href : Maybe String
+    , src : Maybe String
+    , alt : Maybe String
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -66,6 +73,9 @@ base =
         , hoverStyle = Elegant.defaultStyle
         , checked = False
         , value = Nothing
+        , href = Nothing
+        , src = Nothing
+        , alt = Nothing
 
         -- Html Events
         , onInput = Nothing
@@ -183,9 +193,29 @@ max val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | max = Just val }
 
 
+href : String -> HtmlAttributes msg -> HtmlAttributes msg
+href val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | href = Just val }
+
+
+maybeHref : Maybe String -> HtmlAttributes msg -> HtmlAttributes msg
+maybeHref val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | max = val }
+
+
 min : String -> HtmlAttributes msg -> HtmlAttributes msg
 min val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | min = Just val }
+
+
+src : String -> HtmlAttributes msg -> HtmlAttributes msg
+src val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | src = Just val }
+
+
+alt : String -> HtmlAttributes msg -> HtmlAttributes msg
+alt val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | alt = Just val }
 
 
 defaultValue : String -> HtmlAttributes msg -> HtmlAttributes msg
@@ -336,3 +366,8 @@ leaf =
 container : List (HtmlAttributes msg) -> HtmlAttributes msg
 container =
     node []
+
+
+none : HtmlAttributes msg
+none =
+    text ""
