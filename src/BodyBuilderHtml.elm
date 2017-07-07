@@ -24,6 +24,8 @@ module BodyBuilderHtml
         , none
         , id
         , class
+        , value
+        , name
         )
 
 import Html
@@ -50,6 +52,7 @@ type alias Tree msg =
     , alt : Maybe String
     , class : List String
     , id : Maybe String
+    , name : Maybe String
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -82,6 +85,7 @@ base =
         , alt = Nothing
         , class = []
         , id = Nothing
+        , name = Nothing
 
         -- Html Events
         , onInput = Nothing
@@ -175,6 +179,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.defaultValue val.defaultValue
                     , Helpers.emptyListOrApply Html.Events.onInput val.onInput
                     , Helpers.emptyListOrApply Html.Attributes.value val.value
+                    , Helpers.emptyListOrApply Html.Attributes.name val.name
                     ]
                 )
                 (val.content |> List.map htmlAttributesToHtml)
@@ -236,6 +241,11 @@ min val (HtmlAttributes attrs) =
 src : String -> HtmlAttributes msg -> HtmlAttributes msg
 src val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | src = Just val }
+
+
+name : String -> HtmlAttributes msg -> HtmlAttributes msg
+name val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | name = Just val }
 
 
 alt : String -> HtmlAttributes msg -> HtmlAttributes msg
@@ -365,9 +375,9 @@ textField =
         >> type_ "text"
 
 
-value : String -> HtmlAttributes msg -> HtmlAttributes msg
+value : Maybe String -> HtmlAttributes msg -> HtmlAttributes msg
 value val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | value = Just val }
+    HtmlAttributes { attrs | value = val }
 
 
 text : String -> HtmlAttributes msg

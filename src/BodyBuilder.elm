@@ -91,6 +91,10 @@ type alias ValueAttribute b a =
     { a | value : Maybe b }
 
 
+type alias NameAttribute a =
+    { a | name : Maybe String }
+
+
 type alias AAttributes =
     TargetAttribute (HrefAttribute (VisibleAttributes {}))
 
@@ -111,16 +115,20 @@ type alias StringValue a =
     ValueAttribute String a
 
 
+type alias InputAttributes a =
+    { a | type_ : String }
+
+
 type alias InputHiddenAttributes =
-    StringValue {}
+    NameAttribute (ClassAttribute (IdAttribute (StringValue { type_ : String })))
 
 
 type alias InputTextAttributes =
-    StringValue (VisibleAttributes {})
+    StringValue (VisibleAttributes (InputAttributes {}))
 
 
 type alias TextareaAttributes =
-    InputTextAttributes
+    StringValue (VisibleAttributes {})
 
 
 type alias ButtonAttributes =
@@ -128,7 +136,7 @@ type alias ButtonAttributes =
 
 
 type alias InputNumberAttributes =
-    ValueAttribute Int {}
+    ValueAttribute Int (InputAttributes {})
 
 
 type alias InputSliderAttributes =
@@ -234,7 +242,7 @@ blah =
                         ]
                     ]
                 ]
-            , olLi [] [ p [] [ text "1" ], p [] [ text "2" ] ]
+            , olLi [] [ p [] [ text "1" ], p [] [ text "2", br [], text "3" ] ]
             , ulLi [] [ p [] [ text "blahblah" ], text "toto" ]
             , ul []
                 [ li [] []
@@ -422,6 +430,13 @@ ulLi attributes insideLis =
     ul attributes (mapLis insideLis)
 
 
+inputHidden :
+    List (InputHiddenAttributes -> InputHiddenAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputHidden =
+    InputHidden << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "hidden", value = Nothing }
+
+
 href : String -> HrefAttribute a -> HrefAttribute a
 href val attrs =
     { attrs | href = Just val }
@@ -445,6 +460,11 @@ class val attrs =
 id : String -> IdAttribute a -> IdAttribute a
 id val attrs =
     { attrs | id = Just val }
+
+
+name : String -> NameAttribute a -> NameAttribute a
+name val attrs =
+    { attrs | name = Just val }
 
 
 handleHref :
@@ -483,6 +503,24 @@ handleId : { a | id : Maybe String } -> HtmlAttributes msg -> HtmlAttributes msg
 handleId { id } =
     id
         |> Maybe.unwrap identity BodyBuilderHtml.id
+
+
+handleType : { a | type_ : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleType { type_ } =
+    BodyBuilderHtml.type_ type_
+
+
+handleStringValue :
+    { a | value : Maybe String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleStringValue { value } =
+    BodyBuilderHtml.value value
+
+
+handleName : { a | name : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleName { name } =
+    BodyBuilderHtml.name name
 
 
 buildNode :
@@ -568,73 +606,78 @@ toTree node =
         Text str ->
             BodyBuilderHtml.text str
 
-        _ ->
+        Br attributes ->
+            childToHtml attributes "br" baseHandling
+
+        Table _ _ ->
+            -- TODO
             BodyBuilderHtml.none
 
+        Progress attributes ->
+            childToHtml attributes "progress" baseHandling
 
+        Audio attributes ->
+            childToHtml attributes "audio" baseHandling
 
--- Table _ _ ->
---     "table"
---
--- Progress _ ->
---     "progress"
---
--- Audio _ ->
---     "audio"
---
--- Video _ ->
---     "video"
---
--- Img _ ->
---     "img"
---
--- Canvas _ ->
---     "canvas"
---
--- Textarea _ ->
---     "textarea"
---
--- Br _ ->
---     "br"
---
--- InputHidden _ ->
---     "input"
---
--- InputText _ ->
---     "input"
---
--- InputNumber _ ->
---     "input"
---
--- InputSlider _ ->
---     "input"
---
--- InputColor _ ->
---     "input"
---
--- InputCheckbox _ ->
---     "input"
---
--- InputFile _ ->
---     "input"
---
--- InputPassword _ ->
---     "input"
---
--- InputRadio _ ->
---     "input"
---
--- InputRange _ ->
---     "input"
---
--- InputSubmit _ ->
---     "input"
---
--- InputUrl _ ->
---     "input"
---
--- Select _ ->
---     "select"
+        Video attributes ->
+            childToHtml attributes "video" baseHandling
+
+        Canvas attributes ->
+            childToHtml attributes "canvas" baseHandling
+
+        InputHidden attributes ->
+            childToHtml attributes "input" [ handleStringValue, handleType, handleType ]
+
+        Textarea _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputText attributes ->
+            childToHtml { attributes | type_ = "text" } "input" (baseHandling)
+
+        InputNumber _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputSlider _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputColor _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputCheckbox _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputFile _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputPassword _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputRadio _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputRange _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputSubmit _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        InputUrl _ ->
+            -- TODO
+            BodyBuilderHtml.none
+
+        Select _ ->
+            -- TODO
+            BodyBuilderHtml.none
 
 
 nodeToHtml : Node interactiveContent phrasingContent spanningContent listContent -> Html.Html msg
