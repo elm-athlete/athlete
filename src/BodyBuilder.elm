@@ -187,18 +187,79 @@ type alias CanvasAttributes =
     VisibleAttributes {}
 
 
-type Node insideInteractive insideP insideSpan insideHeading insideList
-    = A AAttributes (List (Node InsideInteractive insideP insideSpan insideHeading insideList))
-    | Div FlowAttributes (List (Node insideInteractive insideP OutsideSpan insideHeading insideList))
-    | P FlowAttributes (List (Node insideInteractive InsideP insideSpan insideHeading insideList))
-    | Span FlowAttributes (List (Node insideInteractive InsideP InsideSpan insideHeading insideList))
-    | H Int FlowAttributes (List (Node insideInteractive InsideP OutsideSpan InsideHeading insideList))
-    | Ul FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading InsideList))
-    | Ol FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading InsideList))
-    | Li FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading OutsideList))
+type Compatible
+    = Compatible
+
+
+type Incompatible
+    = Incompatible
+
+
+type alias NodeA compatible =
+    Node { compatible | insideInteractive : Compatible }
+
+
+type alias NodeButton compatible =
+    NodeA compatible
+
+
+type alias InsideDiv compatible =
+    Node { compatible | span : Compatible }
+
+
+type alias OutsideDiv compatible =
+    Node { compatible | span : Incompatible }
+
+
+type alias NodeP compatible =
+    Node { compatible | insideP : Compatible }
+
+
+type alias NodeSpan compatible =
+    Node { compatible | insideSpan : Compatible, insideP : Compatible }
+
+
+type alias InsideH compatible =
+    Node { compatible | p : Compatible, span : Incompatible, heading : Compatible }
+
+
+type alias OutsideH compatible =
+    Node { compatible | span : Incompatible, list : Incompatible, heading : Incompatible }
+
+
+
+-- insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+
+
+type alias NodeUl compatible =
+    Node { compatible | insideList : Compatible }
+
+
+type alias NodeOl compatible =
+    Node { compatible | insideList : Compatible }
+
+
+type alias NodeLi compatible =
+    Node { compatible | insideList : Incompatible }
+
+
+
+-- type alias NodeA insideP insideSpan insideHeading insideList =
+--     Node InsideInteractive insideP insideSpan insideHeading insideList
+
+
+type Node compatible
+    = A AAttributes (List (NodeA compatible))
+    | Div (List (Node { compatible | span : Compatible }))
+    | P FlowAttributes (List (NodeP compatible))
+    | Span (List (Node compatible))
+    | H Int FlowAttributes (List (InsideH compatible))
+    | Ul FlowAttributes (List (NodeUl compatible))
+    | Ol FlowAttributes (List (NodeOl compatible))
+    | Li FlowAttributes (List (NodeLi compatible))
     | Br FlowAttributes
-    | Table (List (Node insideInteractive insideP insideSpan insideHeading insideList)) (List (List (Node insideInteractive insideP insideSpan insideHeading insideList)))
-    | Button ButtonAttributes (List (Node InsideInteractive insideP insideSpan insideHeading insideList))
+      -- | Table (List (Node insideInteractive insideP insideSpan insideHeading insideList)) (List (List (Node insideInteractive insideP insideSpan insideHeading insideList)))
+    | Button ButtonAttributes (List (NodeButton compatible))
     | Progress ProgressAttributes
     | Audio AudioAttributes
     | Video VideoAttributes
@@ -221,24 +282,25 @@ type Node insideInteractive insideP insideSpan insideHeading insideList
     | Text String
 
 
-blah : Node OutsideInteractive OutsideP OutsideSpan OutsideHeading OutsideList
-blah =
-    container
-        [ a [ style [ Elegant.textColor Color.grey ], href "blah", class [ "toto" ], id "titi" ]
-            [ container
-                [ container
-                    [ h1 [ style [ Elegant.textColor Color.green ], hoverStyle [ Elegant.textColor Color.red ] ]
-                        [ span [] [ text "Toto" ]
-                        , span [] [ img "alt" "toto" [] ]
-                        , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
-                        ]
-                    ]
-                ]
-            , olLi [] [ p [] [ text "1" ], p [] [ text "2" ] ]
-            , ulLi [] [ p [] [ text "blahblah" ], text "toto" ]
-            ]
-        , button [] [ text "toto" ]
-        ]
+
+-- blah =
+--     container
+--         [ a [ style [ Elegant.textColor Color.grey ], href "blah", class [ "toto" ], id "titi" ]
+--             [ container
+--                 [ container
+--                     [ h1 [ style [ Elegant.textColor Color.green ], hoverStyle [ Elegant.textColor Color.red ] ]
+--                         [ span [] [ text "Toto" ]
+--                         , span [] [ img "alt" "toto" [] ]
+--
+--                         -- , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
+--                         ]
+--                     ]
+--                 ]
+--             , olLi [] [ p [] [ text "1" ], p [] [ text "2" ] ]
+--             , ulLi [] [ p [] [ text "blahblah" ], text "toto" ]
+--             ]
+--         , button [] [ text "toto" ]
+--         ]
 
 
 defaultsComposedToAttrs : a -> List (a -> a) -> a
@@ -261,157 +323,176 @@ flowDefaultsComposedToAttrs =
     defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-h1 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h1 =
-    H 1 << flowDefaultsComposedToAttrs
+
+--
+-- h1 : List (FlowAttributes -> FlowAttributes) -> List (Node (InsideH compatible)) -> Node (OutsideH compatible)
+-- h1 =
+--     H 1 << flowDefaultsComposedToAttrs
+--
+--
+-- h2 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+-- h2 =
+--     H 2 << flowDefaultsComposedToAttrs
+--
+--
+-- h3 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+-- h3 =
+--     H 3 << flowDefaultsComposedToAttrs
+--
+--
+-- h4 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+-- h4 =
+--     H 4 << flowDefaultsComposedToAttrs
+--
+--
+-- h5 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+-- h5 =
+--     H 5 << flowDefaultsComposedToAttrs
+--
+--
+-- h6 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+-- h6 =
+--     H 6 << flowDefaultsComposedToAttrs
+--
+--
+-- a : List (AAttributes -> AAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+-- a =
+--     A << defaultsComposedToAttrs { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] }
+--
+--
+-- button : List (ButtonAttributes -> ButtonAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+-- button =
+--     Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
+--
+-- div :
+--     List (InsideDiv compatible)
+--     -> OutsideDiv compatible
+--
+-- div : List (Node { compatible | span : Compatible }) -> Node compatible
+-- div children =
+--     Div children
 
 
-h2 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h2 =
-    H 2 << flowDefaultsComposedToAttrs
+type Node2 compatibility
+    = Span2 (List (Node2 compatibility))
 
 
-h3 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h3 =
-    H 3 << flowDefaultsComposedToAttrs
+type alias SpanChild a compatibility =
+    { compatibility | div : a }
 
 
-h4 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h4 =
-    H 4 << flowDefaultsComposedToAttrs
+span : List (Node2 { compatibility | div : Incompatible }) -> Node2 { compatibility | div : Compatible }
+span children =
+    Span2 children
 
 
-h5 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h5 =
-    H 5 << flowDefaultsComposedToAttrs
 
-
-h6 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
-h6 =
-    H 6 << flowDefaultsComposedToAttrs
-
-
-a : List (AAttributes -> AAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-a =
-    A << defaultsComposedToAttrs { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] }
-
-
-button : List (ButtonAttributes -> ButtonAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-button =
-    Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
-
-
-div : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-div =
-    Div << flowDefaultsComposedToAttrs
-
-
-ul : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-ul =
-    Ul << flowDefaultsComposedToAttrs
-
-
-ol : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-ol =
-    Ol << flowDefaultsComposedToAttrs
-
-
-li : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading InsideList
-li =
-    Li << flowDefaultsComposedToAttrs
-
-
-p : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP insideSpan insideHeading OutsideList) -> Node insideInteractive OutsideP insideSpan insideHeading OutsideList
-p =
-    P << flowDefaultsComposedToAttrs
-
-
-br : List (FlowAttributes -> FlowAttributes) -> Node insideInteractive InsideP insideSpan insideHeading OutsideList
-br =
-    Br << flowDefaultsComposedToAttrs
-
-
-span : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP InsideSpan insideHeading OutsideList) -> Node insideInteractive insideP insideSpan insideHeading OutsideList
-span =
-    Span << flowDefaultsComposedToAttrs
-
-
-textarea : List (TextareaAttributes -> TextareaAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-textarea =
-    Textarea << defaultsComposedToAttrs { value = Nothing, class = [], id = Nothing, style = [], hoverStyle = [] }
-
-
-img : String -> String -> List (ImgAttributes -> ImgAttributes) -> Node insideInteractive insideP insideSpan insideHeading OutsideList
-img alt src =
-    Img << defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [] }
-
-
-audio : List (AudioAttributes -> AudioAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-audio =
-    Audio << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
-
-
-progress : List (ProgressAttributes -> ProgressAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
-progress =
-    Progress << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
-
-
-table :
-    List (Node insideInteractive insideP insideSpan insideHeading OutsideList)
-    -> List (List (Node insideInteractive insideP insideSpan insideHeading OutsideList))
-    -> Node insideInteractive insideP insideSpan insideHeading OutsideList
-table =
-    Table
-
-
-text : String -> Node insideInteractive insideP insideSpan insideHeading OutsideList
-text =
-    Text
-
-
-node :
-    List (FlowAttributes -> FlowAttributes)
-    -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-node =
-    div
-
-
-leaf :
-    List (FlowAttributes -> FlowAttributes)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-leaf =
-    flip node []
-
-
-container :
-    List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-container =
-    node []
-
-
-mapLis :
-    List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList)
-mapLis =
-    List.map (\content -> li [] [ content ])
-
-
-olLi :
-    List (FlowAttributes -> FlowAttributes)
-    -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-olLi attributes insideLis =
-    ol attributes (mapLis insideLis)
-
-
-ulLi :
-    List (FlowAttributes -> FlowAttributes)
-    -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
-ulLi attributes insideLis =
-    ul attributes (mapLis insideLis)
+-- blah =
+--     div [ span [] ]
+--
+--
+-- blih =
+--     span [ div [] ]
+-- ul : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+-- ul =
+--     Ul << flowDefaultsComposedToAttrs
+--
+--
+-- ol : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+-- ol =
+--     Ol << flowDefaultsComposedToAttrs
+--
+--
+-- li : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading InsideList
+-- li =
+--     Li << flowDefaultsComposedToAttrs
+--
+--
+-- p : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP insideSpan insideHeading OutsideList) -> Node insideInteractive OutsideP insideSpan insideHeading OutsideList
+-- p =
+--     P << flowDefaultsComposedToAttrs
+--
+--
+-- br : List (FlowAttributes -> FlowAttributes) -> Node insideInteractive InsideP insideSpan insideHeading OutsideList
+-- br =
+--     Br << flowDefaultsComposedToAttrs
+--
+--
+-- span : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP InsideSpan insideHeading OutsideList) -> Node insideInteractive insideP insideSpan insideHeading OutsideList
+-- span =
+--     Span << flowDefaultsComposedToAttrs
+--
+--
+-- textarea : List (TextareaAttributes -> TextareaAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+-- textarea =
+--     Textarea << defaultsComposedToAttrs { value = Nothing, class = [], id = Nothing, style = [], hoverStyle = [] }
+--
+--
+-- img : String -> String -> List (ImgAttributes -> ImgAttributes) -> Node insideInteractive insideP insideSpan insideHeading OutsideList
+-- img alt src =
+--     Img << defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [] }
+--
+--
+-- audio : List (AudioAttributes -> AudioAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+-- audio =
+--     Audio << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
+--
+--
+-- progress : List (ProgressAttributes -> ProgressAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+-- progress =
+--     Progress << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
+-- table :
+--     List (Node insideInteractive insideP insideSpan insideHeading OutsideList)
+--     -> List (List (Node insideInteractive insideP insideSpan insideHeading OutsideList))
+--     -> Node insideInteractive insideP insideSpan insideHeading OutsideList
+-- table =
+--     Table
+-- text : String -> Node insideInteractive insideP insideSpan insideHeading OutsideList
+-- text =
+--     Text
+--
+--
+-- node :
+--     List (FlowAttributes -> FlowAttributes)
+--     -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
+--     -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+-- node =
+--     div
+--
+--
+-- leaf :
+--     List (FlowAttributes -> FlowAttributes)
+--     -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+-- leaf =
+--     flip node []
+--
+--
+-- container :
+--     List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
+--     -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+-- container =
+--     node []
+-- mapLis :
+--     List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
+--     -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList)
+-- mapLis =
+--     List.map (\content -> li [] [ content ])
+--
+--
+-- olLi :
+--     List (FlowAttributes -> FlowAttributes)
+--     -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
+--     -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+-- olLi attributes insideLis =
+--     ol attributes (mapLis insideLis)
+--
+--
+-- ulLi :
+--     List (FlowAttributes -> FlowAttributes)
+--     -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
+--     -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+-- ulLi attributes insideLis =
+--     ul attributes (mapLis insideLis)
 
 
 href : String -> HrefAttribute a -> HrefAttribute a
@@ -439,9 +520,10 @@ id val attrs =
     { attrs | id = Just val }
 
 
-main : Html.Html msg
-main =
-    nodeToHtml blah
+
+-- main : Html.Html msg
+-- main =
+--     nodeToHtml blah
 
 
 handleHref :
@@ -482,173 +564,172 @@ handleId { id } =
         |> Maybe.unwrap identity BodyBuilderHtml.id
 
 
-buildNode :
-    List (Node insideInteractive insideP insideSpan insideHeading insideList)
-    -> a
-    -> String
-    -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
-    -> HtmlAttributes msg
-buildNode children attributes tag usedBodyToBodyHtmlFunctions =
-    let
-        newAttrs =
-            usedBodyToBodyHtmlFunctions |> List.map (\fun -> fun attributes)
-    in
-        BodyBuilderHtml.node ([ BodyBuilderHtml.tag tag ] |> List.append newAttrs) (List.map (\x -> toTree x) children)
 
-
-parentToHtml :
-    List (Node insideInteractive insideP insideSpan insideHeading insideList)
-    -> a
-    -> String
-    -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
-    -> HtmlAttributes msg
-parentToHtml =
-    buildNode
-
-
-childToHtml :
-    a
-    -> String
-    -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
-    -> HtmlAttributes msg
-childToHtml attributes =
-    buildNode [] attributes
-
-
-baseHandling =
-    [ handleStyle, handleClass, handleId ]
-
-
-toTree : Node insideInteractive insideP insideSpan insideHeading insideList -> BodyBuilderHtml.HtmlAttributes msg
-toTree node =
-    case node of
-        A attributes children ->
-            parentToHtml children attributes "a" (baseHandling |> List.append [ handleHref ])
-
-        Ul attributes children ->
-            parentToHtml children attributes "ul" baseHandling
-
-        Ol attributes children ->
-            parentToHtml children attributes "ol" baseHandling
-
-        Li attributes children ->
-            parentToHtml children attributes "li" baseHandling
-
-        Div attributes children ->
-            parentToHtml children attributes "div" baseHandling
-
-        P attributes children ->
-            parentToHtml children attributes "p" baseHandling
-
-        Span attributes children ->
-            parentToHtml children attributes "span" baseHandling
-
-        H number attributes children ->
-            parentToHtml children attributes ("h" ++ (number |> toString)) baseHandling
-
-        Img attributes ->
-            childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
-
-        Button attributes children ->
-            parentToHtml children attributes "button" baseHandling
-
-        Text str ->
-            BodyBuilderHtml.text str
-
-        _ ->
-            BodyBuilderHtml.none
-
-
-
--- Table _ _ ->
---     "table"
---
--- Progress _ ->
---     "progress"
---
--- Audio _ ->
---     "audio"
---
--- Video _ ->
---     "video"
---
--- Img _ ->
---     "img"
---
--- Canvas _ ->
---     "canvas"
---
--- Textarea _ ->
---     "textarea"
---
--- Br _ ->
---     "br"
---
--- InputHidden _ ->
---     "input"
---
--- InputText _ ->
---     "input"
---
--- InputNumber _ ->
---     "input"
---
--- InputSlider _ ->
---     "input"
---
--- InputColor _ ->
---     "input"
---
--- InputCheckbox _ ->
---     "input"
---
--- InputFile _ ->
---     "input"
---
--- InputPassword _ ->
---     "input"
---
--- InputRadio _ ->
---     "input"
---
--- InputRange _ ->
---     "input"
---
--- InputSubmit _ ->
---     "input"
---
--- InputUrl _ ->
---     "input"
---
--- Select _ ->
---     "select"
-
-
-nodeToHtml : Node insideInteractive insideP insideSpan insideHeading insideList -> Html.Html msg
-nodeToHtml node =
-    node |> toTree |> BodyBuilderHtml.view
-
-
-
--- notCompiling =
---     a [ input ]
---
--- notCompiling : Node OutsideInteractive insideP insideSpan
--- notCompiling =
---     a [ audio ]
---
--- notCompiling : Node OutsideInteractive insideP OutsideSpan
--- notCompiling =
---     button [ div [ span [ button [] ] ] ]
+-- buildNode :
+--     List (Node insideInteractive insideP insideSpan insideHeading insideList)
+--     -> a
+--     -> String
+--     -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
+--     -> HtmlAttributes msg
+-- buildNode children attributes tag usedBodyToBodyHtmlFunctions =
+--     let
+--         newAttrs =
+--             usedBodyToBodyHtmlFunctions |> List.map (\fun -> fun attributes)
+--     in
+--         BodyBuilderHtml.node ([ BodyBuilderHtml.tag tag ] |> List.append newAttrs) (List.map (\x -> toTree x) children)
+-- parentToHtml :
+--     List (Node insideInteractive insideP insideSpan insideHeading insideList)
+--     -> a
+--     -> String
+--     -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
+--     -> HtmlAttributes msg
+-- parentToHtml =
+--     buildNode
 --
 --
--- notCompilingBis =
---     span [ p [] ]
+-- childToHtml :
+--     a
+--     -> String
+--     -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
+--     -> HtmlAttributes msg
+-- childToHtml attributes =
+--     buildNode [] attributes
 --
 --
--- notCompilingBisbis =
---     span [ div [] ]
+-- baseHandling =
+--     [ handleStyle, handleClass, handleId ]
 --
 --
--- shouldWork =
---     a [ div [] ]
+-- toTree : Node insideInteractive insideP insideSpan insideHeading insideList -> BodyBuilderHtml.HtmlAttributes msg
+-- toTree node =
+--     case node of
+--         A attributes children ->
+--             parentToHtml children attributes "a" (baseHandling |> List.append [ handleHref ])
+--
+--         Ul attributes children ->
+--             parentToHtml children attributes "ul" baseHandling
+--
+--         Ol attributes children ->
+--             parentToHtml children attributes "ol" baseHandling
+--
+--         Li attributes children ->
+--             parentToHtml children attributes "li" baseHandling
+--
+--         Div attributes children ->
+--             parentToHtml children attributes "div" baseHandling
+--
+--         P attributes children ->
+--             parentToHtml children attributes "p" baseHandling
+--
+--         Span attributes children ->
+--             parentToHtml children attributes "span" baseHandling
+--
+--         H number attributes children ->
+--             parentToHtml children attributes ("h" ++ (number |> toString)) baseHandling
+--
+--         Img attributes ->
+--             childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
+--
+--         Button attributes children ->
+--             parentToHtml children attributes "button" baseHandling
+--
+--         Text str ->
+--             BodyBuilderHtml.text str
+--
+--         _ ->
+--             BodyBuilderHtml.none
+--
+--
+--
+-- -- Table _ _ ->
+-- --     "table"
+-- --
+-- -- Progress _ ->
+-- --     "progress"
+-- --
+-- -- Audio _ ->
+-- --     "audio"
+-- --
+-- -- Video _ ->
+-- --     "video"
+-- --
+-- -- Img _ ->
+-- --     "img"
+-- --
+-- -- Canvas _ ->
+-- --     "canvas"
+-- --
+-- -- Textarea _ ->
+-- --     "textarea"
+-- --
+-- -- Br _ ->
+-- --     "br"
+-- --
+-- -- InputHidden _ ->
+-- --     "input"
+-- --
+-- -- InputText _ ->
+-- --     "input"
+-- --
+-- -- InputNumber _ ->
+-- --     "input"
+-- --
+-- -- InputSlider _ ->
+-- --     "input"
+-- --
+-- -- InputColor _ ->
+-- --     "input"
+-- --
+-- -- InputCheckbox _ ->
+-- --     "input"
+-- --
+-- -- InputFile _ ->
+-- --     "input"
+-- --
+-- -- InputPassword _ ->
+-- --     "input"
+-- --
+-- -- InputRadio _ ->
+-- --     "input"
+-- --
+-- -- InputRange _ ->
+-- --     "input"
+-- --
+-- -- InputSubmit _ ->
+-- --     "input"
+-- --
+-- -- InputUrl _ ->
+-- --     "input"
+-- --
+-- -- Select _ ->
+-- --     "select"
+--
+--
+-- nodeToHtml : Node insideInteractive insideP insideSpan insideHeading insideList -> Html.Html msg
+-- nodeToHtml node =
+--     node |> toTree |> BodyBuilderHtml.view
+--
+--
+--
+-- -- notCompiling =
+-- --     a [ input ]
+-- --
+-- -- notCompiling : Node OutsideInteractive insideP insideSpan
+-- -- notCompiling =
+-- --     a [ audio ]
+-- --
+-- -- notCompiling : Node OutsideInteractive insideP OutsideSpan
+-- -- notCompiling =
+-- --     button [ div [ span [ button [] ] ] ]
+-- --
+-- --
+-- -- notCompilingBis =
+-- --     span [ p [] ]
+-- --
+-- --
+-- -- notCompilingBisbis =
+-- --     span [ div [] ]
+-- --
+-- --
+-- -- shouldWork =
+-- --     a [ div [] ]
