@@ -16,12 +16,12 @@ type InsideInteractive
     = InsideInteractive
 
 
-type InsideP
-    = InsideP
+type InsidePhrasing
+    = InsidePhrasing
 
 
-type OutsideP
-    = OutsideP
+type OutsidePhrasing
+    = OutsidePhrasing
 
 
 type OutsideSpan
@@ -187,18 +187,18 @@ type alias CanvasAttributes =
     VisibleAttributes {}
 
 
-type Node insideInteractive insideP insideSpan insideHeading insideList
-    = A AAttributes (List (Node InsideInteractive insideP insideSpan insideHeading insideList))
-    | Div FlowAttributes (List (Node insideInteractive insideP OutsideSpan insideHeading insideList))
-    | P FlowAttributes (List (Node insideInteractive InsideP insideSpan insideHeading insideList))
-    | Span FlowAttributes (List (Node insideInteractive InsideP InsideSpan insideHeading insideList))
-    | H Int FlowAttributes (List (Node insideInteractive InsideP OutsideSpan InsideHeading insideList))
-    | Ul FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading InsideList))
-    | Ol FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading InsideList))
-    | Li FlowAttributes (List (Node insideInteractive insideP insideSpan insideHeading OutsideList))
+type Node insideInteractive insidePhrasing insideSpan insideList
+    = A AAttributes (List (Node InsideInteractive insidePhrasing insideSpan insideList))
+    | Div FlowAttributes (List (Node insideInteractive insidePhrasing OutsideSpan insideList))
+    | P FlowAttributes (List (Node insideInteractive InsidePhrasing OutsideSpan insideList))
+    | Span FlowAttributes (List (Node insideInteractive InsidePhrasing InsideSpan insideList))
+    | H Int FlowAttributes (List (Node insideInteractive InsidePhrasing OutsideSpan insideList))
+    | Ul FlowAttributes (List (Node insideInteractive insidePhrasing insideSpan InsideList))
+    | Ol FlowAttributes (List (Node insideInteractive insidePhrasing insideSpan InsideList))
+    | Li FlowAttributes (List (Node insideInteractive insidePhrasing insideSpan OutsideList))
     | Br FlowAttributes
-    | Table (List (Node insideInteractive insideP insideSpan insideHeading insideList)) (List (List (Node insideInteractive insideP insideSpan insideHeading insideList)))
-    | Button ButtonAttributes (List (Node InsideInteractive insideP insideSpan insideHeading insideList))
+    | Table (List (Node insideInteractive insidePhrasing insideSpan insideList)) (List (List (Node insideInteractive insidePhrasing insideSpan insideList)))
+    | Button ButtonAttributes (List (Node InsideInteractive insidePhrasing insideSpan insideList))
     | Progress ProgressAttributes
     | Audio AudioAttributes
     | Video VideoAttributes
@@ -221,7 +221,7 @@ type Node insideInteractive insideP insideSpan insideHeading insideList
     | Text String
 
 
-blah : Node OutsideInteractive OutsideP OutsideSpan OutsideHeading OutsideList
+blah : Node OutsideInteractive OutsidePhrasing OutsideSpan OutsideList
 blah =
     container
         [ a [ style [ Elegant.textColor Color.grey ], href "blah", class [ "toto" ], id "titi" ]
@@ -261,155 +261,155 @@ flowDefaultsComposedToAttrs =
     defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-h1 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h1 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
 h1 =
     H 1 << flowDefaultsComposedToAttrs
 
 
-h2 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h2 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
 h2 =
     H 2 << flowDefaultsComposedToAttrs
 
 
-h3 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h3 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
 h3 =
     H 3 << flowDefaultsComposedToAttrs
 
 
-h4 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h4 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
 h4 =
     H 4 << flowDefaultsComposedToAttrs
 
 
-h5 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h5 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
 h5 =
     H 5 << flowDefaultsComposedToAttrs
 
 
-h6 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP OutsideSpan InsideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan OutsideHeading OutsideList
+h6 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
 h6 =
     H 6 << flowDefaultsComposedToAttrs
 
 
-a : List (AAttributes -> AAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+a : List (AAttributes -> AAttributes) -> List (Node InsideInteractive insidePhrasing insideSpan OutsideList) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
 a =
     A << defaultsComposedToAttrs { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] }
 
 
-button : List (ButtonAttributes -> ButtonAttributes) -> List (Node InsideInteractive insideP insideSpan insideHeading OutsideList) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+button : List (ButtonAttributes -> ButtonAttributes) -> List (Node InsideInteractive insidePhrasing insideSpan OutsideList) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
 button =
     Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-div : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+div : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList) -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
 div =
     Div << flowDefaultsComposedToAttrs
 
 
-ul : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+ul : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insidePhrasing OutsideSpan InsideList) -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
 ul =
     Ul << flowDefaultsComposedToAttrs
 
 
-ol : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList) -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+ol : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insidePhrasing OutsideSpan InsideList) -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
 ol =
     Ol << flowDefaultsComposedToAttrs
 
 
-li : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList) -> Node insideInteractive insideP OutsideSpan insideHeading InsideList
+li : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList) -> Node insideInteractive insidePhrasing OutsideSpan InsideList
 li =
     Li << flowDefaultsComposedToAttrs
 
 
-p : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP insideSpan insideHeading OutsideList) -> Node insideInteractive OutsideP insideSpan insideHeading OutsideList
+p : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing insideSpan OutsideList
 p =
     P << flowDefaultsComposedToAttrs
 
 
-br : List (FlowAttributes -> FlowAttributes) -> Node insideInteractive InsideP insideSpan insideHeading OutsideList
+br : List (FlowAttributes -> FlowAttributes) -> Node insideInteractive InsidePhrasing insideSpan OutsideList
 br =
     Br << flowDefaultsComposedToAttrs
 
 
-span : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsideP InsideSpan insideHeading OutsideList) -> Node insideInteractive insideP insideSpan insideHeading OutsideList
+span : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing InsideSpan OutsideList) -> Node insideInteractive insidePhrasing insideSpan OutsideList
 span =
     Span << flowDefaultsComposedToAttrs
 
 
-textarea : List (TextareaAttributes -> TextareaAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+textarea : List (TextareaAttributes -> TextareaAttributes) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
 textarea =
     Textarea << defaultsComposedToAttrs { value = Nothing, class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-img : String -> String -> List (ImgAttributes -> ImgAttributes) -> Node insideInteractive insideP insideSpan insideHeading OutsideList
+img : String -> String -> List (ImgAttributes -> ImgAttributes) -> Node insideInteractive insidePhrasing insideSpan OutsideList
 img alt src =
     Img << defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-audio : List (AudioAttributes -> AudioAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+audio : List (AudioAttributes -> AudioAttributes) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
 audio =
     Audio << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-progress : List (ProgressAttributes -> ProgressAttributes) -> Node OutsideInteractive insideP insideSpan insideHeading OutsideList
+progress : List (ProgressAttributes -> ProgressAttributes) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
 progress =
     Progress << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
 table :
-    List (Node insideInteractive insideP insideSpan insideHeading OutsideList)
-    -> List (List (Node insideInteractive insideP insideSpan insideHeading OutsideList))
-    -> Node insideInteractive insideP insideSpan insideHeading OutsideList
+    List (Node insideInteractive insidePhrasing insideSpan OutsideList)
+    -> List (List (Node insideInteractive insidePhrasing insideSpan OutsideList))
+    -> Node insideInteractive insidePhrasing insideSpan OutsideList
 table =
     Table
 
 
-text : String -> Node insideInteractive insideP insideSpan insideHeading OutsideList
+text : String -> Node insideInteractive insidePhrasing insideSpan OutsideList
 text =
     Text
 
 
 node :
     List (FlowAttributes -> FlowAttributes)
-    -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+    -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
+    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
 node =
     div
 
 
 leaf :
     List (FlowAttributes -> FlowAttributes)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
 leaf =
     flip node []
 
 
 container :
-    List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+    List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
+    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
 container =
     node []
 
 
 mapLis :
-    List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> List (Node insideInteractive insideP OutsideSpan insideHeading InsideList)
+    List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
+    -> List (Node insideInteractive insidePhrasing OutsideSpan InsideList)
 mapLis =
     List.map (\content -> li [] [ content ])
 
 
 olLi :
     List (FlowAttributes -> FlowAttributes)
-    -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+    -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
+    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
 olLi attributes insideLis =
     ol attributes (mapLis insideLis)
 
 
 ulLi :
     List (FlowAttributes -> FlowAttributes)
-    -> List (Node insideInteractive insideP OutsideSpan insideHeading OutsideList)
-    -> Node insideInteractive insideP OutsideSpan insideHeading OutsideList
+    -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
+    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
 ulLi attributes insideLis =
     ul attributes (mapLis insideLis)
 
@@ -483,7 +483,7 @@ handleId { id } =
 
 
 buildNode :
-    List (Node insideInteractive insideP insideSpan insideHeading insideList)
+    List (Node insideInteractive insidePhrasing insideSpan insideList)
     -> a
     -> String
     -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
@@ -497,7 +497,7 @@ buildNode children attributes tag usedBodyToBodyHtmlFunctions =
 
 
 parentToHtml :
-    List (Node insideInteractive insideP insideSpan insideHeading insideList)
+    List (Node insideInteractive insidePhrasing insideSpan insideList)
     -> a
     -> String
     -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
@@ -519,7 +519,7 @@ baseHandling =
     [ handleStyle, handleClass, handleId ]
 
 
-toTree : Node insideInteractive insideP insideSpan insideHeading insideList -> BodyBuilderHtml.HtmlAttributes msg
+toTree : Node insideInteractive insidePhrasing insideSpan insideList -> BodyBuilderHtml.HtmlAttributes msg
 toTree node =
     case node of
         A attributes children ->
@@ -624,7 +624,7 @@ toTree node =
 --     "select"
 
 
-nodeToHtml : Node insideInteractive insideP insideSpan insideHeading insideList -> Html.Html msg
+nodeToHtml : Node insideInteractive insidePhrasing insideSpan insideList -> Html.Html msg
 nodeToHtml node =
     node |> toTree |> BodyBuilderHtml.view
 
@@ -633,11 +633,11 @@ nodeToHtml node =
 -- notCompiling =
 --     a [ input ]
 --
--- notCompiling : Node OutsideInteractive insideP insideSpan
+-- notCompiling : Node OutsideInteractive insidePhrasing insideSpan
 -- notCompiling =
 --     a [ audio ]
 --
--- notCompiling : Node OutsideInteractive insideP OutsideSpan
+-- notCompiling : Node OutsideInteractive insidePhrasing OutsideSpan
 -- notCompiling =
 --     button [ div [ span [ button [] ] ] ]
 --
