@@ -8,28 +8,28 @@ import Color
 import Maybe.Extra as Maybe
 
 
-type OutsideInteractive
-    = OutsideInteractive
+type Interactive
+    = Interactive
 
 
-type InsideInteractive
-    = InsideInteractive
+type NotInteractive
+    = NotInteractive
 
 
-type InsidePhrasing
-    = InsidePhrasing
+type Phrasing
+    = Phrasing
 
 
-type OutsidePhrasing
-    = OutsidePhrasing
+type NotPhrasing
+    = NotPhrasing
 
 
-type OutsideSpan
-    = OutsideSpan
+type Spanning
+    = Spanning
 
 
-type InsideSpan
-    = InsideSpan
+type NotSpanning
+    = NotSpanning
 
 
 type InsideHeading
@@ -40,12 +40,12 @@ type OutsideHeading
     = OutsideHeading
 
 
-type InsideList
-    = InsideList
+type ListElement
+    = ListElement
 
 
-type OutsideList
-    = OutsideList
+type NotListElement
+    = NotListElement
 
 
 type alias VisibleAttributes a =
@@ -187,18 +187,18 @@ type alias CanvasAttributes =
     VisibleAttributes {}
 
 
-type Node insideInteractive insidePhrasing insideSpan insideList
-    = A AAttributes (List (Node InsideInteractive insidePhrasing insideSpan insideList))
-    | Div FlowAttributes (List (Node insideInteractive insidePhrasing OutsideSpan insideList))
-    | P FlowAttributes (List (Node insideInteractive InsidePhrasing OutsideSpan insideList))
-    | Span FlowAttributes (List (Node insideInteractive InsidePhrasing InsideSpan insideList))
-    | H Int FlowAttributes (List (Node insideInteractive InsidePhrasing OutsideSpan insideList))
-    | Ul FlowAttributes (List (Node insideInteractive insidePhrasing insideSpan InsideList))
-    | Ol FlowAttributes (List (Node insideInteractive insidePhrasing insideSpan InsideList))
-    | Li FlowAttributes (List (Node insideInteractive insidePhrasing insideSpan OutsideList))
+type Node interactiveContent phrasingContent spanningContent listContent
+    = A AAttributes (List (Node NotInteractive phrasingContent spanningContent listContent))
+    | Div FlowAttributes (List (Node interactiveContent phrasingContent Spanning listContent))
+    | P FlowAttributes (List (Node interactiveContent Phrasing Spanning listContent))
+    | Span FlowAttributes (List (Node interactiveContent Phrasing NotSpanning listContent))
+    | H Int FlowAttributes (List (Node interactiveContent Phrasing Spanning listContent))
+    | Ul FlowAttributes (List (Node interactiveContent phrasingContent spanningContent ListElement))
+    | Ol FlowAttributes (List (Node interactiveContent phrasingContent spanningContent ListElement))
+    | Li FlowAttributes (List (Node interactiveContent phrasingContent spanningContent NotListElement))
     | Br FlowAttributes
-    | Table (List (Node insideInteractive insidePhrasing insideSpan insideList)) (List (List (Node insideInteractive insidePhrasing insideSpan insideList)))
-    | Button ButtonAttributes (List (Node InsideInteractive insidePhrasing insideSpan insideList))
+    | Table (List (Node interactiveContent phrasingContent spanningContent listContent)) (List (List (Node interactiveContent phrasingContent spanningContent listContent)))
+    | Button ButtonAttributes (List (Node NotInteractive phrasingContent spanningContent listContent))
     | Progress ProgressAttributes
     | Audio AudioAttributes
     | Video VideoAttributes
@@ -221,7 +221,7 @@ type Node insideInteractive insidePhrasing insideSpan insideList
     | Text String
 
 
-blah : Node OutsideInteractive OutsidePhrasing OutsideSpan OutsideList
+blah : Node Interactive NotPhrasing Spanning NotListElement
 blah =
     container
         [ a [ style [ Elegant.textColor Color.grey ], href "blah", class [ "toto" ], id "titi" ]
@@ -236,6 +236,14 @@ blah =
                 ]
             , olLi [] [ p [] [ text "1" ], p [] [ text "2" ] ]
             , ulLi [] [ p [] [ text "blahblah" ], text "toto" ]
+            , ul []
+                [ li [] []
+                , li [] []
+                ]
+            , ol []
+                [ li [] []
+                , li [] []
+                ]
             ]
         , button [] [ text "toto" ]
         ]
@@ -261,155 +269,155 @@ flowDefaultsComposedToAttrs =
     defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-h1 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
+h1 : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent Phrasing Spanning NotListElement) -> Node interactiveContent NotPhrasing Spanning NotListElement
 h1 =
     H 1 << flowDefaultsComposedToAttrs
 
 
-h2 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
+h2 : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent Phrasing Spanning NotListElement) -> Node interactiveContent NotPhrasing Spanning NotListElement
 h2 =
     H 2 << flowDefaultsComposedToAttrs
 
 
-h3 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
+h3 : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent Phrasing Spanning NotListElement) -> Node interactiveContent NotPhrasing Spanning NotListElement
 h3 =
     H 3 << flowDefaultsComposedToAttrs
 
 
-h4 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
+h4 : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent Phrasing Spanning NotListElement) -> Node interactiveContent NotPhrasing Spanning NotListElement
 h4 =
     H 4 << flowDefaultsComposedToAttrs
 
 
-h5 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
+h5 : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent Phrasing Spanning NotListElement) -> Node interactiveContent NotPhrasing Spanning NotListElement
 h5 =
     H 5 << flowDefaultsComposedToAttrs
 
 
-h6 : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing OutsideSpan OutsideList
+h6 : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent Phrasing Spanning NotListElement) -> Node interactiveContent NotPhrasing Spanning NotListElement
 h6 =
     H 6 << flowDefaultsComposedToAttrs
 
 
-a : List (AAttributes -> AAttributes) -> List (Node InsideInteractive insidePhrasing insideSpan OutsideList) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
+a : List (AAttributes -> AAttributes) -> List (Node NotInteractive phrasingContent spanningContent NotListElement) -> Node Interactive phrasingContent spanningContent NotListElement
 a =
     A << defaultsComposedToAttrs { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] }
 
 
-button : List (ButtonAttributes -> ButtonAttributes) -> List (Node InsideInteractive insidePhrasing insideSpan OutsideList) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
+button : List (ButtonAttributes -> ButtonAttributes) -> List (Node NotInteractive phrasingContent spanningContent NotListElement) -> Node Interactive phrasingContent spanningContent NotListElement
 button =
     Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-div : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList) -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
+div : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent phrasingContent Spanning NotListElement) -> Node interactiveContent phrasingContent Spanning NotListElement
 div =
     Div << flowDefaultsComposedToAttrs
 
 
-ul : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insidePhrasing OutsideSpan InsideList) -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
+ul : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent phrasingContent Spanning ListElement) -> Node interactiveContent phrasingContent Spanning NotListElement
 ul =
     Ul << flowDefaultsComposedToAttrs
 
 
-ol : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insidePhrasing OutsideSpan InsideList) -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
+ol : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent phrasingContent Spanning ListElement) -> Node interactiveContent phrasingContent Spanning NotListElement
 ol =
     Ol << flowDefaultsComposedToAttrs
 
 
-li : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList) -> Node insideInteractive insidePhrasing OutsideSpan InsideList
+li : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent phrasingContent Spanning NotListElement) -> Node interactiveContent phrasingContent Spanning ListElement
 li =
     Li << flowDefaultsComposedToAttrs
 
 
-p : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing OutsideSpan OutsideList) -> Node insideInteractive OutsidePhrasing insideSpan OutsideList
+p : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent Phrasing Spanning NotListElement) -> Node interactiveContent NotPhrasing spanningContent NotListElement
 p =
     P << flowDefaultsComposedToAttrs
 
 
-br : List (FlowAttributes -> FlowAttributes) -> Node insideInteractive InsidePhrasing insideSpan OutsideList
+br : List (FlowAttributes -> FlowAttributes) -> Node interactiveContent Phrasing spanningContent NotListElement
 br =
     Br << flowDefaultsComposedToAttrs
 
 
-span : List (FlowAttributes -> FlowAttributes) -> List (Node insideInteractive InsidePhrasing InsideSpan OutsideList) -> Node insideInteractive insidePhrasing insideSpan OutsideList
+span : List (FlowAttributes -> FlowAttributes) -> List (Node interactiveContent Phrasing NotSpanning NotListElement) -> Node interactiveContent phrasingContent spanningContent NotListElement
 span =
     Span << flowDefaultsComposedToAttrs
 
 
-textarea : List (TextareaAttributes -> TextareaAttributes) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
+textarea : List (TextareaAttributes -> TextareaAttributes) -> Node Interactive phrasingContent spanningContent NotListElement
 textarea =
     Textarea << defaultsComposedToAttrs { value = Nothing, class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-img : String -> String -> List (ImgAttributes -> ImgAttributes) -> Node insideInteractive insidePhrasing insideSpan OutsideList
+img : String -> String -> List (ImgAttributes -> ImgAttributes) -> Node interactiveContent phrasingContent spanningContent NotListElement
 img alt src =
     Img << defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-audio : List (AudioAttributes -> AudioAttributes) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
+audio : List (AudioAttributes -> AudioAttributes) -> Node Interactive phrasingContent spanningContent NotListElement
 audio =
     Audio << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
-progress : List (ProgressAttributes -> ProgressAttributes) -> Node OutsideInteractive insidePhrasing insideSpan OutsideList
+progress : List (ProgressAttributes -> ProgressAttributes) -> Node Interactive phrasingContent spanningContent NotListElement
 progress =
     Progress << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
 table :
-    List (Node insideInteractive insidePhrasing insideSpan OutsideList)
-    -> List (List (Node insideInteractive insidePhrasing insideSpan OutsideList))
-    -> Node insideInteractive insidePhrasing insideSpan OutsideList
+    List (Node interactiveContent phrasingContent spanningContent NotListElement)
+    -> List (List (Node interactiveContent phrasingContent spanningContent NotListElement))
+    -> Node interactiveContent phrasingContent spanningContent NotListElement
 table =
     Table
 
 
-text : String -> Node insideInteractive insidePhrasing insideSpan OutsideList
+text : String -> Node interactiveContent phrasingContent spanningContent NotListElement
 text =
     Text
 
 
 node :
     List (FlowAttributes -> FlowAttributes)
-    -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
-    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement)
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 node =
     div
 
 
 leaf :
     List (FlowAttributes -> FlowAttributes)
-    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 leaf =
     flip node []
 
 
 container :
-    List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
-    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
+    List (Node interactiveContent phrasingContent Spanning NotListElement)
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 container =
     node []
 
 
 mapLis :
-    List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
-    -> List (Node insideInteractive insidePhrasing OutsideSpan InsideList)
+    List (Node interactiveContent phrasingContent Spanning NotListElement)
+    -> List (Node interactiveContent phrasingContent Spanning ListElement)
 mapLis =
     List.map (\content -> li [] [ content ])
 
 
 olLi :
     List (FlowAttributes -> FlowAttributes)
-    -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
-    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement)
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 olLi attributes insideLis =
     ol attributes (mapLis insideLis)
 
 
 ulLi :
     List (FlowAttributes -> FlowAttributes)
-    -> List (Node insideInteractive insidePhrasing OutsideSpan OutsideList)
-    -> Node insideInteractive insidePhrasing OutsideSpan OutsideList
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement)
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 ulLi attributes insideLis =
     ul attributes (mapLis insideLis)
 
@@ -437,11 +445,6 @@ class val attrs =
 id : String -> IdAttribute a -> IdAttribute a
 id val attrs =
     { attrs | id = Just val }
-
-
-main : Html.Html msg
-main =
-    nodeToHtml blah
 
 
 handleHref :
@@ -483,10 +486,10 @@ handleId { id } =
 
 
 buildNode :
-    List (Node insideInteractive insidePhrasing insideSpan insideList)
-    -> a
+    List (Node interactiveContent phrasingContent spanningContent listContent)
+    -> attributes
     -> String
-    -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
+    -> List (attributes -> HtmlAttributes msg -> HtmlAttributes msg)
     -> HtmlAttributes msg
 buildNode children attributes tag usedBodyToBodyHtmlFunctions =
     let
@@ -497,29 +500,39 @@ buildNode children attributes tag usedBodyToBodyHtmlFunctions =
 
 
 parentToHtml :
-    List (Node insideInteractive insidePhrasing insideSpan insideList)
-    -> a
+    List (Node interactiveContent phrasingContent spanningContent listContent)
+    -> attributes
     -> String
-    -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
+    -> List (attributes -> HtmlAttributes msg -> HtmlAttributes msg)
     -> HtmlAttributes msg
 parentToHtml =
     buildNode
 
 
 childToHtml :
-    a
+    attributes
     -> String
-    -> List (a -> HtmlAttributes msg -> HtmlAttributes msg)
+    -> List (attributes -> HtmlAttributes msg -> HtmlAttributes msg)
     -> HtmlAttributes msg
 childToHtml attributes =
     buildNode [] attributes
 
 
+type alias BaseAttributes a =
+    { a
+        | class : List String
+        , hoverStyle : List (Style -> Style)
+        , id : Maybe String
+        , style : List (Style -> Style)
+    }
+
+
+baseHandling : List (BaseAttributes a -> HtmlAttributes msg -> HtmlAttributes msg)
 baseHandling =
     [ handleStyle, handleClass, handleId ]
 
 
-toTree : Node insideInteractive insidePhrasing insideSpan insideList -> BodyBuilderHtml.HtmlAttributes msg
+toTree : Node interactiveContent phrasingContent spanningContent listContent -> BodyBuilderHtml.HtmlAttributes msg
 toTree node =
     case node of
         A attributes children ->
@@ -624,31 +637,13 @@ toTree node =
 --     "select"
 
 
-nodeToHtml : Node insideInteractive insidePhrasing insideSpan insideList -> Html.Html msg
+nodeToHtml : Node interactiveContent phrasingContent spanningContent listContent -> Html.Html msg
 nodeToHtml node =
-    node |> toTree |> BodyBuilderHtml.view
+    node
+        |> toTree
+        |> BodyBuilderHtml.view
 
 
-
--- notCompiling =
---     a [ input ]
---
--- notCompiling : Node OutsideInteractive insidePhrasing insideSpan
--- notCompiling =
---     a [ audio ]
---
--- notCompiling : Node OutsideInteractive insidePhrasing OutsideSpan
--- notCompiling =
---     button [ div [ span [ button [] ] ] ]
---
---
--- notCompilingBis =
---     span [ p [] ]
---
---
--- notCompilingBisbis =
---     span [ div [] ]
---
---
--- shouldWork =
---     a [ div [] ]
+main : Html.Html msg
+main =
+    nodeToHtml blah
