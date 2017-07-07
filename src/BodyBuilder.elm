@@ -3,8 +3,9 @@ module BodyBuilder exposing (..)
 import Elegant exposing (Style)
 import Html
 import Function exposing (..)
-import BodyBuilderHtml exposing (..)
-import Color
+import BodyBuilderHtml exposing (HtmlAttributes)
+import Color exposing (Color)
+import Color.Convert as Color
 import Maybe.Extra as Maybe
 
 
@@ -87,8 +88,8 @@ type alias AltAttribute a =
     { a | alt : String }
 
 
-type alias ValueAttribute b a =
-    { a | value : Maybe b }
+type alias ValueAttribute a b =
+    { b | value : Maybe a }
 
 
 type alias NameAttribute a =
@@ -115,16 +116,28 @@ type alias StringValue a =
     ValueAttribute String a
 
 
+type alias IntValue a =
+    ValueAttribute Int a
+
+
+type alias ColorValue a =
+    ValueAttribute Color a
+
+
 type alias InputAttributes a =
-    { a | type_ : String }
+    NameAttribute (ClassAttribute (IdAttribute { a | type_ : String }))
 
 
 type alias InputHiddenAttributes =
-    NameAttribute (ClassAttribute (IdAttribute (StringValue { type_ : String })))
+    InputAttributes (StringValue { type_ : String })
 
 
-type alias InputTextAttributes =
-    StringValue (VisibleAttributes (InputAttributes {}))
+type alias InputVisibleAttributes a =
+    StyleAttribute (InputAttributes a)
+
+
+type alias InputTextAttributes a =
+    StringValue (VisibleAttributes (InputVisibleAttributes a))
 
 
 type alias TextareaAttributes =
@@ -136,47 +149,47 @@ type alias ButtonAttributes =
 
 
 type alias InputNumberAttributes =
-    ValueAttribute Int (InputAttributes {})
+    IntValue (InputVisibleAttributes {})
 
 
 type alias InputSliderAttributes =
-    InputTextAttributes
+    InputNumberAttributes
 
 
 type alias InputColorAttributes =
-    InputTextAttributes
+    ColorValue (InputVisibleAttributes {})
 
 
 type alias InputCheckboxAttributes =
-    InputTextAttributes
+    InputTextAttributes { checked : Bool }
 
 
 type alias InputFileAttributes =
-    InputTextAttributes
+    InputTextAttributes {}
 
 
 type alias InputPasswordAttributes =
-    InputTextAttributes
+    InputTextAttributes {}
 
 
 type alias InputRadioAttributes =
-    InputTextAttributes
+    InputTextAttributes {}
 
 
 type alias InputRangeAttributes =
-    InputTextAttributes
+    InputTextAttributes {}
 
 
 type alias InputSubmitAttributes =
-    InputTextAttributes
+    InputTextAttributes {}
 
 
 type alias InputUrlAttributes =
-    InputTextAttributes
+    InputTextAttributes {}
 
 
 type alias SelectAttributes =
-    InputTextAttributes
+    InputTextAttributes {}
 
 
 type alias ProgressAttributes =
@@ -212,9 +225,9 @@ type Node interactiveContent phrasingContent spanningContent listContent
     | Video VideoAttributes
     | Img ImgAttributes
     | Canvas CanvasAttributes
-    | InputHidden InputHiddenAttributes
     | Textarea TextareaAttributes
-    | InputText InputTextAttributes
+    | InputHidden InputHiddenAttributes
+    | InputText (InputTextAttributes {})
     | InputNumber InputNumberAttributes
     | InputSlider InputSliderAttributes
     | InputColor InputColorAttributes
@@ -242,6 +255,13 @@ blah =
                         ]
                     ]
                 ]
+            , inputHidden [ name "inputHidden", value "inputHidden_", class [ "class" ], id "id" ]
+            , inputText [ name "inputText", value "inputText_", class [ "class" ], id "id" ]
+            , inputNumber [ name "inputNumber", value 12, class [ "class" ], id "id" ]
+            , inputSlider [ name "inputSlider", value 12, class [ "class" ], id "id" ]
+            , inputColor [ name "inputSlider", value Color.yellow, class [ "class" ], id "id" ]
+            , inputCheckbox [ name "inputSlider", value "test", class [ "class" ], id "id", checked ]
+            , inputCheckbox [ name "inputSlider", value "test", class [ "class" ], id "id" ]
             , olLi [] [ p [] [ text "1" ], p [] [ text "2", br [], text "3" ] ]
             , ulLi [] [ p [] [ text "blahblah" ], text "toto" ]
             , ul []
@@ -437,9 +457,59 @@ inputHidden =
     InputHidden << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "hidden", value = Nothing }
 
 
+baseInputAttributes : String -> InputVisibleAttributes (ValueAttribute a {})
+baseInputAttributes type_ =
+    { id = Nothing, name = Nothing, class = [], type_ = type_, value = Nothing, style = [], hoverStyle = [] }
+
+
+inputText :
+    List (InputTextAttributes {} -> InputTextAttributes {})
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputText =
+    InputText << defaultsComposedToAttrs (baseInputAttributes "text")
+
+
+inputNumber :
+    List (InputNumberAttributes -> InputNumberAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputNumber =
+    InputNumber << defaultsComposedToAttrs (baseInputAttributes "number")
+
+
+inputSlider :
+    List (InputSliderAttributes -> InputSliderAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputSlider =
+    InputSlider << defaultsComposedToAttrs (baseInputAttributes "range")
+
+
+inputColor :
+    List (InputColorAttributes -> InputColorAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputColor =
+    InputColor << defaultsComposedToAttrs (baseInputAttributes "color")
+
+
+inputCheckbox :
+    List (InputCheckboxAttributes -> InputCheckboxAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputCheckbox =
+    InputCheckbox << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "checkbox", value = Nothing, style = [], hoverStyle = [], checked = False }
+
+
 href : String -> HrefAttribute a -> HrefAttribute a
 href val attrs =
     { attrs | href = Just val }
+
+
+value : a -> ValueAttribute a b -> ValueAttribute a b
+value val attrs =
+    { attrs | value = Just val }
+
+
+checked : { a | checked : Bool } -> { a | checked : Bool }
+checked attrs =
+    { attrs | checked = True }
 
 
 style : List (Style -> Style) -> StyleAttribute a -> StyleAttribute a
@@ -518,9 +588,42 @@ handleStringValue { value } =
     BodyBuilderHtml.value value
 
 
-handleName : { a | name : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleIntValue :
+    { a | value : Maybe Int }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleIntValue { value } =
+    value
+        |> Maybe.map toString
+        |> BodyBuilderHtml.value
+
+
+handleColorValue :
+    { b | value : Maybe Color }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleColorValue { value } =
+    value
+        |> Maybe.map Color.colorToHex
+        |> BodyBuilderHtml.value
+
+
+handleName : { a | name : Maybe String } -> HtmlAttributes msg -> HtmlAttributes msg
 handleName { name } =
-    BodyBuilderHtml.name name
+    case name of
+        Nothing ->
+            identity
+
+        Just name_ ->
+            BodyBuilderHtml.name name_
+
+
+handleChecked :
+    { a | checked : Bool }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleChecked { checked } =
+    BodyBuilderHtml.checked checked
 
 
 buildNode :
@@ -568,6 +671,11 @@ type alias BaseAttributes a =
 baseHandling : List (BaseAttributes a -> HtmlAttributes msg -> HtmlAttributes msg)
 baseHandling =
     [ handleStyle, handleClass, handleId ]
+
+
+inputAttributesHandling : List (NameAttribute (BaseAttributes { a | type_ : String }) -> HtmlAttributes msg -> HtmlAttributes msg)
+inputAttributesHandling =
+    List.append baseHandling [ handleType, handleName ]
 
 
 toTree : Node interactiveContent phrasingContent spanningContent listContent -> BodyBuilderHtml.HtmlAttributes msg
@@ -626,30 +734,26 @@ toTree node =
             childToHtml attributes "canvas" baseHandling
 
         InputHidden attributes ->
-            childToHtml attributes "input" [ handleStringValue, handleType, handleType ]
+            childToHtml attributes "input" [ handleStringValue, handleType, handleName, handleClass, handleId ]
 
         Textarea _ ->
             -- TODO
             BodyBuilderHtml.none
 
         InputText attributes ->
-            childToHtml { attributes | type_ = "text" } "input" (baseHandling)
+            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
 
-        InputNumber _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputNumber attributes ->
+            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleIntValue ])
 
-        InputSlider _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputSlider attributes ->
+            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleIntValue ])
 
-        InputColor _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputColor attributes ->
+            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleColorValue ])
 
-        InputCheckbox _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputCheckbox attributes ->
+            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleChecked ])
 
         InputFile _ ->
             -- TODO

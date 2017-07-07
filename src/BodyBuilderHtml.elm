@@ -26,6 +26,7 @@ module BodyBuilderHtml
         , class
         , value
         , name
+        , checked
         )
 
 import Html
@@ -45,7 +46,7 @@ type alias Tree msg =
     , defaultValue : Maybe String
     , style : Style
     , hoverStyle : Style
-    , checked : Bool
+    , checked : Maybe Bool
     , value : Maybe String
     , href : Maybe String
     , src : Maybe String
@@ -78,7 +79,7 @@ base =
         , defaultValue = Nothing
         , style = Elegant.defaultStyle
         , hoverStyle = Elegant.defaultStyle
-        , checked = False
+        , checked = Nothing
         , value = Nothing
         , href = Nothing
         , src = Nothing
@@ -160,10 +161,6 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 (List.concat
                     [ classes val.style
                     , hoverClasses val.hoverStyle
-                    , if val.checked then
-                        []
-                      else
-                        [ Html.Attributes.checked True ]
                     , Helpers.emptyListOrApply Html.Attributes.type_ val.type_
                     , Helpers.emptyListOrApply Html.Attributes.max val.max
                     , Helpers.emptyListOrApply Html.Attributes.min val.min
@@ -180,6 +177,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Events.onInput val.onInput
                     , Helpers.emptyListOrApply Html.Attributes.value val.value
                     , Helpers.emptyListOrApply Html.Attributes.name val.name
+                    , Helpers.emptyListOrApply Html.Attributes.checked val.checked
                     ]
                 )
                 (val.content |> List.map htmlAttributesToHtml)
@@ -280,7 +278,7 @@ content val (HtmlAttributes attrs) =
 
 checked : Bool -> HtmlAttributes msg -> HtmlAttributes msg
 checked val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | checked = val }
+    HtmlAttributes { attrs | checked = Just val }
 
 
 div : HtmlAttributes msg -> HtmlAttributes msg
