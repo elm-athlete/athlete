@@ -260,9 +260,10 @@ blah =
         ]
         [ a
             [ style [ Elegant.textColor Color.grey ]
-            , href "#"
+            , href "https://github.com"
             , class [ "toto" ]
             , id "titi"
+            , target "_blank"
             ]
             [ container
                 [ container
@@ -636,6 +637,11 @@ class val attrs =
     { attrs | class = val }
 
 
+target : String -> TargetAttribute a -> TargetAttribute a
+target val attrs =
+    { attrs | target = Just val }
+
+
 id : String -> IdAttribute a -> IdAttribute a
 id val attrs =
     { attrs | id = Just val }
@@ -760,6 +766,19 @@ handleChecked { checked } =
     BodyBuilderHtml.checked checked
 
 
+handleTarget :
+    { a | target : Maybe String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleTarget { target } attributes =
+    case target of
+        Nothing ->
+            attributes
+
+        Just target_ ->
+            BodyBuilderHtml.target target_ attributes
+
+
 buildNode :
     List (Node interactiveContent phrasingContent spanningContent listContent)
     -> attributes
@@ -816,7 +835,7 @@ toTree : Node interactiveContent phrasingContent spanningContent listContent -> 
 toTree node =
     case node of
         A attributes children ->
-            parentToHtml children attributes "a" (baseHandling |> List.append [ handleHref ])
+            parentToHtml children attributes "a" (baseHandling |> List.append [ handleHref, handleTarget ])
 
         Ul attributes children ->
             parentToHtml children attributes "ul" baseHandling
@@ -870,8 +889,8 @@ toTree node =
         InputHidden attributes ->
             childToHtml attributes "input" [ handleStringValue, handleType, handleName, handleClass, handleId ]
 
-        Textarea _ ->
-            -- TODO
+        Textarea attributes ->
+            -- childToHtml attributes "textarea" (inputAttributesHandling |> List.append [ handleStringValue ])
             BodyBuilderHtml.none
 
         InputText attributes ->

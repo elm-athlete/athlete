@@ -28,6 +28,7 @@ module BodyBuilderHtml
         , name
         , checked
         , selectOption
+        , target
         )
 
 import Html
@@ -56,6 +57,7 @@ type alias Tree msg =
     , id : Maybe String
     , name : Maybe String
     , selected : Maybe Bool
+    , target : Maybe String
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -90,6 +92,7 @@ base =
         , id = Nothing
         , name = Nothing
         , selected = Nothing
+        , target = Nothing
 
         -- Html Events
         , onInput = Nothing
@@ -164,17 +167,17 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 (List.concat
                     [ classes val.style
                     , hoverClasses val.hoverStyle
-                    , Helpers.emptyListOrApply Html.Attributes.type_ val.type_
-                    , Helpers.emptyListOrApply Html.Attributes.max val.max
-                    , Helpers.emptyListOrApply Html.Attributes.min val.min
-                    , Helpers.emptyListOrApply Html.Attributes.src val.src
-                    , Helpers.emptyListOrApply Html.Attributes.alt val.alt
                     , Helpers.emptyListOrApply Html.Attributes.class
                         (if val.class |> List.isEmpty then
                             Nothing
                          else
                             Just (val.class |> String.join " ")
                         )
+                    , Helpers.emptyListOrApply Html.Attributes.type_ val.type_
+                    , Helpers.emptyListOrApply Html.Attributes.max val.max
+                    , Helpers.emptyListOrApply Html.Attributes.min val.min
+                    , Helpers.emptyListOrApply Html.Attributes.src val.src
+                    , Helpers.emptyListOrApply Html.Attributes.alt val.alt
                     , Helpers.emptyListOrApply Html.Attributes.id val.id
                     , Helpers.emptyListOrApply Html.Attributes.defaultValue val.defaultValue
                     , Helpers.emptyListOrApply Html.Events.onInput val.onInput
@@ -183,6 +186,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.checked val.checked
                     , Helpers.emptyListOrApply Html.Attributes.href val.href
                     , Helpers.emptyListOrApply Html.Attributes.selected val.selected
+                    , Helpers.emptyListOrApply Html.Attributes.target val.target
                     ]
                 )
                 (val.content |> List.map htmlAttributesToHtml)
@@ -239,6 +243,11 @@ min val (HtmlAttributes attrs) =
 src : String -> HtmlAttributes msg -> HtmlAttributes msg
 src val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | src = Just val }
+
+
+target : String -> HtmlAttributes msg -> HtmlAttributes msg
+target val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | target = Just val }
 
 
 name : String -> HtmlAttributes msg -> HtmlAttributes msg
