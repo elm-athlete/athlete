@@ -935,3 +935,8 @@ program { init, update, subscriptions, view } =
         , subscriptions = subscriptions
         , view = toHtml << view
         }
+
+
+main : Html.Html msg
+main =
+    toHtml blah
