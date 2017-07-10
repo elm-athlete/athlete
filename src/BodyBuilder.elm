@@ -89,7 +89,11 @@ type alias VisibleAttributesAndEvents msg a =
 
 defaultVisibleAttributes : VisibleAttributesInside
 defaultVisibleAttributes =
-    { class = [], id = Nothing, style = [], hoverStyle = [] }
+    { class = []
+    , id = Nothing
+    , style = []
+    , hoverStyle = []
+    }
 
 
 type alias StyleAttribute a =
@@ -172,7 +176,12 @@ type alias InputAttributes a =
 
 
 type alias InputHiddenAttributes =
-    InputAttributes (StringValue { visible : ClassAttribute (IdAttribute {}), type_ : String })
+    InputAttributes
+        (StringValue
+            { visible : ClassAttribute (IdAttribute {})
+            , type_ : String
+            }
+        )
 
 
 type alias InputVisibleAttributes msg a =
@@ -316,99 +325,173 @@ flowDefaultsComposedToAttrs =
     defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
-h1 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h1 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h1 =
     H 1 << flowDefaultsComposedToAttrs
 
 
-h2 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h2 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h2 =
     H 2 << flowDefaultsComposedToAttrs
 
 
-h3 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h3 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h3 =
     H 3 << flowDefaultsComposedToAttrs
 
 
-h4 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h4 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h4 =
     H 4 << flowDefaultsComposedToAttrs
 
 
-h5 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h5 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h5 =
     H 5 << flowDefaultsComposedToAttrs
 
 
-h6 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h6 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h6 =
     H 6 << flowDefaultsComposedToAttrs
 
 
-a : List (AAttributes msg -> AAttributes msg) -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+a :
+    List (AAttributes msg -> AAttributes msg)
+    -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 a =
     A << defaultsComposedToAttrs { href = Nothing, target = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
-button : List (ButtonAttributes msg {} -> ButtonAttributes msg {}) -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+button :
+    List (ButtonAttributes msg {} -> ButtonAttributes msg {})
+    -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 button =
     Button << defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
-div : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning NotListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
+div :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 div =
     Div << flowDefaultsComposedToAttrs
 
 
-ul : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning ListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
+ul :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning ListElement msg)
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 ul =
     Ul << flowDefaultsComposedToAttrs
 
 
-ol : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning ListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
+ol :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning ListElement msg)
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 ol =
     Ol << flowDefaultsComposedToAttrs
 
 
-li : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning NotListElement msg) -> Node interactiveContent phrasingContent Spanning ListElement msg
+li :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> Node interactiveContent phrasingContent Spanning ListElement msg
 li =
     Li << flowDefaultsComposedToAttrs
 
 
-p : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing spanningContent NotListElement msg
+p :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing spanningContent NotListElement msg
 p =
     P << flowDefaultsComposedToAttrs
 
 
-br : List (FlowAttributes msg -> FlowAttributes msg) -> Node interactiveContent Phrasing spanningContent NotListElement msg
+br :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> Node interactiveContent Phrasing spanningContent NotListElement msg
 br =
     Br << flowDefaultsComposedToAttrs
 
 
-span : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing NotSpanning NotListElement msg) -> Node interactiveContent phrasingContent spanningContent NotListElement msg
+span :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing NotSpanning NotListElement msg)
+    -> Node interactiveContent phrasingContent spanningContent NotListElement msg
 span =
     Span << flowDefaultsComposedToAttrs
 
 
-textarea : List (TextareaAttributes msg -> TextareaAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+textarea :
+    List (TextareaAttributes msg -> TextareaAttributes msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 textarea =
-    Textarea << defaultsComposedToAttrs { value = Nothing, name = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    Textarea
+        << defaultsComposedToAttrs
+            { value = Nothing
+            , name = Nothing
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
-img : String -> String -> List (ImgAttributes msg -> ImgAttributes msg) -> Node interactiveContent phrasingContent spanningContent NotListElement msg
+img :
+    String
+    -> String
+    -> List (ImgAttributes msg -> ImgAttributes msg)
+    -> Node interactiveContent phrasingContent spanningContent NotListElement msg
 img alt src =
-    Img << defaultsComposedToAttrs { src = src, alt = alt, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    Img
+        << defaultsComposedToAttrs
+            { src = src
+            , alt = alt
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
-audio : List (AudioAttributes msg -> AudioAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+audio :
+    List (AudioAttributes msg -> AudioAttributes msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 audio =
-    Audio << defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    Audio
+        << defaultsComposedToAttrs
+            { visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
-progress : List (ProgressAttributes msg -> ProgressAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+progress :
+    List (ProgressAttributes msg -> ProgressAttributes msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 progress =
-    Progress << defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    Progress
+        << defaultsComposedToAttrs
+            { visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 table :
@@ -473,7 +556,13 @@ inputHidden :
     List (InputHiddenAttributes -> InputHiddenAttributes)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputHidden =
-    InputHidden << defaultsComposedToAttrs { name = Nothing, visible = { class = [], id = Nothing }, type_ = "hidden", value = Nothing }
+    InputHidden
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , visible = { class = [], id = Nothing }
+            , type_ = "hidden"
+            , value = Nothing
+            }
 
 
 baseInputAttributes : String -> InputVisibleAttributes msg (ValueAttribute a {})
@@ -518,56 +607,111 @@ inputCheckbox :
     List (InputCheckboxAttributes msg -> InputCheckboxAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputCheckbox =
-    InputCheckbox << defaultsComposedToAttrs { name = Nothing, type_ = "checkbox", value = Nothing, checked = False, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    InputCheckbox
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "checkbox"
+            , value = Nothing
+            , checked = False
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputFile :
     List (InputFileAttributes msg -> InputFileAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputFile =
-    InputFile << defaultsComposedToAttrs { name = Nothing, type_ = "file", visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    InputFile
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "file"
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputPassword :
     List (InputPasswordAttributes msg -> InputPasswordAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputPassword =
-    InputPassword << defaultsComposedToAttrs { name = Nothing, type_ = "password", value = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    InputPassword
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "password"
+            , value = Nothing
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputRadio :
     List (InputRadioAttributes msg -> InputRadioAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputRadio =
-    InputRadio << defaultsComposedToAttrs { name = Nothing, type_ = "radio", value = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    InputRadio
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "radio"
+            , value = Nothing
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputRange :
     List (InputRangeAttributes msg -> InputRangeAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputRange =
-    InputRange << defaultsComposedToAttrs { name = Nothing, type_ = "range", value = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    InputRange
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "range"
+            , value = Nothing
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputSubmit :
     List (InputSubmitAttributes msg -> InputSubmitAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputSubmit =
-    InputSubmit << defaultsComposedToAttrs { type_ = "submit", visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    InputSubmit
+        << defaultsComposedToAttrs
+            { type_ = "submit"
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputUrl :
     List (InputUrlAttributes msg -> InputUrlAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputUrl =
-    InputUrl << defaultsComposedToAttrs { name = Nothing, value = Nothing, type_ = "url", visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    InputUrl
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , value = Nothing
+            , type_ = "url"
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 select :
     List (SelectAttributes msg -> SelectAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 select list =
-    (Select << defaultsComposedToAttrs { value = Nothing, options = [], visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }) list
+    (Select
+        << defaultsComposedToAttrs
+            { value = Nothing
+            , options = []
+            , visible = defaultVisibleAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
+    )
+        list
 
 
 options :
@@ -615,6 +759,18 @@ id val ({ visible } as attrs) =
             { visible | id = Just val }
     in
         { attrs | visible = newId }
+
+
+onClick :
+    msg
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+onClick val ({ onMouseEvents } as attrs) =
+    let
+        newOnClick =
+            { onMouseEvents | click = Just val }
+    in
+        { attrs | onMouseEvents = newOnClick }
 
 
 class :
@@ -703,27 +859,42 @@ handleMouseEvents { onMouseEvents } =
             >> unwrap BodyBuilderHtml.onMouseEnter mouseEnter
 
 
-handleSrc : { a | src : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleSrc :
+    { a | src : String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleSrc { src } =
     BodyBuilderHtml.src src
 
 
-handleAlt : { a | alt : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleAlt :
+    { a | alt : String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleAlt { alt } =
     BodyBuilderHtml.alt alt
 
 
-handleClass : { a | visible : { b | class : List String } } -> HtmlAttributes msg -> HtmlAttributes msg
+handleClass :
+    { a | visible : { b | class : List String } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleClass { visible } =
     BodyBuilderHtml.class visible.class
 
 
-handleId : { a | visible : { b | id : Maybe String } } -> HtmlAttributes msg -> HtmlAttributes msg
+handleId :
+    { a | visible : { b | id : Maybe String } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleId { visible } =
     unwrap BodyBuilderHtml.id visible.id
 
 
-handleType : { a | type_ : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleType :
+    { a | type_ : String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleType { type_ } =
     BodyBuilderHtml.type_ type_
 
@@ -756,7 +927,10 @@ handleColorValue { value } =
         |> BodyBuilderHtml.value
 
 
-handleName : { a | name : Maybe String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleName :
+    { a | name : Maybe String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleName { name } =
     case name of
         Nothing ->
@@ -774,7 +948,9 @@ handleOptions { options } =
     BodyBuilderHtml.content (List.map optionsToBodyBuilderHtml options)
 
 
-optionsToBodyBuilderHtml : { label : String, value : String } -> HtmlAttributes msg
+optionsToBodyBuilderHtml :
+    { label : String, value : String }
+    -> HtmlAttributes msg
 optionsToBodyBuilderHtml { value, label } =
     BodyBuilderHtml.node
         [ BodyBuilderHtml.tag "option"
@@ -857,17 +1033,29 @@ childToHtml attributes =
     buildNode [] attributes
 
 
-baseHandling : List (VisibleAttributesAndEvents msg a -> HtmlAttributes msg -> HtmlAttributes msg)
+baseHandling :
+    List
+        (VisibleAttributesAndEvents msg a
+         -> HtmlAttributes msg
+         -> HtmlAttributes msg
+        )
 baseHandling =
-    [ handleStyle, handleClass, handleId ]
+    [ handleStyle, handleClass, handleId, handleMouseEvents ]
 
 
-inputAttributesHandling : List (NameAttribute (VisibleAttributesAndEvents msg { a | type_ : String }) -> HtmlAttributes msg -> HtmlAttributes msg)
+inputAttributesHandling :
+    List
+        (NameAttribute (VisibleAttributesAndEvents msg { a | type_ : String })
+         -> HtmlAttributes msg
+         -> HtmlAttributes msg
+        )
 inputAttributesHandling =
     List.append baseHandling [ handleType, handleName ]
 
 
-toTree : Node interactiveContent phrasingContent spanningContent listContent msg -> BodyBuilderHtml.HtmlAttributes msg
+toTree :
+    Node interactiveContent phrasingContent spanningContent listContent msg
+    -> BodyBuilderHtml.HtmlAttributes msg
 toTree node =
     case node of
         A attributes children ->
@@ -999,76 +1187,85 @@ program { init, update, subscriptions, view } =
         }
 
 
-blah : Node Interactive NotPhrasing Spanning NotListElement msg
-blah =
+blah : model -> Node Interactive NotPhrasing Spanning NotListElement Msg
+blah model =
     div
         [ style
             [ Elegant.width (Elegant.Px 300)
             , Elegant.marginAuto
             ]
         ]
-        [ a
-            [ style [ Elegant.textColor Color.grey ]
-            , href "https://github.com"
-            , class [ "toto" ]
-
-            -- , onClick Click
-            , id "titi"
-            , target "_blank"
-            ]
-            [ container
+        [ div []
+            [ p [ onClick Click ] [ text "bla bla bla" ]
+            , a
+                [ style [ Elegant.textColor Color.grey ]
+                , href "#"
+                , class [ "toto" ]
+                , id "titi"
+                ]
                 [ container
-                    [ h1
-                        [ style [ Elegant.textColor Color.green ]
-                        , hoverStyle [ Elegant.textColor Color.red ]
-                        ]
-                        [ span [] [ text "Toto" ]
-                        , span [] [ img "alt" "toto" [] ]
-                        , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
+                    [ container
+                        [ h1
+                            [ style [ Elegant.textColor Color.green ]
+                            , hoverStyle [ Elegant.textColor Color.red ]
+                            ]
+                            [ span [] [ text "Toto" ]
+                            , span [] [ img "alt" "toto" [] ]
+                            , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
+                            ]
                         ]
                     ]
+                , olLi []
+                    [ p [] [ text "First li in olLi" ]
+                    , p [] [ text "Second li in olLi", br [], text "Line breaking" ]
+                    ]
+                , ulLi []
+                    [ p [] [ text "First li in ulLi" ]
+                    , text "Second li in ulLi"
+                    ]
+                , ul []
+                    [ li [] [ text "First li in ul" ]
+                    , li [] [ text "Second li in ul" ]
+                    ]
+                , ol []
+                    [ li [] [ text "First li in ol" ]
+                    , li [] [ text "Second li in ol" ]
+                    ]
                 ]
-            , olLi []
-                [ p [] [ text "First li in olLi" ]
-                , p [] [ text "Second li in olLi", br [], text "Line breaking" ]
+            , inputHidden [ name "inputHidden", value "inputHidden_", class [ "class" ], id "id" ]
+            , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_", class [ "class" ], id "id" ]
+            , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 12, class [ "class" ], id "id" ]
+            , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 12, class [ "class" ], id "id" ]
+            , inputColor [ style [ Elegant.displayBlock ], name "inputSlider", value Color.yellow, class [ "class" ], id "id" ]
+            , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", class [ "class" ], id "id", checked ]
+            , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", class [ "class" ], id "id" ]
+            , inputFile [ style [ Elegant.displayBlock ], name "inputSlider", class [ "class" ], id "id" ]
+            , inputPassword [ style [ Elegant.displayBlock ], name "inputSlider", value "", class [ "class" ], id "id" ]
+            , inputRadio [ style [ Elegant.displayBlock ], name "inputSlider", value "Test", class [ "class" ], id "id" ]
+            , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 15, class [ "class" ], id "id" ]
+            , inputSubmit [ style [ Elegant.displayBlock ], class [ "class" ], id "id" ]
+            , inputUrl [ style [ Elegant.displayBlock ], class [ "class" ], id "id", name "inputUrl", value "" ]
+            , select
+                [ options
+                    [ option "value" "label"
+                    , option "value2" "label2"
+                    ]
+                , selectedOption "value2"
                 ]
-            , ulLi []
-                [ p [] [ text "First li in ulLi" ]
-                , text "Second li in ulLi"
-                ]
-            , ul []
-                [ li [] [ text "First li in ul" ]
-                , li [] [ text "Second li in ul" ]
-                ]
-            , ol []
-                [ li [] [ text "First li in ol" ]
-                , li [] [ text "Second li in ol" ]
-                ]
+            , button [] [ text "toto" ]
             ]
-        , inputHidden [ name "inputHidden", value "inputHidden_", class [ "class" ], id "id" ]
-        , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_", class [ "class" ], id "id" ]
-        , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 12, class [ "class" ], id "id" ]
-        , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 12, class [ "class" ], id "id" ]
-        , inputColor [ style [ Elegant.displayBlock ], name "inputSlider", value Color.yellow, class [ "class" ], id "id" ]
-        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", class [ "class" ], id "id", checked ]
-        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", class [ "class" ], id "id" ]
-        , inputFile [ style [ Elegant.displayBlock ], name "inputSlider", class [ "class" ], id "id" ]
-        , inputPassword [ style [ Elegant.displayBlock ], name "inputSlider", value "", class [ "class" ], id "id" ]
-        , inputRadio [ style [ Elegant.displayBlock ], name "inputSlider", value "Test", class [ "class" ], id "id" ]
-        , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 15, class [ "class" ], id "id" ]
-        , inputSubmit [ style [ Elegant.displayBlock ], class [ "class" ], id "id" ]
-        , inputUrl [ style [ Elegant.displayBlock ], class [ "class" ], id "id", name "inputUrl", value "" ]
-        , select
-            [ options
-                [ option "value" "label"
-                , option "value2" "label2"
-                ]
-            , selectedOption "value2"
-            ]
-        , button [] [ text "toto" ]
         ]
 
 
-main : Html.Html msg
+type Msg
+    = Click
+
+
+main : Program Basics.Never Int Msg
 main =
-    toHtml blah
+    program
+        { init = 0 ! []
+        , update = \msg model -> 0 ! []
+        , subscriptions = always Sub.none
+        , view = blah
+        }
