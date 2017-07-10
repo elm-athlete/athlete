@@ -125,27 +125,27 @@ type alias ColorValue a =
 
 
 type alias InputAttributes a =
-    NameAttribute (ClassAttribute (IdAttribute { a | type_ : String }))
+    NameAttribute { a | type_ : String }
 
 
 type alias InputHiddenAttributes =
-    InputAttributes (StringValue { type_ : String })
+    InputAttributes (ClassAttribute (IdAttribute (StringValue { type_ : String })))
 
 
 type alias InputVisibleAttributes a =
-    StyleAttribute (InputAttributes a)
+    VisibleAttributes (InputAttributes a)
 
 
 type alias InputTextAttributes a =
-    StringValue (VisibleAttributes (InputVisibleAttributes a))
+    StringValue (InputVisibleAttributes a)
 
 
 type alias TextareaAttributes =
     StringValue (VisibleAttributes {})
 
 
-type alias ButtonAttributes =
-    VisibleAttributes {}
+type alias ButtonAttributes a =
+    VisibleAttributes a
 
 
 type alias InputNumberAttributes =
@@ -165,7 +165,7 @@ type alias InputCheckboxAttributes =
 
 
 type alias InputFileAttributes =
-    InputTextAttributes {}
+    InputVisibleAttributes {}
 
 
 type alias InputPasswordAttributes =
@@ -177,11 +177,11 @@ type alias InputRadioAttributes =
 
 
 type alias InputRangeAttributes =
-    InputTextAttributes {}
+    InputNumberAttributes
 
 
 type alias InputSubmitAttributes =
-    InputTextAttributes {}
+    ButtonAttributes { type_ : String }
 
 
 type alias InputUrlAttributes =
@@ -219,7 +219,7 @@ type Node interactiveContent phrasingContent spanningContent listContent
     | Li FlowAttributes (List (Node interactiveContent phrasingContent spanningContent NotListElement))
     | Br FlowAttributes
     | Table (List (Node interactiveContent phrasingContent spanningContent listContent)) (List (List (Node interactiveContent phrasingContent spanningContent listContent)))
-    | Button ButtonAttributes (List (Node NotInteractive phrasingContent spanningContent listContent))
+    | Button (ButtonAttributes {}) (List (Node NotInteractive phrasingContent spanningContent listContent))
     | Progress ProgressAttributes
     | Audio AudioAttributes
     | Video VideoAttributes
@@ -244,35 +244,60 @@ type Node interactiveContent phrasingContent spanningContent listContent
 
 blah : Node Interactive NotPhrasing Spanning NotListElement
 blah =
-    container
-        [ a [ style [ Elegant.textColor Color.grey ], href "blah", class [ "toto" ], id "titi" ]
+    div
+        [ style
+            [ Elegant.width (Elegant.Px 300)
+            , Elegant.marginAuto
+            ]
+        ]
+        [ a
+            [ style [ Elegant.textColor Color.grey ]
+            , href "#"
+            , class [ "toto" ]
+            , id "titi"
+            ]
             [ container
                 [ container
-                    [ h1 [ style [ Elegant.textColor Color.green ], hoverStyle [ Elegant.textColor Color.red ] ]
+                    [ h1
+                        [ style [ Elegant.textColor Color.green ]
+                        , hoverStyle [ Elegant.textColor Color.red ]
+                        ]
                         [ span [] [ text "Toto" ]
                         , span [] [ img "alt" "toto" [] ]
                         , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
                         ]
                     ]
                 ]
-            , inputHidden [ name "inputHidden", value "inputHidden_", class [ "class" ], id "id" ]
-            , inputText [ name "inputText", value "inputText_", class [ "class" ], id "id" ]
-            , inputNumber [ name "inputNumber", value 12, class [ "class" ], id "id" ]
-            , inputSlider [ name "inputSlider", value 12, class [ "class" ], id "id" ]
-            , inputColor [ name "inputSlider", value Color.yellow, class [ "class" ], id "id" ]
-            , inputCheckbox [ name "inputSlider", value "test", class [ "class" ], id "id", checked ]
-            , inputCheckbox [ name "inputSlider", value "test", class [ "class" ], id "id" ]
-            , olLi [] [ p [] [ text "1" ], p [] [ text "2", br [], text "3" ] ]
-            , ulLi [] [ p [] [ text "blahblah" ], text "toto" ]
+            , olLi []
+                [ p [] [ text "First li in olLi" ]
+                , p [] [ text "Second li in olLi", br [], text "Line breaking" ]
+                ]
+            , ulLi []
+                [ p [] [ text "First li in ulLi" ]
+                , text "Second li in ulLi"
+                ]
             , ul []
-                [ li [] []
-                , li [] []
+                [ li [] [ text "First li in ul" ]
+                , li [] [ text "Second li in ul" ]
                 ]
             , ol []
-                [ li [] []
-                , li [] []
+                [ li [] [ text "First li in ol" ]
+                , li [] [ text "Second li in ol" ]
                 ]
             ]
+        , inputHidden [ name "inputHidden", value "inputHidden_", class [ "class" ], id "id" ]
+        , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_", class [ "class" ], id "id" ]
+        , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 12, class [ "class" ], id "id" ]
+        , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 12, class [ "class" ], id "id" ]
+        , inputColor [ style [ Elegant.displayBlock ], name "inputSlider", value Color.yellow, class [ "class" ], id "id" ]
+        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", class [ "class" ], id "id", checked ]
+        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", class [ "class" ], id "id" ]
+        , inputFile [ style [ Elegant.displayBlock ], name "inputSlider", class [ "class" ], id "id" ]
+        , inputPassword [ style [ Elegant.displayBlock ], name "inputSlider", value "", class [ "class" ], id "id" ]
+        , inputRadio [ style [ Elegant.displayBlock ], name "inputSlider", value "Test", class [ "class" ], id "id" ]
+        , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 15, class [ "class" ], id "id" ]
+        , inputSubmit [ style [ Elegant.displayBlock ], class [ "class" ], id "id" ]
+        , inputUrl [ style [ Elegant.displayBlock ], class [ "class" ], id "id", name "inputUrl", value "" ]
         , button [] [ text "toto" ]
         ]
 
@@ -332,7 +357,7 @@ a =
     A << defaultsComposedToAttrs { href = Nothing, class = [], id = Nothing, target = Nothing, style = [], hoverStyle = [] }
 
 
-button : List (ButtonAttributes -> ButtonAttributes) -> List (Node NotInteractive phrasingContent spanningContent NotListElement) -> Node Interactive phrasingContent spanningContent NotListElement
+button : List (ButtonAttributes {} -> ButtonAttributes {}) -> List (Node NotInteractive phrasingContent spanningContent NotListElement) -> Node Interactive phrasingContent spanningContent NotListElement
 button =
     Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [] }
 
@@ -495,6 +520,48 @@ inputCheckbox :
     -> Node interactiveContent phrasingContent spanningContent listContent
 inputCheckbox =
     InputCheckbox << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "checkbox", value = Nothing, style = [], hoverStyle = [], checked = False }
+
+
+inputFile :
+    List (InputFileAttributes -> InputFileAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputFile =
+    InputFile << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "file", style = [], hoverStyle = [] }
+
+
+inputPassword :
+    List (InputPasswordAttributes -> InputPasswordAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputPassword =
+    InputPassword << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "password", value = Nothing, style = [], hoverStyle = [] }
+
+
+inputRadio :
+    List (InputRadioAttributes -> InputRadioAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputRadio =
+    InputRadio << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "radio", value = Nothing, style = [], hoverStyle = [] }
+
+
+inputRange :
+    List (InputRangeAttributes -> InputRangeAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputRange =
+    InputRange << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "range", value = Nothing, style = [], hoverStyle = [] }
+
+
+inputSubmit :
+    List (InputSubmitAttributes -> InputSubmitAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputSubmit =
+    InputSubmit << defaultsComposedToAttrs { id = Nothing, class = [], type_ = "submit", style = [], hoverStyle = [] }
+
+
+inputUrl :
+    List (InputUrlAttributes -> InputUrlAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+inputUrl =
+    InputUrl << defaultsComposedToAttrs { id = Nothing, class = [], name = Nothing, value = Nothing, type_ = "url", style = [], hoverStyle = [] }
 
 
 href : String -> HrefAttribute a -> HrefAttribute a
@@ -755,31 +822,25 @@ toTree node =
         InputCheckbox attributes ->
             childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleChecked ])
 
-        InputFile _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputFile attributes ->
+            childToHtml attributes "input" (inputAttributesHandling)
 
-        InputPassword _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputPassword attributes ->
+            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
 
-        InputRadio _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputRadio attributes ->
+            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
 
-        InputRange _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputRange attributes ->
+            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleIntValue ])
 
-        InputSubmit _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputSubmit attributes ->
+            childToHtml attributes "button" (baseHandling |> List.append [ handleType ])
 
-        InputUrl _ ->
-            -- TODO
-            BodyBuilderHtml.none
+        InputUrl attributes ->
+            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
 
-        Select _ ->
+        Select attributes ->
             -- TODO
             BodyBuilderHtml.none
 

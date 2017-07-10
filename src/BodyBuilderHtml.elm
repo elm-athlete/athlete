@@ -178,6 +178,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.value val.value
                     , Helpers.emptyListOrApply Html.Attributes.name val.name
                     , Helpers.emptyListOrApply Html.Attributes.checked val.checked
+                    , Helpers.emptyListOrApply Html.Attributes.href val.href
                     ]
                 )
                 (val.content |> List.map htmlAttributesToHtml)
@@ -224,11 +225,6 @@ id val (HtmlAttributes attrs) =
 class : List String -> HtmlAttributes msg -> HtmlAttributes msg
 class val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | class = val }
-
-
-maybeHref : Maybe String -> HtmlAttributes msg -> HtmlAttributes msg
-maybeHref val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | max = val }
 
 
 min : String -> HtmlAttributes msg -> HtmlAttributes msg
