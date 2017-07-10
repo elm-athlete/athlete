@@ -13,7 +13,7 @@ module Elegant
         , zero
         , opposite
         , defaultStyle
-        , style
+        , inlineStyle
         , convertStyles
         , screenWidthBetween
         , screenWidthGE
@@ -175,7 +175,7 @@ module Elegant
 
 # Styling
 @docs defaultStyle
-@docs style
+@docs inlineStyle
 @docs convertStyles
 @docs classes
 @docs classesHover
@@ -1268,8 +1268,8 @@ convertStyles =
 
 
 {-| -}
-style : List (Style -> Style) -> Html.Attribute msg
-style =
+inlineStyle : List (Style -> Style) -> Html.Attribute msg
+inlineStyle =
     Html.Attributes.style
         << convertStyles
 

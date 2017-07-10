@@ -16,18 +16,18 @@ module Main exposing (..)
 @docs standardGrid
 -}
 
-import Elegant exposing (..)
+import Elegant
 import Elegant.Elements as Elements
 import Color
 import Html exposing (Html)
 import Function exposing (compose)
-import BodyBuilder
+import BodyBuilder exposing (Node, Spanning, NotListElement, div, toHtml, text, style)
 
 
 type alias Column interactiveContent phrasingContent spanningContent listContent =
     { denominator : Int
     , numerator : Int
-    , content : List (BodyBuilder.Node interactiveContent phrasingContent spanningContent listContent)
+    , content : List (Node interactiveContent phrasingContent spanningContent listContent)
     }
 
 
@@ -53,29 +53,30 @@ columnToHtml :
     ->
         { a
             | content :
-                List (BodyBuilder.Node interactiveContent phrasingContent BodyBuilder.Spanning BodyBuilder.NotListElement)
+                List (Node interactiveContent phrasingContent Spanning NotListElement)
             , denominator : Int
             , numerator : Int
         }
-    -> BodyBuilder.Node interactiveContent phrasingContent BodyBuilder.Spanning BodyBuilder.NotListElement
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 columnToHtml gutter { denominator, numerator, content } =
-    BodyBuilder.div [ BodyBuilder.style [ columnStyle gutter denominator numerator ] ] content
+    div [ style [ columnStyle gutter denominator numerator ] ] content
 
 
 exampleContent :
     String
-    -> List (BodyBuilder.Node interactiveContent phrasingContent BodyBuilder.Spanning BodyBuilder.NotListElement)
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement)
 exampleContent content =
-    [ BodyBuilder.div [ BodyBuilder.style [ paddingBottom medium ] ]
-        [ BodyBuilder.div [ BodyBuilder.style [ Elements.border Color.black ] ]
-            [ BodyBuilder.text content
+    [ div [ style [ paddingBottom medium ] ]
+        [ div [ style [ Elements.border Color.black ] ]
+            [ text content
             ]
         ]
     ]
 
 
+example : Node interactiveContent phrasingContent Spanning NotListElement
 example =
-    BodyBuilder.div [ BodyBuilder.style [ fullWidth ] ]
+    div [ style [ fullWidth ] ]
         [ standardGrid
             [ col 12 3 (exampleContent "I")
             , col 12 3 (exampleContent "am")
@@ -97,7 +98,7 @@ example =
 
 main : Html msg
 main =
-    BodyBuilder.toHtml example
+    toHtml example
 
 
 {-| Creates a column
@@ -105,7 +106,7 @@ main =
 col :
     Int
     -> Int
-    -> List (BodyBuilder.Node interactiveIn phrasingIn spanningIn listIn)
+    -> List (Node interactiveIn phrasingIn spanningIn listIn)
     -> Column interactiveIn phrasingIn spanningIn listIn
 col =
     Column
@@ -119,13 +120,13 @@ grid :
         List
             { a
                 | content :
-                    List (BodyBuilder.Node interactiveContent phrasingContent BodyBuilder.Spanning BodyBuilder.NotListElement)
+                    List (Node interactiveContent phrasingContent Spanning NotListElement)
                 , denominator : Int
                 , numerator : Int
             }
-    -> BodyBuilder.Node interactiveContent phrasingContent BodyBuilder.Spanning BodyBuilder.NotListElement
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 grid gutter columns =
-    BodyBuilder.div [ BodyBuilder.style [ layoutStyle gutter ] ]
+    div [ style [ layoutStyle gutter ] ]
         (columns |> List.map (columnToHtml gutter))
 
 
@@ -135,11 +136,11 @@ standardGrid :
     List
         { a
             | content :
-                List (BodyBuilder.Node interactiveContent phrasingContent BodyBuilder.Spanning BodyBuilder.NotListElement)
+                List (Node interactiveContent phrasingContent Spanning NotListElement)
             , denominator : Int
             , numerator : Int
         }
-    -> BodyBuilder.Node interactiveContent phrasingContent BodyBuilder.Spanning BodyBuilder.NotListElement
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 standardGrid =
     grid medium
 
@@ -150,10 +151,10 @@ fullGrid :
     List
         { a
             | content :
-                List (BodyBuilder.Node interactiveContent phrasingContent BodyBuilder.Spanning BodyBuilder.NotListElement)
+                List (Node interactiveContent phrasingContent Spanning NotListElement)
             , denominator : Int
             , numerator : Int
         }
-    -> BodyBuilder.Node interactiveContent phrasingContent BodyBuilder.Spanning BodyBuilder.NotListElement
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 fullGrid =
     grid zero
