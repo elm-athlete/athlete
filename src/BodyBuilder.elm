@@ -189,7 +189,11 @@ type alias InputUrlAttributes =
 
 
 type alias SelectAttributes =
-    InputTextAttributes {}
+    StringValue (OptionsAttribute (VisibleAttributes {}))
+
+
+type alias OptionsAttribute a =
+    { a | options : List { value : String, label : String } }
 
 
 type alias ProgressAttributes =
@@ -302,6 +306,13 @@ blah =
         , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 15, class [ "class" ], id "id" ]
         , inputSubmit [ style [ Elegant.displayBlock ], class [ "class" ], id "id" ]
         , inputUrl [ style [ Elegant.displayBlock ], class [ "class" ], id "id", name "inputUrl", value "" ]
+        , select
+            [ options
+                [ option "value" "label"
+                , option "value" "label2"
+                ]
+            , selectedOption "value"
+            ]
         , button [] [ text "toto" ]
         ]
 
@@ -568,6 +579,33 @@ inputUrl =
     InputUrl << defaultsComposedToAttrs { id = Nothing, class = [], name = Nothing, value = Nothing, type_ = "url", style = [], hoverStyle = [] }
 
 
+select :
+    List (SelectAttributes -> SelectAttributes)
+    -> Node interactiveContent phrasingContent spanningContent listContent
+select list =
+    (Select << defaultsComposedToAttrs { id = Nothing, class = [], value = Nothing, style = [], hoverStyle = [], options = [] }) list
+
+
+options :
+    List { value : String, label : String }
+    -> OptionsAttribute a
+    -> OptionsAttribute a
+options val attrs =
+    { attrs | options = val }
+
+
+option : String -> String -> { label : String, value : String }
+option value label =
+    { value = value
+    , label = label
+    }
+
+
+selectedOption : String -> StringValue a -> StringValue a
+selectedOption val attrs =
+    { attrs | value = Just val }
+
+
 href : String -> HrefAttribute a -> HrefAttribute a
 href val attrs =
     { attrs | href = Just val }
@@ -687,6 +725,23 @@ handleName { name } =
 
         Just name_ ->
             BodyBuilderHtml.name name_
+
+
+handleOptions :
+    OptionsAttribute a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleOptions { options } =
+    BodyBuilderHtml.content (List.map optionsToBBHtml options)
+
+
+optionsToBBHtml : { label : String, value : String } -> HtmlAttributes msg
+optionsToBBHtml { value, label } =
+    BodyBuilderHtml.node
+        [ BodyBuilderHtml.tag "option"
+        , BodyBuilderHtml.value (Just value)
+        ]
+        [ BodyBuilderHtml.text label ]
 
 
 handleChecked :
@@ -845,8 +900,14 @@ toTree node =
             childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
 
         Select attributes ->
-            -- TODO
-            BodyBuilderHtml.none
+            childToHtml attributes
+                "select"
+                (baseHandling
+                    |> List.append
+                        [ handleStringValue
+                        , handleOptions
+                        ]
+                )
 
 
 toHtml :
