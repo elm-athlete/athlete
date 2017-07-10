@@ -309,9 +309,9 @@ blah =
         , select
             [ options
                 [ option "value" "label"
-                , option "value" "label2"
+                , option "value2" "label2"
                 ]
-            , selectedOption "value"
+            , selectedOption "value2"
             ]
         , button [] [ text "toto" ]
         ]
@@ -732,16 +732,24 @@ handleOptions :
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOptions { options } =
-    BodyBuilderHtml.content (List.map optionsToBBHtml options)
+    BodyBuilderHtml.content (List.map optionsToBodyBuilderHtml options)
 
 
-optionsToBBHtml : { label : String, value : String } -> HtmlAttributes msg
-optionsToBBHtml { value, label } =
+optionsToBodyBuilderHtml : { label : String, value : String } -> HtmlAttributes msg
+optionsToBodyBuilderHtml { value, label } =
     BodyBuilderHtml.node
         [ BodyBuilderHtml.tag "option"
         , BodyBuilderHtml.value (Just value)
         ]
         [ BodyBuilderHtml.text label ]
+
+
+handleSelectedOptions :
+    StringValue a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleSelectedOptions { value } =
+    BodyBuilderHtml.selectOption value
 
 
 handleChecked :
@@ -904,8 +912,8 @@ toTree node =
                 "select"
                 (baseHandling
                     |> List.append
-                        [ handleStringValue
-                        , handleOptions
+                        [ handleOptions
+                        , handleSelectedOptions
                         ]
                 )
 

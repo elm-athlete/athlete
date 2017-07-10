@@ -27,6 +27,7 @@ module BodyBuilderHtml
         , value
         , name
         , checked
+        , selectOption
         )
 
 import Html
@@ -54,6 +55,7 @@ type alias Tree msg =
     , class : List String
     , id : Maybe String
     , name : Maybe String
+    , selected : Maybe Bool
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -87,6 +89,7 @@ base =
         , class = []
         , id = Nothing
         , name = Nothing
+        , selected = Nothing
 
         -- Html Events
         , onInput = Nothing
@@ -179,6 +182,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.name val.name
                     , Helpers.emptyListOrApply Html.Attributes.checked val.checked
                     , Helpers.emptyListOrApply Html.Attributes.href val.href
+                    , Helpers.emptyListOrApply Html.Attributes.selected val.selected
                     ]
                 )
                 (val.content |> List.map htmlAttributesToHtml)
@@ -269,12 +273,29 @@ hoverStyle val (HtmlAttributes attrs) =
 
 content : List (HtmlAttributes msg) -> HtmlAttributes msg -> HtmlAttributes msg
 content val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | content = val }
+    HtmlAttributes { attrs | content = List.append attrs.content val }
 
 
 checked : Bool -> HtmlAttributes msg -> HtmlAttributes msg
 checked val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | checked = Just val }
+
+
+selectOption : Maybe String -> HtmlAttributes msg -> HtmlAttributes msg
+selectOption value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | content = List.map (selected value) attrs.content }
+
+
+selected : Maybe String -> HtmlAttributes msg -> HtmlAttributes msg
+selected value (HtmlAttributes attrs) =
+    HtmlAttributes
+        { attrs
+            | selected =
+                if attrs.value == value then
+                    Just True
+                else
+                    Nothing
+        }
 
 
 div : HtmlAttributes msg -> HtmlAttributes msg
