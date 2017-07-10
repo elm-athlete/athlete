@@ -141,7 +141,7 @@ type alias InputTextAttributes a =
 
 
 type alias TextareaAttributes =
-    StringValue (VisibleAttributes {})
+    NameAttribute (StringValue (VisibleAttributes {}))
 
 
 type alias ButtonAttributes a =
@@ -307,6 +307,7 @@ blah =
         , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 15, class [ "class" ], id "id" ]
         , inputSubmit [ style [ Elegant.displayBlock ], class [ "class" ], id "id" ]
         , inputUrl [ style [ Elegant.displayBlock ], class [ "class" ], id "id", name "inputUrl", value "" ]
+        , textarea [ style [ Elegant.displayBlock ], class [ "class" ], id "id", name "test", value "bra" ]
         , select
             [ options
                 [ option "value" "label"
@@ -415,7 +416,7 @@ span =
 
 textarea : List (TextareaAttributes -> TextareaAttributes) -> Node Interactive phrasingContent spanningContent NotListElement
 textarea =
-    Textarea << defaultsComposedToAttrs { value = Nothing, class = [], id = Nothing, style = [], hoverStyle = [] }
+    Textarea << defaultsComposedToAttrs { value = Nothing, class = [], name = Nothing, id = Nothing, style = [], hoverStyle = [] }
 
 
 img : String -> String -> List (ImgAttributes -> ImgAttributes) -> Node interactiveContent phrasingContent spanningContent NotListElement
@@ -779,6 +780,21 @@ handleTarget { target } attributes =
             BodyBuilderHtml.target target_ attributes
 
 
+handleContent :
+    { a | value : Maybe String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleContent { value } attributes =
+    case value of
+        Nothing ->
+            attributes
+
+        Just value_ ->
+            attributes
+                |> BodyBuilderHtml.value value
+                |> (BodyBuilderHtml.content [ BodyBuilderHtml.text value_ ])
+
+
 buildNode :
     List (Node interactiveContent phrasingContent spanningContent listContent)
     -> attributes
@@ -887,11 +903,10 @@ toTree node =
             childToHtml attributes "canvas" baseHandling
 
         InputHidden attributes ->
-            childToHtml attributes "input" [ handleStringValue, handleType, handleName, handleClass, handleId ]
+            childToHtml attributes "input" [ handleStringValue, handleName, handleClass, handleId ]
 
         Textarea attributes ->
-            -- childToHtml attributes "textarea" (inputAttributesHandling |> List.append [ handleStringValue ])
-            BodyBuilderHtml.none
+            childToHtml attributes "textarea" (baseHandling |> List.append [ handleName, handleContent ])
 
         InputText attributes ->
             childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
