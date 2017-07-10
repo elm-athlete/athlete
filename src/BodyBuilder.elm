@@ -208,18 +208,22 @@ type alias CanvasAttributes =
     VisibleAttributes {}
 
 
-type Node interactiveContent phrasingContent spanningContent listContent
-    = A AAttributes (List (Node NotInteractive phrasingContent spanningContent listContent))
-    | Div FlowAttributes (List (Node interactiveContent phrasingContent Spanning listContent))
-    | P FlowAttributes (List (Node interactiveContent Phrasing Spanning listContent))
-    | Span FlowAttributes (List (Node interactiveContent Phrasing NotSpanning listContent))
-    | H Int FlowAttributes (List (Node interactiveContent Phrasing Spanning listContent))
+type Never
+    = Never
+
+
+type Node interactiveContent phrasingContent spanningContent a
+    = A AAttributes (List (Node NotInteractive phrasingContent spanningContent NotListElement))
+    | Div FlowAttributes (List (Node interactiveContent phrasingContent Spanning NotListElement))
+    | P FlowAttributes (List (Node interactiveContent Phrasing Spanning NotListElement))
+    | Span FlowAttributes (List (Node interactiveContent Phrasing NotSpanning NotListElement))
+    | H Int FlowAttributes (List (Node interactiveContent Phrasing Spanning NotListElement))
     | Ul FlowAttributes (List (Node interactiveContent phrasingContent spanningContent ListElement))
     | Ol FlowAttributes (List (Node interactiveContent phrasingContent spanningContent ListElement))
     | Li FlowAttributes (List (Node interactiveContent phrasingContent spanningContent NotListElement))
     | Br FlowAttributes
-    | Table (List (Node interactiveContent phrasingContent spanningContent listContent)) (List (List (Node interactiveContent phrasingContent spanningContent listContent)))
-    | Button ButtonAttributes (List (Node NotInteractive phrasingContent spanningContent listContent))
+    | Table (List (Node interactiveContent phrasingContent spanningContent NotListElement)) (List (List (Node interactiveContent phrasingContent spanningContent NotListElement)))
+    | Button ButtonAttributes (List (Node NotInteractive phrasingContent spanningContent NotListElement))
     | Progress ProgressAttributes
     | Audio AudioAttributes
     | Video VideoAttributes
@@ -242,8 +246,8 @@ type Node interactiveContent phrasingContent spanningContent listContent
     | Text String
 
 
-blah : Node Interactive NotPhrasing Spanning NotListElement
-blah =
+blah : model -> Node Interactive NotPhrasing Spanning NotListElement
+blah model =
     container
         [ a [ style [ Elegant.textColor Color.grey ], href "blah", class [ "toto" ], id "titi" ]
             [ container
@@ -784,13 +788,28 @@ toTree node =
             BodyBuilderHtml.none
 
 
-nodeToHtml : Node interactiveContent phrasingContent spanningContent listContent -> Html.Html msg
-nodeToHtml node =
+toHtml :
+    Node interactiveContent phrasingContent spanningContent listContent
+    -> Html.Html msg
+toHtml node =
     node
         |> toTree
         |> BodyBuilderHtml.view
 
 
-main : Html.Html msg
-main =
-    nodeToHtml blah
+type alias BodyBuilderProgramArgs model msg a b c =
+    { init : ( model, Cmd msg )
+    , subscriptions : model -> Sub msg
+    , update : msg -> model -> ( model, Cmd msg )
+    , view : model -> Node a b c NotListElement
+    }
+
+
+program : BodyBuilderProgramArgs model msg a b c -> Program Basics.Never model msg
+program { init, update, subscriptions, view } =
+    Html.program
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = toHtml << view
+        }
