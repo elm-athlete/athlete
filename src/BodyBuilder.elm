@@ -67,17 +67,24 @@ defaultOnMouseEvents =
 
 
 type alias OnMouseEvents msg a =
-    { a
-        | onMouseEvents : OnMouseEventsInside msg
-    }
+    { a | onMouseEvents : OnMouseEventsInside msg }
 
 
-type alias OnClick msg a =
-    { a | onClick : Maybe msg }
+type alias VisibleAttributes a =
+    { a | visible : VisibleAttributesInside }
 
 
-type alias VisibleAttributes msg a =
-    OnMouseEvents msg (ClassAttribute (StyleAttribute (IdAttribute a)))
+type alias VisibleAttributesInside =
+    ClassAttribute (StyleAttribute (IdAttribute {}))
+
+
+type alias VisibleAttributesAndEvents msg a =
+    OnMouseEvents msg (VisibleAttributes a)
+
+
+defaultVisibleAttributes : VisibleAttributesInside
+defaultVisibleAttributes =
+    { class = [], id = Nothing, style = [], hoverStyle = [] }
 
 
 type alias StyleAttribute a =
@@ -128,19 +135,19 @@ type alias NameAttribute a =
 
 
 type alias AAttributes msg =
-    TargetAttribute (HrefAttribute (VisibleAttributes msg {}))
+    TargetAttribute (HrefAttribute (VisibleAttributesAndEvents msg {}))
 
 
 type alias FlowAttributes msg =
-    VisibleAttributes msg {}
+    VisibleAttributesAndEvents msg {}
 
 
 type alias ImgAttributes msg =
-    AltAttribute (SrcAttribute (VisibleAttributes msg {}))
+    AltAttribute (SrcAttribute (VisibleAttributesAndEvents msg {}))
 
 
 type alias IframeAttributes msg =
-    SrcAttribute (VisibleAttributes msg {})
+    SrcAttribute (VisibleAttributesAndEvents msg {})
 
 
 type alias StringValue a =
@@ -160,11 +167,11 @@ type alias InputAttributes a =
 
 
 type alias InputHiddenAttributes =
-    InputAttributes (ClassAttribute (IdAttribute (StringValue { type_ : String })))
+    InputAttributes (StringValue { visible : ClassAttribute (IdAttribute {}), type_ : String })
 
 
 type alias InputVisibleAttributes msg a =
-    VisibleAttributes msg (InputAttributes a)
+    VisibleAttributesAndEvents msg (InputAttributes a)
 
 
 type alias InputTextAttributes msg a =
@@ -172,11 +179,11 @@ type alias InputTextAttributes msg a =
 
 
 type alias TextareaAttributes msg =
-    NameAttribute (StringValue (VisibleAttributes msg {}))
+    NameAttribute (StringValue (VisibleAttributesAndEvents msg {}))
 
 
 type alias ButtonAttributes msg a =
-    VisibleAttributes msg a
+    VisibleAttributesAndEvents msg a
 
 
 type alias InputNumberAttributes msg =
@@ -220,7 +227,7 @@ type alias InputUrlAttributes msg =
 
 
 type alias SelectAttributes msg =
-    StringValue (OptionsAttribute (VisibleAttributes msg {}))
+    StringValue (OptionsAttribute (VisibleAttributesAndEvents msg {}))
 
 
 type alias OptionsAttribute a =
@@ -228,19 +235,19 @@ type alias OptionsAttribute a =
 
 
 type alias ProgressAttributes msg =
-    VisibleAttributes msg {}
+    VisibleAttributesAndEvents msg {}
 
 
 type alias AudioAttributes msg =
-    VisibleAttributes msg {}
+    VisibleAttributesAndEvents msg {}
 
 
 type alias VideoAttributes msg =
-    VisibleAttributes msg {}
+    VisibleAttributesAndEvents msg {}
 
 
 type alias CanvasAttributes msg =
-    VisibleAttributes msg {}
+    VisibleAttributesAndEvents msg {}
 
 
 type Never
@@ -288,29 +295,20 @@ defaultsComposedToAttrs defaults attrs =
 
 flowDefaultsComposedToAttrs :
     List
-        ({ class : List b
-         , hoverStyle : List c
-         , id : Maybe a
-         , style : List d
+        ({ visible : VisibleAttributesInside
          , onMouseEvents : OnMouseEventsInside msg
          }
          ->
-            { class : List b
-            , hoverStyle : List c
-            , id : Maybe a
-            , style : List d
+            { visible : VisibleAttributesInside
             , onMouseEvents : OnMouseEventsInside msg
             }
         )
     ->
-        { class : List b
-        , hoverStyle : List c
-        , id : Maybe a
-        , style : List d
+        { visible : VisibleAttributesInside
         , onMouseEvents : OnMouseEventsInside msg
         }
 flowDefaultsComposedToAttrs =
-    defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 h1 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
@@ -345,12 +343,12 @@ h6 =
 
 a : List (AAttributes msg -> AAttributes msg) -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 a =
-    A << defaultsComposedToAttrs { href = Nothing, target = Nothing, class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    A << defaultsComposedToAttrs { href = Nothing, target = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 button : List (ButtonAttributes msg {} -> ButtonAttributes msg {}) -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 button =
-    Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Button << defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 div : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning NotListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
@@ -390,22 +388,22 @@ span =
 
 textarea : List (TextareaAttributes msg -> TextareaAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 textarea =
-    Textarea << defaultsComposedToAttrs { value = Nothing, class = [], name = Nothing, id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Textarea << defaultsComposedToAttrs { value = Nothing, name = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 img : String -> String -> List (ImgAttributes msg -> ImgAttributes msg) -> Node interactiveContent phrasingContent spanningContent NotListElement msg
 img alt src =
-    Img << defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Img << defaultsComposedToAttrs { src = src, alt = alt, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 audio : List (AudioAttributes msg -> AudioAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 audio =
-    Audio << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Audio << defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 progress : List (ProgressAttributes msg -> ProgressAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 progress =
-    Progress << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Progress << defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 table :
@@ -470,12 +468,12 @@ inputHidden :
     List (InputHiddenAttributes -> InputHiddenAttributes)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputHidden =
-    InputHidden << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "hidden", value = Nothing }
+    InputHidden << defaultsComposedToAttrs { name = Nothing, visible = { class = [], id = Nothing }, type_ = "hidden", value = Nothing }
 
 
 baseInputAttributes : String -> InputVisibleAttributes msg (ValueAttribute a {})
 baseInputAttributes type_ =
-    { id = Nothing, name = Nothing, class = [], type_ = type_, value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    { visible = defaultVisibleAttributes, name = Nothing, type_ = type_, value = Nothing, onMouseEvents = defaultOnMouseEvents }
 
 
 inputText :
@@ -510,56 +508,56 @@ inputCheckbox :
     List (InputCheckboxAttributes msg -> InputCheckboxAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputCheckbox =
-    InputCheckbox << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "checkbox", value = Nothing, style = [], hoverStyle = [], checked = False, onMouseEvents = defaultOnMouseEvents }
+    InputCheckbox << defaultsComposedToAttrs { name = Nothing, type_ = "checkbox", value = Nothing, checked = False, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 inputFile :
     List (InputFileAttributes msg -> InputFileAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputFile =
-    InputFile << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "file", style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputFile << defaultsComposedToAttrs { name = Nothing, type_ = "file", visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 inputPassword :
     List (InputPasswordAttributes msg -> InputPasswordAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputPassword =
-    InputPassword << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "password", value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputPassword << defaultsComposedToAttrs { name = Nothing, type_ = "password", value = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 inputRadio :
     List (InputRadioAttributes msg -> InputRadioAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputRadio =
-    InputRadio << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "radio", value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputRadio << defaultsComposedToAttrs { name = Nothing, type_ = "radio", value = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 inputRange :
     List (InputRangeAttributes msg -> InputRangeAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputRange =
-    InputRange << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "range", value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputRange << defaultsComposedToAttrs { name = Nothing, type_ = "range", value = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 inputSubmit :
     List (InputSubmitAttributes msg -> InputSubmitAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputSubmit =
-    InputSubmit << defaultsComposedToAttrs { id = Nothing, class = [], type_ = "submit", style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputSubmit << defaultsComposedToAttrs { type_ = "submit", visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 inputUrl :
     List (InputUrlAttributes msg -> InputUrlAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputUrl =
-    InputUrl << defaultsComposedToAttrs { id = Nothing, class = [], name = Nothing, value = Nothing, type_ = "url", style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputUrl << defaultsComposedToAttrs { name = Nothing, value = Nothing, type_ = "url", visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 select :
     List (SelectAttributes msg -> SelectAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 select list =
-    (Select << defaultsComposedToAttrs { id = Nothing, class = [], value = Nothing, style = [], hoverStyle = [], options = [], onMouseEvents = defaultOnMouseEvents }) list
+    (Select << defaultsComposedToAttrs { value = Nothing, options = [], visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }) list
 
 
 options :
@@ -597,19 +595,31 @@ checked attrs =
     { attrs | checked = True }
 
 
-style : List (Style -> Style) -> StyleAttribute a -> StyleAttribute a
-style val attrs =
-    { attrs | style = val }
+style : List (Style -> Style) -> { a | visible : { b | style : List (Style -> Style) } } -> { a | visible : { b | style : List (Style -> Style) } }
+style val ({ visible } as attrs) =
+    let
+        newStyle =
+            { visible | style = val }
+    in
+        { attrs | visible = newStyle }
 
 
-hoverStyle : List (Style -> Style) -> StyleAttribute a -> StyleAttribute a
-hoverStyle val attrs =
-    { attrs | hoverStyle = val }
+hoverStyle : List (Style -> Style) -> { a | visible : { b | hoverStyle : List (Style -> Style) } } -> { a | visible : { b | hoverStyle : List (Style -> Style) } }
+hoverStyle val ({ visible } as attrs) =
+    let
+        newHoverStyle =
+            { visible | hoverStyle = val }
+    in
+        { attrs | visible = newHoverStyle }
 
 
-class : List String -> ClassAttribute a -> ClassAttribute a
-class val attrs =
-    { attrs | class = val }
+class : List String -> { a | visible : { b | class : List String } } -> { a | visible : { b | class : List String } }
+class val ({ visible } as attrs) =
+    let
+        newClass =
+            { visible | class = val }
+    in
+        { attrs | visible = newClass }
 
 
 target : String -> TargetAttribute a -> TargetAttribute a
@@ -617,9 +627,13 @@ target val attrs =
     { attrs | target = Just val }
 
 
-id : String -> IdAttribute a -> IdAttribute a
-id val attrs =
-    { attrs | id = Just val }
+id : String -> { a | visible : { b | id : Maybe String } } -> { a | visible : { b | id : Maybe String } }
+id val ({ visible } as attrs) =
+    let
+        newId =
+            { visible | id = Just val }
+    in
+        { attrs | visible = newId }
 
 
 name : String -> NameAttribute a -> NameAttribute a
@@ -632,16 +646,19 @@ handleHref :
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleHref { href } =
-    href
-        |> Maybe.unwrap identity BodyBuilderHtml.href
+    href |> Maybe.unwrap identity BodyBuilderHtml.href
 
 
 handleStyle :
-    { a | hoverStyle : List (Style -> Style), style : List (Style -> Style) }
+    { a | visible : VisibleAttributesInside }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleStyle { style, hoverStyle } =
-    BodyBuilderHtml.style style << BodyBuilderHtml.hoverStyle hoverStyle
+handleStyle { visible } =
+    let
+        { style, hoverStyle } =
+            visible
+    in
+        BodyBuilderHtml.style style << BodyBuilderHtml.hoverStyle hoverStyle
 
 
 handleSrc : { a | src : String } -> HtmlAttributes msg -> HtmlAttributes msg
@@ -654,14 +671,14 @@ handleAlt { alt } =
     BodyBuilderHtml.alt alt
 
 
-handleClass : { a | class : List String } -> HtmlAttributes msg -> HtmlAttributes msg
-handleClass { class } =
-    BodyBuilderHtml.class class
+handleClass : { a | visible : { b | class : List String } } -> HtmlAttributes msg -> HtmlAttributes msg
+handleClass { visible } =
+    BodyBuilderHtml.class visible.class
 
 
-handleId : { a | id : Maybe String } -> HtmlAttributes msg -> HtmlAttributes msg
-handleId { id } =
-    id
+handleId : { a | visible : { b | id : Maybe String } } -> HtmlAttributes msg -> HtmlAttributes msg
+handleId { visible } =
+    visible.id
         |> Maybe.unwrap identity BodyBuilderHtml.id
 
 
@@ -802,21 +819,12 @@ childToHtml attributes =
     buildNode [] attributes
 
 
-type alias BaseAttributes a =
-    { a
-        | class : List String
-        , hoverStyle : List (Style -> Style)
-        , id : Maybe String
-        , style : List (Style -> Style)
-    }
-
-
-baseHandling : List (BaseAttributes a -> HtmlAttributes msg -> HtmlAttributes msg)
+baseHandling : List (VisibleAttributesAndEvents msg a -> HtmlAttributes msg -> HtmlAttributes msg)
 baseHandling =
     [ handleStyle, handleClass, handleId ]
 
 
-inputAttributesHandling : List (NameAttribute (BaseAttributes { a | type_ : String }) -> HtmlAttributes msg -> HtmlAttributes msg)
+inputAttributesHandling : List (NameAttribute (VisibleAttributesAndEvents msg { a | type_ : String }) -> HtmlAttributes msg -> HtmlAttributes msg)
 inputAttributesHandling =
     List.append baseHandling [ handleType, handleName ]
 
