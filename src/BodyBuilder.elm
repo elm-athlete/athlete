@@ -9,6 +9,11 @@ import Color.Convert as Color
 import Maybe.Extra as Maybe
 
 
+unwrap : (a -> b -> b) -> Maybe a -> b -> b
+unwrap =
+    Maybe.unwrap identity
+
+
 type Interactive
     = Interactive
 
@@ -473,7 +478,12 @@ inputHidden =
 
 baseInputAttributes : String -> InputVisibleAttributes msg (ValueAttribute a {})
 baseInputAttributes type_ =
-    { visible = defaultVisibleAttributes, name = Nothing, type_ = type_, value = Nothing, onMouseEvents = defaultOnMouseEvents }
+    { visible = defaultVisibleAttributes
+    , name = Nothing
+    , type_ = type_
+    , value = Nothing
+    , onMouseEvents = defaultOnMouseEvents
+    }
 
 
 inputText :
@@ -595,25 +605,22 @@ checked attrs =
     { attrs | checked = True }
 
 
-style : List (Style -> Style) -> { a | visible : { b | style : List (Style -> Style) } } -> { a | visible : { b | style : List (Style -> Style) } }
-style val ({ visible } as attrs) =
+id :
+    String
+    -> { a | visible : { b | id : Maybe String } }
+    -> { a | visible : { b | id : Maybe String } }
+id val ({ visible } as attrs) =
     let
-        newStyle =
-            { visible | style = val }
+        newId =
+            { visible | id = Just val }
     in
-        { attrs | visible = newStyle }
+        { attrs | visible = newId }
 
 
-hoverStyle : List (Style -> Style) -> { a | visible : { b | hoverStyle : List (Style -> Style) } } -> { a | visible : { b | hoverStyle : List (Style -> Style) } }
-hoverStyle val ({ visible } as attrs) =
-    let
-        newHoverStyle =
-            { visible | hoverStyle = val }
-    in
-        { attrs | visible = newHoverStyle }
-
-
-class : List String -> { a | visible : { b | class : List String } } -> { a | visible : { b | class : List String } }
+class :
+    List String
+    -> { a | visible : { b | class : List String } }
+    -> { a | visible : { b | class : List String } }
 class val ({ visible } as attrs) =
     let
         newClass =
@@ -622,18 +629,33 @@ class val ({ visible } as attrs) =
         { attrs | visible = newClass }
 
 
+style :
+    List (Style -> Style)
+    -> { a | visible : { b | style : List (Style -> Style) } }
+    -> { a | visible : { b | style : List (Style -> Style) } }
+style val ({ visible } as attrs) =
+    let
+        newStyle =
+            { visible | style = val }
+    in
+        { attrs | visible = newStyle }
+
+
+hoverStyle :
+    List (Style -> Style)
+    -> { a | visible : { b | hoverStyle : List (Style -> Style) } }
+    -> { a | visible : { b | hoverStyle : List (Style -> Style) } }
+hoverStyle val ({ visible } as attrs) =
+    let
+        newHoverStyle =
+            { visible | hoverStyle = val }
+    in
+        { attrs | visible = newHoverStyle }
+
+
 target : String -> TargetAttribute a -> TargetAttribute a
 target val attrs =
     { attrs | target = Just val }
-
-
-id : String -> { a | visible : { b | id : Maybe String } } -> { a | visible : { b | id : Maybe String } }
-id val ({ visible } as attrs) =
-    let
-        newId =
-            { visible | id = Just val }
-    in
-        { attrs | visible = newId }
 
 
 name : String -> NameAttribute a -> NameAttribute a
@@ -658,7 +680,27 @@ handleStyle { visible } =
         { style, hoverStyle } =
             visible
     in
-        BodyBuilderHtml.style style << BodyBuilderHtml.hoverStyle hoverStyle
+        BodyBuilderHtml.style style
+            << BodyBuilderHtml.hoverStyle hoverStyle
+
+
+handleMouseEvents :
+    { a | onMouseEvents : OnMouseEventsInside msg }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleMouseEvents { onMouseEvents } =
+    let
+        { click, doubleClick, mouseUp, mouseOut, mouseOver, mouseDown, mouseLeave, mouseEnter } =
+            onMouseEvents
+    in
+        unwrap BodyBuilderHtml.onClick click
+            >> unwrap BodyBuilderHtml.onDoubleClick doubleClick
+            >> unwrap BodyBuilderHtml.onMouseUp mouseUp
+            >> unwrap BodyBuilderHtml.onMouseOut mouseOut
+            >> unwrap BodyBuilderHtml.onMouseOver mouseOver
+            >> unwrap BodyBuilderHtml.onMouseDown mouseDown
+            >> unwrap BodyBuilderHtml.onMouseLeave mouseLeave
+            >> unwrap BodyBuilderHtml.onMouseEnter mouseEnter
 
 
 handleSrc : { a | src : String } -> HtmlAttributes msg -> HtmlAttributes msg
@@ -678,8 +720,7 @@ handleClass { visible } =
 
 handleId : { a | visible : { b | id : Maybe String } } -> HtmlAttributes msg -> HtmlAttributes msg
 handleId { visible } =
-    visible.id
-        |> Maybe.unwrap identity BodyBuilderHtml.id
+    unwrap BodyBuilderHtml.id visible.id
 
 
 handleType : { a | type_ : String } -> HtmlAttributes msg -> HtmlAttributes msg
@@ -762,28 +803,25 @@ handleTarget :
     { a | target : Maybe String }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleTarget { target } attributes =
-    case target of
-        Nothing ->
-            attributes
-
-        Just target_ ->
-            BodyBuilderHtml.target target_ attributes
+handleTarget { target } =
+    unwrap BodyBuilderHtml.target target
 
 
 handleContent :
     { a | value : Maybe String }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleContent { value } attributes =
-    case value of
-        Nothing ->
-            attributes
+handleContent { value } =
+    unwrap setTextareaValue value
 
-        Just value_ ->
-            attributes
-                |> BodyBuilderHtml.value value
-                |> (BodyBuilderHtml.content [ BodyBuilderHtml.text value_ ])
+
+setTextareaValue :
+    String
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+setTextareaValue value =
+    BodyBuilderHtml.value (Just value)
+        >> BodyBuilderHtml.content [ BodyBuilderHtml.text value ]
 
 
 buildNode :

@@ -29,6 +29,14 @@ module BodyBuilderHtml
         , checked
         , selectOption
         , target
+        , onClick
+        , onDoubleClick
+        , onMouseUp
+        , onMouseOut
+        , onMouseOver
+        , onMouseDown
+        , onMouseLeave
+        , onMouseEnter
         )
 
 import Html
@@ -61,6 +69,14 @@ type alias Tree msg =
 
     -- Html Events
     , onInput : Maybe (String -> msg)
+    , onClick : Maybe msg
+    , onDoubleClick : Maybe msg
+    , onMouseUp : Maybe msg
+    , onMouseOut : Maybe msg
+    , onMouseOver : Maybe msg
+    , onMouseDown : Maybe msg
+    , onMouseLeave : Maybe msg
+    , onMouseEnter : Maybe msg
 
     -- Children
     , text : String
@@ -96,6 +112,14 @@ base =
 
         -- Html Events
         , onInput = Nothing
+        , onClick = Nothing
+        , onDoubleClick = Nothing
+        , onMouseUp = Nothing
+        , onMouseOut = Nothing
+        , onMouseOver = Nothing
+        , onMouseDown = Nothing
+        , onMouseLeave = Nothing
+        , onMouseEnter = Nothing
 
         -- Children
         , text = ""
@@ -187,6 +211,14 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.href val.href
                     , Helpers.emptyListOrApply Html.Attributes.selected val.selected
                     , Helpers.emptyListOrApply Html.Attributes.target val.target
+                    , Helpers.emptyListOrApply Html.Events.onClick val.onClick
+                    , Helpers.emptyListOrApply Html.Events.onDoubleClick val.onDoubleClick
+                    , Helpers.emptyListOrApply Html.Events.onMouseUp val.onMouseUp
+                    , Helpers.emptyListOrApply Html.Events.onMouseOut val.onMouseOut
+                    , Helpers.emptyListOrApply Html.Events.onMouseOver val.onMouseOver
+                    , Helpers.emptyListOrApply Html.Events.onMouseDown val.onMouseDown
+                    , Helpers.emptyListOrApply Html.Events.onMouseLeave val.onMouseLeave
+                    , Helpers.emptyListOrApply Html.Events.onMouseEnter val.onMouseEnter
                     ]
                 )
                 (val.content |> List.map htmlAttributesToHtml)
@@ -305,6 +337,46 @@ selected value (HtmlAttributes attrs) =
                 else
                     Nothing
         }
+
+
+onClick : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onClick value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onClick = Just value }
+
+
+onDoubleClick : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onDoubleClick value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onDoubleClick = Just value }
+
+
+onMouseUp : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseUp value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseUp = Just value }
+
+
+onMouseOut : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseOut value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseOut = Just value }
+
+
+onMouseOver : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseOver value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseOver = Just value }
+
+
+onMouseDown : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseDown value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseDown = Just value }
+
+
+onMouseLeave : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseLeave value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseLeave = Just value }
+
+
+onMouseEnter : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseEnter value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseEnter = Just value }
 
 
 div : HtmlAttributes msg -> HtmlAttributes msg
