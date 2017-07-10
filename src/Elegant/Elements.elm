@@ -68,10 +68,10 @@ flexnav =
 main : Html.Html msg
 main =
     Html.div []
-        [ Html.a [ style [ fontSize gamma, paddingRight medium ] ] [ Html.text "Brand" ]
+        [ Html.a [ inlineStyle [ fontSize gamma, paddingRight medium ] ] [ Html.text "Brand" ]
         , Html.input
             [ Html.Attributes.type_ "text"
-            , style
+            , inlineStyle
                 [ borderRadius 4
                 , border Color.gray
                 , marginRight (Px 4)
@@ -79,7 +79,7 @@ main =
             ]
             []
         , Html.button
-            [ style
+            [ inlineStyle
                 [ borderRadius 4
                 , border Color.gray
                 , textColor Color.black

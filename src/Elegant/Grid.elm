@@ -1,10 +1,13 @@
-module Elegant.Grid
-    exposing
-        ( grid
-        , col
-        , standardGrid
-        , fullGrid
-        )
+-- module Elegant.Grid
+--     exposing
+--         ( grid
+--         , col
+--         , standardGrid
+--         , fullGrid
+--         )
+
+
+module Main exposing (..)
 
 {-|
 @docs col
@@ -13,17 +16,18 @@ module Elegant.Grid
 @docs standardGrid
 -}
 
-import Elegant exposing (..)
+import Elegant
 import Elegant.Elements as Elements
 import Color
 import Html exposing (Html)
 import Function exposing (compose)
+import BodyBuilder exposing (Node, Spanning, NotListElement, div, toHtml, text, style)
 
 
-type alias Column msg =
+type alias Column interactiveContent phrasingContent spanningContent listContent =
     { denominator : Int
     , numerator : Int
-    , content : List (Html msg)
+    , content : List (Node interactiveContent phrasingContent spanningContent listContent)
     }
 
 
@@ -44,24 +48,35 @@ layoutStyle gutter =
         |> compose
 
 
-columnToHtml : SizeUnit -> Column msg -> Html msg
+columnToHtml :
+    SizeUnit
+    ->
+        { a
+            | content :
+                List (Node interactiveContent phrasingContent Spanning NotListElement)
+            , denominator : Int
+            , numerator : Int
+        }
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 columnToHtml gutter { denominator, numerator, content } =
-    Html.div [ style [ columnStyle gutter denominator numerator ] ] content
+    div [ style [ columnStyle gutter denominator numerator ] ] content
 
 
-exampleContent : String -> List (Html msg)
+exampleContent :
+    String
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement)
 exampleContent content =
-    [ Html.div [ style [ paddingBottom medium ] ]
-        [ Html.div [ style [ Elements.border Color.black ] ]
-            [ Html.text content
+    [ div [ style [ paddingBottom medium ] ]
+        [ div [ style [ Elements.border Color.black ] ]
+            [ text content
             ]
         ]
     ]
 
 
-example : Html msg
+example : Node interactiveContent phrasingContent Spanning NotListElement
 example =
-    Html.div [ style [ fullWidth ] ]
+    div [ style [ fullWidth ] ]
         [ standardGrid
             [ col 12 3 (exampleContent "I")
             , col 12 3 (exampleContent "am")
@@ -83,33 +98,63 @@ example =
 
 main : Html msg
 main =
-    example
+    toHtml example
 
 
 {-| Creates a column
 -}
-col : Int -> Int -> List (Html msg) -> Column msg
+col :
+    Int
+    -> Int
+    -> List (Node interactiveIn phrasingIn spanningIn listIn)
+    -> Column interactiveIn phrasingIn spanningIn listIn
 col =
     Column
 
 
 {-| Creates a grid with a custom gutter and columns
 -}
-grid : SizeUnit -> List (Column msg) -> Html msg
+grid :
+    SizeUnit
+    ->
+        List
+            { a
+                | content :
+                    List (Node interactiveContent phrasingContent Spanning NotListElement)
+                , denominator : Int
+                , numerator : Int
+            }
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 grid gutter columns =
-    Html.div [ style [ layoutStyle gutter ] ]
+    div [ style [ layoutStyle gutter ] ]
         (columns |> List.map (columnToHtml gutter))
 
 
 {-| Standard grid creates a grid with a 12px gutter
 -}
-standardGrid : List (Column msg) -> Html msg
+standardGrid :
+    List
+        { a
+            | content :
+                List (Node interactiveContent phrasingContent Spanning NotListElement)
+            , denominator : Int
+            , numerator : Int
+        }
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 standardGrid =
     grid medium
 
 
 {-| Full grid creates a grid with no gutter
 -}
-fullGrid : List (Column msg) -> Html msg
+fullGrid :
+    List
+        { a
+            | content :
+                List (Node interactiveContent phrasingContent Spanning NotListElement)
+            , denominator : Int
+            , numerator : Int
+        }
+    -> Node interactiveContent phrasingContent Spanning NotListElement
 fullGrid =
     grid zero
