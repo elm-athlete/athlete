@@ -49,8 +49,27 @@ type NotListElement
     = NotListElement
 
 
-type alias OnMouseEnter msg a =
-    { a | onMouseEnter : Maybe msg }
+type alias OnMouseEventsInside msg =
+    { click : Maybe msg
+    , doubleClick : Maybe msg
+    , mouseDown : Maybe msg
+    , mouseUp : Maybe msg
+    , mouseEnter : Maybe msg
+    , mouseLeave : Maybe msg
+    , mouseOver : Maybe msg
+    , mouseOut : Maybe msg
+    }
+
+
+defaultOnMouseEvents : OnMouseEventsInside msg
+defaultOnMouseEvents =
+    OnMouseEventsInside Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+
+type alias OnMouseEvents msg a =
+    { a
+        | onMouseEvents : OnMouseEventsInside msg
+    }
 
 
 type alias OnClick msg a =
@@ -58,7 +77,7 @@ type alias OnClick msg a =
 
 
 type alias VisibleAttributes msg a =
-    OnMouseEnter msg (OnClick msg (ClassAttribute (StyleAttribute (IdAttribute a))))
+    OnMouseEvents msg (ClassAttribute (StyleAttribute (IdAttribute a)))
 
 
 type alias StyleAttribute a =
@@ -277,16 +296,14 @@ flowDefaultsComposedToAttrs :
          , hoverStyle : List c
          , id : Maybe a
          , style : List d
-         , onMouseEnter : Maybe msg
-         , onClick : Maybe msg
+         , onMouseEvents : OnMouseEventsInside msg
          }
          ->
             { class : List b
             , hoverStyle : List c
             , id : Maybe a
             , style : List d
-            , onMouseEnter : Maybe msg
-            , onClick : Maybe msg
+            , onMouseEvents : OnMouseEventsInside msg
             }
         )
     ->
@@ -294,11 +311,10 @@ flowDefaultsComposedToAttrs :
         , hoverStyle : List c
         , id : Maybe a
         , style : List d
-        , onMouseEnter : Maybe msg
-        , onClick : Maybe msg
+        , onMouseEvents : OnMouseEventsInside msg
         }
 flowDefaultsComposedToAttrs =
-    defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEnter = Nothing, onClick = Nothing }
+    defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 h1 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
@@ -333,12 +349,12 @@ h6 =
 
 a : List (AAttributes msg -> AAttributes msg) -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 a =
-    A << defaultsComposedToAttrs { href = Nothing, target = Nothing, class = [], id = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    A << defaultsComposedToAttrs { href = Nothing, target = Nothing, class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 button : List (ButtonAttributes msg {} -> ButtonAttributes msg {}) -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 button =
-    Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 div : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning NotListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
@@ -378,22 +394,22 @@ span =
 
 textarea : List (TextareaAttributes msg -> TextareaAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 textarea =
-    Textarea << defaultsComposedToAttrs { value = Nothing, class = [], id = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    Textarea << defaultsComposedToAttrs { value = Nothing, class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 img : String -> String -> List (ImgAttributes msg -> ImgAttributes msg) -> Node interactiveContent phrasingContent spanningContent NotListElement msg
 img alt src =
-    Img << defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    Img << defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 audio : List (AudioAttributes msg -> AudioAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 audio =
-    Audio << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    Audio << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 progress : List (ProgressAttributes msg -> ProgressAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
 progress =
-    Progress << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    Progress << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 table :
@@ -463,7 +479,7 @@ inputHidden =
 
 baseInputAttributes : String -> InputVisibleAttributes msg (ValueAttribute a {})
 baseInputAttributes type_ =
-    { id = Nothing, name = Nothing, class = [], type_ = type_, value = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    { id = Nothing, name = Nothing, class = [], type_ = type_, value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 inputText :
@@ -498,56 +514,56 @@ inputCheckbox :
     List (InputCheckboxAttributes msg -> InputCheckboxAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputCheckbox =
-    InputCheckbox << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "checkbox", value = Nothing, style = [], hoverStyle = [], checked = False, onClick = Nothing, onMouseEnter = Nothing }
+    InputCheckbox << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "checkbox", value = Nothing, style = [], hoverStyle = [], checked = False, onMouseEvents = defaultOnMouseEvents }
 
 
 inputFile :
     List (InputFileAttributes msg -> InputFileAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputFile =
-    InputFile << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "file", style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    InputFile << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "file", style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 inputPassword :
     List (InputPasswordAttributes msg -> InputPasswordAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputPassword =
-    InputPassword << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "password", value = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    InputPassword << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "password", value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 inputRadio :
     List (InputRadioAttributes msg -> InputRadioAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputRadio =
-    InputRadio << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "radio", value = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    InputRadio << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "radio", value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 inputRange :
     List (InputRangeAttributes msg -> InputRangeAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputRange =
-    InputRange << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "range", value = Nothing, style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    InputRange << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "range", value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 inputSubmit :
     List (InputSubmitAttributes msg -> InputSubmitAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputSubmit =
-    InputSubmit << defaultsComposedToAttrs { id = Nothing, class = [], type_ = "submit", style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    InputSubmit << defaultsComposedToAttrs { id = Nothing, class = [], type_ = "submit", style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 inputUrl :
     List (InputUrlAttributes msg -> InputUrlAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputUrl =
-    InputUrl << defaultsComposedToAttrs { id = Nothing, class = [], name = Nothing, value = Nothing, type_ = "url", style = [], hoverStyle = [], onClick = Nothing, onMouseEnter = Nothing }
+    InputUrl << defaultsComposedToAttrs { id = Nothing, class = [], name = Nothing, value = Nothing, type_ = "url", style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
 
 
 select :
     List (SelectAttributes msg -> SelectAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 select list =
-    (Select << defaultsComposedToAttrs { id = Nothing, class = [], value = Nothing, style = [], hoverStyle = [], options = [], onClick = Nothing, onMouseEnter = Nothing }) list
+    (Select << defaultsComposedToAttrs { id = Nothing, class = [], value = Nothing, style = [], hoverStyle = [], options = [], onMouseEvents = defaultOnMouseEvents }) list
 
 
 options :
