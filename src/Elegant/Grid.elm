@@ -16,7 +16,7 @@ module Main exposing (..)
 @docs standardGrid
 -}
 
-import Elegant
+import Elegant exposing (..)
 import Elegant.Elements as Elements
 import Color
 import Html exposing (Html)
