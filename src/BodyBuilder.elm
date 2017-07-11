@@ -674,35 +674,35 @@ baseInputAttributes type_ =
 
 inputText :
     List (InputTextAttributes msg {} -> InputTextAttributes msg {})
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 inputText =
     InputText << defaultsComposedToAttrs (baseInputAttributes "text")
 
 
 inputNumber :
     List (InputNumberAttributes msg -> InputNumberAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 inputNumber =
     InputNumber << defaultsComposedToAttrs (baseInputAttributes "number")
 
 
 inputSlider :
     List (InputSliderAttributes msg -> InputSliderAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 inputSlider =
     InputSlider << defaultsComposedToAttrs (baseInputAttributes "range")
 
 
 inputColor :
     List (InputColorAttributes msg -> InputColorAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 inputColor =
     InputColor << defaultsComposedToAttrs (baseInputAttributes "color")
 
 
 inputCheckbox :
     List (InputCheckboxAttributes msg -> InputCheckboxAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 inputCheckbox =
     InputCheckbox
         << defaultsComposedToAttrs
@@ -718,7 +718,7 @@ inputCheckbox =
 
 inputFile :
     List (InputFileAttributes msg -> InputFileAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 inputFile =
     InputFile
         << defaultsComposedToAttrs
@@ -732,7 +732,7 @@ inputFile =
 
 inputPassword :
     List (InputPasswordAttributes msg -> InputPasswordAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 inputPassword =
     InputPassword
         << defaultsComposedToAttrs
@@ -777,7 +777,7 @@ inputRange =
 
 inputSubmit :
     List (InputSubmitAttributes msg -> InputSubmitAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 inputSubmit =
     InputSubmit
         << defaultsComposedToAttrs
@@ -791,7 +791,7 @@ inputSubmit =
 
 inputUrl :
     List (InputUrlAttributes msg -> InputUrlAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 inputUrl =
     InputUrl
         << defaultsComposedToAttrs
@@ -806,7 +806,7 @@ inputUrl =
 
 select :
     List (SelectAttributes msg -> SelectAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node Interactive phrasingContent spanningContent listContent msg
 select list =
     (Select
         << defaultsComposedToAttrs

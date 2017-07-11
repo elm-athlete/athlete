@@ -179,15 +179,20 @@ getAllStyles : HtmlAttributes msg -> List { style : Style, suffix : Maybe String
 getAllStyles =
     fold
         (\node accumulator ->
-            { style = node.style
-            , suffix = Nothing
-            , mediaQuery = Nothing
-            }
-                :: { style = node.hoverStyle
-                   , suffix = Just "hover"
-                   , mediaQuery = Nothing
-                   }
-                :: accumulator
+            let
+                customStyle =
+                    { style = node.style
+                    , suffix = Nothing
+                    , mediaQuery = Nothing
+                    }
+
+                hoverStyle =
+                    { style = node.hoverStyle
+                    , suffix = Just "hover"
+                    , mediaQuery = Nothing
+                    }
+            in
+                customStyle :: hoverStyle :: accumulator
         )
         []
 
