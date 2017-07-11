@@ -9,6 +9,15 @@ import Color.Convert as Color
 import Maybe.Extra as Maybe
 
 
+type alias Url =
+    String
+
+
+unwrap : (a -> b -> b) -> Maybe a -> b -> b
+unwrap =
+    Maybe.unwrap identity
+
+
 type Interactive
     = Interactive
 
@@ -49,6 +58,16 @@ type NotListElement
     = NotListElement
 
 
+
+{-
+   ███████ ██    ██ ███████ ███    ██ ████████ ███████
+   ██      ██    ██ ██      ████   ██    ██    ██
+   █████   ██    ██ █████   ██ ██  ██    ██    ███████
+   ██       ██  ██  ██      ██  ██ ██    ██         ██
+   ███████   ████   ███████ ██   ████    ██    ███████
+-}
+
+
 type alias OnMouseEventsInside msg =
     { click : Maybe msg
     , doubleClick : Maybe msg
@@ -67,24 +86,17 @@ defaultOnMouseEvents =
 
 
 type alias OnMouseEvents msg a =
-    { a
-        | onMouseEvents : OnMouseEventsInside msg
-    }
+    { a | onMouseEvents : OnMouseEventsInside msg }
 
 
-type alias OnClick msg a =
-    { a | onClick : Maybe msg }
 
-
-type alias VisibleAttributes msg a =
-    OnMouseEvents msg (ClassAttribute (StyleAttribute (IdAttribute a)))
-
-
-type alias StyleAttribute a =
-    { a
-        | style : List (Style -> Style)
-        , hoverStyle : List (Style -> Style)
-    }
+{-
+    █████  ████████ ████████ ██████  ██ ██████  ██    ██ ████████ ███████ ███████
+   ██   ██    ██       ██    ██   ██ ██ ██   ██ ██    ██    ██    ██      ██
+   ███████    ██       ██    ██████  ██ ██████  ██    ██    ██    █████   ███████
+   ██   ██    ██       ██    ██   ██ ██ ██   ██ ██    ██    ██    ██           ██
+   ██   ██    ██       ██    ██   ██ ██ ██████   ██████     ██    ███████ ███████
+-}
 
 
 type alias IdAttribute a =
@@ -95,20 +107,62 @@ type alias ClassAttribute a =
     { a | class : List String }
 
 
+type alias HiddenAttribute a =
+    { a | hidden : Bool }
+
+
+type alias TabindexAttribute a =
+    { a | tabindex : Maybe Int }
+
+
+type alias TitleAttribute a =
+    { a | title : Maybe String }
+
+
+type alias UniversalAttributes a =
+    TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute (HiddenAttribute a))))
+
+
+defaultUniversalAttributes : UniversalAttributes {}
+defaultUniversalAttributes =
+    { class = []
+    , id = Nothing
+    , hidden = False
+    , tabindex = Nothing
+    , title = Nothing
+    }
+
+
+type alias StyleAttribute =
+    { standard : List (Style -> Style)
+    , hover : List (Style -> Style)
+    }
+
+
+defaultStyleAttribute : StyleAttribute
+defaultStyleAttribute =
+    { standard = []
+    , hover = []
+    }
+
+
+type alias VisibleAttributes a =
+    { a
+        | style : StyleAttribute
+        , universal : UniversalAttributes {}
+    }
+
+
+type alias VisibleAttributesAndEvents msg a =
+    OnMouseEvents msg (VisibleAttributes a)
+
+
 type alias TargetAttribute a =
     { a | target : Maybe String }
 
 
-type alias Url =
-    String
-
-
 type alias HrefAttribute a =
     { a | href : Maybe Url }
-
-
-type alias Hlah a =
-    { a | value : Int }
 
 
 type alias SrcAttribute a =
@@ -123,26 +177,6 @@ type alias ValueAttribute b a =
     { a | value : Maybe b }
 
 
-type alias NameAttribute a =
-    { a | name : Maybe String }
-
-
-type alias AAttributes msg =
-    TargetAttribute (HrefAttribute (VisibleAttributes msg {}))
-
-
-type alias FlowAttributes msg =
-    VisibleAttributes msg {}
-
-
-type alias ImgAttributes msg =
-    AltAttribute (SrcAttribute (VisibleAttributes msg {}))
-
-
-type alias IframeAttributes msg =
-    SrcAttribute (VisibleAttributes msg {})
-
-
 type alias StringValue a =
     ValueAttribute String a
 
@@ -155,16 +189,67 @@ type alias ColorValue a =
     ValueAttribute Color a
 
 
+type alias NameAttribute a =
+    { a | name : Maybe String }
+
+
+type alias OptionsAttribute a =
+    { a | options : List { value : String, label : String } }
+
+
+type alias DisabledAttribute a =
+    { a | disabled : Bool }
+
+
+type alias WidthAttribute a =
+    { a | width : Maybe Int }
+
+
+type alias HeightAttribute a =
+    { a | height : Maybe Int }
+
+
+
+{-
+   ███████ ██      ███████ ███    ███      █████  ████████ ████████ ██████  ███████
+   ██      ██      ██      ████  ████     ██   ██    ██       ██    ██   ██ ██
+   █████   ██      █████   ██ ████ ██     ███████    ██       ██    ██████  ███████
+   ██      ██      ██      ██  ██  ██     ██   ██    ██       ██    ██   ██      ██
+   ███████ ███████ ███████ ██      ██     ██   ██    ██       ██    ██   ██ ███████
+-}
+
+
+type alias AAttributes msg =
+    TargetAttribute (HrefAttribute (VisibleAttributesAndEvents msg {}))
+
+
+type alias FlowAttributes msg =
+    VisibleAttributesAndEvents msg {}
+
+
+type alias ImgAttributes msg =
+    HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (VisibleAttributesAndEvents msg {}))))
+
+
+type alias IframeAttributes msg =
+    SrcAttribute (VisibleAttributesAndEvents msg {})
+
+
 type alias InputAttributes a =
     NameAttribute { a | type_ : String }
 
 
 type alias InputHiddenAttributes =
-    InputAttributes (ClassAttribute (IdAttribute (StringValue { type_ : String })))
+    InputAttributes
+        (StringValue
+            { universal : UniversalAttributes {}
+            , type_ : String
+            }
+        )
 
 
 type alias InputVisibleAttributes msg a =
-    VisibleAttributes msg (InputAttributes a)
+    VisibleAttributesAndEvents msg (InputAttributes a)
 
 
 type alias InputTextAttributes msg a =
@@ -172,11 +257,11 @@ type alias InputTextAttributes msg a =
 
 
 type alias TextareaAttributes msg =
-    NameAttribute (StringValue (VisibleAttributes msg {}))
+    NameAttribute (StringValue (VisibleAttributesAndEvents msg {}))
 
 
 type alias ButtonAttributes msg a =
-    VisibleAttributes msg a
+    DisabledAttribute (VisibleAttributesAndEvents msg a)
 
 
 type alias InputNumberAttributes msg =
@@ -220,31 +305,33 @@ type alias InputUrlAttributes msg =
 
 
 type alias SelectAttributes msg =
-    StringValue (OptionsAttribute (VisibleAttributes msg {}))
-
-
-type alias OptionsAttribute a =
-    { a | options : List { value : String, label : String } }
+    StringValue (OptionsAttribute (VisibleAttributesAndEvents msg {}))
 
 
 type alias ProgressAttributes msg =
-    VisibleAttributes msg {}
+    VisibleAttributesAndEvents msg {}
 
 
 type alias AudioAttributes msg =
-    VisibleAttributes msg {}
+    SrcAttribute (VisibleAttributesAndEvents msg {})
 
 
 type alias VideoAttributes msg =
-    VisibleAttributes msg {}
+    VisibleAttributesAndEvents msg {}
 
 
 type alias CanvasAttributes msg =
-    VisibleAttributes msg {}
+    HeightAttribute (WidthAttribute (VisibleAttributesAndEvents msg {}))
 
 
-type Never
-    = Never
+
+{-
+   ██   ██ ████████ ███    ███ ██           █████  ███████ ████████
+   ██   ██    ██    ████  ████ ██          ██   ██ ██         ██
+   ███████    ██    ██ ████ ██ ██          ███████ ███████    ██
+   ██   ██    ██    ██  ██  ██ ██          ██   ██      ██    ██
+   ██   ██    ██    ██      ██ ███████     ██   ██ ███████    ██
+-}
 
 
 type Node interactiveContent phrasingContent spanningContent listContent msg
@@ -288,124 +375,222 @@ defaultsComposedToAttrs defaults attrs =
 
 flowDefaultsComposedToAttrs :
     List
-        ({ class : List b
-         , hoverStyle : List c
-         , id : Maybe a
-         , style : List d
+        ({ universal : UniversalAttributes {}
+         , style : StyleAttribute
          , onMouseEvents : OnMouseEventsInside msg
          }
          ->
-            { class : List b
-            , hoverStyle : List c
-            , id : Maybe a
-            , style : List d
+            { universal : UniversalAttributes {}
+            , style : StyleAttribute
             , onMouseEvents : OnMouseEventsInside msg
             }
         )
     ->
-        { class : List b
-        , hoverStyle : List c
-        , id : Maybe a
-        , style : List d
+        { universal : UniversalAttributes {}
+        , style : StyleAttribute
         , onMouseEvents : OnMouseEventsInside msg
         }
 flowDefaultsComposedToAttrs =
-    defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    defaultsComposedToAttrs { style = defaultStyleAttribute, universal = defaultUniversalAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
-h1 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+
+{-
+   ██   ██ ████████ ███    ███ ██           ██████  ██████  ███    ██ ███████ ████████ ██████  ██    ██  ██████ ████████
+   ██   ██    ██    ████  ████ ██          ██      ██    ██ ████   ██ ██         ██    ██   ██ ██    ██ ██         ██
+   ███████    ██    ██ ████ ██ ██          ██      ██    ██ ██ ██  ██ ███████    ██    ██████  ██    ██ ██         ██
+   ██   ██    ██    ██  ██  ██ ██          ██      ██    ██ ██  ██ ██      ██    ██    ██   ██ ██    ██ ██         ██
+   ██   ██    ██    ██      ██ ███████      ██████  ██████  ██   ████ ███████    ██    ██   ██  ██████   ██████    ██
+-}
+
+
+h1 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h1 =
     H 1 << flowDefaultsComposedToAttrs
 
 
-h2 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h2 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h2 =
     H 2 << flowDefaultsComposedToAttrs
 
 
-h3 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h3 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h3 =
     H 3 << flowDefaultsComposedToAttrs
 
 
-h4 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h4 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h4 =
     H 4 << flowDefaultsComposedToAttrs
 
 
-h5 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h5 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h5 =
     H 5 << flowDefaultsComposedToAttrs
 
 
-h6 : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+h6 :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h6 =
     H 6 << flowDefaultsComposedToAttrs
 
 
-a : List (AAttributes msg -> AAttributes msg) -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+a :
+    List (AAttributes msg -> AAttributes msg)
+    -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 a =
-    A << defaultsComposedToAttrs { href = Nothing, target = Nothing, class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    A
+        << defaultsComposedToAttrs
+            { href = Nothing
+            , target = Nothing
+            , style = defaultStyleAttribute
+            , universal = defaultUniversalAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
-button : List (ButtonAttributes msg {} -> ButtonAttributes msg {}) -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+button :
+    List (ButtonAttributes msg {} -> ButtonAttributes msg {})
+    -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 button =
-    Button << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Button
+        << defaultsComposedToAttrs
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            , disabled = False
+            }
 
 
-div : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning NotListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
+div :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 div =
     Div << flowDefaultsComposedToAttrs
 
 
-ul : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning ListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
+ul :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning ListElement msg)
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 ul =
     Ul << flowDefaultsComposedToAttrs
 
 
-ol : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning ListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
+ol :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning ListElement msg)
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 ol =
     Ol << flowDefaultsComposedToAttrs
 
 
-li : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent phrasingContent Spanning NotListElement msg) -> Node interactiveContent phrasingContent Spanning ListElement msg
+li :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> Node interactiveContent phrasingContent Spanning ListElement msg
 li =
     Li << flowDefaultsComposedToAttrs
 
 
-p : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing Spanning NotListElement msg) -> Node interactiveContent NotPhrasing spanningContent NotListElement msg
+p :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
+    -> Node interactiveContent NotPhrasing spanningContent NotListElement msg
 p =
     P << flowDefaultsComposedToAttrs
 
 
-br : List (FlowAttributes msg -> FlowAttributes msg) -> Node interactiveContent Phrasing spanningContent NotListElement msg
+br :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> Node interactiveContent Phrasing spanningContent NotListElement msg
 br =
     Br << flowDefaultsComposedToAttrs
 
 
-span : List (FlowAttributes msg -> FlowAttributes msg) -> List (Node interactiveContent Phrasing NotSpanning NotListElement msg) -> Node interactiveContent phrasingContent spanningContent NotListElement msg
+span :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent Phrasing NotSpanning NotListElement msg)
+    -> Node interactiveContent phrasingContent spanningContent NotListElement msg
 span =
     Span << flowDefaultsComposedToAttrs
 
 
-textarea : List (TextareaAttributes msg -> TextareaAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+textarea :
+    List (TextareaAttributes msg -> TextareaAttributes msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 textarea =
-    Textarea << defaultsComposedToAttrs { value = Nothing, class = [], name = Nothing, id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Textarea
+        << defaultsComposedToAttrs
+            { value = Nothing
+            , name = Nothing
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
-img : String -> String -> List (ImgAttributes msg -> ImgAttributes msg) -> Node interactiveContent phrasingContent spanningContent NotListElement msg
+img :
+    String
+    -> String
+    -> List (ImgAttributes msg -> ImgAttributes msg)
+    -> Node interactiveContent phrasingContent spanningContent NotListElement msg
 img alt src =
-    Img << defaultsComposedToAttrs { src = src, alt = alt, class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Img
+        << defaultsComposedToAttrs
+            { src = src
+            , alt = alt
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            , width = Nothing
+            , height = Nothing
+            }
 
 
-audio : List (AudioAttributes msg -> AudioAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+audio :
+    List (AudioAttributes msg -> AudioAttributes msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 audio =
-    Audio << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Audio
+        << defaultsComposedToAttrs
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            , src = ""
+            }
 
 
-progress : List (ProgressAttributes msg -> ProgressAttributes msg) -> Node Interactive phrasingContent spanningContent NotListElement msg
+progress :
+    List (ProgressAttributes msg -> ProgressAttributes msg)
+    -> Node Interactive phrasingContent spanningContent NotListElement msg
 progress =
-    Progress << defaultsComposedToAttrs { class = [], id = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    Progress
+        << defaultsComposedToAttrs
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 table :
@@ -470,12 +655,24 @@ inputHidden :
     List (InputHiddenAttributes -> InputHiddenAttributes)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputHidden =
-    InputHidden << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "hidden", value = Nothing }
+    InputHidden
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , universal = defaultUniversalAttributes
+            , type_ = "hidden"
+            , value = Nothing
+            }
 
 
 baseInputAttributes : String -> InputVisibleAttributes msg (ValueAttribute a {})
 baseInputAttributes type_ =
-    { id = Nothing, name = Nothing, class = [], type_ = type_, value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    { universal = defaultUniversalAttributes
+    , style = defaultStyleAttribute
+    , name = Nothing
+    , type_ = type_
+    , value = Nothing
+    , onMouseEvents = defaultOnMouseEvents
+    }
 
 
 inputText :
@@ -510,56 +707,130 @@ inputCheckbox :
     List (InputCheckboxAttributes msg -> InputCheckboxAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputCheckbox =
-    InputCheckbox << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "checkbox", value = Nothing, style = [], hoverStyle = [], checked = False, onMouseEvents = defaultOnMouseEvents }
+    InputCheckbox
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "checkbox"
+            , value = Nothing
+            , checked = False
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputFile :
     List (InputFileAttributes msg -> InputFileAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputFile =
-    InputFile << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "file", style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputFile
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "file"
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputPassword :
     List (InputPasswordAttributes msg -> InputPasswordAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputPassword =
-    InputPassword << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "password", value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputPassword
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "password"
+            , value = Nothing
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputRadio :
     List (InputRadioAttributes msg -> InputRadioAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputRadio =
-    InputRadio << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "radio", value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputRadio
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "radio"
+            , value = Nothing
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputRange :
     List (InputRangeAttributes msg -> InputRangeAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputRange =
-    InputRange << defaultsComposedToAttrs { id = Nothing, name = Nothing, class = [], type_ = "range", value = Nothing, style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputRange
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , type_ = "range"
+            , value = Nothing
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 inputSubmit :
     List (InputSubmitAttributes msg -> InputSubmitAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputSubmit =
-    InputSubmit << defaultsComposedToAttrs { id = Nothing, class = [], type_ = "submit", style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputSubmit
+        << defaultsComposedToAttrs
+            { type_ = "submit"
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            , disabled = False
+            }
 
 
 inputUrl :
     List (InputUrlAttributes msg -> InputUrlAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 inputUrl =
-    InputUrl << defaultsComposedToAttrs { id = Nothing, class = [], name = Nothing, value = Nothing, type_ = "url", style = [], hoverStyle = [], onMouseEvents = defaultOnMouseEvents }
+    InputUrl
+        << defaultsComposedToAttrs
+            { name = Nothing
+            , value = Nothing
+            , type_ = "url"
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 select :
     List (SelectAttributes msg -> SelectAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
 select list =
-    (Select << defaultsComposedToAttrs { id = Nothing, class = [], value = Nothing, style = [], hoverStyle = [], options = [], onMouseEvents = defaultOnMouseEvents }) list
+    (Select
+        << defaultsComposedToAttrs
+            { value = Nothing
+            , options = []
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            }
+    )
+        list
+
+
+
+{-
+    █████  ████████ ████████ ██████  ███████      ██████  ██████  ███    ██ ███████ ████████ ██████  ██    ██  ██████ ████████
+   ██   ██    ██       ██    ██   ██ ██          ██      ██    ██ ████   ██ ██         ██    ██   ██ ██    ██ ██         ██
+   ███████    ██       ██    ██████  ███████     ██      ██    ██ ██ ██  ██ ███████    ██    ██████  ██    ██ ██         ██
+   ██   ██    ██       ██    ██   ██      ██     ██      ██    ██ ██  ██ ██      ██    ██    ██   ██ ██    ██ ██         ██
+   ██   ██    ██       ██    ██   ██ ███████      ██████  ██████  ██   ████ ███████    ██    ██   ██  ██████   ██████    ██
+-}
 
 
 options :
@@ -597,19 +868,106 @@ checked attrs =
     { attrs | checked = True }
 
 
-style : List (Style -> Style) -> StyleAttribute a -> StyleAttribute a
-style val attrs =
-    { attrs | style = val }
+hidden :
+    { a | universal : UniversalAttributes {} }
+    -> { a | universal : UniversalAttributes {} }
+hidden ({ universal } as attrs) =
+    let
+        newUniversal =
+            { universal | hidden = True }
+    in
+        { attrs | universal = newUniversal }
 
 
-hoverStyle : List (Style -> Style) -> StyleAttribute a -> StyleAttribute a
-hoverStyle val attrs =
-    { attrs | hoverStyle = val }
+title :
+    String
+    -> { d | universal : { c | title : Maybe String } }
+    -> { d | universal : { c | title : Maybe String } }
+title val ({ universal } as attrs) =
+    let
+        newUniversal =
+            { universal | title = Just val }
+    in
+        { attrs | universal = newUniversal }
 
 
-class : List String -> ClassAttribute a -> ClassAttribute a
-class val attrs =
-    { attrs | class = val }
+tabindex :
+    Int
+    -> { d | universal : { c | tabindex : Maybe Int } }
+    -> { d | universal : { c | tabindex : Maybe Int } }
+tabindex val ({ universal } as attrs) =
+    let
+        newUniversal =
+            { universal | tabindex = Just val }
+    in
+        { attrs | universal = newUniversal }
+
+
+id :
+    String
+    -> { a | universal : { b | id : Maybe String } }
+    -> { a | universal : { b | id : Maybe String } }
+id val ({ universal } as attrs) =
+    let
+        newId =
+            { universal | id = Just val }
+    in
+        { attrs | universal = newId }
+
+
+disabled :
+    { a | disabled : Bool }
+    -> { a | disabled : Bool }
+disabled attrs =
+    { attrs | disabled = True }
+
+
+onClick :
+    msg
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+onClick val ({ onMouseEvents } as attrs) =
+    let
+        newOnClick =
+            { onMouseEvents | click = Just val }
+    in
+        { attrs | onMouseEvents = newOnClick }
+
+
+class :
+    List String
+    -> { a | universal : { b | class : List String } }
+    -> { a | universal : { b | class : List String } }
+class val ({ universal } as attrs) =
+    let
+        newClass =
+            { universal | class = val }
+    in
+        { attrs | universal = newClass }
+
+
+style :
+    List (Style -> Style)
+    -> { a | style : { b | standard : List (Style -> Style) } }
+    -> { a | style : { b | standard : List (Style -> Style) } }
+style val ({ style } as attrs) =
+    let
+        newStyle =
+            { style | standard = val }
+    in
+        { attrs | style = newStyle }
+
+
+hoverStyle :
+    List (Style -> Style)
+    -> { a | style : { b | hover : List (Style -> Style) } }
+    -> { a | style : { b | hover : List (Style -> Style) } }
+hoverStyle val ({ style } as attrs) =
+    let
+        newHoverStyle =
+            { style | hover = val }
+    in
+        { attrs | style = newHoverStyle }
 
 
 target : String -> TargetAttribute a -> TargetAttribute a
@@ -617,14 +975,29 @@ target val attrs =
     { attrs | target = Just val }
 
 
-id : String -> IdAttribute a -> IdAttribute a
-id val attrs =
-    { attrs | id = Just val }
-
-
 name : String -> NameAttribute a -> NameAttribute a
 name val attrs =
     { attrs | name = Just val }
+
+
+width : Int -> WidthAttribute a -> WidthAttribute a
+width val attrs =
+    { attrs | width = Just val }
+
+
+height : Int -> HeightAttribute a -> HeightAttribute a
+height val attrs =
+    { attrs | height = Just val }
+
+
+
+{-
+   ██   ██  █████  ███    ██ ██████  ██      ███████ ██████  ███████
+   ██   ██ ██   ██ ████   ██ ██   ██ ██      ██      ██   ██ ██
+   ███████ ███████ ██ ██  ██ ██   ██ ██      █████   ██████  ███████
+   ██   ██ ██   ██ ██  ██ ██ ██   ██ ██      ██      ██   ██      ██
+   ██   ██ ██   ██ ██   ████ ██████  ███████ ███████ ██   ██ ███████
+-}
 
 
 handleHref :
@@ -632,40 +1005,115 @@ handleHref :
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleHref { href } =
-    href
-        |> Maybe.unwrap identity BodyBuilderHtml.href
+    href |> Maybe.unwrap identity BodyBuilderHtml.href
 
 
 handleStyle :
-    { a | hoverStyle : List (Style -> Style), style : List (Style -> Style) }
+    { a | style : StyleAttribute }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleStyle { style, hoverStyle } =
-    BodyBuilderHtml.style style << BodyBuilderHtml.hoverStyle hoverStyle
+handleStyle { style } =
+    let
+        { standard, hover } =
+            style
+    in
+        BodyBuilderHtml.style standard
+            << BodyBuilderHtml.hoverStyle hover
 
 
-handleSrc : { a | src : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleMouseEvents :
+    { a | onMouseEvents : OnMouseEventsInside msg }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleMouseEvents { onMouseEvents } =
+    let
+        { click, doubleClick, mouseUp, mouseOut, mouseOver, mouseDown, mouseLeave, mouseEnter } =
+            onMouseEvents
+    in
+        unwrap BodyBuilderHtml.onClick click
+            >> unwrap BodyBuilderHtml.onDoubleClick doubleClick
+            >> unwrap BodyBuilderHtml.onMouseUp mouseUp
+            >> unwrap BodyBuilderHtml.onMouseOut mouseOut
+            >> unwrap BodyBuilderHtml.onMouseOver mouseOver
+            >> unwrap BodyBuilderHtml.onMouseDown mouseDown
+            >> unwrap BodyBuilderHtml.onMouseLeave mouseLeave
+            >> unwrap BodyBuilderHtml.onMouseEnter mouseEnter
+
+
+handleSrc :
+    { a | src : String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleSrc { src } =
     BodyBuilderHtml.src src
 
 
-handleAlt : { a | alt : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleDisabled :
+    { a | disabled : Bool }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleDisabled { disabled } =
+    if disabled then
+        BodyBuilderHtml.disabled
+    else
+        identity
+
+
+handleAlt :
+    { a | alt : String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleAlt { alt } =
     BodyBuilderHtml.alt alt
 
 
-handleClass : { a | class : List String } -> HtmlAttributes msg -> HtmlAttributes msg
-handleClass { class } =
-    BodyBuilderHtml.class class
+handleClass :
+    { a | universal : { b | class : List String } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleClass { universal } =
+    BodyBuilderHtml.class universal.class
 
 
-handleId : { a | id : Maybe String } -> HtmlAttributes msg -> HtmlAttributes msg
-handleId { id } =
-    id
-        |> Maybe.unwrap identity BodyBuilderHtml.id
+handleId :
+    { a | universal : { b | id : Maybe String } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleId { universal } =
+    unwrap BodyBuilderHtml.id universal.id
 
 
-handleType : { a | type_ : String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleHidden :
+    { b | universal : { a | hidden : Bool } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleHidden { universal } =
+    if universal.hidden then
+        BodyBuilderHtml.hidden
+    else
+        identity
+
+
+handleTabindex :
+    { b | universal : { a | tabindex : Maybe Int } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleTabindex { universal } =
+    unwrap BodyBuilderHtml.tabindex universal.tabindex
+
+
+handleTitle :
+    { b | universal : { a | title : Maybe String } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleTitle { universal } =
+    unwrap BodyBuilderHtml.title universal.title
+
+
+handleType :
+    { a | type_ : String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleType { type_ } =
     BodyBuilderHtml.type_ type_
 
@@ -698,14 +1146,28 @@ handleColorValue { value } =
         |> BodyBuilderHtml.value
 
 
-handleName : { a | name : Maybe String } -> HtmlAttributes msg -> HtmlAttributes msg
+handleName :
+    { a | name : Maybe String }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
 handleName { name } =
-    case name of
-        Nothing ->
-            identity
+    unwrap BodyBuilderHtml.name name
 
-        Just name_ ->
-            BodyBuilderHtml.name name_
+
+handleWidth :
+    { a | width : Maybe Int }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleWidth { width } =
+    unwrap BodyBuilderHtml.width width
+
+
+handleHeight :
+    { a | height : Maybe Int }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleHeight { height } =
+    unwrap BodyBuilderHtml.height height
 
 
 handleOptions :
@@ -716,7 +1178,9 @@ handleOptions { options } =
     BodyBuilderHtml.content (List.map optionsToBodyBuilderHtml options)
 
 
-optionsToBodyBuilderHtml : { label : String, value : String } -> HtmlAttributes msg
+optionsToBodyBuilderHtml :
+    { label : String, value : String }
+    -> HtmlAttributes msg
 optionsToBodyBuilderHtml { value, label } =
     BodyBuilderHtml.node
         [ BodyBuilderHtml.tag "option"
@@ -745,28 +1209,35 @@ handleTarget :
     { a | target : Maybe String }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleTarget { target } attributes =
-    case target of
-        Nothing ->
-            attributes
-
-        Just target_ ->
-            BodyBuilderHtml.target target_ attributes
+handleTarget { target } =
+    unwrap BodyBuilderHtml.target target
 
 
 handleContent :
     { a | value : Maybe String }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleContent { value } attributes =
-    case value of
-        Nothing ->
-            attributes
+handleContent { value } =
+    unwrap setTextareaValue value
 
-        Just value_ ->
-            attributes
-                |> BodyBuilderHtml.value value
-                |> (BodyBuilderHtml.content [ BodyBuilderHtml.text value_ ])
+
+setTextareaValue :
+    String
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+setTextareaValue value =
+    BodyBuilderHtml.value (Just value)
+        >> BodyBuilderHtml.content [ BodyBuilderHtml.text value ]
+
+
+
+{-
+   ████████  ██████      ██   ██ ████████ ███    ███ ██
+      ██    ██    ██     ██   ██    ██    ████  ████ ██
+      ██    ██    ██     ███████    ██    ██ ████ ██ ██
+      ██    ██    ██     ██   ██    ██    ██  ██  ██ ██
+      ██     ██████      ██   ██    ██    ██      ██ ███████
+-}
 
 
 buildNode :
@@ -802,26 +1273,29 @@ childToHtml attributes =
     buildNode [] attributes
 
 
-type alias BaseAttributes a =
-    { a
-        | class : List String
-        , hoverStyle : List (Style -> Style)
-        , id : Maybe String
-        , style : List (Style -> Style)
-    }
-
-
-baseHandling : List (BaseAttributes a -> HtmlAttributes msg -> HtmlAttributes msg)
+baseHandling :
+    List
+        (VisibleAttributesAndEvents msg a
+         -> HtmlAttributes msg
+         -> HtmlAttributes msg
+        )
 baseHandling =
-    [ handleStyle, handleClass, handleId ]
+    [ handleStyle, handleClass, handleId, handleMouseEvents, handleHidden, handleTabindex, handleTitle ]
 
 
-inputAttributesHandling : List (NameAttribute (BaseAttributes { a | type_ : String }) -> HtmlAttributes msg -> HtmlAttributes msg)
+inputAttributesHandling :
+    List
+        (NameAttribute (VisibleAttributesAndEvents msg { a | type_ : String })
+         -> HtmlAttributes msg
+         -> HtmlAttributes msg
+        )
 inputAttributesHandling =
     List.append baseHandling [ handleType, handleName ]
 
 
-toTree : Node interactiveContent phrasingContent spanningContent listContent msg -> BodyBuilderHtml.HtmlAttributes msg
+toTree :
+    Node interactiveContent phrasingContent spanningContent listContent msg
+    -> BodyBuilderHtml.HtmlAttributes msg
 toTree node =
     case node of
         A attributes children ->
@@ -849,10 +1323,10 @@ toTree node =
             parentToHtml children attributes ("h" ++ (number |> toString)) baseHandling
 
         Img attributes ->
-            childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
+            childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt, handleWidth, handleHeight ])
 
         Button attributes children ->
-            parentToHtml children attributes "button" baseHandling
+            parentToHtml children attributes "button" (List.append baseHandling [ handleDisabled ])
 
         Text str ->
             BodyBuilderHtml.text str
@@ -868,16 +1342,16 @@ toTree node =
             childToHtml attributes "progress" baseHandling
 
         Audio attributes ->
-            childToHtml attributes "audio" baseHandling
+            childToHtml attributes "audio" (List.append baseHandling [ handleSrc ])
 
         Video attributes ->
             childToHtml attributes "video" baseHandling
 
         Canvas attributes ->
-            childToHtml attributes "canvas" baseHandling
+            childToHtml attributes "canvas" (List.append baseHandling [ handleWidth, handleHeight ])
 
         InputHidden attributes ->
-            childToHtml attributes "input" [ handleStringValue, handleName, handleClass, handleId ]
+            childToHtml attributes "input" [ handleStringValue, handleName, handleClass, handleId, handleHidden ]
 
         Textarea attributes ->
             childToHtml attributes "textarea" (baseHandling |> List.append [ handleName, handleContent ])
@@ -910,7 +1384,7 @@ toTree node =
             childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleIntValue ])
 
         InputSubmit attributes ->
-            childToHtml attributes "button" (baseHandling |> List.append [ handleType ])
+            childToHtml attributes "button" (baseHandling |> List.append [ handleType, handleDisabled ])
 
         InputUrl attributes ->
             childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
@@ -951,78 +1425,3 @@ program { init, update, subscriptions, view } =
         , subscriptions = subscriptions
         , view = toHtml << view
         }
-
-
-blah : Node Interactive NotPhrasing Spanning NotListElement msg
-blah =
-    div
-        [ style
-            [ Elegant.width (Elegant.Px 300)
-            , Elegant.marginAuto
-            ]
-        ]
-        [ a
-            [ style [ Elegant.textColor Color.grey ]
-            , href "https://github.com"
-            , class [ "toto" ]
-
-            -- , onClick Click
-            , id "titi"
-            , target "_blank"
-            ]
-            [ container
-                [ container
-                    [ h1
-                        [ style [ Elegant.textColor Color.green ]
-                        , hoverStyle [ Elegant.textColor Color.red ]
-                        ]
-                        [ span [] [ text "Toto" ]
-                        , span [] [ img "alt" "toto" [] ]
-                        , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
-                        ]
-                    ]
-                ]
-            , olLi []
-                [ p [] [ text "First li in olLi" ]
-                , p [] [ text "Second li in olLi", br [], text "Line breaking" ]
-                ]
-            , ulLi []
-                [ p [] [ text "First li in ulLi" ]
-                , text "Second li in ulLi"
-                ]
-            , ul []
-                [ li [] [ text "First li in ul" ]
-                , li [] [ text "Second li in ul" ]
-                ]
-            , ol []
-                [ li [] [ text "First li in ol" ]
-                , li [] [ text "Second li in ol" ]
-                ]
-            ]
-        , inputHidden [ name "inputHidden", value "inputHidden_", class [ "class" ], id "id" ]
-        , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_", class [ "class" ], id "id" ]
-        , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 12, class [ "class" ], id "id" ]
-        , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 12, class [ "class" ], id "id" ]
-        , inputColor [ style [ Elegant.displayBlock ], name "inputSlider", value Color.yellow, class [ "class" ], id "id" ]
-        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", class [ "class" ], id "id", checked ]
-        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", class [ "class" ], id "id" ]
-        , inputFile [ style [ Elegant.displayBlock ], name "inputSlider", class [ "class" ], id "id" ]
-        , inputPassword [ style [ Elegant.displayBlock ], name "inputSlider", value "", class [ "class" ], id "id" ]
-        , inputRadio [ style [ Elegant.displayBlock ], name "inputSlider", value "Test", class [ "class" ], id "id" ]
-        , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 15, class [ "class" ], id "id" ]
-        , inputSubmit [ style [ Elegant.displayBlock ], class [ "class" ], id "id" ]
-        , inputUrl [ style [ Elegant.displayBlock ], class [ "class" ], id "id", name "inputUrl", value "" ]
-        , select
-            [ options
-                [ option "value" "label"
-                , option "value2" "label2"
-                ]
-            , selectedOption "value2"
-            ]
-        , button [] [ text "toto" ]
-        ]
-
-
-main : Html.Html msg
-main =
-    toHtml blah

@@ -24,11 +24,25 @@ module BodyBuilderHtml
         , none
         , id
         , class
+        , hidden
+        , tabindex
+        , title
         , value
         , name
+        , disabled
         , checked
         , selectOption
         , target
+        , width
+        , height
+        , onClick
+        , onDoubleClick
+        , onMouseUp
+        , onMouseOut
+        , onMouseOver
+        , onMouseDown
+        , onMouseLeave
+        , onMouseEnter
         )
 
 import Html
@@ -58,9 +72,23 @@ type alias Tree msg =
     , name : Maybe String
     , selected : Maybe Bool
     , target : Maybe String
+    , hidden : Bool
+    , tabindex : Maybe Int
+    , title : Maybe String
+    , disabled : Maybe Bool
+    , width : Maybe Int
+    , height : Maybe Int
 
     -- Html Events
     , onInput : Maybe (String -> msg)
+    , onClick : Maybe msg
+    , onDoubleClick : Maybe msg
+    , onMouseUp : Maybe msg
+    , onMouseOut : Maybe msg
+    , onMouseOver : Maybe msg
+    , onMouseDown : Maybe msg
+    , onMouseLeave : Maybe msg
+    , onMouseEnter : Maybe msg
 
     -- Children
     , text : String
@@ -93,9 +121,23 @@ base =
         , name = Nothing
         , selected = Nothing
         , target = Nothing
+        , hidden = False
+        , tabindex = Nothing
+        , title = Nothing
+        , disabled = Nothing
+        , width = Nothing
+        , height = Nothing
 
         -- Html Events
         , onInput = Nothing
+        , onClick = Nothing
+        , onDoubleClick = Nothing
+        , onMouseUp = Nothing
+        , onMouseOut = Nothing
+        , onMouseOver = Nothing
+        , onMouseDown = Nothing
+        , onMouseLeave = Nothing
+        , onMouseEnter = Nothing
 
         -- Children
         , text = ""
@@ -167,6 +209,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 (List.concat
                     [ classes val.style
                     , hoverClasses val.hoverStyle
+                    , [ Html.Attributes.hidden val.hidden ]
                     , Helpers.emptyListOrApply Html.Attributes.class
                         (if val.class |> List.isEmpty then
                             Nothing
@@ -179,6 +222,8 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.src val.src
                     , Helpers.emptyListOrApply Html.Attributes.alt val.alt
                     , Helpers.emptyListOrApply Html.Attributes.id val.id
+                    , Helpers.emptyListOrApply Html.Attributes.tabindex val.tabindex
+                    , Helpers.emptyListOrApply Html.Attributes.title val.title
                     , Helpers.emptyListOrApply Html.Attributes.defaultValue val.defaultValue
                     , Helpers.emptyListOrApply Html.Events.onInput val.onInput
                     , Helpers.emptyListOrApply Html.Attributes.value val.value
@@ -187,6 +232,17 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.href val.href
                     , Helpers.emptyListOrApply Html.Attributes.selected val.selected
                     , Helpers.emptyListOrApply Html.Attributes.target val.target
+                    , Helpers.emptyListOrApply Html.Attributes.disabled val.disabled
+                    , Helpers.emptyListOrApply Html.Attributes.width val.width
+                    , Helpers.emptyListOrApply Html.Attributes.height val.height
+                    , Helpers.emptyListOrApply Html.Events.onClick val.onClick
+                    , Helpers.emptyListOrApply Html.Events.onDoubleClick val.onDoubleClick
+                    , Helpers.emptyListOrApply Html.Events.onMouseUp val.onMouseUp
+                    , Helpers.emptyListOrApply Html.Events.onMouseOut val.onMouseOut
+                    , Helpers.emptyListOrApply Html.Events.onMouseOver val.onMouseOver
+                    , Helpers.emptyListOrApply Html.Events.onMouseDown val.onMouseDown
+                    , Helpers.emptyListOrApply Html.Events.onMouseLeave val.onMouseLeave
+                    , Helpers.emptyListOrApply Html.Events.onMouseEnter val.onMouseEnter
                     ]
                 )
                 (val.content |> List.map htmlAttributesToHtml)
@@ -235,6 +291,31 @@ class val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | class = val }
 
 
+tabindex : Int -> HtmlAttributes msg -> HtmlAttributes msg
+tabindex val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | tabindex = Just val }
+
+
+title : String -> HtmlAttributes msg -> HtmlAttributes msg
+title val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | title = Just val }
+
+
+width : Int -> HtmlAttributes msg -> HtmlAttributes msg
+width val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | width = Just val }
+
+
+height : Int -> HtmlAttributes msg -> HtmlAttributes msg
+height val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | height = Just val }
+
+
+disabled : HtmlAttributes msg -> HtmlAttributes msg
+disabled (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | disabled = Just True }
+
+
 min : String -> HtmlAttributes msg -> HtmlAttributes msg
 min val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | min = Just val }
@@ -258,6 +339,11 @@ name val (HtmlAttributes attrs) =
 alt : String -> HtmlAttributes msg -> HtmlAttributes msg
 alt val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | alt = Just val }
+
+
+hidden : HtmlAttributes msg -> HtmlAttributes msg
+hidden (HtmlAttributes attrs) =
+    (HtmlAttributes { attrs | hidden = True })
 
 
 defaultValue : String -> HtmlAttributes msg -> HtmlAttributes msg
@@ -305,6 +391,46 @@ selected value (HtmlAttributes attrs) =
                 else
                     Nothing
         }
+
+
+onClick : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onClick value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onClick = Just value }
+
+
+onDoubleClick : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onDoubleClick value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onDoubleClick = Just value }
+
+
+onMouseUp : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseUp value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseUp = Just value }
+
+
+onMouseOut : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseOut value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseOut = Just value }
+
+
+onMouseOver : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseOver value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseOver = Just value }
+
+
+onMouseDown : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseDown value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseDown = Just value }
+
+
+onMouseLeave : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseLeave value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseLeave = Just value }
+
+
+onMouseEnter : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onMouseEnter value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onMouseEnter = Just value }
 
 
 div : HtmlAttributes msg -> HtmlAttributes msg
@@ -369,8 +495,8 @@ file =
         >> type_ "file"
 
 
-hidden : HtmlAttributes msg -> HtmlAttributes msg
-hidden =
+hiddenInput : HtmlAttributes msg -> HtmlAttributes msg
+hiddenInput =
     input
         >> type_ "hidden"
 
