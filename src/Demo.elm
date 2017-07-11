@@ -52,7 +52,7 @@ blah model =
                 ]
             , inputHidden [ name "inputHidden", value "inputHidden_" ]
             , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_" ]
-            , inputNumber [ style [ Elegant.displayNone, Elegant.displayBlock ], name "inputNumber", value 12 ]
+            , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 12 ]
             , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 12 ]
             , inputColor [ style [ Elegant.displayBlock ], name "inputSlider", value Color.yellow ]
             , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", checked ]
