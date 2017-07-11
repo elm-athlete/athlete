@@ -197,6 +197,10 @@ type alias OptionsAttribute a =
     { a | options : List { value : String, label : String } }
 
 
+type alias DisabledAttribute a =
+    { a | disabled : Bool }
+
+
 
 {-
    ███████ ██      ███████ ███    ███      █████  ████████ ████████ ██████  ███████
@@ -249,7 +253,7 @@ type alias TextareaAttributes msg =
 
 
 type alias ButtonAttributes msg a =
-    VisibleAttributesAndEvents msg a
+    DisabledAttribute (VisibleAttributesAndEvents msg a)
 
 
 type alias InputNumberAttributes msg =
@@ -445,7 +449,14 @@ a :
     -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
     -> Node Interactive phrasingContent spanningContent NotListElement msg
 a =
-    A << defaultsComposedToAttrs { href = Nothing, target = Nothing, style = defaultStyleAttribute, universal = defaultUniversalAttributes, onMouseEvents = defaultOnMouseEvents }
+    A
+        << defaultsComposedToAttrs
+            { href = Nothing
+            , target = Nothing
+            , style = defaultStyleAttribute
+            , universal = defaultUniversalAttributes
+            , onMouseEvents = defaultOnMouseEvents
+            }
 
 
 button :
@@ -453,7 +464,13 @@ button :
     -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
     -> Node Interactive phrasingContent spanningContent NotListElement msg
 button =
-    Button << defaultsComposedToAttrs { universal = defaultUniversalAttributes, style = defaultStyleAttribute, onMouseEvents = defaultOnMouseEvents }
+    Button
+        << defaultsComposedToAttrs
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            , disabled = False
+            }
 
 
 div :
@@ -761,6 +778,7 @@ inputSubmit =
             , universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , disabled = False
             }
 
 
@@ -887,6 +905,13 @@ id val ({ universal } as attrs) =
         { attrs | universal = newId }
 
 
+disabled :
+    { a | disabled : Bool }
+    -> { a | disabled : Bool }
+disabled attrs =
+    { attrs | disabled = True }
+
+
 onClick :
     msg
     -> { a | onMouseEvents : OnMouseEventsInside msg }
@@ -1001,6 +1026,17 @@ handleSrc :
     -> HtmlAttributes msg
 handleSrc { src } =
     BodyBuilderHtml.src src
+
+
+handleDisabled :
+    { a | disabled : Bool }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleDisabled { disabled } =
+    if disabled then
+        BodyBuilderHtml.disabled
+    else
+        identity
 
 
 handleAlt :
@@ -1259,7 +1295,7 @@ toTree node =
             childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
 
         Button attributes children ->
-            parentToHtml children attributes "button" baseHandling
+            parentToHtml children attributes "button" (List.append baseHandling [ handleDisabled ])
 
         Text str ->
             BodyBuilderHtml.text str
@@ -1317,7 +1353,7 @@ toTree node =
             childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleIntValue ])
 
         InputSubmit attributes ->
-            childToHtml attributes "button" (baseHandling |> List.append [ handleType ])
+            childToHtml attributes "button" (baseHandling |> List.append [ handleType, handleDisabled ])
 
         InputUrl attributes ->
             childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
