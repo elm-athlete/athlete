@@ -143,7 +143,9 @@ module Elegant
         , justifyContentCenter
         , spaceBetween
         , spaceAround
-        , fontInherit
+        , fontFamilyInherit
+        , fontFamilySansSerif
+        , fontFamily
         , width
         , fullWidth
         , widthPercent
@@ -337,7 +339,9 @@ module Elegant
 ## Spacings
 @docs spaceBetween
 @docs spaceAround
-@docs fontInherit
+@docs fontFamilyInherit
+@docs fontFamilySansSerif
+@docs fontFamily
 
 ## Width and Height
 @docs width
@@ -623,7 +627,7 @@ type Style
         , fontWeight : Maybe Int
         , fontStyle : Maybe FontStyle
         , fontSize : Maybe SizeUnit
-        , font : Maybe String
+        , fontFamily : Maybe FontFamily
         , alignItems : Maybe AlignItems
         , alignSelf : Maybe AlignSelf
         , justifyContent : Maybe JustifyContent
@@ -780,7 +784,7 @@ defaultStyle =
         , fontWeight = Nothing
         , fontStyle = Nothing
         , fontSize = Nothing
-        , font = Nothing
+        , fontFamily = Nothing
         , alignItems = Nothing
         , alignSelf = Nothing
         , justifyContent = Nothing
@@ -1142,6 +1146,44 @@ offsetToStringList ( x, y ) =
         |> List.map sizeUnitToString_
 
 
+type CustomFontFamily
+    = SystemFont String
+    | CustomFont String
+
+
+type FontFamily
+    = FontFamilyInherit
+    | FontFamilyCustom (List CustomFontFamily)
+
+
+surroundWithQuotes : String -> String
+surroundWithQuotes s =
+    "\"" ++ s ++ "\""
+
+
+fontFamilyToString : Maybe FontFamily -> Maybe String
+fontFamilyToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                FontFamilyInherit ->
+                    "inherit"
+
+                FontFamilyCustom fontList ->
+                    fontList
+                        |> List.map
+                            (\e ->
+                                case e of
+                                    CustomFont fontName ->
+                                        surroundWithQuotes fontName
+
+                                    SystemFont fontName ->
+                                        fontName
+                            )
+                        |> String.join ", "
+        )
+
+
 boxShadowToString : Maybe BoxShadow -> Maybe String
 boxShadowToString =
     nothingOrJust
@@ -1217,6 +1259,7 @@ getStyles (Style styleValues) =
     , ( "font-weight", maybeToString << .fontWeight )
     , ( "font-style", fontStyleToString << .fontStyle )
     , ( "font-size", sizeUnitToString << .fontSize )
+    , ( "font-family", fontFamilyToString << .fontFamily )
     , ( "width", sizeUnitToString << .width )
     , ( "max-width", sizeUnitToString << .maxWidth )
     , ( "min-width", sizeUnitToString << .minWidth )
@@ -2196,9 +2239,34 @@ justifyContentCenter =
 
 
 {-| -}
-fontInherit : Style -> Style
-fontInherit (Style style) =
-    Style { style | font = Just "inherit" }
+fontFamily : FontFamily -> Style -> Style
+fontFamily fontFamily (Style style) =
+    Style { style | fontFamily = Just fontFamily }
+
+
+{-| -}
+fontFamilyInherit : Style -> Style
+fontFamilyInherit =
+    fontFamily FontFamilyInherit
+
+
+{-| Standard Sans Serif font family.
+Inspired from https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/
+-}
+fontFamilySansSerif : Style -> Style
+fontFamilySansSerif =
+    fontFamily
+        (FontFamilyCustom
+            [ SystemFont "-apple-system"
+            , SystemFont "system-ui"
+            , SystemFont "BlinkMacSystemFont"
+            , CustomFont "Segoe UI"
+            , CustomFont "Roboto"
+            , CustomFont "Helvetica Neue"
+            , CustomFont "Arial"
+            , SystemFont "sans-serif"
+            ]
+        )
 
 
 {-| -}
