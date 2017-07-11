@@ -107,10 +107,6 @@ type alias ClassAttribute a =
     { a | class : List String }
 
 
-type alias HiddenAttribute a =
-    { a | hidden : Bool }
-
-
 type alias TabindexAttribute a =
     { a | tabindex : Maybe Int }
 
@@ -120,14 +116,13 @@ type alias TitleAttribute a =
 
 
 type alias UniversalAttributes a =
-    TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute (HiddenAttribute a))))
+    TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute a)))
 
 
 defaultUniversalAttributes : UniversalAttributes {}
 defaultUniversalAttributes =
     { class = []
     , id = Nothing
-    , hidden = False
     , tabindex = Nothing
     , title = Nothing
     }
@@ -865,17 +860,6 @@ checked attrs =
     { attrs | checked = True }
 
 
-hidden :
-    { a | universal : UniversalAttributes {} }
-    -> { a | universal : UniversalAttributes {} }
-hidden ({ universal } as attrs) =
-    let
-        newUniversal =
-            { universal | hidden = True }
-    in
-        { attrs | universal = newUniversal }
-
-
 title :
     String
     -> { d | universal : { c | title : Maybe String } }
@@ -1080,17 +1064,6 @@ handleId { universal } =
     unwrap BodyBuilderHtml.id universal.id
 
 
-handleHidden :
-    { b | universal : { a | hidden : Bool } }
-    -> HtmlAttributes msg
-    -> HtmlAttributes msg
-handleHidden { universal } =
-    if universal.hidden then
-        BodyBuilderHtml.hidden
-    else
-        identity
-
-
 handleTabindex :
     { b | universal : { a | tabindex : Maybe Int } }
     -> HtmlAttributes msg
@@ -1277,7 +1250,7 @@ baseHandling :
          -> HtmlAttributes msg
         )
 baseHandling =
-    [ handleStyle, handleClass, handleId, handleMouseEvents, handleHidden, handleTabindex, handleTitle ]
+    [ handleStyle, handleClass, handleId, handleMouseEvents, handleTabindex, handleTitle ]
 
 
 inputAttributesHandling :
@@ -1348,7 +1321,7 @@ toTree node =
             childToHtml attributes "canvas" (List.append baseHandling [ handleWidth, handleHeight ])
 
         InputHidden attributes ->
-            childToHtml attributes "input" [ handleStringValue, handleName, handleClass, handleId, handleHidden ]
+            childToHtml attributes "input" [ handleStringValue, handleName, handleClass, handleId, handleType ]
 
         Textarea attributes ->
             childToHtml attributes "textarea" (baseHandling |> List.append [ handleName, handleContent ])

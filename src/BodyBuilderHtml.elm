@@ -24,7 +24,6 @@ module BodyBuilderHtml
         , none
         , id
         , class
-        , hidden
         , tabindex
         , title
         , value
@@ -72,7 +71,6 @@ type alias Tree msg =
     , name : Maybe String
     , selected : Maybe Bool
     , target : Maybe String
-    , hidden : Bool
     , tabindex : Maybe Int
     , title : Maybe String
     , disabled : Maybe Bool
@@ -121,7 +119,6 @@ base =
         , name = Nothing
         , selected = Nothing
         , target = Nothing
-        , hidden = False
         , tabindex = Nothing
         , title = Nothing
         , disabled = Nothing
@@ -214,7 +211,6 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 (List.concat
                     [ classes val.style
                     , hoverClasses val.hoverStyle
-                    , [ Html.Attributes.hidden val.hidden ]
                     , Helpers.emptyListOrApply Html.Attributes.class
                         (if val.class |> List.isEmpty then
                             Nothing
@@ -344,11 +340,6 @@ name val (HtmlAttributes attrs) =
 alt : String -> HtmlAttributes msg -> HtmlAttributes msg
 alt val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | alt = Just val }
-
-
-hidden : HtmlAttributes msg -> HtmlAttributes msg
-hidden (HtmlAttributes attrs) =
-    (HtmlAttributes { attrs | hidden = True })
 
 
 defaultValue : String -> HtmlAttributes msg -> HtmlAttributes msg
