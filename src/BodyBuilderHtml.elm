@@ -24,6 +24,9 @@ module BodyBuilderHtml
         , none
         , id
         , class
+        , hidden
+        , tabindex
+        , title
         , value
         , name
         , checked
@@ -66,6 +69,9 @@ type alias Tree msg =
     , name : Maybe String
     , selected : Maybe Bool
     , target : Maybe String
+    , hidden : Bool
+    , tabindex : Maybe Int
+    , title : Maybe String
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -109,6 +115,9 @@ base =
         , name = Nothing
         , selected = Nothing
         , target = Nothing
+        , hidden = False
+        , tabindex = Nothing
+        , title = Nothing
 
         -- Html Events
         , onInput = Nothing
@@ -191,6 +200,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 (List.concat
                     [ classes val.style
                     , hoverClasses val.hoverStyle
+                    , [ Html.Attributes.hidden val.hidden ]
                     , Helpers.emptyListOrApply Html.Attributes.class
                         (if val.class |> List.isEmpty then
                             Nothing
@@ -203,6 +213,8 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.src val.src
                     , Helpers.emptyListOrApply Html.Attributes.alt val.alt
                     , Helpers.emptyListOrApply Html.Attributes.id val.id
+                    , Helpers.emptyListOrApply Html.Attributes.tabindex val.tabindex
+                    , Helpers.emptyListOrApply Html.Attributes.title val.title
                     , Helpers.emptyListOrApply Html.Attributes.defaultValue val.defaultValue
                     , Helpers.emptyListOrApply Html.Events.onInput val.onInput
                     , Helpers.emptyListOrApply Html.Attributes.value val.value
@@ -267,6 +279,16 @@ class val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | class = val }
 
 
+tabindex : Int -> HtmlAttributes msg -> HtmlAttributes msg
+tabindex val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | tabindex = Just val }
+
+
+title : String -> HtmlAttributes msg -> HtmlAttributes msg
+title val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | title = Just val }
+
+
 min : String -> HtmlAttributes msg -> HtmlAttributes msg
 min val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | min = Just val }
@@ -290,6 +312,11 @@ name val (HtmlAttributes attrs) =
 alt : String -> HtmlAttributes msg -> HtmlAttributes msg
 alt val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | alt = Just val }
+
+
+hidden : HtmlAttributes msg -> HtmlAttributes msg
+hidden (HtmlAttributes attrs) =
+    (HtmlAttributes { attrs | hidden = True })
 
 
 defaultValue : String -> HtmlAttributes msg -> HtmlAttributes msg
@@ -441,8 +468,8 @@ file =
         >> type_ "file"
 
 
-hidden : HtmlAttributes msg -> HtmlAttributes msg
-hidden =
+hiddenInput : HtmlAttributes msg -> HtmlAttributes msg
+hiddenInput =
     input
         >> type_ "hidden"
 

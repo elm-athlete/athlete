@@ -54,6 +54,16 @@ type NotListElement
     = NotListElement
 
 
+
+{-
+   ███████ ██    ██ ███████ ███    ██ ████████ ███████
+   ██      ██    ██ ██      ████   ██    ██    ██
+   █████   ██    ██ █████   ██ ██  ██    ██    ███████
+   ██       ██  ██  ██      ██  ██ ██    ██         ██
+   ███████   ████   ███████ ██   ████    ██    ███████
+-}
+
+
 type alias OnMouseEventsInside msg =
     { click : Maybe msg
     , doubleClick : Maybe msg
@@ -75,32 +85,64 @@ type alias OnMouseEvents msg a =
     { a | onMouseEvents : OnMouseEventsInside msg }
 
 
+
+{-
+    █████  ████████ ████████ ██████  ██ ██████  ██    ██ ████████ ███████ ███████
+   ██   ██    ██       ██    ██   ██ ██ ██   ██ ██    ██    ██    ██      ██
+   ███████    ██       ██    ██████  ██ ██████  ██    ██    ██    █████   ███████
+   ██   ██    ██       ██    ██   ██ ██ ██   ██ ██    ██    ██    ██           ██
+   ██   ██    ██       ██    ██   ██ ██ ██████   ██████     ██    ███████ ███████
+-}
+
+
+type alias HiddenAttribute a =
+    { a | hidden : Bool }
+
+
+type alias TabindexAttribute a =
+    { a | tabindex : Maybe Int }
+
+
+type alias TitleAttribute a =
+    { a | title : Maybe String }
+
+
+type alias UniversalAttributes a =
+    TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute (HiddenAttribute a))))
+
+
+defaultUniversalAttributes : UniversalAttributes {}
+defaultUniversalAttributes =
+    { class = []
+    , id = Nothing
+    , hidden = False
+    , tabindex = Nothing
+    , title = Nothing
+    }
+
+
+type alias StyleAttribute =
+    { standard : List (Style -> Style)
+    , hover : List (Style -> Style)
+    }
+
+
+defaultStyleAttribute : StyleAttribute
+defaultStyleAttribute =
+    { standard = []
+    , hover = []
+    }
+
+
 type alias VisibleAttributes a =
-    { a | visible : VisibleAttributesInside }
-
-
-type alias VisibleAttributesInside =
-    ClassAttribute (StyleAttribute (IdAttribute {}))
+    { a
+        | style : StyleAttribute
+        , universal : UniversalAttributes {}
+    }
 
 
 type alias VisibleAttributesAndEvents msg a =
     OnMouseEvents msg (VisibleAttributes a)
-
-
-defaultVisibleAttributes : VisibleAttributesInside
-defaultVisibleAttributes =
-    { class = []
-    , id = Nothing
-    , style = []
-    , hoverStyle = []
-    }
-
-
-type alias StyleAttribute a =
-    { a
-        | style : List (Style -> Style)
-        , hoverStyle : List (Style -> Style)
-    }
 
 
 type alias IdAttribute a =
@@ -123,10 +165,6 @@ type alias HrefAttribute a =
     { a | href : Maybe Url }
 
 
-type alias Hlah a =
-    { a | value : Int }
-
-
 type alias SrcAttribute a =
     { a | src : String }
 
@@ -139,8 +177,34 @@ type alias ValueAttribute b a =
     { a | value : Maybe b }
 
 
+type alias StringValue a =
+    ValueAttribute String a
+
+
+type alias IntValue a =
+    ValueAttribute Int a
+
+
+type alias ColorValue a =
+    ValueAttribute Color a
+
+
 type alias NameAttribute a =
     { a | name : Maybe String }
+
+
+type alias OptionsAttribute a =
+    { a | options : List { value : String, label : String } }
+
+
+
+{-
+   ███████ ██      ███████ ███    ███      █████  ████████ ████████ ██████  ███████
+   ██      ██      ██      ████  ████     ██   ██    ██       ██    ██   ██ ██
+   █████   ██      █████   ██ ████ ██     ███████    ██       ██    ██████  ███████
+   ██      ██      ██      ██  ██  ██     ██   ██    ██       ██    ██   ██      ██
+   ███████ ███████ ███████ ██      ██     ██   ██    ██       ██    ██   ██ ███████
+-}
 
 
 type alias AAttributes msg =
@@ -159,18 +223,6 @@ type alias IframeAttributes msg =
     SrcAttribute (VisibleAttributesAndEvents msg {})
 
 
-type alias StringValue a =
-    ValueAttribute String a
-
-
-type alias IntValue a =
-    ValueAttribute Int a
-
-
-type alias ColorValue a =
-    ValueAttribute Color a
-
-
 type alias InputAttributes a =
     NameAttribute { a | type_ : String }
 
@@ -178,7 +230,7 @@ type alias InputAttributes a =
 type alias InputHiddenAttributes =
     InputAttributes
         (StringValue
-            { visible : ClassAttribute (IdAttribute {})
+            { universal : UniversalAttributes {}
             , type_ : String
             }
         )
@@ -244,10 +296,6 @@ type alias SelectAttributes msg =
     StringValue (OptionsAttribute (VisibleAttributesAndEvents msg {}))
 
 
-type alias OptionsAttribute a =
-    { a | options : List { value : String, label : String } }
-
-
 type alias ProgressAttributes msg =
     VisibleAttributesAndEvents msg {}
 
@@ -309,20 +357,23 @@ defaultsComposedToAttrs defaults attrs =
 
 flowDefaultsComposedToAttrs :
     List
-        ({ visible : VisibleAttributesInside
+        ({ universal : UniversalAttributes {}
+         , style : StyleAttribute
          , onMouseEvents : OnMouseEventsInside msg
          }
          ->
-            { visible : VisibleAttributesInside
+            { universal : UniversalAttributes {}
+            , style : StyleAttribute
             , onMouseEvents : OnMouseEventsInside msg
             }
         )
     ->
-        { visible : VisibleAttributesInside
+        { universal : UniversalAttributes {}
+        , style : StyleAttribute
         , onMouseEvents : OnMouseEventsInside msg
         }
 flowDefaultsComposedToAttrs =
-    defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    defaultsComposedToAttrs { style = defaultStyleAttribute, universal = defaultUniversalAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 h1 :
@@ -378,7 +429,7 @@ a :
     -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
     -> Node Interactive phrasingContent spanningContent NotListElement msg
 a =
-    A << defaultsComposedToAttrs { href = Nothing, target = Nothing, visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    A << defaultsComposedToAttrs { href = Nothing, target = Nothing, style = defaultStyleAttribute, universal = defaultUniversalAttributes, onMouseEvents = defaultOnMouseEvents }
 
 
 button :
@@ -386,7 +437,7 @@ button :
     -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
     -> Node Interactive phrasingContent spanningContent NotListElement msg
 button =
-    Button << defaultsComposedToAttrs { visible = defaultVisibleAttributes, onMouseEvents = defaultOnMouseEvents }
+    Button << defaultsComposedToAttrs { universal = defaultUniversalAttributes, style = defaultStyleAttribute, onMouseEvents = defaultOnMouseEvents }
 
 
 div :
@@ -452,7 +503,8 @@ textarea =
         << defaultsComposedToAttrs
             { value = Nothing
             , name = Nothing
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -467,7 +519,8 @@ img alt src =
         << defaultsComposedToAttrs
             { src = src
             , alt = alt
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -478,7 +531,8 @@ audio :
 audio =
     Audio
         << defaultsComposedToAttrs
-            { visible = defaultVisibleAttributes
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -489,7 +543,8 @@ progress :
 progress =
     Progress
         << defaultsComposedToAttrs
-            { visible = defaultVisibleAttributes
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -559,7 +614,7 @@ inputHidden =
     InputHidden
         << defaultsComposedToAttrs
             { name = Nothing
-            , visible = { class = [], id = Nothing }
+            , universal = defaultUniversalAttributes
             , type_ = "hidden"
             , value = Nothing
             }
@@ -567,7 +622,8 @@ inputHidden =
 
 baseInputAttributes : String -> InputVisibleAttributes msg (ValueAttribute a {})
 baseInputAttributes type_ =
-    { visible = defaultVisibleAttributes
+    { universal = defaultUniversalAttributes
+    , style = defaultStyleAttribute
     , name = Nothing
     , type_ = type_
     , value = Nothing
@@ -613,7 +669,8 @@ inputCheckbox =
             , type_ = "checkbox"
             , value = Nothing
             , checked = False
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -626,7 +683,8 @@ inputFile =
         << defaultsComposedToAttrs
             { name = Nothing
             , type_ = "file"
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -640,7 +698,8 @@ inputPassword =
             { name = Nothing
             , type_ = "password"
             , value = Nothing
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -654,7 +713,8 @@ inputRadio =
             { name = Nothing
             , type_ = "radio"
             , value = Nothing
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -668,7 +728,8 @@ inputRange =
             { name = Nothing
             , type_ = "range"
             , value = Nothing
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -680,7 +741,8 @@ inputSubmit =
     InputSubmit
         << defaultsComposedToAttrs
             { type_ = "submit"
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -694,7 +756,8 @@ inputUrl =
             { name = Nothing
             , value = Nothing
             , type_ = "url"
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
 
@@ -707,7 +770,8 @@ select list =
         << defaultsComposedToAttrs
             { value = Nothing
             , options = []
-            , visible = defaultVisibleAttributes
+            , universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             }
     )
@@ -749,16 +813,51 @@ checked attrs =
     { attrs | checked = True }
 
 
+hidden :
+    { a | universal : UniversalAttributes {} }
+    -> { a | universal : UniversalAttributes {} }
+hidden ({ universal } as attrs) =
+    let
+        newUniversal =
+            { universal | hidden = True }
+    in
+        { attrs | universal = newUniversal }
+
+
+title :
+    String
+    -> { d | universal : { c | title : Maybe String } }
+    -> { d | universal : { c | title : Maybe String } }
+title val ({ universal } as attrs) =
+    let
+        newUniversal =
+            { universal | title = Just val }
+    in
+        { attrs | universal = newUniversal }
+
+
+tabindex :
+    Int
+    -> { d | universal : { c | tabindex : Maybe Int } }
+    -> { d | universal : { c | tabindex : Maybe Int } }
+tabindex val ({ universal } as attrs) =
+    let
+        newUniversal =
+            { universal | tabindex = Just val }
+    in
+        { attrs | universal = newUniversal }
+
+
 id :
     String
-    -> { a | visible : { b | id : Maybe String } }
-    -> { a | visible : { b | id : Maybe String } }
-id val ({ visible } as attrs) =
+    -> { a | universal : { b | id : Maybe String } }
+    -> { a | universal : { b | id : Maybe String } }
+id val ({ universal } as attrs) =
     let
         newId =
-            { visible | id = Just val }
+            { universal | id = Just val }
     in
-        { attrs | visible = newId }
+        { attrs | universal = newId }
 
 
 onClick :
@@ -775,38 +874,38 @@ onClick val ({ onMouseEvents } as attrs) =
 
 class :
     List String
-    -> { a | visible : { b | class : List String } }
-    -> { a | visible : { b | class : List String } }
-class val ({ visible } as attrs) =
+    -> { a | universal : { b | class : List String } }
+    -> { a | universal : { b | class : List String } }
+class val ({ universal } as attrs) =
     let
         newClass =
-            { visible | class = val }
+            { universal | class = val }
     in
-        { attrs | visible = newClass }
+        { attrs | universal = newClass }
 
 
 style :
     List (Style -> Style)
-    -> { a | visible : { b | style : List (Style -> Style) } }
-    -> { a | visible : { b | style : List (Style -> Style) } }
-style val ({ visible } as attrs) =
+    -> { a | style : { b | standard : List (Style -> Style) } }
+    -> { a | style : { b | standard : List (Style -> Style) } }
+style val ({ style } as attrs) =
     let
         newStyle =
-            { visible | style = val }
+            { style | standard = val }
     in
-        { attrs | visible = newStyle }
+        { attrs | style = newStyle }
 
 
 hoverStyle :
     List (Style -> Style)
-    -> { a | visible : { b | hoverStyle : List (Style -> Style) } }
-    -> { a | visible : { b | hoverStyle : List (Style -> Style) } }
-hoverStyle val ({ visible } as attrs) =
+    -> { a | style : { b | hover : List (Style -> Style) } }
+    -> { a | style : { b | hover : List (Style -> Style) } }
+hoverStyle val ({ style } as attrs) =
     let
         newHoverStyle =
-            { visible | hoverStyle = val }
+            { style | hover = val }
     in
-        { attrs | visible = newHoverStyle }
+        { attrs | style = newHoverStyle }
 
 
 target : String -> TargetAttribute a -> TargetAttribute a
@@ -828,16 +927,16 @@ handleHref { href } =
 
 
 handleStyle :
-    { a | visible : VisibleAttributesInside }
+    { a | style : StyleAttribute }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleStyle { visible } =
+handleStyle { style } =
     let
-        { style, hoverStyle } =
-            visible
+        { standard, hover } =
+            style
     in
-        BodyBuilderHtml.style style
-            << BodyBuilderHtml.hoverStyle hoverStyle
+        BodyBuilderHtml.style standard
+            << BodyBuilderHtml.hoverStyle hover
 
 
 handleMouseEvents :
@@ -876,19 +975,46 @@ handleAlt { alt } =
 
 
 handleClass :
-    { a | visible : { b | class : List String } }
+    { a | universal : { b | class : List String } }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleClass { visible } =
-    BodyBuilderHtml.class visible.class
+handleClass { universal } =
+    BodyBuilderHtml.class universal.class
 
 
 handleId :
-    { a | visible : { b | id : Maybe String } }
+    { a | universal : { b | id : Maybe String } }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleId { visible } =
-    unwrap BodyBuilderHtml.id visible.id
+handleId { universal } =
+    unwrap BodyBuilderHtml.id universal.id
+
+
+handleHidden :
+    { b | universal : { a | hidden : Bool } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleHidden { universal } =
+    if universal.hidden then
+        BodyBuilderHtml.hidden
+    else
+        identity
+
+
+handleTabindex :
+    { b | universal : { a | tabindex : Maybe Int } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleTabindex { universal } =
+    unwrap BodyBuilderHtml.tabindex universal.tabindex
+
+
+handleTitle :
+    { b | universal : { a | title : Maybe String } }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleTitle { universal } =
+    unwrap BodyBuilderHtml.title universal.title
 
 
 handleType :
@@ -1040,7 +1166,7 @@ baseHandling :
          -> HtmlAttributes msg
         )
 baseHandling =
-    [ handleStyle, handleClass, handleId, handleMouseEvents ]
+    [ handleStyle, handleClass, handleId, handleMouseEvents, handleHidden, handleTabindex, handleTitle ]
 
 
 inputAttributesHandling :
@@ -1111,7 +1237,7 @@ toTree node =
             childToHtml attributes "canvas" baseHandling
 
         InputHidden attributes ->
-            childToHtml attributes "input" [ handleStringValue, handleName, handleClass, handleId ]
+            childToHtml attributes "input" [ handleStringValue, handleName, handleClass, handleId, handleHidden ]
 
         Textarea attributes ->
             childToHtml attributes "textarea" (baseHandling |> List.append [ handleName, handleContent ])
