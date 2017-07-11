@@ -33,6 +33,8 @@ module BodyBuilderHtml
         , checked
         , selectOption
         , target
+        , width
+        , height
         , onClick
         , onDoubleClick
         , onMouseUp
@@ -74,6 +76,8 @@ type alias Tree msg =
     , tabindex : Maybe Int
     , title : Maybe String
     , disabled : Maybe Bool
+    , width : Maybe Int
+    , height : Maybe Int
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -121,6 +125,8 @@ base =
         , tabindex = Nothing
         , title = Nothing
         , disabled = Nothing
+        , width = Nothing
+        , height = Nothing
 
         -- Html Events
         , onInput = Nothing
@@ -227,6 +233,8 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.selected val.selected
                     , Helpers.emptyListOrApply Html.Attributes.target val.target
                     , Helpers.emptyListOrApply Html.Attributes.disabled val.disabled
+                    , Helpers.emptyListOrApply Html.Attributes.width val.width
+                    , Helpers.emptyListOrApply Html.Attributes.height val.height
                     , Helpers.emptyListOrApply Html.Events.onClick val.onClick
                     , Helpers.emptyListOrApply Html.Events.onDoubleClick val.onDoubleClick
                     , Helpers.emptyListOrApply Html.Events.onMouseUp val.onMouseUp
@@ -291,6 +299,16 @@ tabindex val (HtmlAttributes attrs) =
 title : String -> HtmlAttributes msg -> HtmlAttributes msg
 title val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | title = Just val }
+
+
+width : Int -> HtmlAttributes msg -> HtmlAttributes msg
+width val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | width = Just val }
+
+
+height : Int -> HtmlAttributes msg -> HtmlAttributes msg
+height val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | height = Just val }
 
 
 disabled : HtmlAttributes msg -> HtmlAttributes msg

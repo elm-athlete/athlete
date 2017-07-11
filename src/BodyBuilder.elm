@@ -201,6 +201,14 @@ type alias DisabledAttribute a =
     { a | disabled : Bool }
 
 
+type alias WidthAttribute a =
+    { a | width : Maybe Int }
+
+
+type alias HeightAttribute a =
+    { a | height : Maybe Int }
+
+
 
 {-
    ███████ ██      ███████ ███    ███      █████  ████████ ████████ ██████  ███████
@@ -220,7 +228,7 @@ type alias FlowAttributes msg =
 
 
 type alias ImgAttributes msg =
-    AltAttribute (SrcAttribute (VisibleAttributesAndEvents msg {}))
+    HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (VisibleAttributesAndEvents msg {}))))
 
 
 type alias IframeAttributes msg =
@@ -313,7 +321,7 @@ type alias VideoAttributes msg =
 
 
 type alias CanvasAttributes msg =
-    VisibleAttributesAndEvents msg {}
+    HeightAttribute (WidthAttribute (VisibleAttributesAndEvents msg {}))
 
 
 
@@ -555,6 +563,8 @@ img alt src =
             , universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , width = Nothing
+            , height = Nothing
             }
 
 
@@ -970,6 +980,16 @@ name val attrs =
     { attrs | name = Just val }
 
 
+width : Int -> WidthAttribute a -> WidthAttribute a
+width val attrs =
+    { attrs | width = Just val }
+
+
+height : Int -> HeightAttribute a -> HeightAttribute a
+height val attrs =
+    { attrs | height = Just val }
+
+
 
 {-
    ██   ██  █████  ███    ██ ██████  ██      ███████ ██████  ███████
@@ -1131,12 +1151,23 @@ handleName :
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleName { name } =
-    case name of
-        Nothing ->
-            identity
+    unwrap BodyBuilderHtml.name name
 
-        Just name_ ->
-            BodyBuilderHtml.name name_
+
+handleWidth :
+    { a | width : Maybe Int }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleWidth { width } =
+    unwrap BodyBuilderHtml.width width
+
+
+handleHeight :
+    { a | height : Maybe Int }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleHeight { height } =
+    unwrap BodyBuilderHtml.height height
 
 
 handleOptions :
@@ -1292,7 +1323,7 @@ toTree node =
             parentToHtml children attributes ("h" ++ (number |> toString)) baseHandling
 
         Img attributes ->
-            childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt ])
+            childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt, handleWidth, handleHeight ])
 
         Button attributes children ->
             parentToHtml children attributes "button" (List.append baseHandling [ handleDisabled ])
@@ -1317,7 +1348,7 @@ toTree node =
             childToHtml attributes "video" baseHandling
 
         Canvas attributes ->
-            childToHtml attributes "canvas" baseHandling
+            childToHtml attributes "canvas" (List.append baseHandling [ handleWidth, handleHeight ])
 
         InputHidden attributes ->
             childToHtml attributes "input" [ handleStringValue, handleName, handleClass, handleId, handleHidden ]
