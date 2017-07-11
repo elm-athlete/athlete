@@ -373,25 +373,22 @@ defaultsComposedToAttrs defaults attrs =
     (defaults |> (attrs |> compose))
 
 
-flowDefaultsComposedToAttrs :
-    List
-        ({ universal : UniversalAttributes {}
-         , style : StyleAttribute
-         , onMouseEvents : OnMouseEventsInside msg
-         }
-         ->
-            { universal : UniversalAttributes {}
-            , style : StyleAttribute
-            , onMouseEvents : OnMouseEventsInside msg
-            }
-        )
-    ->
-        { universal : UniversalAttributes {}
-        , style : StyleAttribute
-        , onMouseEvents : OnMouseEventsInside msg
-        }
+styleAttribute style =
+    { standard = style
+    , hover = []
+    }
+
+
+flowDefaultsComposedToAttrsWithStyle style =
+    defaultsComposedToAttrs { style = styleAttribute style, universal = defaultUniversalAttributes, onMouseEvents = defaultOnMouseEvents }
+
+
 flowDefaultsComposedToAttrs =
-    defaultsComposedToAttrs { style = defaultStyleAttribute, universal = defaultUniversalAttributes, onMouseEvents = defaultOnMouseEvents }
+    flowDefaultsComposedToAttrsWithStyle []
+
+
+flowDefaultsComposedToAttrsWithFontSize fontSize =
+    flowDefaultsComposedToAttrsWithStyle [ Elegant.fontSize fontSize ]
 
 
 
@@ -409,7 +406,7 @@ h1 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h1 =
-    H 1 << flowDefaultsComposedToAttrs
+    H 1 << (flowDefaultsComposedToAttrsWithFontSize Elegant.alpha)
 
 
 h2 :
@@ -417,7 +414,7 @@ h2 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h2 =
-    H 2 << flowDefaultsComposedToAttrs
+    H 2 << (flowDefaultsComposedToAttrsWithFontSize Elegant.beta)
 
 
 h3 :
@@ -425,7 +422,7 @@ h3 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h3 =
-    H 3 << flowDefaultsComposedToAttrs
+    H 3 << (flowDefaultsComposedToAttrsWithFontSize Elegant.gamma)
 
 
 h4 :
@@ -433,7 +430,7 @@ h4 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h4 =
-    H 4 << flowDefaultsComposedToAttrs
+    H 4 << (flowDefaultsComposedToAttrsWithFontSize Elegant.delta)
 
 
 h5 :
@@ -441,7 +438,7 @@ h5 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h5 =
-    H 5 << flowDefaultsComposedToAttrs
+    H 5 << (flowDefaultsComposedToAttrsWithFontSize Elegant.epsilon)
 
 
 h6 :
@@ -449,7 +446,7 @@ h6 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h6 =
-    H 6 << flowDefaultsComposedToAttrs
+    H 6 << (flowDefaultsComposedToAttrsWithFontSize Elegant.zeta)
 
 
 a :
