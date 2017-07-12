@@ -2252,7 +2252,9 @@ toTree node =
                 "input"
                 (inputAttributesHandling
                     |> List.append
-                        [ handleIntValue ]
+                        [ handleIntValue
+                        , handleOnIntInputEvent
+                        ]
                 )
 
         InputSubmit attributes ->
