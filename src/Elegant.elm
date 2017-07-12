@@ -501,7 +501,7 @@ type alias BackgroundImage =
     }
 
 
-{-| Simple background image with only an url as src
+{-| Simple background image with only an url as source
 -}
 withUrl : String -> BackgroundImage
 withUrl url =
@@ -1221,21 +1221,6 @@ type FontFamily
     | FontFamilyCustom (List CustomFontFamily)
 
 
-surroundWith : String -> String -> String -> String
-surroundWith surrounderLeft surrounderRight val =
-    surrounderLeft ++ val ++ surrounderRight
-
-
-surroundWithParentheses : String -> String
-surroundWithParentheses =
-    surroundWith "(" ")"
-
-
-surroundWithQuotes : String -> String
-surroundWithQuotes =
-    surroundWith "\"" "\""
-
-
 fontFamilyToString : Maybe FontFamily -> Maybe String
 fontFamilyToString =
     nothingOrJust
@@ -1250,7 +1235,7 @@ fontFamilyToString =
                             (\e ->
                                 case e of
                                     CustomFont fontName ->
-                                        surroundWithQuotes fontName
+                                        Helpers.surroundWithQuotes fontName
 
                                     SystemFont fontName ->
                                         fontName
@@ -1282,7 +1267,7 @@ boxShadowToString =
 
 applyCssFunction : String -> String -> String
 applyCssFunction funName content =
-    funName ++ (surroundWithParentheses content)
+    funName ++ (Helpers.surroundWithParentheses content)
 
 
 angleToString : Angle -> String
@@ -2678,7 +2663,7 @@ inMediaQuery mediaQuery content =
             content
 
         Just queries ->
-            queries ++ Helpers.betweenBraces content
+            queries ++ Helpers.surroundWithBraces content
 
 
 mediaQuerySelector : Maybe Int -> Maybe Int -> String
@@ -2712,4 +2697,4 @@ compileStyleToCss className mediaQueryId selector property =
         ++ className
         ++ (mediaQueryId ? "")
         ++ (selector ? "")
-        ++ Helpers.betweenBraces property
+        ++ Helpers.surroundWithBraces property
