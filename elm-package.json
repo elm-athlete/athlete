@@ -1,5 +1,5 @@
 {
-    "version": "4.1.0",
+    "version": "5.0.0",
     "summary": "Framework for inline CSS",
     "repository": "https://github.com/elm-bodybuilder/elegant.git",
     "license": "MIT",
@@ -10,7 +10,6 @@
         "Elegant",
         "Elegant.Elements",
         "Elegant.Grid",
-        "Elegant.Button",
         "BodyBuilder",
         "BodyBuilderHtml"
     ],
