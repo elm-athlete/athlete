@@ -5,13 +5,23 @@ import Elegant
 import Color
 
 
-blah : model -> Node Interactive NotPhrasing Spanning NotListElement Msg
+type alias Model =
+    { color : Color.Color
+    , width : Int
+    }
+
+
+blah : Model -> Node Interactive NotPhrasing Spanning NotListElement Msg
 blah model =
     div
         [ style
-            [ Elegant.width (Elegant.Px 300)
+            [ Elegant.width (Elegant.Px (300 + model.width))
             , Elegant.marginAuto
-            , Elegant.backgroundImage (Elegant.withUrl "http://www.me-okinawa.com/wp-content/uploads/2013/05/may22-cat-whiskers.jpg")
+
+            -- , Elegant.backgroundImage (Elegant.withUrl "http://www.me-okinawa.com/wp-content/uploads/2013/05/may22-cat-whiskers.jpg")
+            , Elegant.fontFamilySansSerif
+            , Elegant.roundCorner model.width
+            , Elegant.backgroundColor (model.color |> Color.complement)
             ]
         ]
         [ div []
@@ -25,7 +35,7 @@ blah model =
                 [ container
                     [ container
                         [ h1
-                            [ style [ Elegant.textColor Color.green ]
+                            [ style [ Elegant.textColor Color.green, Elegant.screenWidthLE 300 [ Elegant.displayNone ] ]
                             , hoverStyle [ Elegant.textColor Color.red ]
                             ]
                             [ span [] [ text "Toto" ]
@@ -53,15 +63,15 @@ blah model =
                 ]
             , inputHidden [ name "inputHidden", value "inputHidden_" ]
             , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_" ]
-            , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 12 ]
-            , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 12 ]
-            , inputColor [ style [ Elegant.displayBlock ], name "inputSlider", value Color.yellow ]
+            , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 14 ]
+            , inputRange [ style [ Elegant.displayBlock ], name "inputSlider", value 12 ]
+            , inputColor [ style [ Elegant.displayBlock ], name "inputSlider", value model.color, onColorInput ChangeColor ]
             , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", checked ]
             , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test" ]
             , inputFile [ style [ Elegant.displayBlock ], name "inputSlider" ]
             , inputPassword [ style [ Elegant.displayBlock ], name "inputSlider", value "" ]
             , inputRadio [ style [ Elegant.displayBlock ], name "inputSlider", value "Test" ]
-            , inputSlider [ style [ Elegant.displayBlock ], name "inputSlider", value 15 ]
+            , inputRange [ style [ Elegant.displayBlock ], name "inputSlider", value model.width, onIntInput ChangeNumber ]
             , inputSubmit [ style [ Elegant.displayBlock ] ]
             , inputUrl [ style [ Elegant.displayBlock ], name "inputUrl", value "" ]
             , select
@@ -78,13 +88,28 @@ blah model =
 
 type Msg
     = Click
+    | ChangeNumber Int
+    | ChangeColor Color.Color
 
 
-main : Program Basics.Never Int Msg
+update : Msg -> Model -> ( Model, Cmd msg )
+update msg model =
+    case msg of
+        Click ->
+            ( { model | width = model.width + 10 }, Cmd.none )
+
+        ChangeNumber val ->
+            ( { model | width = val }, Cmd.none )
+
+        ChangeColor val ->
+            ( { model | color = val }, Cmd.none )
+
+
+main : Program Basics.Never Model Msg
 main =
     program
-        { init = 0 ! []
-        , update = \msg model -> 0 ! []
+        { init = { width = 10, color = Color.blue } ! []
+        , update = update
         , subscriptions = always Sub.none
         , view = blah
         }
