@@ -82,6 +82,9 @@ module Elegant
         , textJustify
         , whiteSpaceNoWrap
         , backgroundColor
+        , backgroundImage
+        , backgroundImages
+        , withUrl
         , borderColor
         , borderSolid
         , borderDashed
@@ -258,6 +261,9 @@ module Elegant
 @docs textRight
 @docs textJustify
 @docs backgroundColor
+@docs backgroundImage
+@docs withUrl
+@docs backgroundImages
 
 ## Border
 @docs borderColor
@@ -419,8 +425,8 @@ type Normal
 
 
 {-| -}
-type alias Vector =
-    ( Float, Float )
+type alias Vector a =
+    ( a, a )
 
 
 {-| -}
@@ -448,6 +454,58 @@ type alias BoxShadow =
     , maybeColor : Maybe Color
     , offset : Offset
     }
+
+
+type alias Radiant =
+    Float
+
+
+type alias Degree =
+    Float
+
+
+type Angle
+    = Rad Radiant
+    | Deg Degree
+
+
+type alias ColorStop =
+    { offset : Maybe SizeUnit
+    , color : Color
+    }
+
+
+type alias LinearGradient =
+    { angle : Angle
+    , colorStops : List ColorStop
+    }
+
+
+type alias RadialGradient =
+    { colorStops : List ColorStop }
+
+
+type Gradient
+    = Linear LinearGradient
+    | Radial RadialGradient
+
+
+type Image
+    = Gradient Gradient
+    | Source String
+
+
+type alias BackgroundImage =
+    { image : Image
+    , backgroundPosition : Maybe (Vector SizeUnit)
+    }
+
+
+{-| Simple background image with only an url as src
+-}
+withUrl : String -> BackgroundImage
+withUrl url =
+    BackgroundImage (Source url) Nothing
 
 
 {-| Calculate the opposite of a size unit value.
@@ -584,6 +642,7 @@ type Style
         , right : Maybe SizeUnit
         , textColor : Maybe Color
         , backgroundColor : Maybe Color
+        , backgroundImages : List BackgroundImage
         , borderBottomColor : Maybe Color
         , borderBottomWidth : Maybe SizeUnit
         , borderBottomStyle : Maybe Border
@@ -741,6 +800,7 @@ defaultStyle =
         , right = Nothing
         , textColor = Nothing
         , backgroundColor = Nothing
+        , backgroundImages = []
         , borderBottomColor = Nothing
         , borderBottomWidth = Nothing
         , borderBottomStyle = Nothing
@@ -851,9 +911,14 @@ displayToString =
         )
 
 
-colorToString : Maybe Color -> Maybe String
+colorToString : Color -> String
 colorToString =
-    nothingOrJust Color.Convert.colorToCssRgba
+    Color.Convert.colorToCssRgba
+
+
+maybeColorToString : Maybe Color -> Maybe String
+maybeColorToString =
+    nothingOrJust colorToString
 
 
 alignItemsToString : Maybe AlignItems -> Maybe String
@@ -889,8 +954,8 @@ concatNumberWithString number str =
     (number |> toString) ++ str
 
 
-sizeUnitToString_ : SizeUnit -> String
-sizeUnitToString_ val =
+sizeUnitToString : SizeUnit -> String
+sizeUnitToString val =
     case val of
         Px x ->
             concatNumberWithString x "px"
@@ -911,9 +976,9 @@ sizeUnitToString_ val =
             concatNumberWithString x "rem"
 
 
-sizeUnitToString : Maybe SizeUnit -> Maybe String
-sizeUnitToString =
-    nothingOrJust sizeUnitToString_
+maybeSizeUnitToString : Maybe SizeUnit -> Maybe String
+maybeSizeUnitToString =
+    nothingOrJust sizeUnitToString
 
 
 listStyleTypeToString : Maybe ListStyleType -> Maybe String
@@ -1056,7 +1121,7 @@ autoOrSizeUnitToString =
         (\val ->
             case val of
                 Left su ->
-                    sizeUnitToString_ su
+                    sizeUnitToString su
 
                 Right _ ->
                     "auto"
@@ -1069,7 +1134,7 @@ normalOrSizeUnitToString =
         (\val ->
             case val of
                 Left su ->
-                    sizeUnitToString_ su
+                    sizeUnitToString su
 
                 Right _ ->
                     "normal"
@@ -1143,7 +1208,7 @@ maybeToString =
 offsetToStringList : ( SizeUnit, SizeUnit ) -> List String
 offsetToStringList ( x, y ) =
     [ x, y ]
-        |> List.map sizeUnitToString_
+        |> List.map sizeUnitToString
 
 
 type CustomFontFamily
@@ -1156,9 +1221,19 @@ type FontFamily
     | FontFamilyCustom (List CustomFontFamily)
 
 
+surroundWith : String -> String -> String -> String
+surroundWith surrounderLeft surrounderRight val =
+    surrounderLeft ++ val ++ surrounderRight
+
+
+surroundWithParentheses : String -> String
+surroundWithParentheses =
+    surroundWith "(" ")"
+
+
 surroundWithQuotes : String -> String
-surroundWithQuotes s =
-    "\"" ++ s ++ "\""
+surroundWithQuotes =
+    surroundWith "\"" "\""
 
 
 fontFamilyToString : Maybe FontFamily -> Maybe String
@@ -1191,9 +1266,9 @@ boxShadowToString =
             List.concat
                 [ offsetToStringList offset
                 , [ blurRadius, spreadRadius ]
-                    |> List.map (emptyListOrApply sizeUnitToString_)
+                    |> List.map (emptyListOrApply sizeUnitToString)
                     |> List.concat
-                , colorToString maybeColor
+                , maybeColorToString maybeColor
                     |> Maybe.map (\a -> [ a ])
                     |> Maybe.withDefault []
                 , if inset then
@@ -1205,14 +1280,73 @@ boxShadowToString =
         )
 
 
+applyCssFunction : String -> String -> String
+applyCssFunction funName content =
+    funName ++ (surroundWithParentheses content)
+
+
+angleToString : Angle -> String
+angleToString angle =
+    case angle of
+        Rad a ->
+            (a |> toString) ++ "rad"
+
+        Deg a ->
+            (a |> toString) ++ "deg"
+
+
+colorStopToString : ColorStop -> String
+colorStopToString colorStop =
+    case colorStop of
+        { color, offset } ->
+            [ Just (colorToString color), maybeSizeUnitToString offset ] |> Maybe.Extra.values |> String.join " "
+
+
+colorStopsToString : List ColorStop -> String
+colorStopsToString colorStops =
+    colorStops |> List.map colorStopToString |> String.join ", "
+
+
+gradientToString : Gradient -> String
+gradientToString gradient =
+    case gradient of
+        Linear { angle, colorStops } ->
+            applyCssFunction "linear-gradient" ([ angleToString angle, colorStopsToString colorStops ] |> String.join ", ")
+
+        Radial { colorStops } ->
+            applyCssFunction "radial-gradient" (colorStopsToString colorStops)
+
+
+imageToString : Image -> String
+imageToString image =
+    case image of
+        Gradient gradient ->
+            gradientToString gradient
+
+        Source src ->
+            applyCssFunction "url" src
+
+
+backgroundImagesToString : List BackgroundImage -> Maybe String
+backgroundImagesToString backgroundImages =
+    if backgroundImages == [] then
+        Nothing
+    else
+        Just
+            (backgroundImages
+                |> List.map (\{ image } -> imageToString image)
+                |> String.join (" ")
+            )
+
+
 getStyles : Style -> List ( String, Maybe String )
 getStyles (Style styleValues) =
     [ ( "position", positionToString << .position )
-    , ( "left", sizeUnitToString << .left )
-    , ( "top", sizeUnitToString << .top )
-    , ( "bottom", sizeUnitToString << .bottom )
-    , ( "right", sizeUnitToString << .right )
-    , ( "color", colorToString << .textColor )
+    , ( "left", maybeSizeUnitToString << .left )
+    , ( "top", maybeSizeUnitToString << .top )
+    , ( "bottom", maybeSizeUnitToString << .bottom )
+    , ( "right", maybeSizeUnitToString << .right )
+    , ( "color", maybeColorToString << .textColor )
     , ( "display", displayToString << .display )
     , ( "flex-grow", maybeToString << .flexGrow )
     , ( "flex-shrink", maybeToString << .flexShrink )
@@ -1226,28 +1360,29 @@ getStyles (Style styleValues) =
     , ( "text-decoration", textDecorationToString << .textDecoration )
     , ( "white-space", whiteSpaceToString << .whiteSpace )
     , ( "lineHeight", normalOrSizeUnitToString << .lineHeight )
-    , ( "background-color", colorToString << .backgroundColor )
-    , ( "border-bottom-color", colorToString << .borderBottomColor )
-    , ( "border-bottom-width", sizeUnitToString << .borderBottomWidth )
+    , ( "background-color", maybeColorToString << .backgroundColor )
+    , ( "background-image", backgroundImagesToString << .backgroundImages )
+    , ( "border-bottom-color", maybeColorToString << .borderBottomColor )
+    , ( "border-bottom-width", maybeSizeUnitToString << .borderBottomWidth )
     , ( "border-bottom-style", borderToString << .borderBottomStyle )
-    , ( "border-left-color", colorToString << .borderLeftColor )
-    , ( "border-left-width", sizeUnitToString << .borderLeftWidth )
+    , ( "border-left-color", maybeColorToString << .borderLeftColor )
+    , ( "border-left-width", maybeSizeUnitToString << .borderLeftWidth )
     , ( "border-left-style", borderToString << .borderLeftStyle )
-    , ( "border-top-color", colorToString << .borderTopColor )
-    , ( "border-top-width", sizeUnitToString << .borderTopWidth )
+    , ( "border-top-color", maybeColorToString << .borderTopColor )
+    , ( "border-top-width", maybeSizeUnitToString << .borderTopWidth )
     , ( "border-top-style", borderToString << .borderTopStyle )
-    , ( "border-right-color", colorToString << .borderRightColor )
-    , ( "border-right-width", sizeUnitToString << .borderRightWidth )
+    , ( "border-right-color", maybeColorToString << .borderRightColor )
+    , ( "border-right-width", maybeSizeUnitToString << .borderRightWidth )
     , ( "border-right-style", borderToString << .borderRightStyle )
-    , ( "border-bottom-left-radius", sizeUnitToString << .borderBottomLeftRadius )
-    , ( "border-bottom-right-radius", sizeUnitToString << .borderBottomRightRadius )
-    , ( "border-top-left-radius", sizeUnitToString << .borderTopLeftRadius )
-    , ( "border-top-right-radius", sizeUnitToString << .borderTopRightRadius )
+    , ( "border-bottom-left-radius", maybeSizeUnitToString << .borderBottomLeftRadius )
+    , ( "border-bottom-right-radius", maybeSizeUnitToString << .borderBottomRightRadius )
+    , ( "border-top-left-radius", maybeSizeUnitToString << .borderTopLeftRadius )
+    , ( "border-top-right-radius", maybeSizeUnitToString << .borderTopRightRadius )
     , ( "box-shadow", boxShadowToString << .boxShadow )
-    , ( "padding-left", sizeUnitToString << .paddingLeft )
-    , ( "padding-right", sizeUnitToString << .paddingRight )
-    , ( "padding-top", sizeUnitToString << .paddingTop )
-    , ( "padding-bottom", sizeUnitToString << .paddingBottom )
+    , ( "padding-left", maybeSizeUnitToString << .paddingLeft )
+    , ( "padding-right", maybeSizeUnitToString << .paddingRight )
+    , ( "padding-top", maybeSizeUnitToString << .paddingTop )
+    , ( "padding-bottom", maybeSizeUnitToString << .paddingBottom )
     , ( "margin-left", autoOrSizeUnitToString << .marginLeft )
     , ( "margin-right", autoOrSizeUnitToString << .marginRight )
     , ( "margin-top", autoOrSizeUnitToString << .marginTop )
@@ -1258,14 +1393,14 @@ getStyles (Style styleValues) =
     , ( "justify-content", justifyContentToString << .justifyContent )
     , ( "font-weight", maybeToString << .fontWeight )
     , ( "font-style", fontStyleToString << .fontStyle )
-    , ( "font-size", sizeUnitToString << .fontSize )
+    , ( "font-size", maybeSizeUnitToString << .fontSize )
     , ( "font-family", fontFamilyToString << .fontFamily )
-    , ( "width", sizeUnitToString << .width )
-    , ( "max-width", sizeUnitToString << .maxWidth )
-    , ( "min-width", sizeUnitToString << .minWidth )
-    , ( "height", sizeUnitToString << .height )
-    , ( "max-height", sizeUnitToString << .maxHeight )
-    , ( "min-height", sizeUnitToString << .minHeight )
+    , ( "width", maybeSizeUnitToString << .width )
+    , ( "max-width", maybeSizeUnitToString << .maxWidth )
+    , ( "min-width", maybeSizeUnitToString << .minWidth )
+    , ( "height", maybeSizeUnitToString << .height )
+    , ( "max-height", maybeSizeUnitToString << .maxHeight )
+    , ( "min-height", maybeSizeUnitToString << .minHeight )
     , ( "z-index", maybeToString << .zIndex )
     , ( "cursor", .cursor )
     , ( "visibility", visibilityToString << .visibility )
@@ -1371,7 +1506,7 @@ bottom value (Style style) =
 
 
 {-| -}
-absolutelyPositionned : Vector -> Style -> Style
+absolutelyPositionned : Vector Float -> Style -> Style
 absolutelyPositionned ( x, y ) =
     [ position PositionAbsolute
     , left <| Px <| Basics.round <| x
@@ -1769,6 +1904,20 @@ whiteSpaceNoWrap =
 backgroundColor : Color -> Style -> Style
 backgroundColor color (Style style) =
     Style { style | backgroundColor = Just color }
+
+
+{-| Add multiple background images to the styles
+-}
+backgroundImages : List BackgroundImage -> Style -> Style
+backgroundImages backgroundImages (Style style) =
+    Style { style | backgroundImages = backgroundImages }
+
+
+{-| Add a background image to the styles
+-}
+backgroundImage : BackgroundImage -> Style -> Style
+backgroundImage backgroundImage (Style style) =
+    Style { style | backgroundImages = [ backgroundImage ] }
 
 
 {-| -}
