@@ -78,22 +78,24 @@ exampleContent content =
 
 example : Node interactiveContent phrasingContent Spanning NotListElement msg
 example =
-    div [ style [ fullWidth ] ]
-        [ standardGrid
-            [ col 12 3 (exampleContent "I")
-            , col 12 3 (exampleContent "am")
-            , col 12 3 (exampleContent "a")
-            , col 12 3 (exampleContent "grid")
-            , col 12 9 (exampleContent "with some asymetric")
-            , col 12 3 (exampleContent "elements")
-            ]
-        , fullGrid
-            [ col 2 1 (exampleContent "toto")
-            , col 2 1 (exampleContent "toto")
-            ]
-        , grid large
-            [ col 2 1 (exampleContent "toto")
-            , col 2 1 (exampleContent "toto")
+    div [ style [ maxWidth (Px 800), marginAuto ] ]
+        [ div [ style [ fullWidth ] ]
+            [ standardGrid
+                [ col 12 3 (exampleContent "I")
+                , col 12 3 (exampleContent "am")
+                , col 12 3 (exampleContent "a")
+                , col 12 3 (exampleContent "grid")
+                , col 12 9 (exampleContent "with some asymetric")
+                , col 12 3 (exampleContent "elements")
+                ]
+            , fullGrid
+                [ col 2 1 (exampleContent "toto")
+                , col 2 1 (exampleContent "toto")
+                ]
+            , grid large
+                [ col 2 1 (exampleContent "toto")
+                , col 2 1 (exampleContent "toto")
+                ]
             ]
         ]
 

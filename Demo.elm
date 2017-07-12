@@ -3,12 +3,43 @@ module Demo exposing (..)
 import Elegant exposing (..)
 import Elegant.Elements exposing (..)
 import Color exposing (..)
-import Html exposing (text, div, h1, h3)
+import Color.Manipulate as Color
+import BodyBuilder exposing (text, div, h1, h2, h3, h4, h5, h6, style, focusStyle, program, inputColor, onColorInput, value)
+import Function exposing (..)
 
 
-view : Html.Html msg
-view =
-    div [ style [ maxWidth (Percent 100), width (Px 1024), marginAuto, padding medium ] ]
+type Msg
+    = ChangeColor Color
+
+
+type alias Model =
+    { color : Color }
+
+
+
+-- view : Model -> BodyBuilder.Node interactiveContent BodyBuilder.NotPhrasing BodyBuilder.Spanning BodyBuilder.NotListElement Msg
+
+
+buttonStyle color =
+    [ style [ outlineNone, backgroundColor color, Elegant.round, borderNone, h1S, padding medium, overflowHidden ]
+    , focusStyle [ backgroundColor (Color.saturate 0.5 color), boxShadowCenteredBlurry (Px 10) Color.black ]
+    ]
+        |> compose
+
+
+view :
+    Model
+    -> BodyBuilder.Node BodyBuilder.Interactive BodyBuilder.NotPhrasing BodyBuilder.Spanning BodyBuilder.NotListElement Msg
+view { color } =
+    div
+        [ style
+            [ maxWidth (Percent 100)
+            , width (Px 1024)
+            , marginAuto
+            , padding medium
+            , Elegant.fontFamilySansSerif
+            ]
+        ]
         [ h1
             [ style
                 [ paddingBottom tiny
@@ -105,21 +136,51 @@ view =
             , div [ style [ padding medium ] ] [ text "Between" ]
             , div [ style [ padding medium, flex 1, textRight ] ] [ text "And one element taking the rest of the place" ]
             ]
-        , div [ style [ textCenter, padding medium, fontSize alpha ] ]
-            [ text "I am the alpha" ]
-        , div [ style [ textCenter, padding medium, fontSize beta ] ]
-            [ text "I am the beta" ]
-        , div [ style [ textCenter, padding medium, fontSize gamma ] ]
-            [ text "I am the gamma" ]
-        , div [ style [ textCenter, padding medium, fontSize delta ] ]
-            [ text "I am the delta" ]
-        , div [ style [ textCenter, padding medium, fontSize epsilon ] ]
-            [ text "I am the epsilon" ]
+        , h1 []
+            [ text "I am h1" ]
+        , h2 []
+            [ text "I am h2" ]
+        , h3 []
+            [ text "I am h3" ]
+        , h4 []
+            [ text "I am h4" ]
+        , h5 []
+            [ text "I am h5" ]
+        , h6 []
+            [ text "I am h6" ]
+        , div [ style [ h1S ] ]
+            [ text "I am h1 styled" ]
+        , div [ style [ h2S ] ]
+            [ text "I am h2 styled" ]
+        , div [ style [ h3S ] ]
+            [ text "I am h3 styled" ]
+        , div [ style [ h4S ] ]
+            [ text "I am h4 styled" ]
+        , div [ style [ h5S ] ]
+            [ text "I am h5 styled" ]
+        , div [ style [ h6S ] ]
+            [ text "I am h6 styled" ]
         , div [ style [ textCenter, padding medium, displayInlineBlock, Elegant.round, strong, uppercase, border black, padding medium ] ]
             [ text "I am round, strong and uppercase" ]
+        , inputColor [ style [ Elegant.displayBlock ], value color, onColorInput ChangeColor ]
+        , BodyBuilder.button
+            [ buttonStyle color ]
+            [ text "Push me" ]
         ]
 
 
-main : Html.Html msg
+update : Msg -> Model -> ( Model, Cmd msg )
+update msg model =
+    case msg of
+        ChangeColor color ->
+            ( { model | color = color }, Cmd.none )
+
+
+main : Program Basics.Never Model Msg
 main =
-    view
+    program
+        { init = { color = Color.green } ! []
+        , update = update
+        , subscriptions = always Sub.none
+        , view = view
+        }

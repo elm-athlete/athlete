@@ -63,9 +63,17 @@ module Elegant
         , lineHeight
         , lineHeightNormal
         , fontWeightNormal
+        , fontWeight
         , fontStyleNormal
         , fontStyleItalic
         , fontSize
+        , heading
+        , h1S
+        , h2S
+        , h3S
+        , h4S
+        , h5S
+        , h6S
         , alpha
         , beta
         , gamma
@@ -85,6 +93,7 @@ module Elegant
         , backgroundImage
         , backgroundImages
         , withUrl
+        , borderNone
         , borderColor
         , borderSolid
         , borderDashed
@@ -111,6 +120,8 @@ module Elegant
         , borderTopRightRadius
         , borderRadius
         , borderAndTextColor
+        , outline
+        , outlineNone
         , boxShadow
         , boxShadowPlain
         , boxShadowBlurry
@@ -164,6 +175,7 @@ module Elegant
         , transparent
         , classes
         , classesHover
+        , classesFocus
         , stylesToCss
         )
 
@@ -184,6 +196,7 @@ module Elegant
 @docs convertStyles
 @docs classes
 @docs classesHover
+@docs classesFocus
 @docs stylesToCss
 @docs screenWidthBetween
 @docs screenWidthGE
@@ -247,6 +260,7 @@ module Elegant
 @docs bold
 @docs strong
 @docs lineHeight
+@docs fontWeight
 @docs fontWeightNormal
 @docs fontStyleNormal
 @docs fontStyleItalic
@@ -266,6 +280,7 @@ module Elegant
 @docs backgroundImages
 
 ## Border
+@docs borderNone
 @docs borderColor
 @docs borderSolid
 @docs borderDashed
@@ -292,6 +307,8 @@ module Elegant
 @docs borderTopRightRadius
 @docs borderRadius
 @docs borderAndTextColor
+@docs outline
+@docs outlineNone
 @docs boxShadow
 @docs boxShadowPlain
 @docs boxShadowBlurry
@@ -379,6 +396,15 @@ module Elegant
 
 ## Color
 @docs transparent
+
+## Headings Helper functions
+@docs h1S
+@docs h2S
+@docs h3S
+@docs h4S
+@docs h5S
+@docs h6S
+@docs heading
 
 ## Font Sizes
 @docs alpha
@@ -659,6 +685,7 @@ type Style
         , borderBottomRightRadius : Maybe SizeUnit
         , borderTopLeftRadius : Maybe SizeUnit
         , borderTopRightRadius : Maybe SizeUnit
+        , outline : Maybe Outline
         , boxShadow : Maybe BoxShadow
         , paddingRight : Maybe SizeUnit
         , paddingLeft : Maybe SizeUnit
@@ -817,6 +844,7 @@ defaultStyle =
         , borderBottomRightRadius = Nothing
         , borderTopLeftRadius = Nothing
         , borderTopRightRadius = Nothing
+        , outline = Nothing
         , boxShadow = Nothing
         , paddingRight = Nothing
         , paddingLeft = Nothing
@@ -1221,6 +1249,16 @@ type FontFamily
     | FontFamilyCustom (List CustomFontFamily)
 
 
+maybeOutlineToString : Maybe Outline -> Maybe String
+maybeOutlineToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                OutlineNone ->
+                    "none"
+        )
+
+
 fontFamilyToString : Maybe FontFamily -> Maybe String
 fontFamilyToString =
     nothingOrJust
@@ -1363,6 +1401,7 @@ getStyles (Style styleValues) =
     , ( "border-bottom-right-radius", maybeSizeUnitToString << .borderBottomRightRadius )
     , ( "border-top-left-radius", maybeSizeUnitToString << .borderTopLeftRadius )
     , ( "border-top-right-radius", maybeSizeUnitToString << .borderTopRightRadius )
+    , ( "outline", maybeOutlineToString << .outline )
     , ( "box-shadow", boxShadowToString << .boxShadow )
     , ( "padding-left", maybeSizeUnitToString << .paddingLeft )
     , ( "padding-right", maybeSizeUnitToString << .paddingRight )
@@ -1788,61 +1827,115 @@ fontSize val (Style style) =
 {-| -}
 alpha : SizeUnit
 alpha =
-    Em 2.4
+    Rem 2.5
+
+
+{-| helper function to create a heading
+-}
+heading : SizeUnit -> Style -> Style
+heading val =
+    [ margin zero
+    , marginBottom (Rem 0.5)
+    , fontWeight 600
+    , fontSize val
+    ]
+        |> compose
+
+
+{-| helper function to create a h1 style
+-}
+h1S : Style -> Style
+h1S =
+    heading alpha
+
+
+{-| helper function to create a h2 style
+-}
+h2S : Style -> Style
+h2S =
+    heading beta
+
+
+{-| helper function to create a h3 style
+-}
+h3S : Style -> Style
+h3S =
+    heading gamma
+
+
+{-| helper function to create a h4 style
+-}
+h4S : Style -> Style
+h4S =
+    heading delta
+
+
+{-| helper function to create a h5 style
+-}
+h5S : Style -> Style
+h5S =
+    heading epsilon
+
+
+{-| helper function to create a h6 style
+-}
+h6S : Style -> Style
+h6S =
+    heading zeta
 
 
 {-| -}
 beta : SizeUnit
 beta =
-    Em 2.2
+    Rem 2
 
 
 {-| -}
 gamma : SizeUnit
 gamma =
-    Em 1.6
+    Rem 1.75
 
 
 {-| -}
 delta : SizeUnit
 delta =
-    Em 1.5
+    Rem 1.5
 
 
 {-| -}
 epsilon : SizeUnit
 epsilon =
-    Em 1.3
+    Rem 1.25
 
 
 {-| -}
 zeta : SizeUnit
 zeta =
-    Em 1.1
+    Rem 1
 
 
 {-| -}
 eta : SizeUnit
 eta =
-    Em 1.05
+    Em 0.75
 
 
 {-| -}
 theta : SizeUnit
 theta =
-    Em 0.85
+    Em 0.5
 
 
 {-| -}
 iota : SizeUnit
 iota =
-    Em 0.8
+    Em 0.25
 
 
 {-| -}
 kappa : SizeUnit
 kappa =
-    Em 0.5
+    Em 0.125
 
 
 textAlign : TextAlign -> Style -> Style
@@ -1903,6 +1996,13 @@ backgroundImages backgroundImages (Style style) =
 backgroundImage : BackgroundImage -> Style -> Style
 backgroundImage backgroundImage (Style style) =
     Style { style | backgroundImages = [ backgroundImage ] }
+
+
+{-| Remove the border
+-}
+borderNone : Style -> Style
+borderNone =
+    borderWidth 0
 
 
 {-| -}
@@ -2101,6 +2201,24 @@ borderRadius size_ =
 borderAndTextColor : Color -> Style -> Style
 borderAndTextColor val =
     borderColor val << textColor val
+
+
+type Outline
+    = OutlineNone
+
+
+{-| Set the outline to a value
+-}
+outline : Outline -> Style -> Style
+outline val (Style style) =
+    Style { style | outline = Just val }
+
+
+{-| Set the outline to "none" value
+-}
+outlineNone : Style -> Style
+outlineNone =
+    outline OutlineNone
 
 
 boxSizing : String -> Style -> Style
@@ -2513,11 +2631,23 @@ classes =
     classesAndScreenWidths Nothing
 
 
+conditionalClasses : String -> Style -> String
+conditionalClasses condition =
+    classesAndScreenWidths (Just condition)
+
+
 {-| Generate all the classes of a list of Hover Styles
 -}
 classesHover : Style -> String
 classesHover =
-    classesAndScreenWidths (Just "hover")
+    conditionalClasses "hover"
+
+
+{-| Generate all the classes of a list of Focus Styles
+-}
+classesFocus : Style -> String
+classesFocus =
+    conditionalClasses "focus"
 
 
 classesNameGeneration : Maybe String -> Style -> List String

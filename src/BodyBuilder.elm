@@ -125,6 +125,7 @@ module BodyBuilder
         , class
         , style
         , hoverStyle
+        , focusStyle
         , target
         , name
         , width
@@ -265,6 +266,7 @@ module BodyBuilder
 @docs class
 @docs style
 @docs hoverStyle
+@docs focusStyle
 @docs target
 @docs name
 @docs width
@@ -479,6 +481,7 @@ defaultUniversalAttributes =
 type alias StyleAttribute =
     { standard : List (Style -> Style)
     , hover : List (Style -> Style)
+    , focus : List (Style -> Style)
     }
 
 
@@ -486,6 +489,7 @@ defaultStyleAttribute : StyleAttribute
 defaultStyleAttribute =
     { standard = []
     , hover = []
+    , focus = []
     }
 
 
@@ -753,8 +757,8 @@ defaultsComposedToAttrs defaults attrs =
 styleAttribute :
     List (Style -> Style)
     -> StyleAttribute
-styleAttribute =
-    flip styleAttributeWithHover []
+styleAttribute style =
+    styleAttributeWithHover style []
 
 
 styleAttributeWithHover :
@@ -764,6 +768,7 @@ styleAttributeWithHover :
 styleAttributeWithHover style hover =
     { standard = style
     , hover = hover
+    , focus = []
     }
 
 
@@ -789,14 +794,6 @@ flowDefaultsComposedToAttrs =
     flowDefaultsComposedToAttrsWithStyle []
 
 
-flowDefaultsComposedToAttrsWithFontSize :
-    Elegant.SizeUnit
-    -> List (FlowAttributes msg -> FlowAttributes msg)
-    -> FlowAttributes msg
-flowDefaultsComposedToAttrsWithFontSize fontSize =
-    flowDefaultsComposedToAttrsWithStyle [ Elegant.fontSize fontSize ]
-
-
 
 {-
    ██   ██ ████████ ███    ███ ██           ██████  ██████  ███    ██ ███████ ████████ ██████  ██    ██  ██████ ████████
@@ -813,7 +810,7 @@ h1 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h1 =
-    H 1 << (flowDefaultsComposedToAttrsWithFontSize Elegant.alpha)
+    H 1 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h1S ])
 
 
 {-| -}
@@ -822,7 +819,7 @@ h2 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h2 =
-    H 2 << (flowDefaultsComposedToAttrsWithFontSize Elegant.beta)
+    H 2 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h2S ])
 
 
 {-| -}
@@ -831,7 +828,7 @@ h3 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h3 =
-    H 3 << (flowDefaultsComposedToAttrsWithFontSize Elegant.gamma)
+    H 3 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h3S ])
 
 
 {-| -}
@@ -840,7 +837,7 @@ h4 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h4 =
-    H 4 << (flowDefaultsComposedToAttrsWithFontSize Elegant.delta)
+    H 4 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h4S ])
 
 
 {-| -}
@@ -849,7 +846,7 @@ h5 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h5 =
-    H 5 << (flowDefaultsComposedToAttrsWithFontSize Elegant.epsilon)
+    H 5 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h5S ])
 
 
 {-| -}
@@ -858,7 +855,7 @@ h6 :
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
     -> Node interactiveContent NotPhrasing Spanning NotListElement msg
 h6 =
-    H 6 << (flowDefaultsComposedToAttrsWithFontSize Elegant.zeta)
+    H 6 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h6S ])
 
 
 {-| -}
@@ -1624,7 +1621,7 @@ style :
 style val ({ style } as attrs) =
     let
         newStyle =
-            { style | standard = val }
+            { style | standard = style.standard ++ val }
     in
         { attrs | style = newStyle }
 
@@ -1637,9 +1634,22 @@ hoverStyle :
 hoverStyle val ({ style } as attrs) =
     let
         newHoverStyle =
-            { style | hover = val }
+            { style | hover = style.hover ++ val }
     in
         { attrs | style = newHoverStyle }
+
+
+{-| -}
+focusStyle :
+    List (Style -> Style)
+    -> { a | style : { b | focus : List (Style -> Style) } }
+    -> { a | style : { b | focus : List (Style -> Style) } }
+focusStyle val ({ style } as attrs) =
+    let
+        newStyle =
+            { style | focus = style.focus ++ val }
+    in
+        { attrs | style = newStyle }
 
 
 {-| -}
@@ -1690,11 +1700,12 @@ handleStyle :
     -> HtmlAttributes msg
 handleStyle { style } =
     let
-        { standard, hover } =
+        { standard, hover, focus } =
             style
     in
         BodyBuilderHtml.style standard
             << BodyBuilderHtml.hoverStyle hover
+            << BodyBuilderHtml.focusStyle focus
 
 
 handleMouseEvents :

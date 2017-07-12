@@ -15,8 +15,9 @@ blah : Model -> Node Interactive NotPhrasing Spanning NotListElement Msg
 blah model =
     div
         [ style
-            [ Elegant.width (Elegant.Px (300 + model.width))
+            [ Elegant.width (Elegant.Px (700 + model.width))
             , Elegant.marginAuto
+            , Elegant.padding (Elegant.Px model.width)
 
             -- , Elegant.backgroundImage (Elegant.withUrl "http://www.me-okinawa.com/wp-content/uploads/2013/05/may22-cat-whiskers.jpg")
             , Elegant.fontFamilySansSerif

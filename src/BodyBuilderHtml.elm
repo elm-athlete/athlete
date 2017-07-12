@@ -4,6 +4,7 @@ module BodyBuilderHtml
         , view
         , style
         , hoverStyle
+        , focusStyle
         , content
         , div
         , tag
@@ -57,6 +58,7 @@ module BodyBuilderHtml
 @docs view
 @docs style
 @docs hoverStyle
+@docs focusStyle
 @docs content
 @docs div
 @docs tag
@@ -120,6 +122,7 @@ type alias Tree msg =
     , defaultValue : Maybe String
     , style : Style
     , hoverStyle : Style
+    , focusStyle : Style
     , checked : Maybe Bool
     , value : Maybe String
     , href : Maybe String
@@ -174,6 +177,7 @@ base =
         , defaultValue = Nothing
         , style = Elegant.defaultStyle
         , hoverStyle = Elegant.defaultStyle
+        , focusStyle = Elegant.defaultStyle
         , checked = Nothing
         , value = Nothing
         , href = Nothing
@@ -234,6 +238,11 @@ hoverClasses =
     classesToAttributes Elegant.classesHover
 
 
+focusClasses : Style -> List (Html.Attribute msg)
+focusClasses =
+    classesToAttributes Elegant.classesFocus
+
+
 fold : (Tree msg -> a -> a) -> a -> HtmlAttributes msg -> a
 fold fun accumulator (HtmlAttributes tree) =
     List.foldr
@@ -258,8 +267,14 @@ getAllStyles =
                     , suffix = Just "hover"
                     , mediaQuery = Nothing
                     }
+
+                focusStyle =
+                    { style = node.focusStyle
+                    , suffix = Just "focus"
+                    , mediaQuery = Nothing
+                    }
             in
-                customStyle :: hoverStyle :: accumulator
+                customStyle :: hoverStyle :: focusStyle :: accumulator
         )
         []
 
@@ -281,6 +296,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 (List.concat
                     [ classes val.style
                     , hoverClasses val.hoverStyle
+                    , focusClasses val.focusStyle
                     , Helpers.emptyListOrApply Html.Attributes.class
                         (if val.class |> List.isEmpty then
                             Nothing
@@ -457,6 +473,12 @@ style val (HtmlAttributes attrs) =
 hoverStyle : List (Style -> Style) -> HtmlAttributes msg -> HtmlAttributes msg
 hoverStyle val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | hoverStyle = (compose val) attrs.hoverStyle }
+
+
+{-| -}
+focusStyle : List (Style -> Style) -> HtmlAttributes msg -> HtmlAttributes msg
+focusStyle val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | focusStyle = (compose val) attrs.focusStyle }
 
 
 {-| -}
