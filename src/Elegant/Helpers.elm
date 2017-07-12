@@ -1,4 +1,11 @@
-module Elegant.Helpers exposing (isValidInCssName, emptyListOrApply, betweenBraces)
+module Elegant.Helpers
+    exposing
+        ( isValidInCssName
+        , emptyListOrApply
+        , surroundWithBraces
+        , surroundWithParentheses
+        , surroundWithQuotes
+        )
 
 import Char
 
@@ -27,6 +34,21 @@ emptyListOrApply fun =
         >> Maybe.withDefault []
 
 
-betweenBraces : String -> String
-betweenBraces content =
-    "{" ++ content ++ "}"
+surroundWith : String -> String -> String -> String
+surroundWith surrounderLeft surrounderRight val =
+    surrounderLeft ++ val ++ surrounderRight
+
+
+surroundWithBraces : String -> String
+surroundWithBraces =
+    surroundWith "{" "}"
+
+
+surroundWithParentheses : String -> String
+surroundWithParentheses =
+    surroundWith "(" ")"
+
+
+surroundWithQuotes : String -> String
+surroundWithQuotes =
+    surroundWith "\"" "\""

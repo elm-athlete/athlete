@@ -11,6 +11,7 @@ blah model =
         [ style
             [ Elegant.width (Elegant.Px 300)
             , Elegant.marginAuto
+            , Elegant.backgroundImage (Elegant.withUrl "http://www.me-okinawa.com/wp-content/uploads/2013/05/may22-cat-whiskers.jpg")
             ]
         ]
         [ div []
