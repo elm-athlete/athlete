@@ -1,19 +1,21 @@
--- module Elegant.Grid
---     exposing
---         ( grid
---         , col
---         , standardGrid
---         , fullGrid
---         )
-
-
-module Main exposing (..)
+module Elegant.Grid
+    exposing
+        ( grid
+        , col
+        , standardGrid
+        , fullGrid
+        )
 
 {-|
+
+
+# Grid
+
 @docs col
 @docs fullGrid
 @docs grid
 @docs standardGrid
+
 -}
 
 import Elegant exposing (..)
@@ -24,10 +26,10 @@ import Function exposing (compose)
 import BodyBuilder exposing (Node, Spanning, NotListElement, div, toHtml, text, style)
 
 
-type alias Column interactiveContent phrasingContent spanningContent listContent =
+type alias Column interactiveContent phrasingContent spanningContent listContent msg =
     { denominator : Int
     , numerator : Int
-    , content : List (Node interactiveContent phrasingContent spanningContent listContent)
+    , content : List (Node interactiveContent phrasingContent spanningContent listContent msg)
     }
 
 
@@ -53,18 +55,18 @@ columnToHtml :
     ->
         { a
             | content :
-                List (Node interactiveContent phrasingContent Spanning NotListElement)
+                List (Node interactiveContent phrasingContent Spanning NotListElement msg)
             , denominator : Int
             , numerator : Int
         }
-    -> Node interactiveContent phrasingContent Spanning NotListElement
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 columnToHtml gutter { denominator, numerator, content } =
     div [ style [ columnStyle gutter denominator numerator ] ] content
 
 
 exampleContent :
     String
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement)
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
 exampleContent content =
     [ div [ style [ paddingBottom medium ] ]
         [ div [ style [ Elements.border Color.black ] ]
@@ -74,7 +76,7 @@ exampleContent content =
     ]
 
 
-example : Node interactiveContent phrasingContent Spanning NotListElement
+example : Node interactiveContent phrasingContent Spanning NotListElement msg
 example =
     div [ style [ fullWidth ] ]
         [ standardGrid
@@ -106,8 +108,8 @@ main =
 col :
     Int
     -> Int
-    -> List (Node interactiveIn phrasingIn spanningIn listIn)
-    -> Column interactiveIn phrasingIn spanningIn listIn
+    -> List (Node interactiveIn phrasingIn spanningIn listIn msg)
+    -> Column interactiveIn phrasingIn spanningIn listIn msg
 col =
     Column
 
@@ -120,11 +122,11 @@ grid :
         List
             { a
                 | content :
-                    List (Node interactiveContent phrasingContent Spanning NotListElement)
+                    List (Node interactiveContent phrasingContent Spanning NotListElement msg)
                 , denominator : Int
                 , numerator : Int
             }
-    -> Node interactiveContent phrasingContent Spanning NotListElement
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 grid gutter columns =
     div [ style [ layoutStyle gutter ] ]
         (columns |> List.map (columnToHtml gutter))
@@ -136,11 +138,11 @@ standardGrid :
     List
         { a
             | content :
-                List (Node interactiveContent phrasingContent Spanning NotListElement)
+                List (Node interactiveContent phrasingContent Spanning NotListElement msg)
             , denominator : Int
             , numerator : Int
         }
-    -> Node interactiveContent phrasingContent Spanning NotListElement
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 standardGrid =
     grid medium
 
@@ -151,10 +153,10 @@ fullGrid :
     List
         { a
             | content :
-                List (Node interactiveContent phrasingContent Spanning NotListElement)
+                List (Node interactiveContent phrasingContent Spanning NotListElement msg)
             , denominator : Int
             , numerator : Int
         }
-    -> Node interactiveContent phrasingContent Spanning NotListElement
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
 fullGrid =
     grid zero

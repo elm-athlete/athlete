@@ -2385,7 +2385,7 @@ fontFamilyInherit =
 
 
 {-| Standard Sans Serif font family.
-Inspired from https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/
+Inspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>
 -}
 fontFamilySansSerif : Style -> Style
 fontFamilySansSerif =
