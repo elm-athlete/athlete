@@ -7,8 +7,6 @@ module BodyBuilderHtml
         , content
         , div
         , tag
-        , input
-        , range
         , text
         , node
         , leaf
@@ -31,6 +29,7 @@ module BodyBuilderHtml
         , disabled
         , checked
         , selectOption
+        , selected
         , target
         , width
         , height
@@ -48,6 +47,60 @@ module BodyBuilderHtml
         , onFocus
         , on
         )
+
+{-|
+
+
+# Types
+
+@docs HtmlAttributes
+@docs view
+@docs style
+@docs hoverStyle
+@docs content
+@docs div
+@docs tag
+@docs text
+@docs node
+@docs leaf
+@docs container
+@docs type_
+@docs max
+@docs min
+@docs src
+@docs alt
+@docs defaultValue
+@docs onInput
+@docs href
+@docs none
+@docs id
+@docs class
+@docs tabindex
+@docs title
+@docs value
+@docs name
+@docs disabled
+@docs checked
+@docs selectOption
+@docs selected
+@docs target
+@docs width
+@docs height
+@docs onClick
+@docs onDoubleClick
+@docs onMouseUp
+@docs onMouseOut
+@docs onMouseOver
+@docs onMouseDown
+@docs onMouseLeave
+@docs onMouseEnter
+@docs onCheck
+@docs onSubmit
+@docs onBlur
+@docs onFocus
+@docs on
+
+-}
 
 import Html
 import Html.Attributes
@@ -105,6 +158,7 @@ type alias Tree msg =
     }
 
 
+{-| -}
 type HtmlAttributes msg
     = HtmlAttributes (Tree msg)
 
@@ -270,6 +324,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 (val.content |> List.map htmlAttributesToHtml)
 
 
+{-| -}
 view : HtmlAttributes msg -> Html.Html msg
 view val =
     Html.div []
@@ -278,126 +333,151 @@ view val =
         ]
 
 
+{-| -}
 tag : String -> HtmlAttributes msg -> HtmlAttributes msg
 tag val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | tag = Just val }
 
 
+{-| -}
 type_ : String -> HtmlAttributes msg -> HtmlAttributes msg
 type_ val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | type_ = Just val }
 
 
+{-| -}
 text_ : String -> HtmlAttributes msg -> HtmlAttributes msg
 text_ val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | text = val }
 
 
+{-| -}
 max : String -> HtmlAttributes msg -> HtmlAttributes msg
 max val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | max = Just val }
 
 
+{-| -}
 href : String -> HtmlAttributes msg -> HtmlAttributes msg
 href val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | href = Just val }
 
 
+{-| -}
 id : String -> HtmlAttributes msg -> HtmlAttributes msg
 id val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | id = Just val }
 
 
+{-| -}
 class : List String -> HtmlAttributes msg -> HtmlAttributes msg
 class val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | class = val }
 
 
+{-| -}
 tabindex : Int -> HtmlAttributes msg -> HtmlAttributes msg
 tabindex val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | tabindex = Just val }
 
 
+{-| -}
 title : String -> HtmlAttributes msg -> HtmlAttributes msg
 title val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | title = Just val }
 
 
+{-| -}
 width : Int -> HtmlAttributes msg -> HtmlAttributes msg
 width val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | width = Just val }
 
 
+{-| -}
 height : Int -> HtmlAttributes msg -> HtmlAttributes msg
 height val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | height = Just val }
 
 
+{-| -}
 disabled : HtmlAttributes msg -> HtmlAttributes msg
 disabled (HtmlAttributes attrs) =
     HtmlAttributes { attrs | disabled = Just True }
 
 
+{-| -}
 min : String -> HtmlAttributes msg -> HtmlAttributes msg
 min val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | min = Just val }
 
 
+{-| -}
 src : String -> HtmlAttributes msg -> HtmlAttributes msg
 src val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | src = Just val }
 
 
+{-| -}
 target : String -> HtmlAttributes msg -> HtmlAttributes msg
 target val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | target = Just val }
 
 
+{-| -}
 name : String -> HtmlAttributes msg -> HtmlAttributes msg
 name val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | name = Just val }
 
 
+{-| -}
 alt : String -> HtmlAttributes msg -> HtmlAttributes msg
 alt val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | alt = Just val }
 
 
+{-| -}
 defaultValue : String -> HtmlAttributes msg -> HtmlAttributes msg
 defaultValue val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | defaultValue = Just val }
 
 
+{-| -}
 onInput : (String -> msg) -> HtmlAttributes msg -> HtmlAttributes msg
 onInput val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onInput = Just val }
 
 
+{-| -}
 style : List (Style -> Style) -> HtmlAttributes msg -> HtmlAttributes msg
 style val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | style = (compose val) attrs.style }
 
 
+{-| -}
 hoverStyle : List (Style -> Style) -> HtmlAttributes msg -> HtmlAttributes msg
 hoverStyle val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | hoverStyle = (compose val) attrs.hoverStyle }
 
 
+{-| -}
 content : List (HtmlAttributes msg) -> HtmlAttributes msg -> HtmlAttributes msg
 content val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | content = List.append attrs.content val }
 
 
+{-| -}
 checked : Bool -> HtmlAttributes msg -> HtmlAttributes msg
 checked val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | checked = Just val }
 
 
+{-| -}
 selectOption : Maybe String -> HtmlAttributes msg -> HtmlAttributes msg
 selectOption value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | content = List.map (selected value) attrs.content }
 
 
+{-| -}
 selected : Maybe String -> HtmlAttributes msg -> HtmlAttributes msg
 selected value (HtmlAttributes attrs) =
     HtmlAttributes
@@ -410,71 +490,85 @@ selected value (HtmlAttributes attrs) =
         }
 
 
+{-| -}
 onClick : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onClick value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onClick = Just value }
 
 
+{-| -}
 onDoubleClick : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onDoubleClick value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onDoubleClick = Just value }
 
 
+{-| -}
 onMouseUp : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onMouseUp value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onMouseUp = Just value }
 
 
+{-| -}
 onMouseOut : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onMouseOut value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onMouseOut = Just value }
 
 
+{-| -}
 onMouseOver : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onMouseOver value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onMouseOver = Just value }
 
 
+{-| -}
 onMouseDown : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onMouseDown value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onMouseDown = Just value }
 
 
+{-| -}
 onMouseLeave : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onMouseLeave value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onMouseLeave = Just value }
 
 
+{-| -}
 onMouseEnter : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onMouseEnter value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onMouseEnter = Just value }
 
 
+{-| -}
 onCheck : (Bool -> msg) -> HtmlAttributes msg -> HtmlAttributes msg
 onCheck value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onCheck = Just value }
 
 
+{-| -}
 onSubmit : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onSubmit value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onSubmit = Just value }
 
 
+{-| -}
 onFocus : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onFocus value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onFocus = Just value }
 
 
+{-| -}
 onBlur : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onBlur value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onBlur = Just value }
 
 
+{-| -}
 on : String -> Decoder msg -> HtmlAttributes msg -> HtmlAttributes msg
 on event decoder (HtmlAttributes attrs) =
     HtmlAttributes { attrs | on = Just ( event, decoder ) }
 
 
+{-| -}
 div : HtmlAttributes msg -> HtmlAttributes msg
 div =
     tag "div"
@@ -567,16 +661,19 @@ textField =
         >> type_ "text"
 
 
+{-| -}
 value : Maybe String -> HtmlAttributes msg -> HtmlAttributes msg
 value val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | value = val }
 
 
+{-| -}
 text : String -> HtmlAttributes msg
 text value =
     text_ value base
 
 
+{-| -}
 node : List (HtmlAttributes msg -> HtmlAttributes msg) -> List (HtmlAttributes msg) -> HtmlAttributes msg
 node htmlAttributesTransformers children =
     base
@@ -585,16 +682,19 @@ node htmlAttributesTransformers children =
         |> content children
 
 
+{-| -}
 leaf : List (HtmlAttributes msg -> HtmlAttributes msg) -> HtmlAttributes msg
 leaf =
     flip node []
 
 
+{-| -}
 container : List (HtmlAttributes msg) -> HtmlAttributes msg
 container =
     node []
 
 
+{-| -}
 none : HtmlAttributes msg
 none =
     text ""

@@ -40,7 +40,8 @@ blah model =
                             ]
                             [ span [] [ text "Toto" ]
                             , span [] [ img "choux cat" "http://www.me-okinawa.com/wp-content/uploads/2013/05/may22-cat-whiskers.jpg" [] ]
-                            , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
+
+                            -- , table [ container [ span [] [] ] ] [ [ leaf [] ], [ leaf [] ] ]
                             ]
                         ]
                     ]

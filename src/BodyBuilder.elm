@@ -1,4 +1,280 @@
-module BodyBuilder exposing (..)
+module BodyBuilder
+    exposing
+        ( Interactive
+        , NotInteractive
+        , Phrasing
+        , NotPhrasing
+        , Spanning
+        , NotSpanning
+        , InsideHeading
+        , OutsideHeading
+        , ListElement
+        , NotListElement
+        , OnMouseEvents
+        , OnStringInputEvent
+        , OnIntInputEvent
+        , OnColorInputEvent
+        , OnCheckEvent
+        , OnSubmitEvent
+        , OnFocusEvent
+        , OnBlurEvent
+        , OnEvent
+        , IdAttribute
+        , ClassAttribute
+        , TabindexAttribute
+        , TitleAttribute
+        , StyleAttribute
+        , TargetAttribute
+        , HrefAttribute
+        , SrcAttribute
+        , AltAttribute
+        , StringValue
+        , IntValue
+        , ColorValue
+        , NameAttribute
+        , OptionsAttribute
+        , DisabledAttribute
+        , WidthAttribute
+        , HeightAttribute
+        , AAttributes
+        , FlowAttributes
+        , ImgAttributes
+        , IframeAttributes
+        , InputHiddenAttributes
+        , InputTextAttributes
+        , TextareaAttributes
+        , ButtonAttributes
+        , InputNumberAttributes
+        , InputColorAttributes
+        , InputCheckboxAttributes
+        , InputFileAttributes
+        , InputPasswordAttributes
+        , InputRadioAttributes
+        , InputRangeAttributes
+        , InputSubmitAttributes
+        , InputUrlAttributes
+        , SelectAttributes
+        , ProgressAttributes
+        , AudioAttributes
+        , VideoAttributes
+        , CanvasAttributes
+        , Node
+        , h1
+        , h2
+        , h3
+        , h4
+        , h5
+        , h6
+        , a
+        , button
+        , div
+        , ul
+        , ol
+        , li
+        , p
+        , br
+        , span
+        , textarea
+        , img
+        , audio
+        , progress
+        , text
+        , node
+        , leaf
+        , container
+        , olLi
+        , ulLi
+        , inputHidden
+        , inputText
+        , inputNumber
+        , inputColor
+        , inputCheckbox
+        , inputFile
+        , inputPassword
+        , inputRadio
+        , inputRange
+        , inputSubmit
+        , inputUrl
+        , select
+        , options
+        , option
+        , selectedOption
+        , href
+        , value
+        , checked
+        , title
+        , tabindex
+        , id
+        , disabled
+        , onClick
+        , onDoubleClick
+        , onMouseUp
+        , onMouseOut
+        , onMouseOver
+        , onMouseDown
+        , onMouseLeave
+        , onMouseEnter
+        , onStringInput
+        , onIntInput
+        , onColorInput
+        , onCheck
+        , onSubmit
+        , onFocus
+        , onBlur
+        , on
+        , class
+        , style
+        , hoverStyle
+        , target
+        , name
+        , width
+        , height
+        , toTree
+        , BodyBuilderProgramArgs
+        , toHtml
+        , program
+        )
+
+{-|
+
+
+# Type
+
+@docs Interactive
+@docs NotInteractive
+@docs Phrasing
+@docs NotPhrasing
+@docs Spanning
+@docs NotSpanning
+@docs InsideHeading
+@docs OutsideHeading
+@docs ListElement
+@docs NotListElement
+@docs OnMouseEvents
+@docs OnStringInputEvent
+@docs OnIntInputEvent
+@docs OnColorInputEvent
+@docs OnCheckEvent
+@docs OnSubmitEvent
+@docs OnFocusEvent
+@docs OnBlurEvent
+@docs OnEvent
+@docs IdAttribute
+@docs ClassAttribute
+@docs TabindexAttribute
+@docs TitleAttribute
+@docs StyleAttribute
+@docs TargetAttribute
+@docs HrefAttribute
+@docs SrcAttribute
+@docs AltAttribute
+@docs StringValue
+@docs IntValue
+@docs ColorValue
+@docs NameAttribute
+@docs OptionsAttribute
+@docs DisabledAttribute
+@docs WidthAttribute
+@docs HeightAttribute
+@docs AAttributes
+@docs FlowAttributes
+@docs ImgAttributes
+@docs IframeAttributes
+@docs InputHiddenAttributes
+@docs InputTextAttributes
+@docs TextareaAttributes
+@docs ButtonAttributes
+@docs InputNumberAttributes
+@docs InputColorAttributes
+@docs InputCheckboxAttributes
+@docs InputFileAttributes
+@docs InputPasswordAttributes
+@docs InputRadioAttributes
+@docs InputRangeAttributes
+@docs InputSubmitAttributes
+@docs InputUrlAttributes
+@docs SelectAttributes
+@docs ProgressAttributes
+@docs AudioAttributes
+@docs VideoAttributes
+@docs CanvasAttributes
+@docs Node
+@docs h1
+@docs h2
+@docs h3
+@docs h4
+@docs h5
+@docs h6
+@docs a
+@docs button
+@docs div
+@docs ul
+@docs ol
+@docs li
+@docs p
+@docs br
+@docs span
+@docs textarea
+@docs img
+@docs audio
+@docs progress
+@docs text
+@docs node
+@docs leaf
+@docs container
+@docs olLi
+@docs ulLi
+@docs inputHidden
+@docs inputText
+@docs inputNumber
+@docs inputColor
+@docs inputCheckbox
+@docs inputFile
+@docs inputPassword
+@docs inputRadio
+@docs inputRange
+@docs inputSubmit
+@docs inputUrl
+@docs select
+@docs options
+@docs option
+@docs selectedOption
+@docs href
+@docs value
+@docs checked
+@docs title
+@docs tabindex
+@docs id
+@docs disabled
+@docs onClick
+@docs onDoubleClick
+@docs onMouseUp
+@docs onMouseOut
+@docs onMouseOver
+@docs onMouseDown
+@docs onMouseLeave
+@docs onMouseEnter
+@docs onStringInput
+@docs onIntInput
+@docs onColorInput
+@docs onCheck
+@docs onSubmit
+@docs onFocus
+@docs onBlur
+@docs on
+@docs class
+@docs style
+@docs hoverStyle
+@docs target
+@docs name
+@docs width
+@docs height
+@docs toTree
+@docs BodyBuilderProgramArgs
+@docs toHtml
+@docs program
+
+-}
 
 import Elegant exposing (Style)
 import Html
@@ -30,42 +306,52 @@ parseColor =
     Color.hexToColor >> Result.withDefault Color.white
 
 
+{-| -}
 type Interactive
     = Interactive
 
 
+{-| -}
 type NotInteractive
     = NotInteractive
 
 
+{-| -}
 type Phrasing
     = Phrasing
 
 
+{-| -}
 type NotPhrasing
     = NotPhrasing
 
 
+{-| -}
 type Spanning
     = Spanning
 
 
+{-| -}
 type NotSpanning
     = NotSpanning
 
 
+{-| -}
 type InsideHeading
     = InsideHeading
 
 
+{-| -}
 type OutsideHeading
     = OutsideHeading
 
 
+{-| -}
 type ListElement
     = ListElement
 
 
+{-| -}
 type NotListElement
     = NotListElement
 
@@ -97,6 +383,7 @@ defaultOnMouseEvents =
     OnMouseEventsInside Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 
+{-| -}
 type alias OnMouseEvents msg a =
     { a | onMouseEvents : OnMouseEventsInside msg }
 
@@ -105,34 +392,42 @@ type alias OnInputEvent b msg a =
     { a | onInputEvent : Maybe (b -> msg) }
 
 
+{-| -}
 type alias OnStringInputEvent msg a =
     OnInputEvent String msg a
 
 
+{-| -}
 type alias OnIntInputEvent msg a =
     OnInputEvent Int msg a
 
 
+{-| -}
 type alias OnColorInputEvent msg a =
     OnInputEvent Color msg a
 
 
+{-| -}
 type alias OnCheckEvent msg a =
     { a | onCheckEvent : Maybe (Bool -> msg) }
 
 
+{-| -}
 type alias OnSubmitEvent msg a =
     { a | onSubmitEvent : Maybe msg }
 
 
+{-| -}
 type alias OnFocusEvent msg a =
     { a | onFocusEvent : Maybe msg }
 
 
+{-| -}
 type alias OnBlurEvent msg a =
     { a | onBlurEvent : Maybe msg }
 
 
+{-| -}
 type alias OnEvent msg a =
     { a | onEvent : Maybe ( String, Decoder msg ) }
 
@@ -147,18 +442,22 @@ type alias OnEvent msg a =
 -}
 
 
+{-| -}
 type alias IdAttribute a =
     { a | id : Maybe String }
 
 
+{-| -}
 type alias ClassAttribute a =
     { a | class : List String }
 
 
+{-| -}
 type alias TabindexAttribute a =
     { a | tabindex : Maybe Int }
 
 
+{-| -}
 type alias TitleAttribute a =
     { a | title : Maybe String }
 
@@ -176,6 +475,7 @@ defaultUniversalAttributes =
     }
 
 
+{-| -}
 type alias StyleAttribute =
     { standard : List (Style -> Style)
     , hover : List (Style -> Style)
@@ -200,18 +500,22 @@ type alias VisibleAttributesAndEvents msg a =
     OnEvent msg (OnFocusEvent msg (OnBlurEvent msg (OnMouseEvents msg (VisibleAttributes a))))
 
 
+{-| -}
 type alias TargetAttribute a =
     { a | target : Maybe String }
 
 
+{-| -}
 type alias HrefAttribute a =
     { a | href : Maybe Url }
 
 
+{-| -}
 type alias SrcAttribute a =
     { a | src : String }
 
 
+{-| -}
 type alias AltAttribute a =
     { a | alt : String }
 
@@ -220,34 +524,42 @@ type alias ValueAttribute b a =
     { a | value : Maybe b }
 
 
+{-| -}
 type alias StringValue a =
     ValueAttribute String a
 
 
+{-| -}
 type alias IntValue a =
     ValueAttribute Int a
 
 
+{-| -}
 type alias ColorValue a =
     ValueAttribute Color a
 
 
+{-| -}
 type alias NameAttribute a =
     { a | name : Maybe String }
 
 
+{-| -}
 type alias OptionsAttribute a =
     { a | options : List { value : String, label : String } }
 
 
+{-| -}
 type alias DisabledAttribute a =
     { a | disabled : Bool }
 
 
+{-| -}
 type alias WidthAttribute a =
     { a | width : Maybe Int }
 
 
+{-| -}
 type alias HeightAttribute a =
     { a | height : Maybe Int }
 
@@ -262,18 +574,22 @@ type alias HeightAttribute a =
 -}
 
 
+{-| -}
 type alias AAttributes msg =
     TargetAttribute (HrefAttribute (VisibleAttributesAndEvents msg {}))
 
 
+{-| -}
 type alias FlowAttributes msg =
     VisibleAttributesAndEvents msg {}
 
 
+{-| -}
 type alias ImgAttributes msg =
     HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (VisibleAttributesAndEvents msg {}))))
 
 
+{-| -}
 type alias IframeAttributes msg =
     SrcAttribute (VisibleAttributesAndEvents msg {})
 
@@ -282,6 +598,7 @@ type alias InputAttributes a =
     NameAttribute { a | type_ : String }
 
 
+{-| -}
 type alias InputHiddenAttributes =
     InputAttributes
         (StringValue
@@ -299,70 +616,87 @@ type alias InputStringValueAttributes msg a =
     StringValue (InputVisibleAttributes msg a)
 
 
+{-| -}
 type alias InputTextAttributes msg a =
     OnStringInputEvent msg (InputStringValueAttributes msg a)
 
 
+{-| -}
 type alias TextareaAttributes msg =
     OnStringInputEvent msg (NameAttribute (StringValue (VisibleAttributesAndEvents msg {})))
 
 
+{-| -}
 type alias ButtonAttributes msg a =
     DisabledAttribute (VisibleAttributesAndEvents msg a)
 
 
+{-| -}
 type alias InputNumberAttributes msg =
     OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {}))
 
 
+{-| -}
 type alias InputColorAttributes msg =
     OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {}))
 
 
+{-| -}
 type alias InputCheckboxAttributes msg =
     OnCheckEvent msg (InputStringValueAttributes msg { checked : Bool })
 
 
+{-| -}
 type alias InputFileAttributes msg =
     InputVisibleAttributes msg {}
 
 
+{-| -}
 type alias InputPasswordAttributes msg =
     InputTextAttributes msg {}
 
 
+{-| -}
 type alias InputRadioAttributes msg =
     InputStringValueAttributes msg {}
 
 
+{-| -}
 type alias InputRangeAttributes msg =
     InputNumberAttributes msg
 
 
+{-| -}
 type alias InputSubmitAttributes msg =
     OnSubmitEvent msg (ButtonAttributes msg { type_ : String })
 
 
+{-| -}
 type alias InputUrlAttributes msg =
     InputTextAttributes msg {}
 
 
+{-| -}
 type alias SelectAttributes msg =
     StringValue (OptionsAttribute (VisibleAttributesAndEvents msg {}))
 
 
+{-| -}
 type alias ProgressAttributes msg =
     VisibleAttributesAndEvents msg {}
 
 
+{-| -}
 type alias AudioAttributes msg =
     SrcAttribute (VisibleAttributesAndEvents msg {})
 
 
+{-| -}
 type alias VideoAttributes msg =
     VisibleAttributesAndEvents msg {}
 
 
+{-| -}
 type alias CanvasAttributes msg =
     HeightAttribute (WidthAttribute (VisibleAttributesAndEvents msg {}))
 
@@ -377,6 +711,7 @@ type alias CanvasAttributes msg =
 -}
 
 
+{-| -}
 type Node interactiveContent phrasingContent spanningContent listContent msg
     = A (AAttributes msg) (List (Node NotInteractive phrasingContent spanningContent NotListElement msg))
     | Div (FlowAttributes msg) (List (Node interactiveContent phrasingContent Spanning NotListElement msg))
@@ -472,6 +807,7 @@ flowDefaultsComposedToAttrsWithFontSize fontSize =
 -}
 
 
+{-| -}
 h1 :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
@@ -480,6 +816,7 @@ h1 =
     H 1 << (flowDefaultsComposedToAttrsWithFontSize Elegant.alpha)
 
 
+{-| -}
 h2 :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
@@ -488,6 +825,7 @@ h2 =
     H 2 << (flowDefaultsComposedToAttrsWithFontSize Elegant.beta)
 
 
+{-| -}
 h3 :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
@@ -496,6 +834,7 @@ h3 =
     H 3 << (flowDefaultsComposedToAttrsWithFontSize Elegant.gamma)
 
 
+{-| -}
 h4 :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
@@ -504,6 +843,7 @@ h4 =
     H 4 << (flowDefaultsComposedToAttrsWithFontSize Elegant.delta)
 
 
+{-| -}
 h5 :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
@@ -512,6 +852,7 @@ h5 =
     H 5 << (flowDefaultsComposedToAttrsWithFontSize Elegant.epsilon)
 
 
+{-| -}
 h6 :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
@@ -520,6 +861,7 @@ h6 =
     H 6 << (flowDefaultsComposedToAttrsWithFontSize Elegant.zeta)
 
 
+{-| -}
 a :
     List (AAttributes msg -> AAttributes msg)
     -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
@@ -538,6 +880,7 @@ a =
             }
 
 
+{-| -}
 button :
     List (ButtonAttributes msg {} -> ButtonAttributes msg {})
     -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
@@ -555,6 +898,7 @@ button =
             }
 
 
+{-| -}
 div :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
@@ -563,6 +907,7 @@ div =
     Div << flowDefaultsComposedToAttrs
 
 
+{-| -}
 ul :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent phrasingContent Spanning ListElement msg)
@@ -571,6 +916,7 @@ ul =
     Ul << flowDefaultsComposedToAttrs
 
 
+{-| -}
 ol :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent phrasingContent Spanning ListElement msg)
@@ -579,6 +925,7 @@ ol =
     Ol << flowDefaultsComposedToAttrs
 
 
+{-| -}
 li :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
@@ -587,6 +934,7 @@ li =
     Li << flowDefaultsComposedToAttrs
 
 
+{-| -}
 p :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
@@ -595,6 +943,7 @@ p =
     P << flowDefaultsComposedToAttrs
 
 
+{-| -}
 br :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> Node interactiveContent Phrasing spanningContent NotListElement msg
@@ -602,6 +951,7 @@ br =
     Br << flowDefaultsComposedToAttrs
 
 
+{-| -}
 span :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent Phrasing NotSpanning NotListElement msg)
@@ -610,6 +960,7 @@ span =
     Span << flowDefaultsComposedToAttrs
 
 
+{-| -}
 textarea :
     List (TextareaAttributes msg -> TextareaAttributes msg)
     -> Node Interactive phrasingContent spanningContent NotListElement msg
@@ -628,6 +979,7 @@ textarea =
             }
 
 
+{-| -}
 img :
     String
     -> String
@@ -649,6 +1001,7 @@ img alt src =
             }
 
 
+{-| -}
 audio :
     List (AudioAttributes msg -> AudioAttributes msg)
     -> Node Interactive phrasingContent spanningContent NotListElement msg
@@ -665,6 +1018,7 @@ audio =
             }
 
 
+{-| -}
 progress :
     List (ProgressAttributes msg -> ProgressAttributes msg)
     -> Node Interactive phrasingContent spanningContent NotListElement msg
@@ -680,6 +1034,7 @@ progress =
             }
 
 
+{-| -}
 table :
     List (Node interactiveContent phrasingContent spanningContent NotListElement msg)
     -> List (List (Node interactiveContent phrasingContent spanningContent NotListElement msg))
@@ -688,11 +1043,13 @@ table =
     Table
 
 
+{-| -}
 text : String -> Node interactiveContent phrasingContent spanningContent NotListElement msg
 text =
     Text
 
 
+{-| -}
 node :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
@@ -701,6 +1058,7 @@ node =
     div
 
 
+{-| -}
 leaf :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> Node interactiveContent phrasingContent Spanning NotListElement msg
@@ -708,6 +1066,7 @@ leaf =
     flip node []
 
 
+{-| -}
 container :
     List (Node interactiveContent phrasingContent Spanning NotListElement msg)
     -> Node interactiveContent phrasingContent Spanning NotListElement msg
@@ -722,6 +1081,7 @@ mapLis =
     List.map (\content -> li [] [ content ])
 
 
+{-| -}
 olLi :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
@@ -730,6 +1090,7 @@ olLi attributes insideLis =
     ol attributes (mapLis insideLis)
 
 
+{-| -}
 ulLi :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
@@ -738,6 +1099,7 @@ ulLi attributes insideLis =
     ul attributes (mapLis insideLis)
 
 
+{-| -}
 inputHidden :
     List (InputHiddenAttributes -> InputHiddenAttributes)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
@@ -751,6 +1113,7 @@ inputHidden =
             }
 
 
+{-| -}
 inputText :
     List (InputTextAttributes msg {} -> InputTextAttributes msg {})
     -> Node Interactive phrasingContent spanningContent listContent msg
@@ -770,6 +1133,7 @@ inputText =
             }
 
 
+{-| -}
 inputNumber :
     List (InputNumberAttributes msg -> InputNumberAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
@@ -789,6 +1153,7 @@ inputNumber =
             }
 
 
+{-| -}
 inputColor :
     List (InputColorAttributes msg -> InputColorAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
@@ -808,6 +1173,7 @@ inputColor =
             }
 
 
+{-| -}
 inputCheckbox :
     List (InputCheckboxAttributes msg -> InputCheckboxAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
@@ -828,6 +1194,7 @@ inputCheckbox =
             }
 
 
+{-| -}
 inputFile :
     List (InputFileAttributes msg -> InputFileAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
@@ -845,6 +1212,7 @@ inputFile =
             }
 
 
+{-| -}
 inputPassword :
     List (InputPasswordAttributes msg -> InputPasswordAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
@@ -864,6 +1232,7 @@ inputPassword =
             }
 
 
+{-| -}
 inputRadio :
     List (InputRadioAttributes msg -> InputRadioAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
@@ -882,6 +1251,7 @@ inputRadio =
             }
 
 
+{-| -}
 inputRange :
     List (InputRangeAttributes msg -> InputRangeAttributes msg)
     -> Node interactiveContent phrasingContent spanningContent listContent msg
@@ -901,6 +1271,7 @@ inputRange =
             }
 
 
+{-| -}
 inputSubmit :
     List (InputSubmitAttributes msg -> InputSubmitAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
@@ -919,6 +1290,7 @@ inputSubmit =
             }
 
 
+{-| -}
 inputUrl :
     List (InputUrlAttributes msg -> InputUrlAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
@@ -938,6 +1310,7 @@ inputUrl =
             }
 
 
+{-| -}
 select :
     List (SelectAttributes msg -> SelectAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
@@ -965,6 +1338,7 @@ select =
 -}
 
 
+{-| -}
 options :
     List { value : String, label : String }
     -> OptionsAttribute a
@@ -973,6 +1347,7 @@ options val attrs =
     { attrs | options = val }
 
 
+{-| -}
 option : String -> String -> { label : String, value : String }
 option value label =
     { value = value
@@ -980,26 +1355,31 @@ option value label =
     }
 
 
+{-| -}
 selectedOption : String -> StringValue a -> StringValue a
 selectedOption val attrs =
     { attrs | value = Just val }
 
 
+{-| -}
 href : String -> HrefAttribute a -> HrefAttribute a
 href val attrs =
     { attrs | href = Just val }
 
 
+{-| -}
 value : a -> ValueAttribute a b -> ValueAttribute a b
 value val attrs =
     { attrs | value = Just val }
 
 
+{-| -}
 checked : { a | checked : Bool } -> { a | checked : Bool }
 checked attrs =
     { attrs | checked = True }
 
 
+{-| -}
 title :
     String
     -> { d | universal : { c | title : Maybe String } }
@@ -1012,6 +1392,7 @@ title val ({ universal } as attrs) =
         { attrs | universal = newUniversal }
 
 
+{-| -}
 tabindex :
     Int
     -> { d | universal : { c | tabindex : Maybe Int } }
@@ -1024,6 +1405,7 @@ tabindex val ({ universal } as attrs) =
         { attrs | universal = newUniversal }
 
 
+{-| -}
 id :
     String
     -> { a | universal : { b | id : Maybe String } }
@@ -1036,6 +1418,7 @@ id val ({ universal } as attrs) =
         { attrs | universal = newId }
 
 
+{-| -}
 disabled :
     { a | disabled : Bool }
     -> { a | disabled : Bool }
@@ -1043,6 +1426,7 @@ disabled attrs =
     { attrs | disabled = True }
 
 
+{-| -}
 onClick :
     msg
     -> { a | onMouseEvents : OnMouseEventsInside msg }
@@ -1055,6 +1439,7 @@ onClick val ({ onMouseEvents } as attrs) =
         { attrs | onMouseEvents = newOnClick }
 
 
+{-| -}
 onDoubleClick :
     msg
     -> { a | onMouseEvents : OnMouseEventsInside msg }
@@ -1067,6 +1452,7 @@ onDoubleClick val ({ onMouseEvents } as attrs) =
         { attrs | onMouseEvents = newOnDoubleClick }
 
 
+{-| -}
 onMouseUp :
     msg
     -> { a | onMouseEvents : OnMouseEventsInside msg }
@@ -1079,6 +1465,7 @@ onMouseUp val ({ onMouseEvents } as attrs) =
         { attrs | onMouseEvents = newOnMouseUp }
 
 
+{-| -}
 onMouseOut :
     msg
     -> { a | onMouseEvents : OnMouseEventsInside msg }
@@ -1091,6 +1478,7 @@ onMouseOut val ({ onMouseEvents } as attrs) =
         { attrs | onMouseEvents = newOnMouseOut }
 
 
+{-| -}
 onMouseOver :
     msg
     -> { a | onMouseEvents : OnMouseEventsInside msg }
@@ -1103,6 +1491,7 @@ onMouseOver val ({ onMouseEvents } as attrs) =
         { attrs | onMouseEvents = newOnMouseUp }
 
 
+{-| -}
 onMouseDown :
     msg
     -> { a | onMouseEvents : OnMouseEventsInside msg }
@@ -1115,6 +1504,7 @@ onMouseDown val ({ onMouseEvents } as attrs) =
         { attrs | onMouseEvents = newOnMouseDown }
 
 
+{-| -}
 onMouseLeave :
     msg
     -> { a | onMouseEvents : OnMouseEventsInside msg }
@@ -1127,6 +1517,7 @@ onMouseLeave val ({ onMouseEvents } as attrs) =
         { attrs | onMouseEvents = newOnMouseLeave }
 
 
+{-| -}
 onMouseEnter :
     msg
     -> { a | onMouseEvents : OnMouseEventsInside msg }
@@ -1139,6 +1530,7 @@ onMouseEnter val ({ onMouseEvents } as attrs) =
         { attrs | onMouseEvents = newOnMouseEnter }
 
 
+{-| -}
 onStringInput :
     (String -> msg)
     -> { a | onInputEvent : Maybe (String -> msg) }
@@ -1147,6 +1539,7 @@ onStringInput val attrs =
     { attrs | onInputEvent = Just val }
 
 
+{-| -}
 onIntInput :
     (Int -> msg)
     -> { a | onInputEvent : Maybe (Int -> msg) }
@@ -1155,6 +1548,7 @@ onIntInput val attrs =
     { attrs | onInputEvent = Just val }
 
 
+{-| -}
 onColorInput :
     (Color -> msg)
     -> { a | onInputEvent : Maybe (Color -> msg) }
@@ -1163,6 +1557,7 @@ onColorInput val attrs =
     { attrs | onInputEvent = Just val }
 
 
+{-| -}
 onCheck :
     (Bool -> msg)
     -> { a | onCheckEvent : Maybe (Bool -> msg) }
@@ -1171,6 +1566,7 @@ onCheck val attrs =
     { attrs | onCheckEvent = Just val }
 
 
+{-| -}
 onSubmit :
     msg
     -> { a | onSubmitEvent : Maybe msg }
@@ -1179,6 +1575,7 @@ onSubmit val attrs =
     { attrs | onSubmitEvent = Just val }
 
 
+{-| -}
 onFocus :
     msg
     -> { a | onFocusEvent : Maybe msg }
@@ -1187,6 +1584,7 @@ onFocus val attrs =
     { attrs | onFocusEvent = Just val }
 
 
+{-| -}
 onBlur :
     msg
     -> { a | onBlurEvent : Maybe msg }
@@ -1195,6 +1593,7 @@ onBlur val attrs =
     { attrs | onBlurEvent = Just val }
 
 
+{-| -}
 on :
     String
     -> Decoder msg
@@ -1204,6 +1603,7 @@ on event decoder attrs =
     { attrs | onEvent = Just ( event, decoder ) }
 
 
+{-| -}
 class :
     List String
     -> { a | universal : { b | class : List String } }
@@ -1216,6 +1616,7 @@ class val ({ universal } as attrs) =
         { attrs | universal = newClass }
 
 
+{-| -}
 style :
     List (Style -> Style)
     -> { a | style : { b | standard : List (Style -> Style) } }
@@ -1228,6 +1629,7 @@ style val ({ style } as attrs) =
         { attrs | style = newStyle }
 
 
+{-| -}
 hoverStyle :
     List (Style -> Style)
     -> { a | style : { b | hover : List (Style -> Style) } }
@@ -1240,21 +1642,25 @@ hoverStyle val ({ style } as attrs) =
         { attrs | style = newHoverStyle }
 
 
+{-| -}
 target : String -> TargetAttribute a -> TargetAttribute a
 target val attrs =
     { attrs | target = Just val }
 
 
+{-| -}
 name : String -> NameAttribute a -> NameAttribute a
 name val attrs =
     { attrs | name = Just val }
 
 
+{-| -}
 width : Int -> WidthAttribute a -> WidthAttribute a
 width val attrs =
     { attrs | width = Just val }
 
 
+{-| -}
 height : Int -> HeightAttribute a -> HeightAttribute a
 height val attrs =
     { attrs | height = Just val }
@@ -1639,6 +2045,7 @@ inputAttributesHandling =
     List.append baseHandling [ handleType, handleName ]
 
 
+{-| -}
 toTree :
     Node interactiveContent phrasingContent spanningContent listContent msg
     -> BodyBuilderHtml.HtmlAttributes msg
@@ -1880,6 +2287,7 @@ toTree node =
                 )
 
 
+{-| -}
 toHtml :
     Node interactiveContent phrasingContent spanningContent listContent msg
     -> Html.Html msg
@@ -1889,6 +2297,7 @@ toHtml node =
         |> BodyBuilderHtml.view
 
 
+{-| -}
 type alias BodyBuilderProgramArgs model a b c msg =
     { init : ( model, Cmd msg )
     , subscriptions : model -> Sub msg
@@ -1897,6 +2306,7 @@ type alias BodyBuilderProgramArgs model a b c msg =
     }
 
 
+{-| -}
 program : BodyBuilderProgramArgs model a b c msg -> Program Basics.Never model msg
 program { init, update, subscriptions, view } =
     Html.program
