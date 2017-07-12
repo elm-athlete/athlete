@@ -42,6 +42,11 @@ module BodyBuilderHtml
         , onMouseDown
         , onMouseLeave
         , onMouseEnter
+        , onCheck
+        , onSubmit
+        , onBlur
+        , onFocus
+        , on
         )
 
 import Html
@@ -50,6 +55,7 @@ import Html.Events
 import Function exposing (compose)
 import Elegant exposing (Style)
 import Elegant.Helpers as Helpers
+import Json.Decode exposing (Decoder)
 
 
 type alias Tree msg =
@@ -87,6 +93,11 @@ type alias Tree msg =
     , onMouseDown : Maybe msg
     , onMouseLeave : Maybe msg
     , onMouseEnter : Maybe msg
+    , onCheck : Maybe (Bool -> msg)
+    , onSubmit : Maybe msg
+    , onBlur : Maybe msg
+    , onFocus : Maybe msg
+    , on : Maybe ( String, Decoder msg )
 
     -- Children
     , text : String
@@ -135,6 +146,11 @@ base =
         , onMouseDown = Nothing
         , onMouseLeave = Nothing
         , onMouseEnter = Nothing
+        , onCheck = Nothing
+        , onSubmit = Nothing
+        , onBlur = Nothing
+        , onFocus = Nothing
+        , on = Nothing
 
         -- Children
         , text = ""
@@ -244,6 +260,11 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Events.onMouseDown val.onMouseDown
                     , Helpers.emptyListOrApply Html.Events.onMouseLeave val.onMouseLeave
                     , Helpers.emptyListOrApply Html.Events.onMouseEnter val.onMouseEnter
+                    , Helpers.emptyListOrApply Html.Events.onCheck val.onCheck
+                    , Helpers.emptyListOrApply Html.Events.onSubmit val.onSubmit
+                    , Helpers.emptyListOrApply Html.Events.onFocus val.onFocus
+                    , Helpers.emptyListOrApply Html.Events.onBlur val.onBlur
+                    , Helpers.emptyListOrApply (\( event, decoder ) -> Html.Events.on event decoder) val.on
                     ]
                 )
                 (val.content |> List.map htmlAttributesToHtml)
@@ -427,6 +448,31 @@ onMouseLeave value (HtmlAttributes attrs) =
 onMouseEnter : msg -> HtmlAttributes msg -> HtmlAttributes msg
 onMouseEnter value (HtmlAttributes attrs) =
     HtmlAttributes { attrs | onMouseEnter = Just value }
+
+
+onCheck : (Bool -> msg) -> HtmlAttributes msg -> HtmlAttributes msg
+onCheck value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onCheck = Just value }
+
+
+onSubmit : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onSubmit value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onSubmit = Just value }
+
+
+onFocus : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onFocus value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onFocus = Just value }
+
+
+onBlur : msg -> HtmlAttributes msg -> HtmlAttributes msg
+onBlur value (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | onBlur = Just value }
+
+
+on : String -> Decoder msg -> HtmlAttributes msg -> HtmlAttributes msg
+on event decoder (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | on = Just ( event, decoder ) }
 
 
 div : HtmlAttributes msg -> HtmlAttributes msg

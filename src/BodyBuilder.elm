@@ -7,6 +7,8 @@ import BodyBuilderHtml exposing (HtmlAttributes)
 import Color exposing (Color)
 import Color.Convert as Color
 import Maybe.Extra as Maybe
+import ParseInt
+import Json.Decode exposing (Decoder)
 
 
 type alias Url =
@@ -16,6 +18,16 @@ type alias Url =
 unwrap : (a -> b -> b) -> Maybe a -> b -> b
 unwrap =
     Maybe.unwrap identity
+
+
+parseInt : String -> Int
+parseInt =
+    ParseInt.parseInt >> Result.withDefault 0
+
+
+parseColor : String -> Color
+parseColor =
+    Color.hexToColor >> Result.withDefault Color.white
 
 
 type Interactive
@@ -89,6 +101,42 @@ type alias OnMouseEvents msg a =
     { a | onMouseEvents : OnMouseEventsInside msg }
 
 
+type alias OnInputEvent b msg a =
+    { a | onInputEvent : Maybe (b -> msg) }
+
+
+type alias OnStringInputEvent msg a =
+    OnInputEvent String msg a
+
+
+type alias OnIntInputEvent msg a =
+    OnInputEvent Int msg a
+
+
+type alias OnColorInputEvent msg a =
+    OnInputEvent Color msg a
+
+
+type alias OnCheckEvent msg a =
+    { a | onCheckEvent : Maybe (Bool -> msg) }
+
+
+type alias OnSubmitEvent msg a =
+    { a | onSubmitEvent : Maybe msg }
+
+
+type alias OnFocusEvent msg a =
+    { a | onFocusEvent : Maybe msg }
+
+
+type alias OnBlurEvent msg a =
+    { a | onBlurEvent : Maybe msg }
+
+
+type alias OnEvent msg a =
+    { a | onEvent : Maybe ( String, Decoder msg ) }
+
+
 
 {-
     █████  ████████ ████████ ██████  ██ ██████  ██    ██ ████████ ███████ ███████
@@ -149,7 +197,7 @@ type alias VisibleAttributes a =
 
 
 type alias VisibleAttributesAndEvents msg a =
-    OnMouseEvents msg (VisibleAttributes a)
+    OnEvent msg (OnFocusEvent msg (OnBlurEvent msg (OnMouseEvents msg (VisibleAttributes a))))
 
 
 type alias TargetAttribute a =
@@ -247,12 +295,16 @@ type alias InputVisibleAttributes msg a =
     VisibleAttributesAndEvents msg (InputAttributes a)
 
 
-type alias InputTextAttributes msg a =
+type alias InputStringValueAttributes msg a =
     StringValue (InputVisibleAttributes msg a)
 
 
+type alias InputTextAttributes msg a =
+    OnStringInputEvent msg (InputStringValueAttributes msg a)
+
+
 type alias TextareaAttributes msg =
-    NameAttribute (StringValue (VisibleAttributesAndEvents msg {}))
+    OnStringInputEvent msg (NameAttribute (StringValue (VisibleAttributesAndEvents msg {})))
 
 
 type alias ButtonAttributes msg a =
@@ -260,19 +312,15 @@ type alias ButtonAttributes msg a =
 
 
 type alias InputNumberAttributes msg =
-    IntValue (InputVisibleAttributes msg {})
-
-
-type alias InputSliderAttributes msg =
-    InputNumberAttributes msg
+    OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {}))
 
 
 type alias InputColorAttributes msg =
-    ColorValue (InputVisibleAttributes msg {})
+    OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {}))
 
 
 type alias InputCheckboxAttributes msg =
-    InputTextAttributes msg { checked : Bool }
+    OnCheckEvent msg (InputStringValueAttributes msg { checked : Bool })
 
 
 type alias InputFileAttributes msg =
@@ -284,7 +332,7 @@ type alias InputPasswordAttributes msg =
 
 
 type alias InputRadioAttributes msg =
-    InputTextAttributes msg {}
+    InputStringValueAttributes msg {}
 
 
 type alias InputRangeAttributes msg =
@@ -292,7 +340,7 @@ type alias InputRangeAttributes msg =
 
 
 type alias InputSubmitAttributes msg =
-    ButtonAttributes msg { type_ : String }
+    OnSubmitEvent msg (ButtonAttributes msg { type_ : String })
 
 
 type alias InputUrlAttributes msg =
@@ -350,7 +398,6 @@ type Node interactiveContent phrasingContent spanningContent listContent msg
     | InputHidden InputHiddenAttributes
     | InputText (InputTextAttributes msg {})
     | InputNumber (InputNumberAttributes msg)
-    | InputSlider (InputSliderAttributes msg)
     | InputColor (InputColorAttributes msg)
     | InputCheckbox (InputCheckboxAttributes msg)
     | InputFile (InputFileAttributes msg)
@@ -368,20 +415,49 @@ defaultsComposedToAttrs defaults attrs =
     (defaults |> (attrs |> compose))
 
 
-styleAttribute style =
+styleAttribute :
+    List (Style -> Style)
+    -> StyleAttribute
+styleAttribute =
+    flip styleAttributeWithHover []
+
+
+styleAttributeWithHover :
+    List (Style -> Style)
+    -> List (Style -> Style)
+    -> StyleAttribute
+styleAttributeWithHover style hover =
     { standard = style
-    , hover = []
+    , hover = hover
     }
 
 
+flowDefaultsComposedToAttrsWithStyle :
+    List (Style -> Style)
+    -> List (FlowAttributes msg -> FlowAttributes msg)
+    -> FlowAttributes msg
 flowDefaultsComposedToAttrsWithStyle style =
-    defaultsComposedToAttrs { style = styleAttribute style, universal = defaultUniversalAttributes, onMouseEvents = defaultOnMouseEvents }
+    defaultsComposedToAttrs
+        { style = styleAttribute style
+        , universal = defaultUniversalAttributes
+        , onMouseEvents = defaultOnMouseEvents
+        , onEvent = Nothing
+        , onBlurEvent = Nothing
+        , onFocusEvent = Nothing
+        }
 
 
+flowDefaultsComposedToAttrs :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> FlowAttributes msg
 flowDefaultsComposedToAttrs =
     flowDefaultsComposedToAttrsWithStyle []
 
 
+flowDefaultsComposedToAttrsWithFontSize :
+    Elegant.SizeUnit
+    -> List (FlowAttributes msg -> FlowAttributes msg)
+    -> FlowAttributes msg
 flowDefaultsComposedToAttrsWithFontSize fontSize =
     flowDefaultsComposedToAttrsWithStyle [ Elegant.fontSize fontSize ]
 
@@ -456,6 +532,9 @@ a =
             , style = defaultStyleAttribute
             , universal = defaultUniversalAttributes
             , onMouseEvents = defaultOnMouseEvents
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -470,6 +549,9 @@ button =
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             , disabled = False
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -539,6 +621,10 @@ textarea =
             , universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , onInputEvent = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -557,6 +643,9 @@ img alt src =
             , onMouseEvents = defaultOnMouseEvents
             , width = Nothing
             , height = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -570,6 +659,9 @@ audio =
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             , src = ""
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -582,6 +674,9 @@ progress =
             { universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -656,43 +751,61 @@ inputHidden =
             }
 
 
-baseInputAttributes : String -> InputVisibleAttributes msg (ValueAttribute a {})
-baseInputAttributes type_ =
-    { universal = defaultUniversalAttributes
-    , style = defaultStyleAttribute
-    , name = Nothing
-    , type_ = type_
-    , value = Nothing
-    , onMouseEvents = defaultOnMouseEvents
-    }
-
-
 inputText :
     List (InputTextAttributes msg {} -> InputTextAttributes msg {})
     -> Node Interactive phrasingContent spanningContent listContent msg
 inputText =
-    InputText << defaultsComposedToAttrs (baseInputAttributes "text")
+    InputText
+        << defaultsComposedToAttrs
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , name = Nothing
+            , type_ = "text"
+            , value = Nothing
+            , onMouseEvents = defaultOnMouseEvents
+            , onInputEvent = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
+            }
 
 
 inputNumber :
     List (InputNumberAttributes msg -> InputNumberAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
 inputNumber =
-    InputNumber << defaultsComposedToAttrs (baseInputAttributes "number")
-
-
-inputSlider :
-    List (InputSliderAttributes msg -> InputSliderAttributes msg)
-    -> Node Interactive phrasingContent spanningContent listContent msg
-inputSlider =
-    InputSlider << defaultsComposedToAttrs (baseInputAttributes "range")
+    InputNumber
+        << defaultsComposedToAttrs
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , name = Nothing
+            , type_ = "number"
+            , value = Nothing
+            , onMouseEvents = defaultOnMouseEvents
+            , onInputEvent = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
+            }
 
 
 inputColor :
     List (InputColorAttributes msg -> InputColorAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
 inputColor =
-    InputColor << defaultsComposedToAttrs (baseInputAttributes "color")
+    InputColor
+        << defaultsComposedToAttrs
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , name = Nothing
+            , type_ = "color"
+            , value = Nothing
+            , onMouseEvents = defaultOnMouseEvents
+            , onInputEvent = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
+            }
 
 
 inputCheckbox :
@@ -708,6 +821,10 @@ inputCheckbox =
             , universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , onCheckEvent = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -722,6 +839,9 @@ inputFile =
             , universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -737,6 +857,10 @@ inputPassword =
             , universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , onInputEvent = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -752,6 +876,9 @@ inputRadio =
             , universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -761,12 +888,16 @@ inputRange :
 inputRange =
     InputRange
         << defaultsComposedToAttrs
-            { name = Nothing
+            { universal = defaultUniversalAttributes
+            , style = defaultStyleAttribute
+            , name = Nothing
             , type_ = "range"
             , value = Nothing
-            , universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , onInputEvent = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -781,6 +912,10 @@ inputSubmit =
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             , disabled = False
+            , onSubmitEvent = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
@@ -796,23 +931,28 @@ inputUrl =
             , universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , onInputEvent = Nothing
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
 
 
 select :
     List (SelectAttributes msg -> SelectAttributes msg)
     -> Node Interactive phrasingContent spanningContent listContent msg
-select list =
-    (Select
+select =
+    Select
         << defaultsComposedToAttrs
             { value = Nothing
             , options = []
             , universal = defaultUniversalAttributes
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
             }
-    )
-        list
 
 
 
@@ -915,6 +1055,155 @@ onClick val ({ onMouseEvents } as attrs) =
         { attrs | onMouseEvents = newOnClick }
 
 
+onDoubleClick :
+    msg
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+onDoubleClick val ({ onMouseEvents } as attrs) =
+    let
+        newOnDoubleClick =
+            { onMouseEvents | doubleClick = Just val }
+    in
+        { attrs | onMouseEvents = newOnDoubleClick }
+
+
+onMouseUp :
+    msg
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+onMouseUp val ({ onMouseEvents } as attrs) =
+    let
+        newOnMouseUp =
+            { onMouseEvents | mouseUp = Just val }
+    in
+        { attrs | onMouseEvents = newOnMouseUp }
+
+
+onMouseOut :
+    msg
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+onMouseOut val ({ onMouseEvents } as attrs) =
+    let
+        newOnMouseOut =
+            { onMouseEvents | mouseOut = Just val }
+    in
+        { attrs | onMouseEvents = newOnMouseOut }
+
+
+onMouseOver :
+    msg
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+onMouseOver val ({ onMouseEvents } as attrs) =
+    let
+        newOnMouseUp =
+            { onMouseEvents | mouseOver = Just val }
+    in
+        { attrs | onMouseEvents = newOnMouseUp }
+
+
+onMouseDown :
+    msg
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+onMouseDown val ({ onMouseEvents } as attrs) =
+    let
+        newOnMouseDown =
+            { onMouseEvents | mouseDown = Just val }
+    in
+        { attrs | onMouseEvents = newOnMouseDown }
+
+
+onMouseLeave :
+    msg
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+onMouseLeave val ({ onMouseEvents } as attrs) =
+    let
+        newOnMouseLeave =
+            { onMouseEvents | mouseLeave = Just val }
+    in
+        { attrs | onMouseEvents = newOnMouseLeave }
+
+
+onMouseEnter :
+    msg
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> { a | onMouseEvents : OnMouseEventsInside msg }
+onMouseEnter val ({ onMouseEvents } as attrs) =
+    let
+        newOnMouseEnter =
+            { onMouseEvents | mouseEnter = Just val }
+    in
+        { attrs | onMouseEvents = newOnMouseEnter }
+
+
+onStringInput :
+    (String -> msg)
+    -> { a | onInputEvent : Maybe (String -> msg) }
+    -> { a | onInputEvent : Maybe (String -> msg) }
+onStringInput val attrs =
+    { attrs | onInputEvent = Just val }
+
+
+onIntInput :
+    (Int -> msg)
+    -> { a | onInputEvent : Maybe (Int -> msg) }
+    -> { a | onInputEvent : Maybe (Int -> msg) }
+onIntInput val attrs =
+    { attrs | onInputEvent = Just val }
+
+
+onColorInput :
+    (Color -> msg)
+    -> { a | onInputEvent : Maybe (Color -> msg) }
+    -> { a | onInputEvent : Maybe (Color -> msg) }
+onColorInput val attrs =
+    { attrs | onInputEvent = Just val }
+
+
+onCheck :
+    (Bool -> msg)
+    -> { a | onCheckEvent : Maybe (Bool -> msg) }
+    -> { a | onCheckEvent : Maybe (Bool -> msg) }
+onCheck val attrs =
+    { attrs | onCheckEvent = Just val }
+
+
+onSubmit :
+    msg
+    -> { a | onSubmitEvent : Maybe msg }
+    -> { a | onSubmitEvent : Maybe msg }
+onSubmit val attrs =
+    { attrs | onSubmitEvent = Just val }
+
+
+onFocus :
+    msg
+    -> { a | onFocusEvent : Maybe msg }
+    -> { a | onFocusEvent : Maybe msg }
+onFocus val attrs =
+    { attrs | onFocusEvent = Just val }
+
+
+onBlur :
+    msg
+    -> { a | onBlurEvent : Maybe msg }
+    -> { a | onBlurEvent : Maybe msg }
+onBlur val attrs =
+    { attrs | onBlurEvent = Just val }
+
+
+on :
+    String
+    -> Decoder msg
+    -> { a | onEvent : Maybe ( String, Decoder msg ) }
+    -> { a | onEvent : Maybe ( String, Decoder msg ) }
+on event decoder attrs =
+    { attrs | onEvent = Just ( event, decoder ) }
+
+
 class :
     List String
     -> { a | universal : { b | class : List String } }
@@ -1011,14 +1300,90 @@ handleMouseEvents { onMouseEvents } =
         { click, doubleClick, mouseUp, mouseOut, mouseOver, mouseDown, mouseLeave, mouseEnter } =
             onMouseEvents
     in
-        unwrap BodyBuilderHtml.onClick click
-            >> unwrap BodyBuilderHtml.onDoubleClick doubleClick
-            >> unwrap BodyBuilderHtml.onMouseUp mouseUp
-            >> unwrap BodyBuilderHtml.onMouseOut mouseOut
-            >> unwrap BodyBuilderHtml.onMouseOver mouseOver
-            >> unwrap BodyBuilderHtml.onMouseDown mouseDown
-            >> unwrap BodyBuilderHtml.onMouseLeave mouseLeave
-            >> unwrap BodyBuilderHtml.onMouseEnter mouseEnter
+        [ unwrap BodyBuilderHtml.onClick click
+        , unwrap BodyBuilderHtml.onDoubleClick doubleClick
+        , unwrap BodyBuilderHtml.onMouseUp mouseUp
+        , unwrap BodyBuilderHtml.onMouseOut mouseOut
+        , unwrap BodyBuilderHtml.onMouseOver mouseOver
+        , unwrap BodyBuilderHtml.onMouseDown mouseDown
+        , unwrap BodyBuilderHtml.onMouseLeave mouseLeave
+        , unwrap BodyBuilderHtml.onMouseEnter mouseEnter
+        ]
+            |> compose
+
+
+handleOnStringInputEvent :
+    { a | onInputEvent : Maybe (String -> msg) }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleOnStringInputEvent { onInputEvent } =
+    unwrap BodyBuilderHtml.onInput onInputEvent
+
+
+handleOnIntInputEvent :
+    { a | onInputEvent : Maybe (Int -> msg) }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleOnIntInputEvent { onInputEvent } =
+    case onInputEvent of
+        Nothing ->
+            identity
+
+        Just val ->
+            BodyBuilderHtml.onInput (parseInt >> val)
+
+
+handleOnColorInputEvent :
+    { a | onInputEvent : Maybe (Color -> msg) }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleOnColorInputEvent { onInputEvent } =
+    case onInputEvent of
+        Nothing ->
+            identity
+
+        Just val ->
+            BodyBuilderHtml.onInput (parseColor >> val)
+
+
+handleOnCheckEvent :
+    { a | onCheckEvent : Maybe (Bool -> msg) }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleOnCheckEvent { onCheckEvent } =
+    unwrap BodyBuilderHtml.onCheck onCheckEvent
+
+
+handleOnSubmitEvent :
+    { a | onSubmitEvent : Maybe msg }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleOnSubmitEvent { onSubmitEvent } =
+    unwrap BodyBuilderHtml.onSubmit onSubmitEvent
+
+
+handleOnBlurEvent :
+    { a | onBlurEvent : Maybe msg }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleOnBlurEvent { onBlurEvent } =
+    unwrap BodyBuilderHtml.onBlur onBlurEvent
+
+
+handleOnFocusEvent :
+    { a | onFocusEvent : Maybe msg }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleOnFocusEvent { onFocusEvent } =
+    unwrap BodyBuilderHtml.onFocus onFocusEvent
+
+
+handleOnEvent :
+    { a | onEvent : Maybe ( String, Decoder msg ) }
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleOnEvent { onEvent } =
+    unwrap (\( event, decoder ) -> BodyBuilderHtml.on event decoder) onEvent
 
 
 handleSrc :
@@ -1221,7 +1586,9 @@ buildNode children attributes tag usedBodyToBodyHtmlFunctions =
         newAttrs =
             usedBodyToBodyHtmlFunctions |> List.map (\fun -> fun attributes)
     in
-        BodyBuilderHtml.node ([ BodyBuilderHtml.tag tag ] |> List.append newAttrs) (List.map (\x -> toTree x) children)
+        BodyBuilderHtml.node
+            ([ BodyBuilderHtml.tag tag ] |> List.append newAttrs)
+            (List.map (\x -> toTree x) children)
 
 
 parentToHtml :
@@ -1250,7 +1617,16 @@ baseHandling :
          -> HtmlAttributes msg
         )
 baseHandling =
-    [ handleStyle, handleClass, handleId, handleMouseEvents, handleTabindex, handleTitle ]
+    [ handleStyle
+    , handleClass
+    , handleId
+    , handleMouseEvents
+    , handleTabindex
+    , handleTitle
+    , handleOnFocusEvent
+    , handleOnBlurEvent
+    , handleOnEvent
+    ]
 
 
 inputAttributesHandling :
@@ -1269,95 +1645,229 @@ toTree :
 toTree node =
     case node of
         A attributes children ->
-            parentToHtml children attributes "a" (baseHandling |> List.append [ handleHref, handleTarget ])
+            parentToHtml children
+                attributes
+                "a"
+                (baseHandling
+                    |> List.append
+                        [ handleHref
+                        , handleTarget
+                        ]
+                )
 
         Ul attributes children ->
-            parentToHtml children attributes "ul" baseHandling
+            parentToHtml children
+                attributes
+                "ul"
+                baseHandling
 
         Ol attributes children ->
-            parentToHtml children attributes "ol" baseHandling
+            parentToHtml children
+                attributes
+                "ol"
+                baseHandling
 
         Li attributes children ->
-            parentToHtml children attributes "li" baseHandling
+            parentToHtml children
+                attributes
+                "li"
+                baseHandling
 
         Div attributes children ->
-            parentToHtml children attributes "div" baseHandling
+            parentToHtml children
+                attributes
+                "div"
+                baseHandling
 
         P attributes children ->
-            parentToHtml children attributes "p" baseHandling
+            parentToHtml children
+                attributes
+                "p"
+                baseHandling
 
         Span attributes children ->
-            parentToHtml children attributes "span" baseHandling
+            parentToHtml children
+                attributes
+                "span"
+                baseHandling
 
         H number attributes children ->
-            parentToHtml children attributes ("h" ++ (number |> toString)) baseHandling
+            parentToHtml children
+                attributes
+                ("h" ++ (number |> toString))
+                baseHandling
 
         Img attributes ->
-            childToHtml attributes "img" (baseHandling |> List.append [ handleSrc, handleAlt, handleWidth, handleHeight ])
+            childToHtml attributes
+                "img"
+                (baseHandling
+                    |> List.append
+                        [ handleSrc
+                        , handleAlt
+                        , handleWidth
+                        , handleHeight
+                        ]
+                )
 
         Button attributes children ->
-            parentToHtml children attributes "button" (List.append baseHandling [ handleDisabled ])
+            parentToHtml children
+                attributes
+                "button"
+                (baseHandling
+                    |> List.append
+                        [ handleDisabled ]
+                )
 
         Text str ->
             BodyBuilderHtml.text str
 
         Br attributes ->
-            childToHtml attributes "br" baseHandling
+            childToHtml attributes
+                "br"
+                baseHandling
 
         Table _ _ ->
             -- TODO
             BodyBuilderHtml.none
 
         Progress attributes ->
-            childToHtml attributes "progress" baseHandling
+            childToHtml attributes
+                "progress"
+                baseHandling
 
         Audio attributes ->
-            childToHtml attributes "audio" (List.append baseHandling [ handleSrc ])
+            childToHtml attributes
+                "audio"
+                (baseHandling
+                    |> List.append
+                        [ handleSrc ]
+                )
 
         Video attributes ->
-            childToHtml attributes "video" baseHandling
+            childToHtml attributes
+                "video"
+                baseHandling
 
         Canvas attributes ->
-            childToHtml attributes "canvas" (List.append baseHandling [ handleWidth, handleHeight ])
+            childToHtml attributes
+                "canvas"
+                (baseHandling
+                    |> List.append
+                        [ handleWidth
+                        , handleHeight
+                        ]
+                )
 
         InputHidden attributes ->
-            childToHtml attributes "input" [ handleStringValue, handleName, handleClass, handleId, handleType ]
+            childToHtml attributes
+                "input"
+                [ handleStringValue
+                , handleName
+                , handleClass
+                , handleId
+                , handleType
+                ]
 
         Textarea attributes ->
-            childToHtml attributes "textarea" (baseHandling |> List.append [ handleName, handleContent ])
+            childToHtml attributes
+                "textarea"
+                (baseHandling
+                    |> List.append
+                        [ handleName
+                        , handleContent
+                        , handleOnStringInputEvent
+                        ]
+                )
 
         InputText attributes ->
-            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
+            childToHtml attributes
+                "input"
+                (inputAttributesHandling
+                    |> List.append
+                        [ handleStringValue
+                        , handleOnStringInputEvent
+                        ]
+                )
 
         InputNumber attributes ->
-            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleIntValue ])
-
-        InputSlider attributes ->
-            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleIntValue ])
+            childToHtml attributes
+                "input"
+                (inputAttributesHandling
+                    |> List.append
+                        [ handleIntValue
+                        , handleOnIntInputEvent
+                        ]
+                )
 
         InputColor attributes ->
-            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleColorValue ])
+            childToHtml attributes
+                "input"
+                (inputAttributesHandling
+                    |> List.append
+                        [ handleColorValue
+                        , handleOnColorInputEvent
+                        ]
+                )
 
         InputCheckbox attributes ->
-            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleChecked ])
+            childToHtml attributes
+                "input"
+                (inputAttributesHandling
+                    |> List.append
+                        [ handleChecked ]
+                )
 
         InputFile attributes ->
-            childToHtml attributes "input" (inputAttributesHandling)
+            childToHtml attributes
+                "input"
+                inputAttributesHandling
 
         InputPassword attributes ->
-            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
+            childToHtml attributes
+                "input"
+                (inputAttributesHandling
+                    |> List.append
+                        [ handleStringValue
+                        , handleOnStringInputEvent
+                        ]
+                )
 
         InputRadio attributes ->
-            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
+            childToHtml attributes
+                "input"
+                (inputAttributesHandling
+                    |> List.append
+                        [ handleStringValue ]
+                )
 
         InputRange attributes ->
-            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleIntValue ])
+            childToHtml attributes
+                "input"
+                (inputAttributesHandling
+                    |> List.append
+                        [ handleIntValue ]
+                )
 
         InputSubmit attributes ->
-            childToHtml attributes "button" (baseHandling |> List.append [ handleType, handleDisabled ])
+            childToHtml attributes
+                "button"
+                (baseHandling
+                    |> List.append
+                        [ handleType
+                        , handleDisabled
+                        , handleOnSubmitEvent
+                        ]
+                )
 
         InputUrl attributes ->
-            childToHtml attributes "input" (inputAttributesHandling |> List.append [ handleStringValue ])
+            childToHtml attributes
+                "input"
+                (inputAttributesHandling
+                    |> List.append
+                        [ handleStringValue
+                        , handleOnStringInputEvent
+                        ]
+                )
 
         Select attributes ->
             childToHtml attributes
