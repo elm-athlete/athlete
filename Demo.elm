@@ -4,20 +4,25 @@ import Elegant exposing (..)
 import Elegant.Elements exposing (..)
 import Color exposing (..)
 import Color.Manipulate as Color
-import BodyBuilder exposing (text, div, h1, h2, h3, h4, h5, h6, style, focusStyle, program, inputColor, onInput, value)
+import BodyBuilder exposing (..)
 import Function exposing (..)
+import Elegant.Grid exposing (..)
+import Elegant.Elements as Elements exposing (..)
 
 
 type Msg
     = ChangeColor Color
+    | ChangeWidth Int
+    | ChangeGutter Int
+    | ChangeColumnsNumber Int
 
 
 type alias Model =
-    { color : Color }
-
-
-
--- view : Model -> BodyBuilder.Node interactiveContent BodyBuilder.NotPhrasing BodyBuilder.Spanning BodyBuilder.NotListElement Msg
+    { color : Color
+    , columnWidth : Int
+    , gutterWidth : Int
+    , columnsNumber : Int
+    }
 
 
 buttonStyle color =
@@ -27,14 +32,23 @@ buttonStyle color =
         |> compose
 
 
+exampleGridContent content =
+    [ div [ style [ paddingBottom medium ] ]
+        [ div [ style [ Elements.border Color.black, padding large, textCenter ] ]
+            [ text content
+            ]
+        ]
+    ]
+
+
 view :
     Model
     -> BodyBuilder.Node BodyBuilder.Interactive BodyBuilder.NotPhrasing BodyBuilder.Spanning BodyBuilder.NotListElement Msg
-view { color } =
+view { color, columnWidth, gutterWidth, columnsNumber } =
     div
         [ style
             [ maxWidth (Percent 100)
-            , width (Px 1024)
+            , Elegant.width (Px 1024)
             , marginAuto
             , padding medium
             , Elegant.fontFamilySansSerif
@@ -56,7 +70,7 @@ view { color } =
             [ text "Alignment" ]
         , div
             [ style
-                [ width (Px 400)
+                [ Elegant.width (Px 400)
                 , marginAuto
                 , border black
                 , padding medium
@@ -65,7 +79,7 @@ view { color } =
             [ text "I'm centered with auto margins and a width of 400px" ]
         , div
             [ style
-                [ width (Px 600)
+                [ Elegant.width (Px 600)
                 , marginAuto
                 , border black
                 , padding medium
@@ -166,6 +180,38 @@ view { color } =
         , BodyBuilder.button
             [ buttonStyle color ]
             [ text "Push me" ]
+        , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_" ]
+        , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 14 ]
+        , inputRange [ style [ Elegant.displayBlock ], name "inputSlider", value 12 ]
+        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", checked ]
+        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test" ]
+        , inputFile [ style [ Elegant.displayBlock ], name "inputSlider" ]
+        , inputPassword [ style [ Elegant.displayBlock ], name "inputSlider", value "" ]
+        , inputRadio [ style [ Elegant.displayBlock ], name "inputSlider", value "Test" ]
+        , inputUrl [ style [ Elegant.displayBlock ], name "inputUrl" ]
+        , inputSubmit [ style [ Elegant.displayBlock ] ]
+        , h3 [] [ text "Gutter width (default 12 px)" ]
+        , inputRange [ style [ Elegant.displayInlineBlock ], value gutterWidth, onInput ChangeGutter ]
+        , inputNumber [ style [ Elegant.displayInlineBlock ], value gutterWidth, onInput ChangeGutter ]
+        , h3 [] [ text "Columns number (default 12)" ]
+        , inputRange [ style [ Elegant.displayInlineBlock ], value columnsNumber, onInput ChangeColumnsNumber ]
+        , inputNumber [ style [ Elegant.displayInlineBlock ], value columnsNumber, onInput ChangeColumnsNumber ]
+        , h3 [] [ text "Columns width : number of units by column (default 3)" ]
+        , inputRange [ style [ Elegant.displayInlineBlock ], value columnWidth, onInput ChangeWidth ]
+        , inputNumber [ style [ Elegant.displayInlineBlock ], value columnWidth, onInput ChangeWidth ]
+        , grid (Px gutterWidth)
+            [ col columnsNumber 4 (exampleGridContent "BodyBuilder")
+            , col columnsNumber (columnWidth) (exampleGridContent "is")
+            , col columnsNumber (columnWidth) (exampleGridContent "really")
+            , col columnsNumber (columnWidth) (exampleGridContent "awesome")
+            , col columnsNumber (columnWidth) (exampleGridContent "to")
+            ]
+        , grid (Px gutterWidth)
+            [ col 12 6 (exampleGridContent "design")
+            , col 12 6 (exampleGridContent "your")
+            , col 12 6 (exampleGridContent "own")
+            , col 12 6 (exampleGridContent "grids")
+            ]
         ]
 
 
@@ -175,11 +221,26 @@ update msg model =
         ChangeColor color ->
             ( { model | color = color }, Cmd.none )
 
+        ChangeWidth width ->
+            ( { model | columnWidth = width }, Cmd.none )
+
+        ChangeGutter gutter ->
+            ( { model | gutterWidth = gutter }, Cmd.none )
+
+        ChangeColumnsNumber columnsNumber ->
+            ( { model | columnsNumber = columnsNumber }, Cmd.none )
+
 
 main : Program Basics.Never Model Msg
 main =
     program
-        { init = { color = Color.green } ! []
+        { init =
+            { color = Color.green
+            , columnWidth = 2
+            , gutterWidth = 12
+            , columnsNumber = 12
+            }
+                ! []
         , update = update
         , subscriptions = always Sub.none
         , view = view
