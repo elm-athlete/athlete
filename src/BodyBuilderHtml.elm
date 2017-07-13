@@ -35,6 +35,8 @@ module BodyBuilderHtml
         , target
         , width
         , height
+        , placeholder
+        , autocomplete
         , onClick
         , onDoubleClick
         , onMouseUp
@@ -90,6 +92,8 @@ module BodyBuilderHtml
 @docs target
 @docs width
 @docs height
+@docs placeholder
+@docs autocomplete
 @docs onClick
 @docs onDoubleClick
 @docs onMouseUp
@@ -141,6 +145,8 @@ type alias Tree msg =
     , disabled : Maybe Bool
     , width : Maybe Int
     , height : Maybe Int
+    , placeholder : Maybe String
+    , autocomplete : Bool
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -197,6 +203,8 @@ base =
         , disabled = Nothing
         , width = Nothing
         , height = Nothing
+        , placeholder = Nothing
+        , autocomplete = True
 
         -- Html Events
         , onInput = Nothing
@@ -301,6 +309,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     [ classes val.style
                     , hoverClasses val.hoverStyle
                     , focusClasses val.focusStyle
+                    , [ Html.Attributes.autocomplete val.autocomplete ]
                     , Helpers.emptyListOrApply Html.Attributes.class
                         (if val.class |> List.isEmpty then
                             Nothing
@@ -327,6 +336,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.disabled val.disabled
                     , Helpers.emptyListOrApply Html.Attributes.width val.width
                     , Helpers.emptyListOrApply Html.Attributes.height val.height
+                    , Helpers.emptyListOrApply Html.Attributes.placeholder val.placeholder
                     , Helpers.emptyListOrApply Html.Events.onClick val.onClick
                     , Helpers.emptyListOrApply Html.Events.onDoubleClick val.onDoubleClick
                     , Helpers.emptyListOrApply Html.Events.onMouseUp val.onMouseUp
@@ -521,6 +531,20 @@ selected value (HtmlAttributes attrs) =
                 else
                     Nothing
         }
+
+
+{-| -}
+autocomplete : Bool -> HtmlAttributes msg -> HtmlAttributes msg
+autocomplete value (HtmlAttributes attrs) =
+    HtmlAttributes
+        { attrs | autocomplete = value }
+
+
+{-| -}
+placeholder : String -> HtmlAttributes msg -> HtmlAttributes msg
+placeholder value (HtmlAttributes attrs) =
+    HtmlAttributes
+        { attrs | placeholder = Just value }
 
 
 {-| -}

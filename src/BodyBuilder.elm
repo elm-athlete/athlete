@@ -646,7 +646,7 @@ type alias InputStringValueAttributes msg a =
 
 {-| -}
 type alias InputTextAttributes msg a =
-    OnStringInputEvent msg (InputStringValueAttributes msg a)
+    AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a)))
 
 
 {-| -}
@@ -696,7 +696,7 @@ type alias InputRangeAttributes msg =
 
 {-| -}
 type alias InputSubmitAttributes msg =
-    OnSubmitEvent msg (ButtonAttributes msg { type_ : String })
+    ValueAttribute String (OnSubmitEvent msg (ButtonAttributes msg { type_ : String }))
 
 
 {-| -}
@@ -1153,6 +1153,8 @@ inputText =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , placeholder = Nothing
+            , autocomplete = True
             }
 
 
@@ -1258,6 +1260,8 @@ inputPassword =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , placeholder = Nothing
+            , autocomplete = True
             }
 
 
@@ -1320,6 +1324,7 @@ inputSubmit =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , value = Nothing
             }
 
 
@@ -1341,6 +1346,8 @@ inputUrl =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , placeholder = Nothing
+            , autocomplete = True
             }
 
 
@@ -1748,6 +1755,22 @@ step val attrs =
     { attrs | step = Just val }
 
 
+autocomplete :
+    Bool
+    -> AutocompleteAttribute a
+    -> AutocompleteAttribute a
+autocomplete val attrs =
+    { attrs | autocomplete = val }
+
+
+placeholder :
+    String
+    -> PlaceholderAttribute a
+    -> PlaceholderAttribute a
+placeholder val attrs =
+    { attrs | placeholder = Just val }
+
+
 
 {-
    ██   ██  █████  ███    ██ ██████  ██      ███████ ██████  ███████
@@ -1759,7 +1782,7 @@ step val attrs =
 
 
 handleHref :
-    { a | href : Maybe String }
+    HrefAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleHref { href } =
@@ -1781,7 +1804,7 @@ handleStyle { style } =
 
 
 handleMouseEvents :
-    { a | onMouseEvents : OnMouseEventsInside msg }
+    OnMouseEvents msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleMouseEvents { onMouseEvents } =
@@ -1814,7 +1837,7 @@ handleOnInputEvent { onInputEvent, fromStringInput } =
 
 
 handleOnCheckEvent :
-    { a | onCheckEvent : Maybe (Bool -> msg) }
+    OnCheckEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnCheckEvent { onCheckEvent } =
@@ -1822,7 +1845,7 @@ handleOnCheckEvent { onCheckEvent } =
 
 
 handleOnSubmitEvent :
-    { a | onSubmitEvent : Maybe msg }
+    OnSubmitEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnSubmitEvent { onSubmitEvent } =
@@ -1830,7 +1853,7 @@ handleOnSubmitEvent { onSubmitEvent } =
 
 
 handleOnBlurEvent :
-    { a | onBlurEvent : Maybe msg }
+    OnBlurEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnBlurEvent { onBlurEvent } =
@@ -1838,7 +1861,7 @@ handleOnBlurEvent { onBlurEvent } =
 
 
 handleOnFocusEvent :
-    { a | onFocusEvent : Maybe msg }
+    OnFocusEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnFocusEvent { onFocusEvent } =
@@ -1846,7 +1869,7 @@ handleOnFocusEvent { onFocusEvent } =
 
 
 handleOnEvent :
-    { a | onEvent : Maybe ( String, Decoder msg ) }
+    OnEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnEvent { onEvent } =
@@ -1854,7 +1877,7 @@ handleOnEvent { onEvent } =
 
 
 handleSrc :
-    { a | src : String }
+    SrcAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleSrc { src } =
@@ -1862,7 +1885,7 @@ handleSrc { src } =
 
 
 handleDisabled :
-    { a | disabled : Bool }
+    DisabledAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleDisabled { disabled } =
@@ -1873,7 +1896,7 @@ handleDisabled { disabled } =
 
 
 handleAlt :
-    { a | alt : String }
+    AltAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleAlt { alt } =
@@ -1881,7 +1904,7 @@ handleAlt { alt } =
 
 
 handleClass :
-    { a | universal : { b | class : List String } }
+    { a | universal : UniversalAttributes b }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleClass { universal } =
@@ -1889,7 +1912,7 @@ handleClass { universal } =
 
 
 handleId :
-    { a | universal : { b | id : Maybe String } }
+    { a | universal : UniversalAttributes b }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleId { universal } =
@@ -1897,7 +1920,7 @@ handleId { universal } =
 
 
 handleTabindex :
-    { b | universal : { a | tabindex : Maybe Int } }
+    { a | universal : UniversalAttributes b }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleTabindex { universal } =
@@ -1905,7 +1928,7 @@ handleTabindex { universal } =
 
 
 handleTitle :
-    { b | universal : { a | title : Maybe String } }
+    { a | universal : UniversalAttributes b }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleTitle { universal } =
@@ -1921,7 +1944,7 @@ handleType { type_ } =
 
 
 handleStringValue :
-    { a | value : Maybe String }
+    ValueAttribute String a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleStringValue { value } =
@@ -1929,7 +1952,7 @@ handleStringValue { value } =
 
 
 handleIntValue :
-    { a | value : Maybe Int }
+    ValueAttribute Int a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleIntValue { value } =
@@ -1939,7 +1962,7 @@ handleIntValue { value } =
 
 
 handleColorValue :
-    { b | value : Maybe Color }
+    ValueAttribute Color a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleColorValue { value } =
@@ -1949,7 +1972,7 @@ handleColorValue { value } =
 
 
 handleName :
-    { a | name : Maybe String }
+    NameAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleName { name } =
@@ -1957,7 +1980,7 @@ handleName { name } =
 
 
 handleWidth :
-    { a | width : Maybe Int }
+    WidthAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleWidth { width } =
@@ -1965,7 +1988,7 @@ handleWidth { width } =
 
 
 handleHeight :
-    { a | height : Maybe Int }
+    HeightAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleHeight { height } =
@@ -2008,7 +2031,7 @@ handleChecked { checked } =
 
 
 handleTarget :
-    { a | target : Maybe String }
+    TargetAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleTarget { target } =
@@ -2016,7 +2039,7 @@ handleTarget { target } =
 
 
 handleContent :
-    { a | value : Maybe String }
+    ValueAttribute String a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleContent { value } =
@@ -2054,6 +2077,22 @@ handleStep :
     -> HtmlAttributes msg
 handleStep { step } =
     unwrap (BodyBuilderHtml.step << toString) step
+
+
+handleAutocomplete :
+    AutocompleteAttribute a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleAutocomplete { autocomplete } =
+    BodyBuilderHtml.autocomplete autocomplete
+
+
+handlePlaceholder :
+    PlaceholderAttribute a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handlePlaceholder { placeholder } =
+    unwrap BodyBuilderHtml.placeholder placeholder
 
 
 
@@ -2278,6 +2317,8 @@ toTree node =
                     |> List.append
                         [ handleStringValue
                         , handleOnInputEvent
+                        , handleAutocomplete
+                        , handlePlaceholder
                         ]
                 )
 
@@ -2324,6 +2365,8 @@ toTree node =
                     |> List.append
                         [ handleStringValue
                         , handleOnInputEvent
+                        , handleAutocomplete
+                        , handlePlaceholder
                         ]
                 )
 
@@ -2356,6 +2399,7 @@ toTree node =
                         [ handleType
                         , handleDisabled
                         , handleOnSubmitEvent
+                        , handleStringValue
                         ]
                 )
 
@@ -2366,6 +2410,8 @@ toTree node =
                     |> List.append
                         [ handleStringValue
                         , handleOnInputEvent
+                        , handleAutocomplete
+                        , handlePlaceholder
                         ]
                 )
 
