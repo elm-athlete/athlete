@@ -114,9 +114,7 @@ module BodyBuilder
         , onMouseDown
         , onMouseLeave
         , onMouseEnter
-        , onStringInput
-        , onIntInput
-        , onColorInput
+        , onInput
         , onCheck
         , onSubmit
         , onFocus
@@ -255,9 +253,7 @@ module BodyBuilder
 @docs onMouseDown
 @docs onMouseLeave
 @docs onMouseEnter
-@docs onStringInput
-@docs onIntInput
-@docs onColorInput
+@docs onInput
 @docs onCheck
 @docs onSubmit
 @docs onFocus
@@ -391,7 +387,10 @@ type alias OnMouseEvents msg a =
 
 
 type alias OnInputEvent b msg a =
-    { a | onInputEvent : Maybe (b -> msg) }
+    { a
+        | onInputEvent : Maybe (b -> msg)
+        , fromStringInput : String -> b
+    }
 
 
 {-| -}
@@ -970,6 +969,7 @@ textarea =
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             , onInputEvent = Nothing
+            , fromStringInput = identity
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
@@ -1124,6 +1124,7 @@ inputText =
             , value = Nothing
             , onMouseEvents = defaultOnMouseEvents
             , onInputEvent = Nothing
+            , fromStringInput = identity
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
@@ -1144,6 +1145,7 @@ inputNumber =
             , value = Nothing
             , onMouseEvents = defaultOnMouseEvents
             , onInputEvent = Nothing
+            , fromStringInput = parseInt
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
@@ -1164,6 +1166,7 @@ inputColor =
             , value = Nothing
             , onMouseEvents = defaultOnMouseEvents
             , onInputEvent = Nothing
+            , fromStringInput = parseColor
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
@@ -1223,6 +1226,7 @@ inputPassword =
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             , onInputEvent = Nothing
+            , fromStringInput = identity
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
@@ -1262,6 +1266,7 @@ inputRange =
             , value = Nothing
             , onMouseEvents = defaultOnMouseEvents
             , onInputEvent = Nothing
+            , fromStringInput = parseInt
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
@@ -1301,6 +1306,7 @@ inputUrl =
             , style = defaultStyleAttribute
             , onMouseEvents = defaultOnMouseEvents
             , onInputEvent = Nothing
+            , fromStringInput = identity
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
@@ -1528,29 +1534,11 @@ onMouseEnter val ({ onMouseEvents } as attrs) =
 
 
 {-| -}
-onStringInput :
-    (String -> msg)
-    -> { a | onInputEvent : Maybe (String -> msg) }
-    -> { a | onInputEvent : Maybe (String -> msg) }
-onStringInput val attrs =
-    { attrs | onInputEvent = Just val }
-
-
-{-| -}
-onIntInput :
-    (Int -> msg)
-    -> { a | onInputEvent : Maybe (Int -> msg) }
-    -> { a | onInputEvent : Maybe (Int -> msg) }
-onIntInput val attrs =
-    { attrs | onInputEvent = Just val }
-
-
-{-| -}
-onColorInput :
-    (Color -> msg)
-    -> { a | onInputEvent : Maybe (Color -> msg) }
-    -> { a | onInputEvent : Maybe (Color -> msg) }
-onColorInput val attrs =
+onInput :
+    (a -> msg)
+    -> OnInputEvent a msg b
+    -> OnInputEvent a msg b
+onInput val attrs =
     { attrs | onInputEvent = Just val }
 
 
@@ -1729,38 +1717,51 @@ handleMouseEvents { onMouseEvents } =
             |> compose
 
 
-handleOnStringInputEvent :
-    { a | onInputEvent : Maybe (String -> msg) }
+handleOnInputEvent :
+    OnInputEvent a msg b
     -> HtmlAttributes msg
     -> HtmlAttributes msg
-handleOnStringInputEvent { onInputEvent } =
-    unwrap BodyBuilderHtml.onInput onInputEvent
+handleOnInputEvent { onInputEvent, fromStringInput } =
+    unwrap
+        (\val ->
+            BodyBuilderHtml.onInput (fromStringInput >> val)
+        )
+        onInputEvent
 
 
-handleOnIntInputEvent :
-    { a | onInputEvent : Maybe (Int -> msg) }
-    -> HtmlAttributes msg
-    -> HtmlAttributes msg
-handleOnIntInputEvent { onInputEvent } =
-    case onInputEvent of
-        Nothing ->
-            identity
 
-        Just val ->
-            BodyBuilderHtml.onInput (parseInt >> val)
-
-
-handleOnColorInputEvent :
-    { a | onInputEvent : Maybe (Color -> msg) }
-    -> HtmlAttributes msg
-    -> HtmlAttributes msg
-handleOnColorInputEvent { onInputEvent } =
-    case onInputEvent of
-        Nothing ->
-            identity
-
-        Just val ->
-            BodyBuilderHtml.onInput (parseColor >> val)
+-- handleOnInputEvent :
+--     { a | onInputEvent : Maybe (String -> msg) }
+--     -> HtmlAttributes msg
+--     -> HtmlAttributes msg
+-- handleOnInputEvent { onInputEvent } =
+--     unwrap BodyBuilderHtml.onInput onInputEvent
+--
+--
+-- handleOnInputEvent :
+--     { a | onInputEvent : Maybe (Int -> msg) }
+--     -> HtmlAttributes msg
+--     -> HtmlAttributes msg
+-- handleOnInputEvent { onInputEvent } =
+--     case onInputEvent of
+--         Nothing ->
+--             identity
+--
+--         Just val ->
+--             BodyBuilderHtml.onInput (parseInt >> val)
+--
+--
+-- handleOnColorInputEvent :
+--     { a | onInputEvent : Maybe (Color -> msg) }
+--     -> HtmlAttributes msg
+--     -> HtmlAttributes msg
+-- handleOnColorInputEvent { onInputEvent } =
+--     case onInputEvent of
+--         Nothing ->
+--             identity
+--
+--         Just val ->
+--             BodyBuilderHtml.onInput (parseColor >> val)
 
 
 handleOnCheckEvent :
@@ -2193,7 +2194,7 @@ toTree node =
                     |> List.append
                         [ handleName
                         , handleContent
-                        , handleOnStringInputEvent
+                        , handleOnInputEvent
                         ]
                 )
 
@@ -2203,7 +2204,7 @@ toTree node =
                 (inputAttributesHandling
                     |> List.append
                         [ handleStringValue
-                        , handleOnStringInputEvent
+                        , handleOnInputEvent
                         ]
                 )
 
@@ -2213,7 +2214,7 @@ toTree node =
                 (inputAttributesHandling
                     |> List.append
                         [ handleIntValue
-                        , handleOnIntInputEvent
+                        , handleOnInputEvent
                         ]
                 )
 
@@ -2223,7 +2224,7 @@ toTree node =
                 (inputAttributesHandling
                     |> List.append
                         [ handleColorValue
-                        , handleOnColorInputEvent
+                        , handleOnInputEvent
                         ]
                 )
 
@@ -2246,7 +2247,7 @@ toTree node =
                 (inputAttributesHandling
                     |> List.append
                         [ handleStringValue
-                        , handleOnStringInputEvent
+                        , handleOnInputEvent
                         ]
                 )
 
@@ -2264,7 +2265,7 @@ toTree node =
                 (inputAttributesHandling
                     |> List.append
                         [ handleIntValue
-                        , handleOnIntInputEvent
+                        , handleOnInputEvent
                         ]
                 )
 
@@ -2285,7 +2286,7 @@ toTree node =
                 (inputAttributesHandling
                     |> List.append
                         [ handleStringValue
-                        , handleOnStringInputEvent
+                        , handleOnInputEvent
                         ]
                 )
 

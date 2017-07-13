@@ -4,7 +4,7 @@ import Elegant exposing (..)
 import Elegant.Elements exposing (..)
 import Color exposing (..)
 import Color.Manipulate as Color
-import BodyBuilder exposing (text, div, h1, h2, h3, h4, h5, h6, style, focusStyle, program, inputColor, onColorInput, value)
+import BodyBuilder exposing (text, div, h1, h2, h3, h4, h5, h6, style, focusStyle, program, inputColor, onInput, value)
 import Function exposing (..)
 
 
@@ -162,7 +162,7 @@ view { color } =
             [ text "I am h6 styled" ]
         , div [ style [ textCenter, padding medium, displayInlineBlock, Elegant.round, strong, uppercase, border black, padding medium ] ]
             [ text "I am round, strong and uppercase" ]
-        , inputColor [ style [ Elegant.displayBlock ], value color, onColorInput ChangeColor ]
+        , inputColor [ style [ Elegant.displayBlock ], value color, onInput ChangeColor ]
         , BodyBuilder.button
             [ buttonStyle color ]
             [ text "Push me" ]
