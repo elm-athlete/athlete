@@ -35,6 +35,7 @@ module BodyBuilderHtml
         , target
         , width
         , height
+        , label
         , placeholder
         , autocomplete
         , onClick
@@ -92,6 +93,7 @@ module BodyBuilderHtml
 @docs target
 @docs width
 @docs height
+@docs label
 @docs placeholder
 @docs autocomplete
 @docs onClick
@@ -147,6 +149,7 @@ type alias Tree msg =
     , height : Maybe Int
     , placeholder : Maybe String
     , autocomplete : Bool
+    , label : Maybe (Label msg)
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -167,6 +170,13 @@ type alias Tree msg =
     -- Children
     , text : String
     , content : List (HtmlAttributes msg)
+    }
+
+
+type alias Label msg =
+    { attributes : HtmlAttributes msg -> HtmlAttributes msg
+    , position : String
+    , content_ : HtmlAttributes msg
     }
 
 
@@ -205,6 +215,7 @@ base =
         , height = Nothing
         , placeholder = Nothing
         , autocomplete = True
+        , label = Nothing
 
         -- Html Events
         , onInput = Nothing
@@ -297,62 +308,80 @@ htmlAttributesToCss val =
         (Elegant.stylesToCss (getAllStyles val))
 
 
+addLabelContent : Label msg -> HtmlAttributes msg -> List (HtmlAttributes msg)
+addLabelContent { position, content_ } =
+    if position == "after" then
+        List.singleton >> (::) content_
+    else
+        flip (::) [ content_ ]
+
+
 htmlAttributesToHtml : HtmlAttributes msg -> Html.Html msg
 htmlAttributesToHtml (HtmlAttributes val) =
-    case val.tag of
-        Nothing ->
-            Html.text val.text
+    case val.label of
+        Just label_ ->
+            base
+                |> label_.attributes
+                |> content (HtmlAttributes val |> removeLabel |> addLabelContent label_)
+                |> tag "label"
+                |> Debug.log "test"
+                |> htmlAttributesToHtml
 
-        Just tag_ ->
-            Html.node tag_
-                (List.concat
-                    [ classes val.style
-                    , hoverClasses val.hoverStyle
-                    , focusClasses val.focusStyle
-                    , [ Html.Attributes.autocomplete val.autocomplete ]
-                    , Helpers.emptyListOrApply Html.Attributes.class
-                        (if val.class |> List.isEmpty then
-                            Nothing
-                         else
-                            Just (val.class |> String.join " ")
+        Nothing ->
+            case val.tag of
+                Nothing ->
+                    Html.text val.text
+
+                Just tag_ ->
+                    Html.node tag_
+                        (List.concat
+                            [ classes val.style
+                            , hoverClasses val.hoverStyle
+                            , focusClasses val.focusStyle
+                            , [ Html.Attributes.autocomplete val.autocomplete ]
+                            , Helpers.emptyListOrApply Html.Attributes.class
+                                (if val.class |> List.isEmpty then
+                                    Nothing
+                                 else
+                                    Just (val.class |> String.join " ")
+                                )
+                            , Helpers.emptyListOrApply Html.Attributes.type_ val.type_
+                            , Helpers.emptyListOrApply Html.Attributes.max val.max
+                            , Helpers.emptyListOrApply Html.Attributes.min val.min
+                            , Helpers.emptyListOrApply Html.Attributes.step val.step
+                            , Helpers.emptyListOrApply Html.Attributes.src val.src
+                            , Helpers.emptyListOrApply Html.Attributes.alt val.alt
+                            , Helpers.emptyListOrApply Html.Attributes.id val.id
+                            , Helpers.emptyListOrApply Html.Attributes.tabindex val.tabindex
+                            , Helpers.emptyListOrApply Html.Attributes.title val.title
+                            , Helpers.emptyListOrApply Html.Attributes.defaultValue val.defaultValue
+                            , Helpers.emptyListOrApply Html.Attributes.value val.value
+                            , Helpers.emptyListOrApply Html.Attributes.name val.name
+                            , Helpers.emptyListOrApply Html.Attributes.checked val.checked
+                            , Helpers.emptyListOrApply Html.Attributes.href val.href
+                            , Helpers.emptyListOrApply Html.Attributes.selected val.selected
+                            , Helpers.emptyListOrApply Html.Attributes.target val.target
+                            , Helpers.emptyListOrApply Html.Attributes.disabled val.disabled
+                            , Helpers.emptyListOrApply Html.Attributes.width val.width
+                            , Helpers.emptyListOrApply Html.Attributes.height val.height
+                            , Helpers.emptyListOrApply Html.Attributes.placeholder val.placeholder
+                            , Helpers.emptyListOrApply Html.Events.onInput val.onInput
+                            , Helpers.emptyListOrApply Html.Events.onClick val.onClick
+                            , Helpers.emptyListOrApply Html.Events.onDoubleClick val.onDoubleClick
+                            , Helpers.emptyListOrApply Html.Events.onMouseUp val.onMouseUp
+                            , Helpers.emptyListOrApply Html.Events.onMouseOut val.onMouseOut
+                            , Helpers.emptyListOrApply Html.Events.onMouseOver val.onMouseOver
+                            , Helpers.emptyListOrApply Html.Events.onMouseDown val.onMouseDown
+                            , Helpers.emptyListOrApply Html.Events.onMouseLeave val.onMouseLeave
+                            , Helpers.emptyListOrApply Html.Events.onMouseEnter val.onMouseEnter
+                            , Helpers.emptyListOrApply Html.Events.onCheck val.onCheck
+                            , Helpers.emptyListOrApply Html.Events.onSubmit val.onSubmit
+                            , Helpers.emptyListOrApply Html.Events.onFocus val.onFocus
+                            , Helpers.emptyListOrApply Html.Events.onBlur val.onBlur
+                            , Helpers.emptyListOrApply (\( event, decoder ) -> Html.Events.on event decoder) val.on
+                            ]
                         )
-                    , Helpers.emptyListOrApply Html.Attributes.type_ val.type_
-                    , Helpers.emptyListOrApply Html.Attributes.max val.max
-                    , Helpers.emptyListOrApply Html.Attributes.min val.min
-                    , Helpers.emptyListOrApply Html.Attributes.step val.step
-                    , Helpers.emptyListOrApply Html.Attributes.src val.src
-                    , Helpers.emptyListOrApply Html.Attributes.alt val.alt
-                    , Helpers.emptyListOrApply Html.Attributes.id val.id
-                    , Helpers.emptyListOrApply Html.Attributes.tabindex val.tabindex
-                    , Helpers.emptyListOrApply Html.Attributes.title val.title
-                    , Helpers.emptyListOrApply Html.Attributes.defaultValue val.defaultValue
-                    , Helpers.emptyListOrApply Html.Events.onInput val.onInput
-                    , Helpers.emptyListOrApply Html.Attributes.value val.value
-                    , Helpers.emptyListOrApply Html.Attributes.name val.name
-                    , Helpers.emptyListOrApply Html.Attributes.checked val.checked
-                    , Helpers.emptyListOrApply Html.Attributes.href val.href
-                    , Helpers.emptyListOrApply Html.Attributes.selected val.selected
-                    , Helpers.emptyListOrApply Html.Attributes.target val.target
-                    , Helpers.emptyListOrApply Html.Attributes.disabled val.disabled
-                    , Helpers.emptyListOrApply Html.Attributes.width val.width
-                    , Helpers.emptyListOrApply Html.Attributes.height val.height
-                    , Helpers.emptyListOrApply Html.Attributes.placeholder val.placeholder
-                    , Helpers.emptyListOrApply Html.Events.onClick val.onClick
-                    , Helpers.emptyListOrApply Html.Events.onDoubleClick val.onDoubleClick
-                    , Helpers.emptyListOrApply Html.Events.onMouseUp val.onMouseUp
-                    , Helpers.emptyListOrApply Html.Events.onMouseOut val.onMouseOut
-                    , Helpers.emptyListOrApply Html.Events.onMouseOver val.onMouseOver
-                    , Helpers.emptyListOrApply Html.Events.onMouseDown val.onMouseDown
-                    , Helpers.emptyListOrApply Html.Events.onMouseLeave val.onMouseLeave
-                    , Helpers.emptyListOrApply Html.Events.onMouseEnter val.onMouseEnter
-                    , Helpers.emptyListOrApply Html.Events.onCheck val.onCheck
-                    , Helpers.emptyListOrApply Html.Events.onSubmit val.onSubmit
-                    , Helpers.emptyListOrApply Html.Events.onFocus val.onFocus
-                    , Helpers.emptyListOrApply Html.Events.onBlur val.onBlur
-                    , Helpers.emptyListOrApply (\( event, decoder ) -> Html.Events.on event decoder) val.on
-                    ]
-                )
-                (val.content |> List.map htmlAttributesToHtml)
+                        (val.content |> List.map htmlAttributesToHtml)
 
 
 {-| -}
@@ -452,6 +481,17 @@ min val (HtmlAttributes attrs) =
 src : String -> HtmlAttributes msg -> HtmlAttributes msg
 src val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | src = Just val }
+
+
+{-| -}
+label : Label msg -> HtmlAttributes msg -> HtmlAttributes msg
+label val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | label = Just val }
+
+
+removeLabel : HtmlAttributes msg -> HtmlAttributes msg
+removeLabel (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | label = Nothing }
 
 
 {-| -}

@@ -59,6 +59,7 @@ module BodyBuilder
         , VideoAttributes
         , CanvasAttributes
         , Node
+        , Position(..)
         , h1
         , h2
         , h3
@@ -111,6 +112,8 @@ module BodyBuilder
         , step
         , autocomplete
         , placeholder
+        , label
+        , position
         , onClick
         , onDoubleClick
         , onMouseUp
@@ -203,6 +206,7 @@ module BodyBuilder
 @docs VideoAttributes
 @docs CanvasAttributes
 @docs Node
+@docs Position
 @docs h1
 @docs h2
 @docs h3
@@ -253,6 +257,8 @@ module BodyBuilder
 @docs min
 @docs max
 @docs step
+@docs label
+@docs position
 @docs autocomplete
 @docs placeholder
 @docs onClick
@@ -602,6 +608,26 @@ type alias PlaceholderAttribute a =
     { a | placeholder : Maybe String }
 
 
+type alias LabelAttribute msg a =
+    { a
+        | label :
+            Maybe
+                { attributes : LabelAttributes msg
+                , content : Node NotInteractive Phrasing Spanning NotListElement msg
+                }
+    }
+
+
+type alias PositionAttribute a =
+    { a | position : Position }
+
+
+{-| -}
+type Position
+    = Before
+    | After
+
+
 
 {-
    ███████ ██      ███████ ███    ███      █████  ████████ ████████ ██████  ███████
@@ -647,7 +673,7 @@ type alias InputHiddenAttributes =
 
 
 type alias InputVisibleAttributes msg a =
-    VisibleAttributesAndEvents msg (InputAttributes a)
+    LabelAttribute msg (VisibleAttributesAndEvents msg (InputAttributes a))
 
 
 type alias InputStringValueAttributes msg a =
@@ -737,6 +763,20 @@ type alias VideoAttributes msg =
 {-| -}
 type alias CanvasAttributes msg =
     HeightAttribute (WidthAttribute (VisibleAttributesAndEvents msg {}))
+
+
+type alias LabelAttributes msg =
+    PositionAttribute (VisibleAttributesAndEvents msg {})
+
+
+positionToString : Position -> String
+positionToString position =
+    case position of
+        Before ->
+            "before"
+
+        After ->
+            "after"
 
 
 
@@ -1165,6 +1205,7 @@ inputText =
             , onFocusEvent = Nothing
             , placeholder = Nothing
             , autocomplete = True
+            , label = Nothing
             }
 
 
@@ -1189,6 +1230,7 @@ inputNumber =
             , min = Nothing
             , max = Nothing
             , step = Nothing
+            , label = Nothing
             }
 
 
@@ -1210,6 +1252,7 @@ inputColor =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , label = Nothing
             }
 
 
@@ -1231,6 +1274,7 @@ inputCheckbox =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , label = Nothing
             }
 
 
@@ -1249,6 +1293,7 @@ inputFile =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , label = Nothing
             }
 
 
@@ -1272,6 +1317,7 @@ inputPassword =
             , onFocusEvent = Nothing
             , placeholder = Nothing
             , autocomplete = True
+            , label = Nothing
             }
 
 
@@ -1291,6 +1337,7 @@ inputRadio =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , label = Nothing
             }
 
 
@@ -1315,6 +1362,7 @@ inputRange =
             , min = Nothing
             , max = Nothing
             , step = Nothing
+            , label = Nothing
             }
 
 
@@ -1358,6 +1406,7 @@ inputUrl =
             , onFocusEvent = Nothing
             , placeholder = Nothing
             , autocomplete = True
+            , label = Nothing
             }
 
 
@@ -1468,6 +1517,41 @@ tabindex val ({ universal } as attrs) =
             { universal | tabindex = Just val }
     in
         { attrs | universal = newUniversal }
+
+
+{-| -}
+label :
+    List (LabelAttributes msg -> LabelAttributes msg)
+    -> Node NotInteractive Phrasing Spanning NotListElement msg
+    -> LabelAttribute msg a
+    -> LabelAttribute msg a
+label attributes content attrs =
+    { attrs
+        | label =
+            Just
+                { attributes =
+                    defaultsComposedToAttrs
+                        { onBlurEvent = Nothing
+                        , onEvent = Nothing
+                        , onFocusEvent = Nothing
+                        , onMouseEvents = defaultOnMouseEvents
+                        , position = After
+                        , style = styleAttribute []
+                        , universal = defaultUniversalAttributes
+                        }
+                        attributes
+                , content = content
+                }
+    }
+
+
+{-| -}
+position :
+    Position
+    -> PositionAttribute a
+    -> PositionAttribute a
+position val attrs =
+    { attrs | position = val }
 
 
 {-| -}
@@ -1810,9 +1894,11 @@ handleStyle { style } =
         { standard, hover, focus } =
             style
     in
-        BodyBuilderHtml.style standard
-            << BodyBuilderHtml.hoverStyle hover
-            << BodyBuilderHtml.focusStyle focus
+        [ BodyBuilderHtml.style standard
+        , BodyBuilderHtml.hoverStyle hover
+        , BodyBuilderHtml.focusStyle focus
+        ]
+            |> compose
 
 
 handleMouseEvents :
@@ -2107,6 +2193,25 @@ handlePlaceholder { placeholder } =
     unwrap BodyBuilderHtml.placeholder placeholder
 
 
+handleLabel :
+    LabelAttribute msg a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleLabel { label } =
+    unwrap
+        (\label_ ->
+            BodyBuilderHtml.label
+                { attributes =
+                    baseHandling
+                        |> List.map (\fun -> fun label_.attributes)
+                        |> compose
+                , position = positionToString label_.attributes.position
+                , content_ = toTree label_.content
+                }
+        )
+        label
+
+
 
 {-
    ████████  ██████      ██   ██ ████████ ███    ███ ██
@@ -2130,7 +2235,7 @@ buildNode children attributes tag usedBodyToBodyHtmlFunctions =
     in
         BodyBuilderHtml.node
             ([ BodyBuilderHtml.tag tag ] |> List.append newAttrs)
-            (List.map (\x -> toTree x) children)
+            (List.map toTree children)
 
 
 parentToHtml :
@@ -2173,12 +2278,17 @@ baseHandling =
 
 inputAttributesHandling :
     List
-        (NameAttribute (VisibleAttributesAndEvents msg { a | type_ : String })
+        (LabelAttribute msg (NameAttribute (VisibleAttributesAndEvents msg { a | type_ : String }))
          -> HtmlAttributes msg
          -> HtmlAttributes msg
         )
 inputAttributesHandling =
-    List.append baseHandling [ handleType, handleName ]
+    List.append
+        baseHandling
+        [ handleType
+        , handleName
+        , handleLabel
+        ]
 
 
 {-| -}
