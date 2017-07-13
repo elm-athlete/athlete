@@ -567,6 +567,31 @@ type alias HeightAttribute a =
     { a | height : Maybe Int }
 
 
+{-| -}
+type alias MinAttribute a =
+    { a | min : Maybe Int }
+
+
+{-| -}
+type alias MaxAttribute a =
+    { a | max : Maybe Int }
+
+
+{-| -}
+type alias StepAttribute a =
+    { a | step : Maybe Int }
+
+
+{-| -}
+type alias AutocompleteAttribute a =
+    { a | autocomplete : Bool }
+
+
+{-| -}
+type alias PlaceholderAttribute a =
+    { a | placeholder : Maybe String }
+
+
 
 {-
    ███████ ██      ███████ ███    ███      █████  ████████ ████████ ██████  ███████
@@ -621,7 +646,7 @@ type alias InputStringValueAttributes msg a =
 
 {-| -}
 type alias InputTextAttributes msg a =
-    OnStringInputEvent msg (InputStringValueAttributes msg a)
+    AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a)))
 
 
 {-| -}
@@ -636,7 +661,7 @@ type alias ButtonAttributes msg a =
 
 {-| -}
 type alias InputNumberAttributes msg =
-    OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {}))
+    StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {})))))
 
 
 {-| -}
@@ -671,7 +696,7 @@ type alias InputRangeAttributes msg =
 
 {-| -}
 type alias InputSubmitAttributes msg =
-    OnSubmitEvent msg (ButtonAttributes msg { type_ : String })
+    ValueAttribute String (OnSubmitEvent msg (ButtonAttributes msg { type_ : String }))
 
 
 {-| -}
@@ -1128,6 +1153,8 @@ inputText =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , placeholder = Nothing
+            , autocomplete = True
             }
 
 
@@ -1149,6 +1176,9 @@ inputNumber =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , min = Nothing
+            , max = Nothing
+            , step = Nothing
             }
 
 
@@ -1230,6 +1260,8 @@ inputPassword =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , placeholder = Nothing
+            , autocomplete = True
             }
 
 
@@ -1270,6 +1302,9 @@ inputRange =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , min = Nothing
+            , max = Nothing
+            , step = Nothing
             }
 
 
@@ -1289,6 +1324,7 @@ inputSubmit =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , value = Nothing
             }
 
 
@@ -1310,6 +1346,8 @@ inputUrl =
             , onEvent = Nothing
             , onBlurEvent = Nothing
             , onFocusEvent = Nothing
+            , placeholder = Nothing
+            , autocomplete = True
             }
 
 
@@ -1351,7 +1389,10 @@ options val attrs =
 
 
 {-| -}
-option : String -> String -> { label : String, value : String }
+option :
+    String
+    -> String
+    -> { label : String, value : String }
 option value label =
     { value = value
     , label = label
@@ -1359,25 +1400,36 @@ option value label =
 
 
 {-| -}
-selectedOption : String -> StringValue a -> StringValue a
+selectedOption :
+    String
+    -> StringValue a
+    -> StringValue a
 selectedOption val attrs =
     { attrs | value = Just val }
 
 
 {-| -}
-href : String -> HrefAttribute a -> HrefAttribute a
+href :
+    String
+    -> HrefAttribute a
+    -> HrefAttribute a
 href val attrs =
     { attrs | href = Just val }
 
 
 {-| -}
-value : a -> ValueAttribute a b -> ValueAttribute a b
+value :
+    a
+    -> ValueAttribute a b
+    -> ValueAttribute a b
 value val attrs =
     { attrs | value = Just val }
 
 
 {-| -}
-checked : { a | checked : Bool } -> { a | checked : Bool }
+checked :
+    { a | checked : Bool }
+    -> { a | checked : Bool }
 checked attrs =
     { attrs | checked = True }
 
@@ -1385,8 +1437,8 @@ checked attrs =
 {-| -}
 title :
     String
-    -> { d | universal : { c | title : Maybe String } }
-    -> { d | universal : { c | title : Maybe String } }
+    -> { a | universal : UniversalAttributes b }
+    -> { a | universal : UniversalAttributes b }
 title val ({ universal } as attrs) =
     let
         newUniversal =
@@ -1398,8 +1450,8 @@ title val ({ universal } as attrs) =
 {-| -}
 tabindex :
     Int
-    -> { d | universal : { c | tabindex : Maybe Int } }
-    -> { d | universal : { c | tabindex : Maybe Int } }
+    -> { a | universal : UniversalAttributes b }
+    -> { a | universal : UniversalAttributes b }
 tabindex val ({ universal } as attrs) =
     let
         newUniversal =
@@ -1411,8 +1463,8 @@ tabindex val ({ universal } as attrs) =
 {-| -}
 id :
     String
-    -> { a | universal : { b | id : Maybe String } }
-    -> { a | universal : { b | id : Maybe String } }
+    -> { a | universal : UniversalAttributes b }
+    -> { a | universal : UniversalAttributes b }
 id val ({ universal } as attrs) =
     let
         newId =
@@ -1423,8 +1475,8 @@ id val ({ universal } as attrs) =
 
 {-| -}
 disabled :
-    { a | disabled : Bool }
-    -> { a | disabled : Bool }
+    DisabledAttribute a
+    -> DisabledAttribute a
 disabled attrs =
     { attrs | disabled = True }
 
@@ -1432,8 +1484,8 @@ disabled attrs =
 {-| -}
 onClick :
     msg
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> OnMouseEvents msg a
+    -> OnMouseEvents msg a
 onClick val ({ onMouseEvents } as attrs) =
     let
         newOnClick =
@@ -1445,8 +1497,8 @@ onClick val ({ onMouseEvents } as attrs) =
 {-| -}
 onDoubleClick :
     msg
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> OnMouseEvents msg a
+    -> OnMouseEvents msg a
 onDoubleClick val ({ onMouseEvents } as attrs) =
     let
         newOnDoubleClick =
@@ -1458,8 +1510,8 @@ onDoubleClick val ({ onMouseEvents } as attrs) =
 {-| -}
 onMouseUp :
     msg
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> OnMouseEvents msg a
+    -> OnMouseEvents msg a
 onMouseUp val ({ onMouseEvents } as attrs) =
     let
         newOnMouseUp =
@@ -1471,8 +1523,8 @@ onMouseUp val ({ onMouseEvents } as attrs) =
 {-| -}
 onMouseOut :
     msg
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> OnMouseEvents msg a
+    -> OnMouseEvents msg a
 onMouseOut val ({ onMouseEvents } as attrs) =
     let
         newOnMouseOut =
@@ -1484,8 +1536,8 @@ onMouseOut val ({ onMouseEvents } as attrs) =
 {-| -}
 onMouseOver :
     msg
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> OnMouseEvents msg a
+    -> OnMouseEvents msg a
 onMouseOver val ({ onMouseEvents } as attrs) =
     let
         newOnMouseUp =
@@ -1497,8 +1549,8 @@ onMouseOver val ({ onMouseEvents } as attrs) =
 {-| -}
 onMouseDown :
     msg
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> OnMouseEvents msg a
+    -> OnMouseEvents msg a
 onMouseDown val ({ onMouseEvents } as attrs) =
     let
         newOnMouseDown =
@@ -1510,8 +1562,8 @@ onMouseDown val ({ onMouseEvents } as attrs) =
 {-| -}
 onMouseLeave :
     msg
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> OnMouseEvents msg a
+    -> OnMouseEvents msg a
 onMouseLeave val ({ onMouseEvents } as attrs) =
     let
         newOnMouseLeave =
@@ -1523,8 +1575,8 @@ onMouseLeave val ({ onMouseEvents } as attrs) =
 {-| -}
 onMouseEnter :
     msg
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
-    -> { a | onMouseEvents : OnMouseEventsInside msg }
+    -> OnMouseEvents msg a
+    -> OnMouseEvents msg a
 onMouseEnter val ({ onMouseEvents } as attrs) =
     let
         newOnMouseEnter =
@@ -1545,8 +1597,8 @@ onInput val attrs =
 {-| -}
 onCheck :
     (Bool -> msg)
-    -> { a | onCheckEvent : Maybe (Bool -> msg) }
-    -> { a | onCheckEvent : Maybe (Bool -> msg) }
+    -> OnCheckEvent msg a
+    -> OnCheckEvent msg a
 onCheck val attrs =
     { attrs | onCheckEvent = Just val }
 
@@ -1554,8 +1606,8 @@ onCheck val attrs =
 {-| -}
 onSubmit :
     msg
-    -> { a | onSubmitEvent : Maybe msg }
-    -> { a | onSubmitEvent : Maybe msg }
+    -> OnSubmitEvent msg a
+    -> OnSubmitEvent msg a
 onSubmit val attrs =
     { attrs | onSubmitEvent = Just val }
 
@@ -1563,8 +1615,8 @@ onSubmit val attrs =
 {-| -}
 onFocus :
     msg
-    -> { a | onFocusEvent : Maybe msg }
-    -> { a | onFocusEvent : Maybe msg }
+    -> OnFocusEvent msg a
+    -> OnFocusEvent msg a
 onFocus val attrs =
     { attrs | onFocusEvent = Just val }
 
@@ -1572,8 +1624,8 @@ onFocus val attrs =
 {-| -}
 onBlur :
     msg
-    -> { a | onBlurEvent : Maybe msg }
-    -> { a | onBlurEvent : Maybe msg }
+    -> OnBlurEvent msg a
+    -> OnBlurEvent msg a
 onBlur val attrs =
     { attrs | onBlurEvent = Just val }
 
@@ -1582,8 +1634,8 @@ onBlur val attrs =
 on :
     String
     -> Decoder msg
-    -> { a | onEvent : Maybe ( String, Decoder msg ) }
-    -> { a | onEvent : Maybe ( String, Decoder msg ) }
+    -> OnEvent msg a
+    -> OnEvent msg a
 on event decoder attrs =
     { attrs | onEvent = Just ( event, decoder ) }
 
@@ -1591,8 +1643,8 @@ on event decoder attrs =
 {-| -}
 class :
     List String
-    -> { a | universal : { b | class : List String } }
-    -> { a | universal : { b | class : List String } }
+    -> { a | universal : UniversalAttributes b }
+    -> { a | universal : UniversalAttributes b }
 class val ({ universal } as attrs) =
     let
         newClass =
@@ -1604,8 +1656,8 @@ class val ({ universal } as attrs) =
 {-| -}
 style :
     List (Style -> Style)
-    -> { a | style : { b | standard : List (Style -> Style) } }
-    -> { a | style : { b | standard : List (Style -> Style) } }
+    -> { a | style : StyleAttribute }
+    -> { a | style : StyleAttribute }
 style val ({ style } as attrs) =
     let
         newStyle =
@@ -1617,8 +1669,8 @@ style val ({ style } as attrs) =
 {-| -}
 hoverStyle :
     List (Style -> Style)
-    -> { a | style : { b | hover : List (Style -> Style) } }
-    -> { a | style : { b | hover : List (Style -> Style) } }
+    -> { a | style : StyleAttribute }
+    -> { a | style : StyleAttribute }
 hoverStyle val ({ style } as attrs) =
     let
         newHoverStyle =
@@ -1630,8 +1682,8 @@ hoverStyle val ({ style } as attrs) =
 {-| -}
 focusStyle :
     List (Style -> Style)
-    -> { a | style : { b | focus : List (Style -> Style) } }
-    -> { a | style : { b | focus : List (Style -> Style) } }
+    -> { a | style : StyleAttribute }
+    -> { a | style : StyleAttribute }
 focusStyle val ({ style } as attrs) =
     let
         newStyle =
@@ -1641,27 +1693,82 @@ focusStyle val ({ style } as attrs) =
 
 
 {-| -}
-target : String -> TargetAttribute a -> TargetAttribute a
+target :
+    String
+    -> TargetAttribute a
+    -> TargetAttribute a
 target val attrs =
     { attrs | target = Just val }
 
 
 {-| -}
-name : String -> NameAttribute a -> NameAttribute a
+name :
+    String
+    -> NameAttribute a
+    -> NameAttribute a
 name val attrs =
     { attrs | name = Just val }
 
 
 {-| -}
-width : Int -> WidthAttribute a -> WidthAttribute a
+width :
+    Int
+    -> WidthAttribute a
+    -> WidthAttribute a
 width val attrs =
     { attrs | width = Just val }
 
 
 {-| -}
-height : Int -> HeightAttribute a -> HeightAttribute a
+height :
+    Int
+    -> HeightAttribute a
+    -> HeightAttribute a
 height val attrs =
     { attrs | height = Just val }
+
+
+{-| -}
+min :
+    Int
+    -> MinAttribute a
+    -> MinAttribute a
+min val attrs =
+    { attrs | min = Just val }
+
+
+{-| -}
+max :
+    Int
+    -> MaxAttribute a
+    -> MaxAttribute a
+max val attrs =
+    { attrs | max = Just val }
+
+
+{-| -}
+step :
+    Int
+    -> StepAttribute a
+    -> StepAttribute a
+step val attrs =
+    { attrs | step = Just val }
+
+
+autocomplete :
+    Bool
+    -> AutocompleteAttribute a
+    -> AutocompleteAttribute a
+autocomplete val attrs =
+    { attrs | autocomplete = val }
+
+
+placeholder :
+    String
+    -> PlaceholderAttribute a
+    -> PlaceholderAttribute a
+placeholder val attrs =
+    { attrs | placeholder = Just val }
 
 
 
@@ -1675,7 +1782,7 @@ height val attrs =
 
 
 handleHref :
-    { a | href : Maybe String }
+    HrefAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleHref { href } =
@@ -1697,7 +1804,7 @@ handleStyle { style } =
 
 
 handleMouseEvents :
-    { a | onMouseEvents : OnMouseEventsInside msg }
+    OnMouseEvents msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleMouseEvents { onMouseEvents } =
@@ -1729,43 +1836,8 @@ handleOnInputEvent { onInputEvent, fromStringInput } =
         onInputEvent
 
 
-
--- handleOnInputEvent :
---     { a | onInputEvent : Maybe (String -> msg) }
---     -> HtmlAttributes msg
---     -> HtmlAttributes msg
--- handleOnInputEvent { onInputEvent } =
---     unwrap BodyBuilderHtml.onInput onInputEvent
---
---
--- handleOnInputEvent :
---     { a | onInputEvent : Maybe (Int -> msg) }
---     -> HtmlAttributes msg
---     -> HtmlAttributes msg
--- handleOnInputEvent { onInputEvent } =
---     case onInputEvent of
---         Nothing ->
---             identity
---
---         Just val ->
---             BodyBuilderHtml.onInput (parseInt >> val)
---
---
--- handleOnColorInputEvent :
---     { a | onInputEvent : Maybe (Color -> msg) }
---     -> HtmlAttributes msg
---     -> HtmlAttributes msg
--- handleOnColorInputEvent { onInputEvent } =
---     case onInputEvent of
---         Nothing ->
---             identity
---
---         Just val ->
---             BodyBuilderHtml.onInput (parseColor >> val)
-
-
 handleOnCheckEvent :
-    { a | onCheckEvent : Maybe (Bool -> msg) }
+    OnCheckEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnCheckEvent { onCheckEvent } =
@@ -1773,7 +1845,7 @@ handleOnCheckEvent { onCheckEvent } =
 
 
 handleOnSubmitEvent :
-    { a | onSubmitEvent : Maybe msg }
+    OnSubmitEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnSubmitEvent { onSubmitEvent } =
@@ -1781,7 +1853,7 @@ handleOnSubmitEvent { onSubmitEvent } =
 
 
 handleOnBlurEvent :
-    { a | onBlurEvent : Maybe msg }
+    OnBlurEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnBlurEvent { onBlurEvent } =
@@ -1789,7 +1861,7 @@ handleOnBlurEvent { onBlurEvent } =
 
 
 handleOnFocusEvent :
-    { a | onFocusEvent : Maybe msg }
+    OnFocusEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnFocusEvent { onFocusEvent } =
@@ -1797,7 +1869,7 @@ handleOnFocusEvent { onFocusEvent } =
 
 
 handleOnEvent :
-    { a | onEvent : Maybe ( String, Decoder msg ) }
+    OnEvent msg a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleOnEvent { onEvent } =
@@ -1805,7 +1877,7 @@ handleOnEvent { onEvent } =
 
 
 handleSrc :
-    { a | src : String }
+    SrcAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleSrc { src } =
@@ -1813,7 +1885,7 @@ handleSrc { src } =
 
 
 handleDisabled :
-    { a | disabled : Bool }
+    DisabledAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleDisabled { disabled } =
@@ -1824,7 +1896,7 @@ handleDisabled { disabled } =
 
 
 handleAlt :
-    { a | alt : String }
+    AltAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleAlt { alt } =
@@ -1832,7 +1904,7 @@ handleAlt { alt } =
 
 
 handleClass :
-    { a | universal : { b | class : List String } }
+    { a | universal : UniversalAttributes b }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleClass { universal } =
@@ -1840,7 +1912,7 @@ handleClass { universal } =
 
 
 handleId :
-    { a | universal : { b | id : Maybe String } }
+    { a | universal : UniversalAttributes b }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleId { universal } =
@@ -1848,7 +1920,7 @@ handleId { universal } =
 
 
 handleTabindex :
-    { b | universal : { a | tabindex : Maybe Int } }
+    { a | universal : UniversalAttributes b }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleTabindex { universal } =
@@ -1856,7 +1928,7 @@ handleTabindex { universal } =
 
 
 handleTitle :
-    { b | universal : { a | title : Maybe String } }
+    { a | universal : UniversalAttributes b }
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleTitle { universal } =
@@ -1872,7 +1944,7 @@ handleType { type_ } =
 
 
 handleStringValue :
-    { a | value : Maybe String }
+    ValueAttribute String a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleStringValue { value } =
@@ -1880,7 +1952,7 @@ handleStringValue { value } =
 
 
 handleIntValue :
-    { a | value : Maybe Int }
+    ValueAttribute Int a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleIntValue { value } =
@@ -1890,7 +1962,7 @@ handleIntValue { value } =
 
 
 handleColorValue :
-    { b | value : Maybe Color }
+    ValueAttribute Color a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleColorValue { value } =
@@ -1900,7 +1972,7 @@ handleColorValue { value } =
 
 
 handleName :
-    { a | name : Maybe String }
+    NameAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleName { name } =
@@ -1908,7 +1980,7 @@ handleName { name } =
 
 
 handleWidth :
-    { a | width : Maybe Int }
+    WidthAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleWidth { width } =
@@ -1916,7 +1988,7 @@ handleWidth { width } =
 
 
 handleHeight :
-    { a | height : Maybe Int }
+    HeightAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleHeight { height } =
@@ -1959,7 +2031,7 @@ handleChecked { checked } =
 
 
 handleTarget :
-    { a | target : Maybe String }
+    TargetAttribute a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleTarget { target } =
@@ -1967,7 +2039,7 @@ handleTarget { target } =
 
 
 handleContent :
-    { a | value : Maybe String }
+    ValueAttribute String a
     -> HtmlAttributes msg
     -> HtmlAttributes msg
 handleContent { value } =
@@ -1981,6 +2053,46 @@ setTextareaValue :
 setTextareaValue value =
     BodyBuilderHtml.value (Just value)
         >> BodyBuilderHtml.content [ BodyBuilderHtml.text value ]
+
+
+handleMin :
+    MinAttribute a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleMin { min } =
+    unwrap (BodyBuilderHtml.min << toString) min
+
+
+handleMax :
+    MaxAttribute a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleMax { max } =
+    unwrap (BodyBuilderHtml.max << toString) max
+
+
+handleStep :
+    StepAttribute a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleStep { step } =
+    unwrap (BodyBuilderHtml.step << toString) step
+
+
+handleAutocomplete :
+    AutocompleteAttribute a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handleAutocomplete { autocomplete } =
+    BodyBuilderHtml.autocomplete autocomplete
+
+
+handlePlaceholder :
+    PlaceholderAttribute a
+    -> HtmlAttributes msg
+    -> HtmlAttributes msg
+handlePlaceholder { placeholder } =
+    unwrap BodyBuilderHtml.placeholder placeholder
 
 
 
@@ -2205,6 +2317,8 @@ toTree node =
                     |> List.append
                         [ handleStringValue
                         , handleOnInputEvent
+                        , handleAutocomplete
+                        , handlePlaceholder
                         ]
                 )
 
@@ -2215,6 +2329,9 @@ toTree node =
                     |> List.append
                         [ handleIntValue
                         , handleOnInputEvent
+                        , handleMin
+                        , handleMax
+                        , handleStep
                         ]
                 )
 
@@ -2248,6 +2365,8 @@ toTree node =
                     |> List.append
                         [ handleStringValue
                         , handleOnInputEvent
+                        , handleAutocomplete
+                        , handlePlaceholder
                         ]
                 )
 
@@ -2266,6 +2385,9 @@ toTree node =
                     |> List.append
                         [ handleIntValue
                         , handleOnInputEvent
+                        , handleMin
+                        , handleMax
+                        , handleStep
                         ]
                 )
 
@@ -2277,6 +2399,7 @@ toTree node =
                         [ handleType
                         , handleDisabled
                         , handleOnSubmitEvent
+                        , handleStringValue
                         ]
                 )
 
@@ -2287,6 +2410,8 @@ toTree node =
                     |> List.append
                         [ handleStringValue
                         , handleOnInputEvent
+                        , handleAutocomplete
+                        , handlePlaceholder
                         ]
                 )
 

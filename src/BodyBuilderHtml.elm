@@ -15,6 +15,7 @@ module BodyBuilderHtml
         , type_
         , max
         , min
+        , step
         , src
         , alt
         , defaultValue
@@ -34,6 +35,8 @@ module BodyBuilderHtml
         , target
         , width
         , height
+        , placeholder
+        , autocomplete
         , onClick
         , onDoubleClick
         , onMouseUp
@@ -69,6 +72,7 @@ module BodyBuilderHtml
 @docs type_
 @docs max
 @docs min
+@docs step
 @docs src
 @docs alt
 @docs defaultValue
@@ -88,6 +92,8 @@ module BodyBuilderHtml
 @docs target
 @docs width
 @docs height
+@docs placeholder
+@docs autocomplete
 @docs onClick
 @docs onDoubleClick
 @docs onMouseUp
@@ -119,6 +125,7 @@ type alias Tree msg =
     , type_ : Maybe String
     , max : Maybe String
     , min : Maybe String
+    , step : Maybe String
     , defaultValue : Maybe String
     , style : Style
     , hoverStyle : Style
@@ -138,6 +145,8 @@ type alias Tree msg =
     , disabled : Maybe Bool
     , width : Maybe Int
     , height : Maybe Int
+    , placeholder : Maybe String
+    , autocomplete : Bool
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -174,6 +183,7 @@ base =
         , type_ = Nothing
         , max = Nothing
         , min = Nothing
+        , step = Nothing
         , defaultValue = Nothing
         , style = Elegant.defaultStyle
         , hoverStyle = Elegant.defaultStyle
@@ -193,6 +203,8 @@ base =
         , disabled = Nothing
         , width = Nothing
         , height = Nothing
+        , placeholder = Nothing
+        , autocomplete = True
 
         -- Html Events
         , onInput = Nothing
@@ -297,6 +309,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     [ classes val.style
                     , hoverClasses val.hoverStyle
                     , focusClasses val.focusStyle
+                    , [ Html.Attributes.autocomplete val.autocomplete ]
                     , Helpers.emptyListOrApply Html.Attributes.class
                         (if val.class |> List.isEmpty then
                             Nothing
@@ -306,6 +319,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.type_ val.type_
                     , Helpers.emptyListOrApply Html.Attributes.max val.max
                     , Helpers.emptyListOrApply Html.Attributes.min val.min
+                    , Helpers.emptyListOrApply Html.Attributes.step val.step
                     , Helpers.emptyListOrApply Html.Attributes.src val.src
                     , Helpers.emptyListOrApply Html.Attributes.alt val.alt
                     , Helpers.emptyListOrApply Html.Attributes.id val.id
@@ -322,6 +336,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.disabled val.disabled
                     , Helpers.emptyListOrApply Html.Attributes.width val.width
                     , Helpers.emptyListOrApply Html.Attributes.height val.height
+                    , Helpers.emptyListOrApply Html.Attributes.placeholder val.placeholder
                     , Helpers.emptyListOrApply Html.Events.onClick val.onClick
                     , Helpers.emptyListOrApply Html.Events.onDoubleClick val.onDoubleClick
                     , Helpers.emptyListOrApply Html.Events.onMouseUp val.onMouseUp
@@ -371,6 +386,12 @@ text_ val (HtmlAttributes attrs) =
 max : String -> HtmlAttributes msg -> HtmlAttributes msg
 max val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | max = Just val }
+
+
+{-| -}
+step : String -> HtmlAttributes msg -> HtmlAttributes msg
+step val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | step = Just val }
 
 
 {-| -}
@@ -510,6 +531,20 @@ selected value (HtmlAttributes attrs) =
                 else
                     Nothing
         }
+
+
+{-| -}
+autocomplete : Bool -> HtmlAttributes msg -> HtmlAttributes msg
+autocomplete value (HtmlAttributes attrs) =
+    HtmlAttributes
+        { attrs | autocomplete = value }
+
+
+{-| -}
+placeholder : String -> HtmlAttributes msg -> HtmlAttributes msg
+placeholder value (HtmlAttributes attrs) =
+    HtmlAttributes
+        { attrs | placeholder = Just value }
 
 
 {-| -}
