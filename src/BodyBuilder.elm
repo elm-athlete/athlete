@@ -106,6 +106,11 @@ module BodyBuilder
         , tabindex
         , id
         , disabled
+        , min
+        , max
+        , step
+        , autocomplete
+        , placeholder
         , onClick
         , onDoubleClick
         , onMouseUp
@@ -245,6 +250,11 @@ module BodyBuilder
 @docs tabindex
 @docs id
 @docs disabled
+@docs min
+@docs max
+@docs step
+@docs autocomplete
+@docs placeholder
 @docs onClick
 @docs onDoubleClick
 @docs onMouseUp
@@ -1755,6 +1765,7 @@ step val attrs =
     { attrs | step = Just val }
 
 
+{-| -}
 autocomplete :
     Bool
     -> AutocompleteAttribute a
@@ -1763,6 +1774,7 @@ autocomplete val attrs =
     { attrs | autocomplete = val }
 
 
+{-| -}
 placeholder :
     String
     -> PlaceholderAttribute a
