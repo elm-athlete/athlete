@@ -15,6 +15,7 @@ module BodyBuilderHtml
         , type_
         , max
         , min
+        , step
         , src
         , alt
         , defaultValue
@@ -69,6 +70,7 @@ module BodyBuilderHtml
 @docs type_
 @docs max
 @docs min
+@docs step
 @docs src
 @docs alt
 @docs defaultValue
@@ -119,6 +121,7 @@ type alias Tree msg =
     , type_ : Maybe String
     , max : Maybe String
     , min : Maybe String
+    , step : Maybe String
     , defaultValue : Maybe String
     , style : Style
     , hoverStyle : Style
@@ -174,6 +177,7 @@ base =
         , type_ = Nothing
         , max = Nothing
         , min = Nothing
+        , step = Nothing
         , defaultValue = Nothing
         , style = Elegant.defaultStyle
         , hoverStyle = Elegant.defaultStyle
@@ -306,6 +310,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                     , Helpers.emptyListOrApply Html.Attributes.type_ val.type_
                     , Helpers.emptyListOrApply Html.Attributes.max val.max
                     , Helpers.emptyListOrApply Html.Attributes.min val.min
+                    , Helpers.emptyListOrApply Html.Attributes.step val.step
                     , Helpers.emptyListOrApply Html.Attributes.src val.src
                     , Helpers.emptyListOrApply Html.Attributes.alt val.alt
                     , Helpers.emptyListOrApply Html.Attributes.id val.id
@@ -371,6 +376,12 @@ text_ val (HtmlAttributes attrs) =
 max : String -> HtmlAttributes msg -> HtmlAttributes msg
 max val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | max = Just val }
+
+
+{-| -}
+step : String -> HtmlAttributes msg -> HtmlAttributes msg
+step val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | step = Just val }
 
 
 {-| -}
