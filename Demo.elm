@@ -15,6 +15,10 @@ type Msg
     | ChangeWidth Int
     | ChangeGutter Int
     | ChangeColumnsNumber Int
+    | ChangeBootstrapState Bool
+    | ChangeBodyBuilderState Bool
+    | ChangeBoth Bool
+    | Blah String
 
 
 type alias Model =
@@ -22,12 +26,14 @@ type alias Model =
     , columnWidth : Int
     , gutterWidth : Int
     , columnsNumber : Int
+    , bootstrapState : Bool
+    , bodybuilderState : Bool
     }
 
 
 buttonStyle color =
     [ style [ outlineNone, backgroundColor color, Elegant.round, borderNone, h1S, padding medium, overflowHidden ]
-    , focusStyle [ backgroundColor (Color.saturate 0.5 color), boxShadowCenteredBlurry (Px 10) Color.black ]
+    , focusStyle [ backgroundColor (Color.saturate 0.5 color), boxShadowCenteredBlurry (Px 1) Color.black ]
     ]
         |> compose
 
@@ -44,7 +50,7 @@ exampleGridContent content =
 view :
     Model
     -> BodyBuilder.Node BodyBuilder.Interactive BodyBuilder.NotPhrasing BodyBuilder.Spanning BodyBuilder.NotListElement Msg
-view { color, columnWidth, gutterWidth, columnsNumber } =
+view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstrapState } =
     div
         [ style
             [ maxWidth (Percent 100)
@@ -62,7 +68,7 @@ view { color, columnWidth, gutterWidth, columnsNumber } =
                 ]
             ]
             [ text "Elegant" ]
-        , h3
+        , h2
             [ style
                 [ paddingBottom tiny
                 ]
@@ -119,7 +125,7 @@ view { color, columnWidth, gutterWidth, columnsNumber } =
                 ]
             ]
             [ text "I have a big black border" ]
-        , h3
+        , h2
             [ style
                 [ paddingBottom tiny
                 ]
@@ -181,28 +187,39 @@ view { color, columnWidth, gutterWidth, columnsNumber } =
             [ buttonStyle color ]
             [ text "Push me" ]
         , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_" ]
-        , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 14 ]
-        , inputRange [ style [ Elegant.displayBlock ], name "inputSlider", value 12 ]
-        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", checked ]
-        , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test" ]
-        , inputFile [ style [ Elegant.displayBlock ], name "inputSlider" ]
-        , inputPassword [ style [ Elegant.displayBlock ], name "inputSlider", value "" ]
-        , inputRadio [ style [ Elegant.displayBlock ], name "inputSlider", value "Test" ]
+        , div []
+            [ inputCheckbox [ style [ Elegant.displayInlineBlock ], checked (bootstrapState && bodybuilderState), onCheck ChangeBoth ]
+            , span [] [ text "I like Both" ]
+            ]
+        , div [ style [ paddingLeft large ] ]
+            [ div []
+                [ inputCheckbox [ style [ Elegant.displayInlineBlock ], checked bootstrapState, onCheck ChangeBootstrapState ]
+                , span [] [ text "I like Bootstrap" ]
+                ]
+            , div []
+                [ inputCheckbox [ style [ Elegant.displayInlineBlock ], checked bodybuilderState, onCheck ChangeBodyBuilderState ]
+                , span [] [ text "I like BodyBuilder" ]
+                ]
+            ]
+        , inputFile [ style [ Elegant.displayBlock ] ]
+        , inputPassword [ style [ Elegant.displayBlock ], value "" ]
+        , inputRadio [ style [ Elegant.displayBlock ], value "Test" ]
         , inputUrl [ style [ Elegant.displayBlock ], name "inputUrl" ]
-        , inputSubmit [ style [ Elegant.displayBlock ] ]
+        , inputSubmit [ style [ Elegant.displayBlock ], value "Submit Form" ]
+        , h2 [ style [ paddingTop medium ] ] [ text "Parametrable grid !" ]
         , h3 [] [ text "Gutter width (default 12 px)" ]
         , inputRange [ style [ Elegant.displayInlineBlock ], value gutterWidth, onInput ChangeGutter ]
         , inputNumber [ style [ Elegant.displayInlineBlock ], value gutterWidth, onInput ChangeGutter ]
         , h3 [] [ text "Columns number (default 12)" ]
-        , inputRange [ style [ Elegant.displayInlineBlock ], value columnsNumber, onInput ChangeColumnsNumber ]
-        , inputNumber [ style [ Elegant.displayInlineBlock ], value columnsNumber, onInput ChangeColumnsNumber ]
-        , h3 [] [ text "Columns width : number of units by column (default 3)" ]
-        , inputRange [ style [ Elegant.displayInlineBlock ], value columnWidth, onInput ChangeWidth ]
-        , inputNumber [ style [ Elegant.displayInlineBlock ], value columnWidth, onInput ChangeWidth ]
+        , inputRange [ style [ Elegant.displayInlineBlock ], value columnsNumber, BodyBuilder.min 6, BodyBuilder.max 12, BodyBuilder.step 2, onInput ChangeColumnsNumber ]
+        , inputNumber [ style [ Elegant.displayInlineBlock ], value columnsNumber, BodyBuilder.min 6, BodyBuilder.max 12, BodyBuilder.step 2, onInput ChangeColumnsNumber ]
+        , h3 [] [ text "Columns width : number of units by column (default 2)" ]
+        , inputRange [ style [ Elegant.displayInlineBlock ], value columnWidth, BodyBuilder.min 2, BodyBuilder.max 6, onInput ChangeWidth ]
+        , inputNumber [ style [ Elegant.displayInlineBlock ], value columnWidth, BodyBuilder.min 2, BodyBuilder.max 6, onInput ChangeWidth ]
+        , textarea [ value (gutterWidth |> toString) ]
         , grid (Px gutterWidth)
-            [ col columnsNumber 4 (exampleGridContent "BodyBuilder")
+            [ col columnsNumber columnWidth (exampleGridContent "BodyBuilder")
             , col columnsNumber (columnWidth) (exampleGridContent "is")
-            , col columnsNumber (columnWidth) (exampleGridContent "really")
             , col columnsNumber (columnWidth) (exampleGridContent "awesome")
             , col columnsNumber (columnWidth) (exampleGridContent "to")
             ]
@@ -230,15 +247,29 @@ update msg model =
         ChangeColumnsNumber columnsNumber ->
             ( { model | columnsNumber = columnsNumber }, Cmd.none )
 
+        ChangeBootstrapState state ->
+            ( { model | bootstrapState = state }, Cmd.none )
+
+        ChangeBodyBuilderState state ->
+            ( { model | bodybuilderState = state }, Cmd.none )
+
+        ChangeBoth state ->
+            ( { model | bootstrapState = state, bodybuilderState = state }, Cmd.none )
+
+        Blah toto ->
+            ( model, Cmd.none )
+
 
 main : Program Basics.Never Model Msg
 main =
     program
         { init =
             { color = Color.green
-            , columnWidth = 2
+            , columnWidth = 3
             , gutterWidth = 12
             , columnsNumber = 12
+            , bodybuilderState = False
+            , bootstrapState = False
             }
                 ! []
         , update = update

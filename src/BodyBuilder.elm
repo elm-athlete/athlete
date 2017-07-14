@@ -1487,10 +1487,11 @@ value val attrs =
 
 {-| -}
 checked :
-    { a | checked : Bool }
+    Bool
     -> { a | checked : Bool }
-checked attrs =
-    { attrs | checked = True }
+    -> { a | checked : Bool }
+checked val attrs =
+    { attrs | checked = val }
 
 
 {-| -}
@@ -2472,7 +2473,9 @@ toTree node =
                 "input"
                 (inputAttributesHandling
                     |> List.append
-                        [ handleChecked ]
+                        [ handleChecked
+                        , handleOnCheckEvent
+                        ]
                 )
 
         InputFile attributes ->
@@ -2515,7 +2518,7 @@ toTree node =
 
         InputSubmit attributes ->
             childToHtml attributes
-                "button"
+                "input"
                 (baseHandling
                     |> List.append
                         [ handleType
