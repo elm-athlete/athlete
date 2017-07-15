@@ -64,7 +64,10 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
             [ style
                 [ paddingBottom tiny
                 , textCenter
-                , fontSize alpha
+                , fontFamily
+                    (FontFamilyCustom
+                        [ SystemFont "cursive" ]
+                    )
                 ]
             ]
             [ text "Elegant" ]

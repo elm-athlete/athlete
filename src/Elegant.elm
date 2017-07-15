@@ -160,6 +160,8 @@ module Elegant
         , fontFamilyInherit
         , fontFamilySansSerif
         , fontFamily
+        , FontFamily(..)
+        , CustomFontFamily(..)
         , width
         , fullWidth
         , widthPercent
@@ -365,6 +367,8 @@ module Elegant
 @docs fontFamilyInherit
 @docs fontFamilySansSerif
 @docs fontFamily
+@docs FontFamily
+@docs CustomFontFamily
 
 ## Width and Height
 @docs width
@@ -1239,11 +1243,15 @@ offsetToStringList ( x, y ) =
         |> List.map sizeUnitToString
 
 
+{-| Custom font family
+-}
 type CustomFontFamily
     = SystemFont String
     | CustomFont String
 
 
+{-| FontFamily Type
+-}
 type FontFamily
     = FontFamilyInherit
     | FontFamilyCustom (List CustomFontFamily)
