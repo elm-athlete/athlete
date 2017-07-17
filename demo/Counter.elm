@@ -9,22 +9,28 @@ import Color
 
 buttonStyle : Style -> Style
 buttonStyle =
-    [ Elegant.paddingVertical (Px 0)
+    [ Elegant.paddingVertical Elegant.zero
     , Elegant.borderWidth 0
-    , Elegant.fontSize (Px 7)
-    , Elegant.backgroundColor (Color.rgba 0 0 0 0)
+    , Elegant.fontSize (Px 10)
+    , Elegant.backgroundColor Elegant.transparent
     ]
         |> compose
 
 
-view : a -> Node Interactive NotPhrasing Spanning NotListElement Msg
-view model =
+counter : a -> Node Interactive NotPhrasing Spanning NotListElement Msg
+counter model =
     div [ style [ Elegant.displayInlineBlock ] ]
-        [ div [ style [ Elegant.displayFlex, Elegant.alignItemsCenter, Elegant.Elements.border Color.black ] ]
+        [ div
+            [ style
+                [ Elegant.displayFlex
+                , Elegant.alignItemsCenter
+                , Elegant.Elements.border Color.gray
+                ]
+            ]
             [ inputText
                 [ style
-                    [ padding (Px 0)
-                    , fontSize (Px 13)
+                    [ padding Elegant.zero
+                    , fontSize (Px 20)
                     , Elegant.borderWidth 0
                     ]
                 , onInput Change
@@ -40,6 +46,13 @@ view model =
                 , button [ onClick Substract, style [ buttonStyle ] ] [ text "-" ]
                 ]
             ]
+        ]
+
+
+view : a -> Node Interactive NotPhrasing Spanning NotListElement Msg
+view model =
+    div [ style [ Elegant.displayFlex, Elegant.alignItemsCenter, Elegant.height (Vh 100), Elegant.justifyContentCenter ] ]
+        [ counter model
         ]
 
 
