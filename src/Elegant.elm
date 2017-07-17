@@ -134,6 +134,7 @@ module Elegant
         , flexShrink
         , flexBasis
         , flexDirectionColumn
+        , flexDirectionRow
         , flex
         , flexWrapWrap
         , flexWrapNoWrap
@@ -332,6 +333,7 @@ module Elegant
 @docs flexGrow
 @docs flexShrink
 @docs flexDirectionColumn
+@docs flexDirectionRow
 
 ## Opacity
 @docs opacity
@@ -642,6 +644,7 @@ type FlexWrap
 
 type FlexDirection
     = FlexDirectionColumn
+    | FlexDirectionRow
 
 
 type AlignSelf
@@ -1193,6 +1196,9 @@ flexDirectionToString =
             case val of
                 FlexDirectionColumn ->
                     "column"
+
+                FlexDirectionRow ->
+                    "row"
         )
 
 
@@ -2370,6 +2376,12 @@ flexDirection value (Style style) =
 flexDirectionColumn : Style -> Style
 flexDirectionColumn =
     flexDirection FlexDirectionColumn
+
+
+{-| -}
+flexDirectionRow : Style -> Style
+flexDirectionRow =
+    flexDirection FlexDirectionRow
 
 
 {-| -}
