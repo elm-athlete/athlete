@@ -3,90 +3,176 @@ module Transition exposing (..)
 import BodyBuilder exposing (..)
 import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
 import AnimationFrame
+import Color
 import Time exposing (Time)
 
 
 type Page
     = Index
-    | IndexTo Int
-    | IndexFrom Int
+    | Show Int
 
 
 type alias Model =
-    { page : Page
-    , timer : Float
+    { before : List Page
+    , current : Page
+    , after : List Page
+    , transition :
+        { timer : Float
+        , direction : Direction
+        }
     }
+
+
+type Direction
+    = Forward
+    | Backward
+    | Initial
 
 
 type Msg
     = Enter Int
-    | Leave Int
+    | Back
     | Tick Time
+
+
+insidePageView page =
+    case page of
+        Index ->
+            div [ style [ Elegant.backgroundColor Color.yellow ] ]
+                [ div [ onClick (Enter 1) ] [ text "Toto 1Toto 1Toto 1Toto 1Toto 1Toto 1Toto 1" ]
+                , div [ onClick (Enter 2) ] [ text "Toto 2Toto 2Toto 2Toto 2Toto 2Toto 2Toto 2" ]
+                ]
+
+        Show val ->
+            div [ style [ Elegant.backgroundColor Color.blue ] ]
+                [ div [ onClick Back ] [ text "back" ]
+                , div [] [ text (val |> toString) ]
+                ]
+
+
+pageView sizeUntilNow beforeSize transition page =
+    let
+        percentage =
+            (sizeUntilNow / (beforeSize + 1))
+    in
+        [ div
+            [ style
+                [ Elegant.width (Percent 100)
+                ]
+            ]
+            [ insidePageView page ]
+        ]
 
 
 view : Model -> Node Interactive NotPhrasing Spanning NotListElement Msg
 view model =
     let
-        percentage =
-            case model.page of
-                IndexTo _ ->
-                    model.timer / 20 - 50
+        total =
+            model.before ++ [ model.current ] ++ model.after
 
-                IndexFrom _ ->
-                    0 - model.timer / 20
+        totalSize =
+            total |> List.length |> toFloat
 
-                Index ->
-                    0
+        beforeSize =
+            model.before |> List.length |> toFloat
     in
         div [ style [ Elegant.overflowHidden ] ]
-            [ div [ style [ Elegant.displayFlex, Elegant.width (Percent 200) ] ]
-                [ div [ style [ Elegant.positionRelative, Elegant.left (Percent percentage), Elegant.width (Percent 100), Elegant.opacity 1 ] ]
-                    [ p [ onClick (Enter 1) ] [ text "Toto 1Toto 1Toto 1Toto 1Toto 1Toto 1Toto 1" ]
-                    , p [ onClick (Enter 2) ] [ text "Toto 2Toto 2Toto 2Toto 2Toto 2Toto 2Toto 2" ]
+            [ div
+                [ style
+                    [ Elegant.displayFlex
+                    , Elegant.width (Percent (100 * totalSize))
+                    , Elegant.right
+                        (Percent
+                            ((100 * beforeSize)
+                                + ((if model.transition.direction == Forward then
+                                        negate
+                                    else
+                                        identity
+                                   )
+                                    (model.transition.timer / 10)
+                                  )
+                            )
+                        )
+                    , Elegant.positionRelative
                     ]
-                , div
-                    [ style [ Elegant.positionRelative, Elegant.left (Percent percentage), Elegant.width (Percent 100), Elegant.opacity 1 ] ]
-                    [ p [ onClick (Leave 1) ] [ text "1" ] ]
                 ]
-            , div [] [ p [] [ text (model.timer |> toString) ] ]
+                (Tuple.second
+                    (List.foldl
+                        (\page ( sizeUntilNow, views ) ->
+                            ( sizeUntilNow + 1
+                            , views ++ (pageView sizeUntilNow beforeSize model.transition page)
+                            )
+                        )
+                        ( 0, [] )
+                        total
+                    )
+                )
             ]
 
 
-update :
-    Msg
-    -> Model
-    -> ( Model, Cmd msg )
+push el model =
+    { model
+        | before = model.current :: model.before
+        , current = el
+        , after = []
+        , transition = { direction = Forward, timer = 1000 }
+    }
+
+
+pull model =
+    case model.before of
+        [] ->
+            model
+
+        head :: tail ->
+            { model
+                | before = tail
+                , current = head
+                , after = model.current :: model.after
+                , transition = { direction = Backward, timer = 1000 }
+            }
+
+
+timeDiff diff ({ timer } as transition) =
+    let
+        newTimer =
+            if timer - diff <= 0 then
+                0
+            else
+                timer - diff
+    in
+        { transition | timer = newTimer }
+
+
+update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
         Enter val ->
-            ( { model | page = (IndexTo val), timer = 1000 }, Cmd.none )
+            ( model |> push (Show val), Cmd.none )
 
-        Leave val ->
-            ( { model | page = (IndexFrom val), timer = 1000 }, Cmd.none )
+        Back ->
+            ( model |> pull, Cmd.none )
 
         Tick diff ->
-            let
-                newTimer =
-                    if model.timer - diff < 0 then
-                        0
-                    else
-                        model.timer - diff
-            in
-                ( { model | timer = newTimer }, Cmd.none )
+            ( { model | transition = model.transition |> timeDiff diff }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    if model.timer > 0 then
+    if model.transition.timer > 0 then
         AnimationFrame.diffs Tick
     else
         Sub.none
 
 
+init =
+    { before = [], current = Index, after = [], transition = { direction = Initial, timer = 0 } }
+
+
 main : Program Basics.Never Model Msg
 main =
     program
-        { init = ( { page = Index, timer = 0 }, Cmd.none )
+        { init = ( init, Cmd.none )
         , update = update
         , subscriptions = subscriptions
         , view = view
