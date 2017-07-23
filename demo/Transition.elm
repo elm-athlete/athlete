@@ -64,7 +64,7 @@ titleView fable =
         [ onClick (Enter fable.id)
         , style
             [ Elegant.cursorPointer
-            , borderBottom
+            , borderBottom gray
             , Elegant.padding Elegant.large
             , Elegant.backgroundColor Color.white
             ]
@@ -72,20 +72,22 @@ titleView fable =
         [ text fable.title ]
 
 
+header : Node interactiveContent phrasingContent Spanning NotListElement Msg
 header =
     div
-        [ style
-            [ Elegant.padding Elegant.medium
-            , Elegant.backgroundColor Color.white
+        [ onClick Back
+        , style
+            [ Elegant.backgroundColor Color.white
             , Elegant.textColor Color.black
+            , Elegant.padding Elegant.medium
+            , Elegant.cursorPointer
             ]
         ]
-        [ div [ onClick Back, style [ Elegant.cursorPointer ] ]
-            [ text "< back"
-            ]
+        [ text "< back"
         ]
 
 
+body : Fable -> Node interactiveContent phrasingContent Spanning NotListElement msg
 body fable =
     div [ style [ Elegant.overflowYScroll, Elegant.fullWidth ] ]
         [ img "" fable.image [ style [ Elegant.fullWidth ] ]
@@ -123,9 +125,9 @@ insidePageView page fables =
                 )
 
 
-borderBottom : Elegant.Style -> Elegant.Style
-borderBottom =
-    [ Elegant.borderBottomColor gray
+borderBottom : Color.Color -> Elegant.Style -> Elegant.Style
+borderBottom color =
+    [ Elegant.borderBottomColor color
     , Elegant.borderBottomWidth 1
     , Elegant.borderBottomSolid
     ]
@@ -264,8 +266,12 @@ push el model =
             | before = model.current :: model.before
             , current = el
             , after = []
-            , transition = Just (transition Forward 250 EaseInOut)
+            , transition = Just (transition Forward basicLength EaseInOut)
         }
+
+
+basicLength =
+    250
 
 
 transition : Direction -> Float -> Easing -> Transition
@@ -287,7 +293,7 @@ pull model =
                     | before = tail
                     , current = head
                     , after = model.current :: model.after
-                    , transition = Just (transition Backward 250 EaseInOut)
+                    , transition = Just (transition Backward basicLength EaseInOut)
                 }
 
 
