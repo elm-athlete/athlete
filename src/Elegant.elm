@@ -145,6 +145,14 @@ module Elegant
         , overflowVisible
         , overflowHidden
         , overflowScroll
+        , overflowXAuto
+        , overflowXVisible
+        , overflowXHidden
+        , overflowXScroll
+        , overflowYAuto
+        , overflowYVisible
+        , overflowYHidden
+        , overflowYScroll
         , listStyleNone
         , listStyleDisc
         , listStyleCircle
@@ -343,6 +351,14 @@ module Elegant
 @docs overflowHidden
 @docs overflowScroll
 @docs overflowVisible
+@docs overflowXAuto
+@docs overflowXVisible
+@docs overflowXHidden
+@docs overflowXScroll
+@docs overflowYAuto
+@docs overflowYVisible
+@docs overflowYHidden
+@docs overflowYScroll
 
 ## List Style Type
 @docs listStyleNone
@@ -709,7 +725,8 @@ type Style
         , flexWrap : Maybe FlexWrap
         , flexDirection : Maybe FlexDirection
         , opacity : Maybe Float
-        , overflow : Maybe Overflow
+        , overflowX : Maybe Overflow
+        , overflowY : Maybe Overflow
         , listStyleType : Maybe ListStyleType
         , verticalAlign : Maybe String
         , textAlign : Maybe TextAlign
@@ -868,7 +885,8 @@ defaultStyle =
         , flexWrap = Nothing
         , flexDirection = Nothing
         , opacity = Nothing
-        , overflow = Nothing
+        , overflowX = Nothing
+        , overflowY = Nothing
         , listStyleType = Nothing
         , verticalAlign = Nothing
         , textAlign = Nothing
@@ -1391,7 +1409,8 @@ getStyles (Style styleValues) =
     , ( "flex-wrap", flexWrapToString << .flexWrap )
     , ( "flex-direction", flexDirectionToString << .flexDirection )
     , ( "opacity", maybeToString << .opacity )
-    , ( "overflow", overflowToString << .overflow )
+    , ( "overflow-x", overflowToString << .overflowX )
+    , ( "overflow-y", overflowToString << .overflowY )
     , ( "text-align", textAlignToString << .textAlign )
     , ( "text-transform", textTransformToString << .textTransform )
     , ( "text-decoration", textDecorationToString << .textDecoration )
@@ -2390,9 +2409,21 @@ opacity val (Style style) =
     Style { style | opacity = Just val }
 
 
+{-| -}
+overflowX : Overflow -> Style -> Style
+overflowX val (Style style) =
+    Style { style | overflowX = Just val }
+
+
+{-| -}
+overflowY : Overflow -> Style -> Style
+overflowY val (Style style) =
+    Style { style | overflowY = Just val }
+
+
 overflow : Overflow -> Style -> Style
-overflow val (Style style) =
-    Style { style | overflow = Just val }
+overflow val =
+    overflowX val << overflowY val
 
 
 {-| -}
@@ -2417,6 +2448,54 @@ overflowHidden =
 overflowScroll : Style -> Style
 overflowScroll =
     overflow OverflowScroll
+
+
+{-| -}
+overflowXAuto : Style -> Style
+overflowXAuto =
+    overflowX OverflowAuto
+
+
+{-| -}
+overflowXVisible : Style -> Style
+overflowXVisible =
+    overflowX OverflowVisible
+
+
+{-| -}
+overflowXHidden : Style -> Style
+overflowXHidden =
+    overflowX OverflowHidden
+
+
+{-| -}
+overflowXScroll : Style -> Style
+overflowXScroll =
+    overflowX OverflowScroll
+
+
+{-| -}
+overflowYAuto : Style -> Style
+overflowYAuto =
+    overflowY OverflowAuto
+
+
+{-| -}
+overflowYVisible : Style -> Style
+overflowYVisible =
+    overflowY OverflowVisible
+
+
+{-| -}
+overflowYHidden : Style -> Style
+overflowYHidden =
+    overflowY OverflowHidden
+
+
+{-| -}
+overflowYScroll : Style -> Style
+overflowYScroll =
+    overflowY OverflowScroll
 
 
 listStyleType : ListStyleType -> Style -> Style
