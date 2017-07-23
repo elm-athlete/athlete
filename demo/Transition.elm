@@ -12,14 +12,18 @@ type Page
     | Show Int
 
 
+type alias Transition =
+    { timer : Float
+    , length : Float
+    , direction : Direction
+    }
+
+
 type alias Model =
     { before : List Page
     , current : Page
     , after : List Page
-    , transition :
-        { timer : Float
-        , direction : Direction
-        }
+    , transition : Transition
     }
 
 
@@ -35,6 +39,7 @@ type Msg
     | Tick Time
 
 
+insidePageView : Page -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 insidePageView page =
     case page of
         Index ->
@@ -50,18 +55,27 @@ insidePageView page =
                 ]
 
 
+pageView :
+    a
+    -> b
+    -> c
+    -> Page
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement Msg)
 pageView sizeUntilNow beforeSize transition page =
-    let
-        percentage =
-            (sizeUntilNow / (beforeSize + 1))
-    in
-        [ div
-            [ style
-                [ Elegant.width (Percent 100)
-                ]
-            ]
-            [ insidePageView page ]
-        ]
+    [ div
+        [ style [ Elegant.fullWidth ] ]
+        [ insidePageView page ]
+    ]
+
+
+getTransitionValue : Transition -> Float
+getTransitionValue transition =
+    (if transition.direction == Forward then
+        negate
+     else
+        identity
+    )
+        (transition.timer / 1000)
 
 
 view : Model -> Node Interactive NotPhrasing Spanning NotListElement Msg
@@ -83,15 +97,7 @@ view model =
                     , Elegant.width (Percent (100 * totalSize))
                     , Elegant.right
                         (Percent
-                            ((100 * beforeSize)
-                                + ((if model.transition.direction == Forward then
-                                        negate
-                                    else
-                                        identity
-                                   )
-                                    (model.transition.timer / 10)
-                                  )
-                            )
+                            (100 * (beforeSize + getTransitionValue model.transition))
                         )
                     , Elegant.positionRelative
                     ]
@@ -110,15 +116,17 @@ view model =
             ]
 
 
+push : Page -> Model -> Model
 push el model =
     { model
         | before = model.current :: model.before
         , current = el
         , after = []
-        , transition = { direction = Forward, timer = 1000 }
+        , transition = { direction = Forward, length = 500, timer = 1000 }
     }
 
 
+pull : Model -> Model
 pull model =
     case model.before of
         [] ->
@@ -129,10 +137,11 @@ pull model =
                 | before = tail
                 , current = head
                 , after = model.current :: model.after
-                , transition = { direction = Backward, timer = 1000 }
+                , transition = { direction = Backward, length = 500, timer = 1000 }
             }
 
 
+timeDiff : Float -> Transition -> Transition
 timeDiff diff ({ timer } as transition) =
     let
         newTimer =
@@ -165,8 +174,9 @@ subscriptions model =
         Sub.none
 
 
+init : Model
 init =
-    { before = [], current = Index, after = [], transition = { direction = Initial, timer = 0 } }
+    { before = [], current = Index, after = [], transition = { direction = Initial, timer = 0, length = 0 } }
 
 
 main : Program Basics.Never Model Msg
