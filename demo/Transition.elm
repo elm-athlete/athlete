@@ -72,19 +72,47 @@ titleView fable =
         [ text fable.title ]
 
 
-showView fable =
-    div [ style [ Elegant.backgroundColor Color.white, Elegant.height (Vh 100) ] ]
-        [ div [ style [ Elegant.padding Elegant.medium ] ] [ div [ onClick Back, style [ Elegant.cursorPointer ] ] [ text "< back" ] ]
-        , img "" fable.image [ style [ Elegant.fullWidth ] ]
+header =
+    div
+        [ style
+            [ Elegant.padding Elegant.medium
+            , Elegant.backgroundColor Color.white
+            , Elegant.textColor Color.black
+            ]
+        ]
+        [ div [ onClick Back, style [ Elegant.cursorPointer ] ]
+            [ text "< back"
+            ]
+        ]
+
+
+body fable =
+    div [ style [ Elegant.overflowYScroll, Elegant.fullWidth ] ]
+        [ img "" fable.image [ style [ Elegant.fullWidth ] ]
         , div [ style [ Elegant.padding Elegant.medium ] ] ((fable.content |> String.split "\n" |> List.map (\e -> div [] [ text e ])))
         ]
+
+
+showView :
+    Fable
+    -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+showView fable =
+    div [ style [ Elegant.backgroundColor Color.white, Elegant.height (Vh 100), Elegant.displayFlex, Elegant.flexDirectionColumn ] ]
+        [ header
+        , body fable
+        ]
+
+
+gray : Color.Color
+gray =
+    Color.rgba 0 0 0 0.5
 
 
 insidePageView : Page -> List Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 insidePageView page fables =
     case page of
         Index ->
-            div [ style [ Elegant.backgroundColor Color.gray, Elegant.height (Vh 100) ] ]
+            div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
                 (fables |> List.map titleView)
 
         Show val ->
@@ -95,8 +123,13 @@ insidePageView page fables =
                 )
 
 
+borderBottom : Elegant.Style -> Elegant.Style
 borderBottom =
-    [ Elegant.borderBottomColor Color.black, Elegant.borderBottomWidth 1, Elegant.borderBottomSolid ] |> compose
+    [ Elegant.borderBottomColor gray
+    , Elegant.borderBottomWidth 1
+    , Elegant.borderBottomSolid
+    ]
+        |> compose
 
 
 pageView sizeUntilNow beforeSize transition page current fables =
@@ -165,7 +198,7 @@ view model =
         beforeSize =
             model.before |> List.length |> toFloat
     in
-        div [ style [ Elegant.overflowXHidden, Elegant.overflowYScroll ] ]
+        div [ style [ Elegant.overflowHidden ] ]
             [ div
                 [ style
                     [ Elegant.displayFlex
