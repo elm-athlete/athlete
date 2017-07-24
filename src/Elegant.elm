@@ -188,6 +188,8 @@ module Elegant
         , classesHover
         , classesFocus
         , stylesToCss
+        , userSelectNone
+        , userSelectAll
         )
 
 {-|
@@ -212,6 +214,8 @@ module Elegant
 @docs screenWidthBetween
 @docs screenWidthGE
 @docs screenWidthLE
+@docs userSelectNone
+@docs userSelectAll
 
 # Styles
 ## Positions
@@ -419,7 +423,9 @@ module Elegant
 ## Color
 @docs transparent
 
+
 ## Headings Helper functions
+
 @docs h1S
 @docs h2S
 @docs h3S
@@ -680,6 +686,11 @@ type WhiteSpace
     = WhiteSpaceNoWrap
 
 
+type UserSelect
+    = UserSelectNone
+    | UserSelectAll
+
+
 {-| Contains all style for an element used with Elegant.
 -}
 type Style
@@ -752,6 +763,7 @@ type Style
         , visibility : Maybe Visibility
         , boxSizing : Maybe String
         , screenWidths : List ScreenWidth
+        , userSelect : Maybe UserSelect
         }
 
 
@@ -912,6 +924,7 @@ defaultStyle =
         , visibility = Nothing
         , boxSizing = Nothing
         , screenWidths = []
+        , userSelect = Nothing
         }
 
 
@@ -1335,6 +1348,18 @@ boxShadowToString =
         )
 
 
+userSelectToString : Maybe UserSelect -> Maybe String
+userSelectToString =
+    nothingOrJust <|
+        \val ->
+            case val of
+                UserSelectNone ->
+                    "none"
+
+                UserSelectAll ->
+                    "all"
+
+
 applyCssFunction : String -> String -> String
 applyCssFunction funName content =
     funName ++ (Helpers.surroundWithParentheses content)
@@ -1403,6 +1428,7 @@ getStyles (Style styleValues) =
     , ( "right", maybeSizeUnitToString << .right )
     , ( "color", maybeColorToString << .textColor )
     , ( "display", displayToString << .display )
+    , ( "user-select", userSelectToString << .userSelect )
     , ( "flex-grow", maybeToString << .flexGrow )
     , ( "flex-shrink", maybeToString << .flexShrink )
     , ( "flex-basis", autoOrSizeUnitToString << .flexBasis )
@@ -2706,6 +2732,23 @@ visibilityHidden =
 transparent : Color
 transparent =
     Color.rgba 0 0 0 0.0
+
+
+userSelect : UserSelect -> Style -> Style
+userSelect val (Style style) =
+    Style { style | userSelect = Just val }
+
+
+{-| -}
+userSelectNone : Style -> Style
+userSelectNone =
+    userSelect UserSelectNone
+
+
+{-| -}
+userSelectAll : Style -> Style
+userSelectAll =
+    userSelect UserSelectAll
 
 
 

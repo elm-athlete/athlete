@@ -68,7 +68,7 @@ blah model =
             , inputNumber [ style [ Elegant.displayBlock ], name "inputNumber", value 14 ]
             , inputRange [ style [ Elegant.displayBlock ], name "inputSlider", value 12 ]
             , inputColor [ style [ Elegant.displayBlock ], name "inputSlider", value model.color, onInput ChangeColor ]
-            , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", checked ]
+            , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test", checked True ]
             , inputCheckbox [ style [ Elegant.displayBlock ], name "inputSlider", value "test" ]
             , inputFile [ style [ Elegant.displayBlock ], name "inputSlider" ]
             , inputPassword [ style [ Elegant.displayBlock ], name "inputSlider", value "" ]
