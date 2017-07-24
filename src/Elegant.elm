@@ -13,7 +13,7 @@ module Elegant
         , zero
         , opposite
         , defaultStyle
-        , style
+        , inlineStyle
         , convertStyles
         , screenWidthBetween
         , screenWidthGE
@@ -63,9 +63,17 @@ module Elegant
         , lineHeight
         , lineHeightNormal
         , fontWeightNormal
+        , fontWeight
         , fontStyleNormal
         , fontStyleItalic
         , fontSize
+        , heading
+        , h1S
+        , h2S
+        , h3S
+        , h4S
+        , h5S
+        , h6S
         , alpha
         , beta
         , gamma
@@ -82,6 +90,10 @@ module Elegant
         , textJustify
         , whiteSpaceNoWrap
         , backgroundColor
+        , backgroundImage
+        , backgroundImages
+        , withUrl
+        , borderNone
         , borderColor
         , borderSolid
         , borderDashed
@@ -108,6 +120,8 @@ module Elegant
         , borderTopRightRadius
         , borderRadius
         , borderAndTextColor
+        , outline
+        , outlineNone
         , boxShadow
         , boxShadowPlain
         , boxShadowBlurry
@@ -120,6 +134,7 @@ module Elegant
         , flexShrink
         , flexBasis
         , flexDirectionColumn
+        , flexDirectionRow
         , flex
         , flexWrapWrap
         , flexWrapNoWrap
@@ -130,6 +145,14 @@ module Elegant
         , overflowVisible
         , overflowHidden
         , overflowScroll
+        , overflowXAuto
+        , overflowXVisible
+        , overflowXHidden
+        , overflowXScroll
+        , overflowYAuto
+        , overflowYVisible
+        , overflowYHidden
+        , overflowYScroll
         , listStyleNone
         , listStyleDisc
         , listStyleCircle
@@ -143,7 +166,11 @@ module Elegant
         , justifyContentCenter
         , spaceBetween
         , spaceAround
-        , fontInherit
+        , fontFamilyInherit
+        , fontFamilySansSerif
+        , fontFamily
+        , FontFamily(..)
+        , CustomFontFamily(..)
         , width
         , fullWidth
         , widthPercent
@@ -159,6 +186,7 @@ module Elegant
         , transparent
         , classes
         , classesHover
+        , classesFocus
         , stylesToCss
         , userSelectNone
         , userSelectAll
@@ -177,10 +205,11 @@ module Elegant
 
 # Styling
 @docs defaultStyle
-@docs style
+@docs inlineStyle
 @docs convertStyles
 @docs classes
 @docs classesHover
+@docs classesFocus
 @docs stylesToCss
 @docs screenWidthBetween
 @docs screenWidthGE
@@ -246,6 +275,7 @@ module Elegant
 @docs bold
 @docs strong
 @docs lineHeight
+@docs fontWeight
 @docs fontWeightNormal
 @docs fontStyleNormal
 @docs fontStyleItalic
@@ -260,8 +290,12 @@ module Elegant
 @docs textRight
 @docs textJustify
 @docs backgroundColor
+@docs backgroundImage
+@docs withUrl
+@docs backgroundImages
 
 ## Border
+@docs borderNone
 @docs borderColor
 @docs borderSolid
 @docs borderDashed
@@ -288,6 +322,8 @@ module Elegant
 @docs borderTopRightRadius
 @docs borderRadius
 @docs borderAndTextColor
+@docs outline
+@docs outlineNone
 @docs boxShadow
 @docs boxShadowPlain
 @docs boxShadowBlurry
@@ -309,6 +345,7 @@ module Elegant
 @docs flexGrow
 @docs flexShrink
 @docs flexDirectionColumn
+@docs flexDirectionRow
 
 ## Opacity
 @docs opacity
@@ -318,6 +355,14 @@ module Elegant
 @docs overflowHidden
 @docs overflowScroll
 @docs overflowVisible
+@docs overflowXAuto
+@docs overflowXVisible
+@docs overflowXHidden
+@docs overflowXScroll
+@docs overflowYAuto
+@docs overflowYVisible
+@docs overflowYHidden
+@docs overflowYScroll
 
 ## List Style Type
 @docs listStyleNone
@@ -341,7 +386,11 @@ module Elegant
 ## Spacings
 @docs spaceBetween
 @docs spaceAround
-@docs fontInherit
+@docs fontFamilyInherit
+@docs fontFamilySansSerif
+@docs fontFamily
+@docs FontFamily
+@docs CustomFontFamily
 
 ## Width and Height
 @docs width
@@ -373,6 +422,17 @@ module Elegant
 
 ## Color
 @docs transparent
+
+
+## Headings Helper functions
+
+@docs h1S
+@docs h2S
+@docs h3S
+@docs h4S
+@docs h5S
+@docs h6S
+@docs heading
 
 ## Font Sizes
 @docs alpha
@@ -419,8 +479,8 @@ type Normal
 
 
 {-| -}
-type alias Vector =
-    ( Float, Float )
+type alias Vector a =
+    ( a, a )
 
 
 {-| -}
@@ -448,6 +508,58 @@ type alias BoxShadow =
     , maybeColor : Maybe Color
     , offset : Offset
     }
+
+
+type alias Radiant =
+    Float
+
+
+type alias Degree =
+    Float
+
+
+type Angle
+    = Rad Radiant
+    | Deg Degree
+
+
+type alias ColorStop =
+    { offset : Maybe SizeUnit
+    , color : Color
+    }
+
+
+type alias LinearGradient =
+    { angle : Angle
+    , colorStops : List ColorStop
+    }
+
+
+type alias RadialGradient =
+    { colorStops : List ColorStop }
+
+
+type Gradient
+    = Linear LinearGradient
+    | Radial RadialGradient
+
+
+type Image
+    = Gradient Gradient
+    | Source String
+
+
+type alias BackgroundImage =
+    { image : Image
+    , backgroundPosition : Maybe (Vector SizeUnit)
+    }
+
+
+{-| Simple background image with only an url as source
+-}
+withUrl : String -> BackgroundImage
+withUrl url =
+    BackgroundImage (Source url) Nothing
 
 
 {-| Calculate the opposite of a size unit value.
@@ -554,6 +666,7 @@ type FlexWrap
 
 type FlexDirection
     = FlexDirectionColumn
+    | FlexDirectionRow
 
 
 type AlignSelf
@@ -589,6 +702,7 @@ type Style
         , right : Maybe SizeUnit
         , textColor : Maybe Color
         , backgroundColor : Maybe Color
+        , backgroundImages : List BackgroundImage
         , borderBottomColor : Maybe Color
         , borderBottomWidth : Maybe SizeUnit
         , borderBottomStyle : Maybe Border
@@ -605,6 +719,7 @@ type Style
         , borderBottomRightRadius : Maybe SizeUnit
         , borderTopLeftRadius : Maybe SizeUnit
         , borderTopRightRadius : Maybe SizeUnit
+        , outline : Maybe Outline
         , boxShadow : Maybe BoxShadow
         , paddingRight : Maybe SizeUnit
         , paddingLeft : Maybe SizeUnit
@@ -621,7 +736,8 @@ type Style
         , flexWrap : Maybe FlexWrap
         , flexDirection : Maybe FlexDirection
         , opacity : Maybe Float
-        , overflow : Maybe Overflow
+        , overflowX : Maybe Overflow
+        , overflowY : Maybe Overflow
         , listStyleType : Maybe ListStyleType
         , verticalAlign : Maybe String
         , textAlign : Maybe TextAlign
@@ -632,7 +748,7 @@ type Style
         , fontWeight : Maybe Int
         , fontStyle : Maybe FontStyle
         , fontSize : Maybe SizeUnit
-        , font : Maybe String
+        , fontFamily : Maybe FontFamily
         , alignItems : Maybe AlignItems
         , alignSelf : Maybe AlignSelf
         , justifyContent : Maybe JustifyContent
@@ -747,6 +863,7 @@ defaultStyle =
         , right = Nothing
         , textColor = Nothing
         , backgroundColor = Nothing
+        , backgroundImages = []
         , borderBottomColor = Nothing
         , borderBottomWidth = Nothing
         , borderBottomStyle = Nothing
@@ -763,6 +880,7 @@ defaultStyle =
         , borderBottomRightRadius = Nothing
         , borderTopLeftRadius = Nothing
         , borderTopRightRadius = Nothing
+        , outline = Nothing
         , boxShadow = Nothing
         , paddingRight = Nothing
         , paddingLeft = Nothing
@@ -779,7 +897,8 @@ defaultStyle =
         , flexWrap = Nothing
         , flexDirection = Nothing
         , opacity = Nothing
-        , overflow = Nothing
+        , overflowX = Nothing
+        , overflowY = Nothing
         , listStyleType = Nothing
         , verticalAlign = Nothing
         , textAlign = Nothing
@@ -790,7 +909,7 @@ defaultStyle =
         , fontWeight = Nothing
         , fontStyle = Nothing
         , fontSize = Nothing
-        , font = Nothing
+        , fontFamily = Nothing
         , alignItems = Nothing
         , alignSelf = Nothing
         , justifyContent = Nothing
@@ -858,9 +977,14 @@ displayToString =
         )
 
 
-colorToString : Maybe Color -> Maybe String
+colorToString : Color -> String
 colorToString =
-    nothingOrJust Color.Convert.colorToCssRgba
+    Color.Convert.colorToCssRgba
+
+
+maybeColorToString : Maybe Color -> Maybe String
+maybeColorToString =
+    nothingOrJust colorToString
 
 
 alignItemsToString : Maybe AlignItems -> Maybe String
@@ -896,8 +1020,8 @@ concatNumberWithString number str =
     (number |> toString) ++ str
 
 
-sizeUnitToString_ : SizeUnit -> String
-sizeUnitToString_ val =
+sizeUnitToString : SizeUnit -> String
+sizeUnitToString val =
     case val of
         Px x ->
             concatNumberWithString x "px"
@@ -918,9 +1042,9 @@ sizeUnitToString_ val =
             concatNumberWithString x "rem"
 
 
-sizeUnitToString : Maybe SizeUnit -> Maybe String
-sizeUnitToString =
-    nothingOrJust sizeUnitToString_
+maybeSizeUnitToString : Maybe SizeUnit -> Maybe String
+maybeSizeUnitToString =
+    nothingOrJust sizeUnitToString
 
 
 listStyleTypeToString : Maybe ListStyleType -> Maybe String
@@ -1063,7 +1187,7 @@ autoOrSizeUnitToString =
         (\val ->
             case val of
                 Left su ->
-                    sizeUnitToString_ su
+                    sizeUnitToString su
 
                 Right _ ->
                     "auto"
@@ -1076,7 +1200,7 @@ normalOrSizeUnitToString =
         (\val ->
             case val of
                 Left su ->
-                    sizeUnitToString_ su
+                    sizeUnitToString su
 
                 Right _ ->
                     "normal"
@@ -1103,6 +1227,9 @@ flexDirectionToString =
             case val of
                 FlexDirectionColumn ->
                     "column"
+
+                FlexDirectionRow ->
+                    "row"
         )
 
 
@@ -1150,7 +1277,54 @@ maybeToString =
 offsetToStringList : ( SizeUnit, SizeUnit ) -> List String
 offsetToStringList ( x, y ) =
     [ x, y ]
-        |> List.map sizeUnitToString_
+        |> List.map sizeUnitToString
+
+
+{-| Custom font family
+-}
+type CustomFontFamily
+    = SystemFont String
+    | CustomFont String
+
+
+{-| FontFamily Type
+-}
+type FontFamily
+    = FontFamilyInherit
+    | FontFamilyCustom (List CustomFontFamily)
+
+
+maybeOutlineToString : Maybe Outline -> Maybe String
+maybeOutlineToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                OutlineNone ->
+                    "none"
+        )
+
+
+fontFamilyToString : Maybe FontFamily -> Maybe String
+fontFamilyToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                FontFamilyInherit ->
+                    "inherit"
+
+                FontFamilyCustom fontList ->
+                    fontList
+                        |> List.map
+                            (\e ->
+                                case e of
+                                    CustomFont fontName ->
+                                        Helpers.surroundWithQuotes fontName
+
+                                    SystemFont fontName ->
+                                        fontName
+                            )
+                        |> String.join ", "
+        )
 
 
 boxShadowToString : Maybe BoxShadow -> Maybe String
@@ -1160,9 +1334,9 @@ boxShadowToString =
             List.concat
                 [ offsetToStringList offset
                 , [ blurRadius, spreadRadius ]
-                    |> List.map (emptyListOrApply sizeUnitToString_)
+                    |> List.map (emptyListOrApply sizeUnitToString)
                     |> List.concat
-                , colorToString maybeColor
+                , maybeColorToString maybeColor
                     |> Maybe.map (\a -> [ a ])
                     |> Maybe.withDefault []
                 , if inset then
@@ -1176,25 +1350,83 @@ boxShadowToString =
 
 userSelectToString : Maybe UserSelect -> Maybe String
 userSelectToString =
-    nothingOrJust
-        (\val ->
+    nothingOrJust <|
+        \val ->
             case val of
                 UserSelectNone ->
                     "none"
 
                 UserSelectAll ->
                     "all"
-        )
+
+
+applyCssFunction : String -> String -> String
+applyCssFunction funName content =
+    funName ++ (Helpers.surroundWithParentheses content)
+
+
+angleToString : Angle -> String
+angleToString angle =
+    case angle of
+        Rad a ->
+            (a |> toString) ++ "rad"
+
+        Deg a ->
+            (a |> toString) ++ "deg"
+
+
+colorStopToString : ColorStop -> String
+colorStopToString colorStop =
+    case colorStop of
+        { color, offset } ->
+            [ Just (colorToString color), maybeSizeUnitToString offset ] |> Maybe.Extra.values |> String.join " "
+
+
+colorStopsToString : List ColorStop -> String
+colorStopsToString colorStops =
+    colorStops |> List.map colorStopToString |> String.join ", "
+
+
+gradientToString : Gradient -> String
+gradientToString gradient =
+    case gradient of
+        Linear { angle, colorStops } ->
+            applyCssFunction "linear-gradient" ([ angleToString angle, colorStopsToString colorStops ] |> String.join ", ")
+
+        Radial { colorStops } ->
+            applyCssFunction "radial-gradient" (colorStopsToString colorStops)
+
+
+imageToString : Image -> String
+imageToString image =
+    case image of
+        Gradient gradient ->
+            gradientToString gradient
+
+        Source src ->
+            applyCssFunction "url" src
+
+
+backgroundImagesToString : List BackgroundImage -> Maybe String
+backgroundImagesToString backgroundImages =
+    if backgroundImages == [] then
+        Nothing
+    else
+        Just
+            (backgroundImages
+                |> List.map (\{ image } -> imageToString image)
+                |> String.join (" ")
+            )
 
 
 getStyles : Style -> List ( String, Maybe String )
 getStyles (Style styleValues) =
     [ ( "position", positionToString << .position )
-    , ( "left", sizeUnitToString << .left )
-    , ( "top", sizeUnitToString << .top )
-    , ( "bottom", sizeUnitToString << .bottom )
-    , ( "right", sizeUnitToString << .right )
-    , ( "color", colorToString << .textColor )
+    , ( "left", maybeSizeUnitToString << .left )
+    , ( "top", maybeSizeUnitToString << .top )
+    , ( "bottom", maybeSizeUnitToString << .bottom )
+    , ( "right", maybeSizeUnitToString << .right )
+    , ( "color", maybeColorToString << .textColor )
     , ( "display", displayToString << .display )
     , ( "user-select", userSelectToString << .userSelect )
     , ( "flex-grow", maybeToString << .flexGrow )
@@ -1203,34 +1435,37 @@ getStyles (Style styleValues) =
     , ( "flex-wrap", flexWrapToString << .flexWrap )
     , ( "flex-direction", flexDirectionToString << .flexDirection )
     , ( "opacity", maybeToString << .opacity )
-    , ( "overflow", overflowToString << .overflow )
+    , ( "overflow-x", overflowToString << .overflowX )
+    , ( "overflow-y", overflowToString << .overflowY )
     , ( "text-align", textAlignToString << .textAlign )
     , ( "text-transform", textTransformToString << .textTransform )
     , ( "text-decoration", textDecorationToString << .textDecoration )
     , ( "white-space", whiteSpaceToString << .whiteSpace )
     , ( "lineHeight", normalOrSizeUnitToString << .lineHeight )
-    , ( "background-color", colorToString << .backgroundColor )
-    , ( "border-bottom-color", colorToString << .borderBottomColor )
-    , ( "border-bottom-width", sizeUnitToString << .borderBottomWidth )
+    , ( "background-color", maybeColorToString << .backgroundColor )
+    , ( "background-image", backgroundImagesToString << .backgroundImages )
+    , ( "border-bottom-color", maybeColorToString << .borderBottomColor )
+    , ( "border-bottom-width", maybeSizeUnitToString << .borderBottomWidth )
     , ( "border-bottom-style", borderToString << .borderBottomStyle )
-    , ( "border-left-color", colorToString << .borderLeftColor )
-    , ( "border-left-width", sizeUnitToString << .borderLeftWidth )
+    , ( "border-left-color", maybeColorToString << .borderLeftColor )
+    , ( "border-left-width", maybeSizeUnitToString << .borderLeftWidth )
     , ( "border-left-style", borderToString << .borderLeftStyle )
-    , ( "border-top-color", colorToString << .borderTopColor )
-    , ( "border-top-width", sizeUnitToString << .borderTopWidth )
+    , ( "border-top-color", maybeColorToString << .borderTopColor )
+    , ( "border-top-width", maybeSizeUnitToString << .borderTopWidth )
     , ( "border-top-style", borderToString << .borderTopStyle )
-    , ( "border-right-color", colorToString << .borderRightColor )
-    , ( "border-right-width", sizeUnitToString << .borderRightWidth )
+    , ( "border-right-color", maybeColorToString << .borderRightColor )
+    , ( "border-right-width", maybeSizeUnitToString << .borderRightWidth )
     , ( "border-right-style", borderToString << .borderRightStyle )
-    , ( "border-bottom-left-radius", sizeUnitToString << .borderBottomLeftRadius )
-    , ( "border-bottom-right-radius", sizeUnitToString << .borderBottomRightRadius )
-    , ( "border-top-left-radius", sizeUnitToString << .borderTopLeftRadius )
-    , ( "border-top-right-radius", sizeUnitToString << .borderTopRightRadius )
+    , ( "border-bottom-left-radius", maybeSizeUnitToString << .borderBottomLeftRadius )
+    , ( "border-bottom-right-radius", maybeSizeUnitToString << .borderBottomRightRadius )
+    , ( "border-top-left-radius", maybeSizeUnitToString << .borderTopLeftRadius )
+    , ( "border-top-right-radius", maybeSizeUnitToString << .borderTopRightRadius )
+    , ( "outline", maybeOutlineToString << .outline )
     , ( "box-shadow", boxShadowToString << .boxShadow )
-    , ( "padding-left", sizeUnitToString << .paddingLeft )
-    , ( "padding-right", sizeUnitToString << .paddingRight )
-    , ( "padding-top", sizeUnitToString << .paddingTop )
-    , ( "padding-bottom", sizeUnitToString << .paddingBottom )
+    , ( "padding-left", maybeSizeUnitToString << .paddingLeft )
+    , ( "padding-right", maybeSizeUnitToString << .paddingRight )
+    , ( "padding-top", maybeSizeUnitToString << .paddingTop )
+    , ( "padding-bottom", maybeSizeUnitToString << .paddingBottom )
     , ( "margin-left", autoOrSizeUnitToString << .marginLeft )
     , ( "margin-right", autoOrSizeUnitToString << .marginRight )
     , ( "margin-top", autoOrSizeUnitToString << .marginTop )
@@ -1241,13 +1476,14 @@ getStyles (Style styleValues) =
     , ( "justify-content", justifyContentToString << .justifyContent )
     , ( "font-weight", maybeToString << .fontWeight )
     , ( "font-style", fontStyleToString << .fontStyle )
-    , ( "font-size", sizeUnitToString << .fontSize )
-    , ( "width", sizeUnitToString << .width )
-    , ( "max-width", sizeUnitToString << .maxWidth )
-    , ( "min-width", sizeUnitToString << .minWidth )
-    , ( "height", sizeUnitToString << .height )
-    , ( "max-height", sizeUnitToString << .maxHeight )
-    , ( "min-height", sizeUnitToString << .minHeight )
+    , ( "font-size", maybeSizeUnitToString << .fontSize )
+    , ( "font-family", fontFamilyToString << .fontFamily )
+    , ( "width", maybeSizeUnitToString << .width )
+    , ( "max-width", maybeSizeUnitToString << .maxWidth )
+    , ( "min-width", maybeSizeUnitToString << .minWidth )
+    , ( "height", maybeSizeUnitToString << .height )
+    , ( "max-height", maybeSizeUnitToString << .maxHeight )
+    , ( "min-height", maybeSizeUnitToString << .minHeight )
     , ( "z-index", maybeToString << .zIndex )
     , ( "cursor", .cursor )
     , ( "visibility", visibilityToString << .visibility )
@@ -1293,8 +1529,8 @@ convertStyles =
 
 
 {-| -}
-style : List (Style -> Style) -> Html.Attribute msg
-style =
+inlineStyle : List (Style -> Style) -> Html.Attribute msg
+inlineStyle =
     Html.Attributes.style
         << convertStyles
 
@@ -1353,7 +1589,7 @@ bottom value (Style style) =
 
 
 {-| -}
-absolutelyPositionned : Vector -> Style -> Style
+absolutelyPositionned : Vector Float -> Style -> Style
 absolutelyPositionned ( x, y ) =
     [ position PositionAbsolute
     , left <| Px <| Basics.round <| x
@@ -1650,61 +1886,115 @@ fontSize val (Style style) =
 {-| -}
 alpha : SizeUnit
 alpha =
-    Em 2.4
+    Rem 2.5
+
+
+{-| helper function to create a heading
+-}
+heading : SizeUnit -> Style -> Style
+heading val =
+    [ margin zero
+    , marginBottom (Rem 0.5)
+    , fontWeight 600
+    , fontSize val
+    ]
+        |> compose
+
+
+{-| helper function to create a h1 style
+-}
+h1S : Style -> Style
+h1S =
+    heading alpha
+
+
+{-| helper function to create a h2 style
+-}
+h2S : Style -> Style
+h2S =
+    heading beta
+
+
+{-| helper function to create a h3 style
+-}
+h3S : Style -> Style
+h3S =
+    heading gamma
+
+
+{-| helper function to create a h4 style
+-}
+h4S : Style -> Style
+h4S =
+    heading delta
+
+
+{-| helper function to create a h5 style
+-}
+h5S : Style -> Style
+h5S =
+    heading epsilon
+
+
+{-| helper function to create a h6 style
+-}
+h6S : Style -> Style
+h6S =
+    heading zeta
 
 
 {-| -}
 beta : SizeUnit
 beta =
-    Em 2.2
+    Rem 2
 
 
 {-| -}
 gamma : SizeUnit
 gamma =
-    Em 1.6
+    Rem 1.75
 
 
 {-| -}
 delta : SizeUnit
 delta =
-    Em 1.5
+    Rem 1.5
 
 
 {-| -}
 epsilon : SizeUnit
 epsilon =
-    Em 1.3
+    Rem 1.25
 
 
 {-| -}
 zeta : SizeUnit
 zeta =
-    Em 1.1
+    Rem 1
 
 
 {-| -}
 eta : SizeUnit
 eta =
-    Em 1.05
+    Em 0.75
 
 
 {-| -}
 theta : SizeUnit
 theta =
-    Em 0.85
+    Em 0.5
 
 
 {-| -}
 iota : SizeUnit
 iota =
-    Em 0.8
+    Em 0.25
 
 
 {-| -}
 kappa : SizeUnit
 kappa =
-    Em 0.5
+    Em 0.125
 
 
 textAlign : TextAlign -> Style -> Style
@@ -1751,6 +2041,27 @@ whiteSpaceNoWrap =
 backgroundColor : Color -> Style -> Style
 backgroundColor color (Style style) =
     Style { style | backgroundColor = Just color }
+
+
+{-| Add multiple background images to the styles
+-}
+backgroundImages : List BackgroundImage -> Style -> Style
+backgroundImages backgroundImages (Style style) =
+    Style { style | backgroundImages = backgroundImages }
+
+
+{-| Add a background image to the styles
+-}
+backgroundImage : BackgroundImage -> Style -> Style
+backgroundImage backgroundImage (Style style) =
+    Style { style | backgroundImages = [ backgroundImage ] }
+
+
+{-| Remove the border
+-}
+borderNone : Style -> Style
+borderNone =
+    borderWidth 0
 
 
 {-| -}
@@ -1951,6 +2262,24 @@ borderAndTextColor val =
     borderColor val << textColor val
 
 
+type Outline
+    = OutlineNone
+
+
+{-| Set the outline to a value
+-}
+outline : Outline -> Style -> Style
+outline val (Style style) =
+    Style { style | outline = Just val }
+
+
+{-| Set the outline to "none" value
+-}
+outlineNone : Style -> Style
+outlineNone =
+    outline OutlineNone
+
+
 boxSizing : String -> Style -> Style
 boxSizing val (Style style) =
     Style { style | boxSizing = Just val }
@@ -2095,14 +2424,32 @@ flexDirectionColumn =
 
 
 {-| -}
+flexDirectionRow : Style -> Style
+flexDirectionRow =
+    flexDirection FlexDirectionRow
+
+
+{-| -}
 opacity : Float -> Style -> Style
 opacity val (Style style) =
     Style { style | opacity = Just val }
 
 
+{-| -}
+overflowX : Overflow -> Style -> Style
+overflowX val (Style style) =
+    Style { style | overflowX = Just val }
+
+
+{-| -}
+overflowY : Overflow -> Style -> Style
+overflowY val (Style style) =
+    Style { style | overflowY = Just val }
+
+
 overflow : Overflow -> Style -> Style
-overflow val (Style style) =
-    Style { style | overflow = Just val }
+overflow val =
+    overflowX val << overflowY val
 
 
 {-| -}
@@ -2127,6 +2474,54 @@ overflowHidden =
 overflowScroll : Style -> Style
 overflowScroll =
     overflow OverflowScroll
+
+
+{-| -}
+overflowXAuto : Style -> Style
+overflowXAuto =
+    overflowX OverflowAuto
+
+
+{-| -}
+overflowXVisible : Style -> Style
+overflowXVisible =
+    overflowX OverflowVisible
+
+
+{-| -}
+overflowXHidden : Style -> Style
+overflowXHidden =
+    overflowX OverflowHidden
+
+
+{-| -}
+overflowXScroll : Style -> Style
+overflowXScroll =
+    overflowX OverflowScroll
+
+
+{-| -}
+overflowYAuto : Style -> Style
+overflowYAuto =
+    overflowY OverflowAuto
+
+
+{-| -}
+overflowYVisible : Style -> Style
+overflowYVisible =
+    overflowY OverflowVisible
+
+
+{-| -}
+overflowYHidden : Style -> Style
+overflowYHidden =
+    overflowY OverflowHidden
+
+
+{-| -}
+overflowYScroll : Style -> Style
+overflowYScroll =
+    overflowY OverflowScroll
 
 
 listStyleType : ListStyleType -> Style -> Style
@@ -2221,9 +2616,34 @@ justifyContentCenter =
 
 
 {-| -}
-fontInherit : Style -> Style
-fontInherit (Style style) =
-    Style { style | font = Just "inherit" }
+fontFamily : FontFamily -> Style -> Style
+fontFamily fontFamily (Style style) =
+    Style { style | fontFamily = Just fontFamily }
+
+
+{-| -}
+fontFamilyInherit : Style -> Style
+fontFamilyInherit =
+    fontFamily FontFamilyInherit
+
+
+{-| Standard Sans Serif font family.
+Inspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>
+-}
+fontFamilySansSerif : Style -> Style
+fontFamilySansSerif =
+    fontFamily
+        (FontFamilyCustom
+            [ SystemFont "-apple-system"
+            , SystemFont "system-ui"
+            , SystemFont "BlinkMacSystemFont"
+            , CustomFont "Segoe UI"
+            , CustomFont "Roboto"
+            , CustomFont "Helvetica Neue"
+            , CustomFont "Arial"
+            , SystemFont "sans-serif"
+            ]
+        )
 
 
 {-| -}
@@ -2353,11 +2773,23 @@ classes =
     classesAndScreenWidths Nothing
 
 
+conditionalClasses : String -> Style -> String
+conditionalClasses condition =
+    classesAndScreenWidths (Just condition)
+
+
 {-| Generate all the classes of a list of Hover Styles
 -}
 classesHover : Style -> String
 classesHover =
-    classesAndScreenWidths (Just "hover")
+    conditionalClasses "hover"
+
+
+{-| Generate all the classes of a list of Focus Styles
+-}
+classesFocus : Style -> String
+classesFocus =
+    conditionalClasses "focus"
 
 
 classesNameGeneration : Maybe String -> Style -> List String
@@ -2462,11 +2894,8 @@ stylesToCss : List ConditionalStyle -> String
 stylesToCss styles =
     styles
         |> List.concatMap compileScreenWidths
-        |> Debug.log "1e"
         |> List.concatMap compileConditionalStyle
-        |> Debug.log "test"
         |> List.map compileAtomicClass
-        |> Debug.log "test2"
         |> List.Extra.unique
         |> String.join "\n"
         |> (++) boxSizingCss
@@ -2506,7 +2935,7 @@ inMediaQuery mediaQuery content =
             content
 
         Just queries ->
-            queries ++ Helpers.betweenBraces content
+            queries ++ Helpers.surroundWithBraces content
 
 
 mediaQuerySelector : Maybe Int -> Maybe Int -> String
@@ -2540,4 +2969,4 @@ compileStyleToCss className mediaQueryId selector property =
         ++ className
         ++ (mediaQueryId ? "")
         ++ (selector ? "")
-        ++ Helpers.betweenBraces property
+        ++ Helpers.surroundWithBraces property

@@ -5,6 +5,7 @@ import Elegant exposing (SizeUnit(..), Style)
 import Html exposing (Html)
 import Color
 import Html exposing (Html)
+import Function exposing (..)
 
 
 type Msg
@@ -22,7 +23,10 @@ main =
 
 square : Int -> Style -> Style
 square x =
-    Elegant.width (Px x) << Elegant.height (Px x)
+    [ Elegant.width (Px x)
+    , Elegant.height (Px x)
+    ]
+        |> compose
 
 
 update : Msg -> String -> String
