@@ -1196,7 +1196,7 @@ getStyles (Style styleValues) =
     , ( "right", sizeUnitToString << .right )
     , ( "color", colorToString << .textColor )
     , ( "display", displayToString << .display )
-    , ( "userSelect", userSelectToString << .userSelect )
+    , ( "user-select", userSelectToString << .userSelect )
     , ( "flex-grow", maybeToString << .flexGrow )
     , ( "flex-shrink", maybeToString << .flexShrink )
     , ( "flex-basis", autoOrSizeUnitToString << .flexBasis )
