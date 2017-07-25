@@ -120,7 +120,10 @@ module Elegant
         , borderTopRightRadius
         , borderRadius
         , borderAndTextColor
-        , outline
+        , outlineWidth
+        , outlineColor
+        , outlineStyleSolid
+        , outlineStyleDashed
         , outlineNone
         , boxShadow
         , boxShadowPlain
@@ -188,6 +191,8 @@ module Elegant
         , classesHover
         , classesFocus
         , stylesToCss
+        , userSelectNone
+        , userSelectAll
         )
 
 {-|
@@ -212,6 +217,8 @@ module Elegant
 @docs screenWidthBetween
 @docs screenWidthGE
 @docs screenWidthLE
+@docs userSelectNone
+@docs userSelectAll
 
 # Styles
 ## Positions
@@ -318,7 +325,10 @@ module Elegant
 @docs borderTopRightRadius
 @docs borderRadius
 @docs borderAndTextColor
-@docs outline
+@docs outlineWidth
+@docs outlineStyleSolid
+@docs outlineStyleDashed
+@docs outlineColor
 @docs outlineNone
 @docs boxShadow
 @docs boxShadowPlain
@@ -419,7 +429,9 @@ module Elegant
 ## Color
 @docs transparent
 
+
 ## Headings Helper functions
+
 @docs h1S
 @docs h2S
 @docs h3S
@@ -448,15 +460,8 @@ import Function exposing (compose)
 import List.Extra
 import Elegant.Helpers as Helpers exposing (emptyListOrApply)
 import Maybe.Extra exposing ((?))
-
-
--- import Html.Events
-
 import Color exposing (Color)
 import Color.Convert
-
-
--- import Task
 
 
 type Either a b
@@ -680,6 +685,11 @@ type WhiteSpace
     = WhiteSpaceNoWrap
 
 
+type UserSelect
+    = UserSelectNone
+    | UserSelectAll
+
+
 {-| Contains all style for an element used with Elegant.
 -}
 type Style
@@ -708,7 +718,9 @@ type Style
         , borderBottomRightRadius : Maybe SizeUnit
         , borderTopLeftRadius : Maybe SizeUnit
         , borderTopRightRadius : Maybe SizeUnit
-        , outline : Maybe Outline
+        , outlineColor : Maybe Color
+        , outlineStyle : Maybe Border
+        , outlineWidth : Maybe SizeUnit
         , boxShadow : Maybe BoxShadow
         , paddingRight : Maybe SizeUnit
         , paddingLeft : Maybe SizeUnit
@@ -752,6 +764,7 @@ type Style
         , visibility : Maybe Visibility
         , boxSizing : Maybe String
         , screenWidths : List ScreenWidth
+        , userSelect : Maybe UserSelect
         }
 
 
@@ -868,7 +881,9 @@ defaultStyle =
         , borderBottomRightRadius = Nothing
         , borderTopLeftRadius = Nothing
         , borderTopRightRadius = Nothing
-        , outline = Nothing
+        , outlineColor = Nothing
+        , outlineWidth = Nothing
+        , outlineStyle = Nothing
         , boxShadow = Nothing
         , paddingRight = Nothing
         , paddingLeft = Nothing
@@ -912,6 +927,7 @@ defaultStyle =
         , visibility = Nothing
         , boxSizing = Nothing
         , screenWidths = []
+        , userSelect = Nothing
         }
 
 
@@ -1281,16 +1297,6 @@ type FontFamily
     | FontFamilyCustom (List CustomFontFamily)
 
 
-maybeOutlineToString : Maybe Outline -> Maybe String
-maybeOutlineToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                OutlineNone ->
-                    "none"
-        )
-
-
 fontFamilyToString : Maybe FontFamily -> Maybe String
 fontFamilyToString =
     nothingOrJust
@@ -1333,6 +1339,18 @@ boxShadowToString =
                 ]
                 |> String.join " "
         )
+
+
+userSelectToString : Maybe UserSelect -> Maybe String
+userSelectToString =
+    nothingOrJust <|
+        \val ->
+            case val of
+                UserSelectNone ->
+                    "none"
+
+                UserSelectAll ->
+                    "all"
 
 
 applyCssFunction : String -> String -> String
@@ -1403,6 +1421,7 @@ getStyles (Style styleValues) =
     , ( "right", maybeSizeUnitToString << .right )
     , ( "color", maybeColorToString << .textColor )
     , ( "display", displayToString << .display )
+    , ( "user-select", userSelectToString << .userSelect )
     , ( "flex-grow", maybeToString << .flexGrow )
     , ( "flex-shrink", maybeToString << .flexShrink )
     , ( "flex-basis", autoOrSizeUnitToString << .flexBasis )
@@ -1434,7 +1453,9 @@ getStyles (Style styleValues) =
     , ( "border-bottom-right-radius", maybeSizeUnitToString << .borderBottomRightRadius )
     , ( "border-top-left-radius", maybeSizeUnitToString << .borderTopLeftRadius )
     , ( "border-top-right-radius", maybeSizeUnitToString << .borderTopRightRadius )
-    , ( "outline", maybeOutlineToString << .outline )
+    , ( "outline-color", maybeColorToString << .outlineColor )
+    , ( "outline-width", maybeSizeUnitToString << .outlineWidth )
+    , ( "outline-style", borderToString << .outlineStyle )
     , ( "box-shadow", boxShadowToString << .boxShadow )
     , ( "padding-left", maybeSizeUnitToString << .paddingLeft )
     , ( "padding-right", maybeSizeUnitToString << .paddingRight )
@@ -2236,22 +2257,39 @@ borderAndTextColor val =
     borderColor val << textColor val
 
 
-type Outline
-    = OutlineNone
+{-| -}
+outlineColor : Color -> Style -> Style
+outlineColor val (Style style) =
+    Style { style | outlineColor = Just val }
 
 
-{-| Set the outline to a value
--}
-outline : Outline -> Style -> Style
-outline val (Style style) =
-    Style { style | outline = Just val }
+outlineStyle : Border -> Style -> Style
+outlineStyle val (Style style) =
+    Style { style | outlineStyle = Just val }
 
 
-{-| Set the outline to "none" value
--}
+{-| -}
+outlineStyleSolid : Style -> Style
+outlineStyleSolid =
+    outlineStyle BorderSolid
+
+
+{-| -}
+outlineStyleDashed : Style -> Style
+outlineStyleDashed =
+    outlineStyle BorderDashed
+
+
+{-| -}
+outlineWidth : Int -> Style -> Style
+outlineWidth val (Style style) =
+    Style { style | outlineWidth = Just (Px val) }
+
+
+{-| -}
 outlineNone : Style -> Style
 outlineNone =
-    outline OutlineNone
+    outlineWidth 0
 
 
 boxSizing : String -> Style -> Style
@@ -2706,6 +2744,23 @@ visibilityHidden =
 transparent : Color
 transparent =
     Color.rgba 0 0 0 0.0
+
+
+userSelect : UserSelect -> Style -> Style
+userSelect val (Style style) =
+    Style { style | userSelect = Just val }
+
+
+{-| -}
+userSelectNone : Style -> Style
+userSelectNone =
+    userSelect UserSelectNone
+
+
+{-| -}
+userSelectAll : Style -> Style
+userSelectAll =
+    userSelect UserSelectAll
 
 
 

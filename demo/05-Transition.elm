@@ -4,7 +4,7 @@ module Transition exposing (..)
     and styles. I thought it would have taken more time to create, but, in the
     end I did it. Elm was the way to go after all.
     It is heavily inspired by the way iOS works, but the code is original :)
-    I wouldn't have been able to write that without Elm and Elegant.
+    I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 -}
 
 import BodyBuilder exposing (..)
