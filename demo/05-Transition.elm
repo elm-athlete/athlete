@@ -266,7 +266,12 @@ body :
     -> a
     -> Node interactiveContent phrasingContent Spanning NotListElement msg
 body bodyFun data =
-    div [ style [ Elegant.overflowYScroll, Elegant.fullWidth ] ]
+    div
+        [ style
+            [ Elegant.overflowYScroll
+            , Elegant.fullWidth
+            ]
+        ]
         [ bodyFun data
         ]
 
@@ -276,21 +281,36 @@ showView :
     -> a
     -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 showView bodyFun data =
-    div [ style [ Elegant.backgroundColor Color.white, Elegant.height (Vh 100), Elegant.displayFlex, Elegant.flexDirectionColumn ] ]
+    div
+        [ style
+            [ Elegant.backgroundColor Color.white
+            , Elegant.height (Vh 100)
+            , Elegant.displayFlex
+            , Elegant.flexDirectionColumn
+            ]
+        ]
         [ header
         , body bodyFun data
         ]
 
 
-fableBodyView : Fable -> Node interactiveContent phrasingContent Spanning NotListElement msg
-fableBodyView fable =
+fableContentView : String -> List (Node interactiveContent Phrasing spanningContent NotListElement msg)
+fableContentView =
+    (>>)
+        (String.split "\n")
+        (List.foldl (\e accu -> accu ++ [ text e, br [] ]) [])
+
+
+fableBodyView : Fable -> Node interactiveContent Phrasing Spanning NotListElement msg
+fableBodyView { image, content } =
     div []
-        [ img "" fable.image [ style [ Elegant.fullWidth ] ]
-        , div [ style [ Elegant.padding Elegant.medium ] ] ((fable.content |> String.split "\n" |> List.map (\e -> div [] [ text e ])))
+        [ img "" image [ style [ Elegant.fullWidth ] ]
+        , div [ style [ Elegant.padding Elegant.medium ] ]
+            (fableContentView content)
         ]
 
 
-insidePageView : Page -> List Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+insidePageView : Page -> List Fable -> Node interactiveContent Phrasing Spanning NotListElement Msg
 insidePageView page fables =
     case page of
         Index ->
@@ -319,7 +339,10 @@ pageView sizeUntilNow beforeSize transition page current fables =
         ]
 
 
-tableView : History -> List Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+tableView :
+    History
+    -> List Fable
+    -> Node interactiveContent Phrasing Spanning NotListElement Msg
 tableView history fables =
     let
         total =
@@ -378,7 +401,7 @@ tableView history fables =
             ]
 
 
-view : Model -> Node Interactive NotPhrasing Spanning NotListElement Msg
+view : Model -> Node interactiveContent Phrasing Spanning NotListElement Msg
 view { history, data } =
     tableView history data
 
