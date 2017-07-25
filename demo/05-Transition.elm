@@ -9,8 +9,8 @@ module Transition exposing (..)
 
 import BodyBuilder exposing (..)
 import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
+import Elegant.Elements exposing (borderBottom)
 import AnimationFrame
-import Function exposing (..)
 import Color
 import Time exposing (Time)
 
@@ -74,6 +74,149 @@ type alias Fable =
     }
 
 
+easingFun : Easing -> Float -> Float
+easingFun easing =
+    case easing of
+        EaseInOut ->
+            easeInOut
+
+        Linear ->
+            identity
+
+
+easeInOut : Float -> Float
+easeInOut t =
+    if t < 0.5 then
+        2 * t * t
+    else
+        -1 + (4 - 2 * t) * t
+
+
+getMaybeTransitionValue : Maybe Transition -> Float
+getMaybeTransitionValue maybeTransition =
+    case maybeTransition of
+        Nothing ->
+            0
+
+        Just transition ->
+            transition |> getTransitionValue
+
+
+getTransitionValue : Transition -> Float
+getTransitionValue { direction, timer, length, easing } =
+    (case direction of
+        Forward ->
+            negate
+
+        Backward ->
+            identity
+    )
+        ((easingFun easing) (timer / length))
+
+
+isRunning : Maybe Transition -> Bool
+isRunning transition =
+    case transition of
+        Nothing ->
+            False
+
+        Just transition ->
+            transition.timer /= 0
+
+
+timeDiff : Float -> Transition -> Transition
+timeDiff diff ({ timer } as transition) =
+    let
+        newTimer =
+            if timer - diff <= 0 then
+                0
+            else
+                timer - diff
+    in
+        { transition | timer = newTimer }
+
+
+basicDuration : number
+basicDuration =
+    250
+
+
+customTransition : Float -> Direction -> Easing -> Transition
+customTransition duration =
+    Transition duration duration
+
+
+push : Page -> History -> History
+push el ({ transition, before, current, after } as history) =
+    if isRunning transition then
+        history
+    else
+        { history
+            | before = current :: before
+            , current = el
+            , after = []
+            , transition = Just (customTransition basicDuration Forward EaseInOut)
+        }
+
+
+pull : History -> History
+pull ({ transition, before, current, after } as history) =
+    if isRunning transition then
+        history
+    else
+        case before of
+            [] ->
+                history
+
+            head :: tail ->
+                { history
+                    | before = tail
+                    , current = head
+                    , after = current :: after
+                    , transition = Just (customTransition basicDuration Backward EaseInOut)
+                }
+
+
+handleHistory : HistoryMsg -> History -> History
+handleHistory val history =
+    case val of
+        Enter val ->
+            history |> push (Show val)
+
+        Back ->
+            history |> pull
+
+        Tick diff ->
+            (case history.transition of
+                Nothing ->
+                    history
+
+                Just transition ->
+                    let
+                        newTransition =
+                            (transition |> timeDiff diff)
+                    in
+                        if newTransition.timer > 0 then
+                            { history | transition = Just newTransition }
+                        else
+                            { history | transition = Nothing }
+            )
+
+
+historySubscriptions : History -> Sub Msg
+historySubscriptions history =
+    maybeTransitionSubscription history.transition
+
+
+initHistory : History
+initHistory =
+    { before = []
+    , current = Index
+    , after = []
+    , transition = Nothing
+    }
+
+
 titleView : Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 titleView fable =
     div
@@ -103,6 +246,11 @@ header =
         ]
 
 
+gray : Color.Color
+gray =
+    Color.rgba 0 0 0 0.5
+
+
 body : Fable -> Node interactiveContent phrasingContent Spanning NotListElement msg
 body fable =
     div [ style [ Elegant.overflowYScroll, Elegant.fullWidth ] ]
@@ -111,19 +259,12 @@ body fable =
         ]
 
 
-showView :
-    Fable
-    -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+showView : Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 showView fable =
     div [ style [ Elegant.backgroundColor Color.white, Elegant.height (Vh 100), Elegant.displayFlex, Elegant.flexDirectionColumn ] ]
         [ header
         , body fable
         ]
-
-
-gray : Color.Color
-gray =
-    Color.rgba 0 0 0 0.5
 
 
 insidePageView : Page -> List Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
@@ -141,15 +282,6 @@ insidePageView page fables =
                 )
 
 
-borderBottom : Color.Color -> Elegant.Style -> Elegant.Style
-borderBottom color =
-    [ Elegant.borderBottomColor color
-    , Elegant.borderBottomWidth 1
-    , Elegant.borderBottomSolid
-    ]
-        |> compose
-
-
 pageView sizeUntilNow beforeSize transition page current fables =
     let
         boxShadowIfRunning =
@@ -164,48 +296,8 @@ pageView sizeUntilNow beforeSize transition page current fables =
         ]
 
 
-getMaybeTransitionValue : Maybe Transition -> Float
-getMaybeTransitionValue maybeTransition =
-    case maybeTransition of
-        Nothing ->
-            0
-
-        Just transition ->
-            transition |> getTransitionValue
-
-
-getTransitionValue : Transition -> Float
-getTransitionValue { direction, timer, length, easing } =
-    (case direction of
-        Forward ->
-            negate
-
-        Backward ->
-            identity
-    )
-        ((easingFun easing) (timer / length))
-
-
-easingFun : Easing -> Float -> Float
-easingFun easing =
-    case easing of
-        EaseInOut ->
-            easeInOut
-
-        Linear ->
-            identity
-
-
-easeInOut : Float -> Float
-easeInOut t =
-    if t < 0.5 then
-        2 * t * t
-    else
-        -1 + (4 - 2 * t) * t
-
-
-view : Model -> Node Interactive NotPhrasing Spanning NotListElement Msg
-view { history, data } =
+tableView : History -> List Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+tableView history data =
     let
         total =
             history.before ++ [ history.current ] ++ history.after
@@ -263,105 +355,21 @@ view { history, data } =
             ]
 
 
-isRunning : Maybe Transition -> Bool
-isRunning transition =
-    case transition of
-        Nothing ->
-            False
-
-        Just transition ->
-            transition.timer /= 0
-
-
-push : Page -> History -> History
-push el history =
-    if isRunning history.transition then
-        history
-    else
-        { history
-            | before = history.current :: history.before
-            , current = el
-            , after = []
-            , transition = Just (transition Forward basicLength EaseInOut)
-        }
-
-
-basicLength : number
-basicLength =
-    250
-
-
-transition : Direction -> Float -> Easing -> Transition
-transition direction length easing =
-    { direction = direction, length = length, timer = length, easing = easing }
-
-
-pull : History -> History
-pull history =
-    if isRunning history.transition then
-        history
-    else
-        case history.before of
-            [] ->
-                history
-
-            head :: tail ->
-                { history
-                    | before = tail
-                    , current = head
-                    , after = history.current :: history.after
-                    , transition = Just (transition Backward basicLength EaseInOut)
-                }
-
-
-timeDiff : Float -> Transition -> Transition
-timeDiff diff ({ timer } as transition) =
-    let
-        newTimer =
-            if timer - diff <= 0 then
-                0
-            else
-                timer - diff
-    in
-        { transition | timer = newTimer }
-
-
-handleHistory : HistoryMsg -> History -> History
-handleHistory val history =
-    case val of
-        Enter val ->
-            history |> push (Show val)
-
-        Back ->
-            history |> pull
-
-        Tick diff ->
-            (case history.transition of
-                Nothing ->
-                    history
-
-                Just transition ->
-                    let
-                        newTransition =
-                            (transition |> timeDiff diff)
-                    in
-                        if newTransition.timer > 0 then
-                            { history | transition = Just newTransition }
-                        else
-                            { history | transition = Nothing }
-            )
+view : Model -> Node Interactive NotPhrasing Spanning NotListElement Msg
+view { history, data } =
+    tableView history data
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
-        HistoryMsgWrapper val ->
-            ( { model | history = handleHistory val model.history }, Cmd.none )
+        HistoryMsgWrapper historyMsg ->
+            ( { model | history = handleHistory historyMsg model.history }, Cmd.none )
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    case model.history.transition of
+maybeTransitionSubscription : Maybe Transition -> Sub Msg
+maybeTransitionSubscription transition =
+    case transition of
         Nothing ->
             Sub.none
 
@@ -369,13 +377,9 @@ subscriptions model =
             AnimationFrame.diffs (HistoryMsgWrapper << Tick)
 
 
-initHistory : History
-initHistory =
-    { before = []
-    , current = Index
-    , after = []
-    , transition = Nothing
-    }
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    historySubscriptions model.history
 
 
 init : Model
