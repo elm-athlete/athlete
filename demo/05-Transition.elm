@@ -325,7 +325,7 @@ insidePageView page fables =
                 )
 
 
-pageView transition page current fables =
+pageView transition current fables page =
     let
         boxShadowIfRunning =
             if isRunning transition then
@@ -400,15 +400,9 @@ tableView history fables =
                     ]
                 ]
                 (if history.transition |> isRunning then
-                    (List.foldl
-                        (\page views ->
-                            views ++ (pageView history.transition page visiblePages_ fables)
-                        )
-                        []
-                        visiblePages_
-                    )
+                    List.concatMap (pageView history.transition visiblePages_ fables) visiblePages_
                  else
-                    pageView history.transition history.current history.current fables
+                    pageView history.transition history.current fables history.current
                 )
             ]
 
