@@ -136,6 +136,16 @@ timeDiff diff ({ timer } as transition) =
         { transition | timer = newTimer }
 
 
+maybeTransitionSubscription : Maybe Transition -> Sub Msg
+maybeTransitionSubscription transition =
+    case transition of
+        Nothing ->
+            Sub.none
+
+        Just transition ->
+            AnimationFrame.diffs (HistoryMsgWrapper << Tick)
+
+
 basicDuration : number
 basicDuration =
     250
@@ -251,19 +261,32 @@ gray =
     Color.rgba 0 0 0 0.5
 
 
-body : Fable -> Node interactiveContent phrasingContent Spanning NotListElement msg
-body fable =
+body :
+    (a -> Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> a
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+body bodyFun data =
     div [ style [ Elegant.overflowYScroll, Elegant.fullWidth ] ]
-        [ img "" fable.image [ style [ Elegant.fullWidth ] ]
-        , div [ style [ Elegant.padding Elegant.medium ] ] ((fable.content |> String.split "\n" |> List.map (\e -> div [] [ text e ])))
+        [ bodyFun data
         ]
 
 
-showView : Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
-showView fable =
+showView :
+    (a -> Node interactiveContent phrasingContent Spanning NotListElement Msg)
+    -> a
+    -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+showView bodyFun data =
     div [ style [ Elegant.backgroundColor Color.white, Elegant.height (Vh 100), Elegant.displayFlex, Elegant.flexDirectionColumn ] ]
         [ header
-        , body fable
+        , body bodyFun data
+        ]
+
+
+fableBodyView : Fable -> Node interactiveContent phrasingContent Spanning NotListElement msg
+fableBodyView fable =
+    div []
+        [ img "" fable.image [ style [ Elegant.fullWidth ] ]
+        , div [ style [ Elegant.padding Elegant.medium ] ] ((fable.content |> String.split "\n" |> List.map (\e -> div [] [ text e ])))
         ]
 
 
@@ -278,7 +301,7 @@ insidePageView page fables =
             div []
                 (fables
                     |> List.filter (\e -> e.id == val)
-                    |> List.map showView
+                    |> List.map (showView fableBodyView)
                 )
 
 
@@ -297,7 +320,7 @@ pageView sizeUntilNow beforeSize transition page current fables =
 
 
 tableView : History -> List Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
-tableView history data =
+tableView history fables =
     let
         total =
             history.before ++ [ history.current ] ++ history.after
@@ -342,7 +365,7 @@ tableView history data =
                         (List.foldl
                             (\page ( sizeUntilNow, views ) ->
                                 ( sizeUntilNow + 1
-                                , views ++ (pageView sizeUntilNow beforeSize history.transition page history.current data)
+                                , views ++ (pageView sizeUntilNow beforeSize history.transition page history.current fables)
                                 )
                             )
                             ( 0, [] )
@@ -350,7 +373,7 @@ tableView history data =
                         )
                     )
                  else
-                    pageView 0 0 history.transition history.current history.current data
+                    pageView 0 0 history.transition history.current history.current fables
                 )
             ]
 
@@ -365,16 +388,6 @@ update msg model =
     case msg of
         HistoryMsgWrapper historyMsg ->
             ( { model | history = handleHistory historyMsg model.history }, Cmd.none )
-
-
-maybeTransitionSubscription : Maybe Transition -> Sub Msg
-maybeTransitionSubscription transition =
-    case transition of
-        Nothing ->
-            Sub.none
-
-        Just transition ->
-            AnimationFrame.diffs (HistoryMsgWrapper << Tick)
 
 
 subscriptions : Model -> Sub Msg
