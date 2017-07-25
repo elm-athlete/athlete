@@ -325,7 +325,7 @@ insidePageView page fables =
                 )
 
 
-pageView sizeUntilNow beforeSize transition page current fables =
+pageView transition page current fables =
     let
         boxShadowIfRunning =
             if isRunning transition then
@@ -400,19 +400,15 @@ tableView history fables =
                     ]
                 ]
                 (if history.transition |> isRunning then
-                    (Tuple.second
-                        (List.foldl
-                            (\page ( sizeUntilNow, views ) ->
-                                ( sizeUntilNow + 1
-                                , views ++ (pageView sizeUntilNow beforeSize history.transition page visiblePages_ fables)
-                                )
-                            )
-                            ( 0, [] )
-                            visiblePages_
+                    (List.foldl
+                        (\page views ->
+                            views ++ (pageView history.transition page visiblePages_ fables)
                         )
+                        []
+                        visiblePages_
                     )
                  else
-                    pageView 0 0 history.transition history.current history.current fables
+                    pageView history.transition history.current history.current fables
                 )
             ]
 
