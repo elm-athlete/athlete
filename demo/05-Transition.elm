@@ -18,6 +18,8 @@ import Time exposing (Time)
 type Page
     = Index
     | Show Int
+    | ShowImg String
+    | ShowNotes Int
 
 
 type Easing
@@ -54,7 +56,9 @@ type Direction
 
 type HistoryMsg
     = Enter Int
+    | EnterNotes Int
     | Back
+    | ShowImage String
     | Tick Time
 
 
@@ -70,6 +74,7 @@ type alias Fable =
     { id : Int
     , title : String
     , content : MarkdownString
+    , notes : Maybe String
     , image : String
     }
 
@@ -111,7 +116,7 @@ getTransitionValue { direction, timer, length, easing } =
         Backward ->
             identity
     )
-        ((easingFun easing) (timer / length))
+        (easingFun easing <| timer / length)
         + (case direction of
             Forward ->
                 1
@@ -150,7 +155,7 @@ maybeTransitionSubscription transition =
             Sub.none
 
         Just transition ->
-            AnimationFrame.diffs (HistoryMsgWrapper << Tick)
+            AnimationFrame.diffs <| HistoryMsgWrapper << Tick
 
 
 basicDuration : number
@@ -172,7 +177,7 @@ push el ({ transition, before, current, after } as history) =
             | before = current :: before
             , current = el
             , after = []
-            , transition = Just (customTransition basicDuration Forward EaseInOut)
+            , transition = Just <| customTransition basicDuration Forward EaseInOut
         }
 
 
@@ -190,7 +195,7 @@ pull ({ transition, before, current, after } as history) =
                     | before = tail
                     , current = head
                     , after = current :: after
-                    , transition = Just (customTransition basicDuration Backward EaseInOut)
+                    , transition = Just <| customTransition basicDuration Backward EaseInOut
                 }
 
 
@@ -199,6 +204,12 @@ handleHistory val history =
     case val of
         Enter val ->
             history |> push (Show val)
+
+        ShowImage image ->
+            history |> push (ShowImg image)
+
+        EnterNotes val ->
+            history |> push (ShowNotes val)
 
         Back ->
             history |> pull
@@ -242,7 +253,7 @@ gray =
 titleView : Fable -> Node Interactive phrasingContent Spanning NotListElement Msg
 titleView fable =
     button
-        [ onClick (HistoryMsgWrapper (Enter fable.id))
+        [ onClick <| HistoryMsgWrapper <| Enter fable.id
         , style
             [ Elegant.cursorPointer
             , Elegant.borderNone
@@ -255,7 +266,7 @@ titleView fable =
             , Elegant.backgroundColor Color.white
             , Elegant.fullWidth
             ]
-        , focusStyle [ Elegant.backgroundColor (Color.grayscale 0.05) ]
+        , focusStyle [ Elegant.backgroundColor <| Color.grayscale 0.05 ]
         ]
         [ text fable.title ]
 
@@ -263,7 +274,7 @@ titleView fable =
 header : Node interactiveContent phrasingContent Spanning NotListElement Msg
 header =
     div
-        [ onClick (HistoryMsgWrapper Back)
+        [ onClick <| HistoryMsgWrapper Back
         , style
             [ Elegant.backgroundColor Color.white
             , Elegant.textColor Color.black
@@ -308,20 +319,42 @@ showView bodyFun data =
         ]
 
 
-fableContentView : String -> List (Node interactiveContent Phrasing spanningContent NotListElement msg)
-fableContentView =
+textToHtml : String -> List (Node interactiveContent Phrasing spanningContent NotListElement msg)
+textToHtml =
     (>>)
         (String.split "\n")
         (List.foldl (\e accu -> accu ++ [ text e, br [] ]) [])
 
 
 fableBodyView : Fable -> Node interactiveContent Phrasing Spanning NotListElement Msg
-fableBodyView { image, content } =
+fableBodyView { image, content, id, notes } =
     div []
-        [ img "" image [ style [ Elegant.fullWidth ] ]
-        , div [ style [ Elegant.padding Elegant.medium ] ]
-            (fableContentView content)
-        ]
+        ([ img "" image [ style [ Elegant.fullWidth ] ]
+         , div [ style [ Elegant.padding Elegant.medium ] ]
+            ((textToHtml content)
+                ++ (case notes of
+                        Nothing ->
+                            []
+
+                        Just notes_ ->
+                            [ div [ onClick <| HistoryMsgWrapper <| EnterNotes id, style [ Elegant.cursorPointer, Elegant.underline ] ] [ text "Show notes..." ] ]
+                   )
+            )
+         ]
+        )
+
+
+fableNotesView : Fable -> Node interactiveContent Phrasing Spanning NotListElement msg
+fableNotesView { notes } =
+    case notes of
+        Nothing ->
+            text ""
+
+        Just notes_ ->
+            div []
+                [ div [ style [ Elegant.padding Elegant.medium ] ]
+                    (textToHtml notes_)
+                ]
 
 
 insidePageView : Page -> List Fable -> Node Interactive Phrasing Spanning NotListElement Msg
@@ -337,6 +370,19 @@ insidePageView page fables =
                     |> List.filter (\e -> e.id == val)
                     |> List.map (showView fableBodyView)
                 )
+
+        ShowNotes val ->
+            div []
+                (fables
+                    |> List.filter (\e -> e.id == val)
+                    |> List.map (showView fableNotesView)
+                )
+
+        ShowImg src ->
+            div []
+                [ header
+                , img "" src [ style [ Elegant.fullWidth ] ]
+                ]
 
 
 pageView : Maybe Transition -> List Fable -> Page -> List (Node Interactive Phrasing Spanning NotListElement Msg)
@@ -379,7 +425,7 @@ visiblePages { transition, before, current, after } =
 
 percentage : Float -> SizeUnit
 percentage a =
-    (Percent (100 * (a)))
+    Percent <| 100 * a
 
 
 historyView :
@@ -395,9 +441,9 @@ historyView history fables =
             [ div
                 [ style
                     [ Elegant.displayFlex
-                    , Elegant.width (percentage (visiblePages_ |> List.length |> toFloat))
+                    , Elegant.width <| percentage <| toFloat <| List.length <| visiblePages_
                     , Elegant.positionRelative
-                    , Elegant.right (percentage (getMaybeTransitionValue history.transition))
+                    , Elegant.right <| percentage <| getMaybeTransitionValue <| history.transition
                     ]
                 ]
                 (List.concatMap (pageView history.transition fables) visiblePages_)
@@ -429,11 +475,13 @@ init =
         [ { id = 1
           , title = "La cigale et la fourmi"
           , content = "La Cigale, ayant chanté\nTout l'Été,\nSe trouva fort dépourvue\nQuand la bise fut venue.\nPas un seul petit morceau\nDe mouche ou de vermisseau.\nElle alla crier famine\nChez la Fourmi sa voisine,\nLa priant de lui prêter\nQuelque grain pour subsister\nJusqu'à la saison nouvelle.\nJe vous paierai, lui dit-elle,\nAvant l'Oût, foi d'animal,\nIntérêt et principal.\nLa Fourmi n'est pas prêteuse ;\nC'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ?\nDit-elle à cette emprunteuse.\n— Nuit et jour à tout venant\nJe chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise.\nEh bien !dansez maintenant. »\n"
+          , notes = Just "Cette fable est la première du premier recueil (124 fables, divisées en 6 livres) paru en mars 1668. Ce recueil est dédié au Dauphin, le fils de Louis XIV et de Marie-Thérèse, alors âgé de 6 ans et demi. La dédicace est en prose, suivie de la Préface au lecteur, de la traduction libre de la 'Vie d'Esope', et se termine par un compliment en vers reprenant et résumant l'essentiel de la dédicace en prose.\n'Ainsi ces fables sont un tableau où chacun de nous se trouve dépeint'\n'Je chante les héros dont Esope est le père'....sont des extraits célèbres de cette dédicace\n"
           , image = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Snodgrass_Magicicada_septendecim.jpg/1024px-Snodgrass_Magicicada_septendecim.jpg"
           }
         , { id = 2
           , title = "Le corbeau et le renard"
           , content = "Maître Corbeau, sur un arbre perché,\nTenait en son bec un fromage.\nMaître Renard, par l'odeur alléché,\nLui tint à peu près ce langage :\nEt bonjour, Monsieur du Corbeau.\nQue vous êtes joli ! que vous me semblez beau !\nSans mentir, si votre ramage\nSe rapporte à votre plumage,\nVous êtes le Phénix des hôtes de ces bois.\nÀ ces mots, le Corbeau ne se sent pas de joie ;\nEt pour montrer sa belle voix,\nIl ouvre un large bec, laisse tomber sa proie.\nLe Renard s'en saisit, et dit : Mon bon Monsieur,\nApprenez que tout flatteur\nVit aux dépens de celui qui l'écoute.\nCette leçon vaut bien un fromage, sans doute.\nLe Corbeau honteux et confus\nJura, mais un peu tard, qu'on ne l'y prendrait plus."
+          , notes = Nothing
           , image = "https://upload.wikimedia.org/wikipedia/commons/4/47/Karga_9107.svg"
           }
         ]
