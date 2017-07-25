@@ -112,6 +112,13 @@ getTransitionValue { direction, timer, length, easing } =
             identity
     )
         ((easingFun easing) (timer / length))
+        + (case direction of
+            Forward ->
+                1
+
+            Backward ->
+                0
+          )
 
 
 isRunning : Maybe Transition -> Bool
@@ -121,7 +128,7 @@ isRunning transition =
             False
 
         Just transition ->
-            transition.timer /= 0
+            transition.timer > 0
 
 
 timeDiff : Float -> Transition -> Transition
@@ -227,16 +234,28 @@ initHistory =
     }
 
 
-titleView : Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+gray : Color.Color
+gray =
+    Color.grayscale 0.9
+
+
+titleView : Fable -> Node Interactive phrasingContent Spanning NotListElement Msg
 titleView fable =
-    div
+    button
         [ onClick (HistoryMsgWrapper (Enter fable.id))
         , style
             [ Elegant.cursorPointer
+            , Elegant.borderNone
             , borderBottom gray
+            , Elegant.outlineNone
+            , Elegant.textLeft
+            , Elegant.fontFamilyInherit
+            , Elegant.fontSize Elegant.zeta
             , Elegant.padding Elegant.large
             , Elegant.backgroundColor Color.white
+            , Elegant.fullWidth
             ]
+        , focusStyle [ Elegant.backgroundColor (Color.grayscale 0.05) ]
         ]
         [ text fable.title ]
 
@@ -254,11 +273,6 @@ header =
         ]
         [ text "< back"
         ]
-
-
-gray : Color.Color
-gray =
-    Color.rgba 0 0 0 0.5
 
 
 body :
@@ -301,7 +315,7 @@ fableContentView =
         (List.foldl (\e accu -> accu ++ [ text e, br [] ]) [])
 
 
-fableBodyView : Fable -> Node interactiveContent Phrasing Spanning NotListElement msg
+fableBodyView : Fable -> Node interactiveContent Phrasing Spanning NotListElement Msg
 fableBodyView { image, content } =
     div []
         [ img "" image [ style [ Elegant.fullWidth ] ]
@@ -310,7 +324,7 @@ fableBodyView { image, content } =
         ]
 
 
-insidePageView : Page -> List Fable -> Node interactiveContent Phrasing Spanning NotListElement Msg
+insidePageView : Page -> List Fable -> Node Interactive Phrasing Spanning NotListElement Msg
 insidePageView page fables =
     case page of
         Index ->
@@ -325,12 +339,12 @@ insidePageView page fables =
                 )
 
 
-pageView : Maybe Transition -> List Fable -> Page -> List (Node interactiveContent Phrasing Spanning NotListElement Msg)
+pageView : Maybe Transition -> List Fable -> Page -> List (Node Interactive Phrasing Spanning NotListElement Msg)
 pageView transition fables page =
     let
         boxShadowIfRunning =
             if isRunning transition then
-                [ Elegant.boxShadowCenteredBlurry (Px 5) Color.black ]
+                [ Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale (abs (transition |> getMaybeTransitionValue))) ]
             else
                 []
     in
@@ -365,48 +379,32 @@ visiblePages { transition, before, current, after } =
                     [ current ] ++ (putHeadInListIfExists after)
 
 
-tableView :
+historyView :
     History
     -> List Fable
-    -> Node interactiveContent Phrasing Spanning NotListElement Msg
-tableView history fables =
+    -> Node Interactive Phrasing Spanning NotListElement Msg
+historyView history fables =
     let
         visiblePages_ =
             visiblePages history
-
-        visiblePagesSize =
-            visiblePages_ |> List.length |> toFloat
-
-        beforeSize =
-            history.before |> List.length |> toFloat
     in
         div [ style [ Elegant.overflowHidden ] ]
             [ div
                 [ style
                     [ Elegant.displayFlex
-                    , Elegant.width (Percent (100 * visiblePagesSize))
-                    , Elegant.right
-                        (Percent
-                            (100
-                                * ((if history.transition |> isRunning then
-                                        beforeSize
-                                    else
-                                        0
-                                   )
-                                    + getMaybeTransitionValue history.transition
-                                  )
-                            )
-                        )
+                    , Elegant.width (Percent (100 * (visiblePages_ |> List.length |> toFloat)))
                     , Elegant.positionRelative
+                    , Elegant.right (Percent (100 * (getMaybeTransitionValue history.transition)))
                     ]
                 ]
                 (List.concatMap (pageView history.transition fables) visiblePages_)
             ]
 
 
-view : Model -> Node interactiveContent Phrasing Spanning NotListElement Msg
+view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
 view { history, fables } =
-    tableView history fables
+    div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
+        [ historyView history fables ]
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
