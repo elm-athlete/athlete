@@ -43,7 +43,7 @@ type alias History =
 
 type alias Model =
     { history : History
-    , data : List Fable
+    , fables : List Fable
     }
 
 
@@ -402,8 +402,8 @@ tableView history fables =
 
 
 view : Model -> Node interactiveContent Phrasing Spanning NotListElement Msg
-view { history, data } =
-    tableView history data
+view { history, fables } =
+    tableView history fables
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
@@ -421,7 +421,7 @@ subscriptions model =
 init : Model
 init =
     { history = initHistory
-    , data =
+    , fables =
         [ { id = 1
           , title = "La cigale et la fourmi"
           , content = "La Cigale, ayant chanté\nTout l'Été,\nSe trouva fort dépourvue\nQuand la bise fut venue.\nPas un seul petit morceau\nDe mouche ou de vermisseau.\nElle alla crier famine\nChez la Fourmi sa voisine,\nLa priant de lui prêter\nQuelque grain pour subsister\nJusqu'à la saison nouvelle.\nJe vous paierai, lui dit-elle,\nAvant l'Oût, foi d'animal,\nIntérêt et principal.\nLa Fourmi n'est pas prêteuse ;\nC'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ?\nDit-elle à cette emprunteuse.\n— Nuit et jour à tout venant\nJe chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise.\nEh bien !dansez maintenant. »\n"
