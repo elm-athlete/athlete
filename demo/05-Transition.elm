@@ -376,7 +376,7 @@ visiblePages { transition, before, current, after } =
                     (putHeadInListIfExists before) ++ [ current ]
 
                 Backward ->
-                    [ current ] ++ (putHeadInListIfExists after)
+                    current :: putHeadInListIfExists after
 
 
 historyView :
