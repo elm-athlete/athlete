@@ -325,7 +325,8 @@ insidePageView page fables =
                 )
 
 
-pageView transition current fables page =
+pageView : Maybe Transition -> List Fable -> Page -> List (Node interactiveContent Phrasing Spanning NotListElement Msg)
+pageView transition fables page =
     let
         boxShadowIfRunning =
             if isRunning transition then
@@ -399,11 +400,7 @@ tableView history fables =
                     , Elegant.positionRelative
                     ]
                 ]
-                (if history.transition |> isRunning then
-                    List.concatMap (pageView history.transition visiblePages_ fables) visiblePages_
-                 else
-                    pageView history.transition history.current fables history.current
-                )
+                (List.concatMap (pageView history.transition fables) visiblePages_)
             ]
 
 
