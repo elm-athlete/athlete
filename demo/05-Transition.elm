@@ -33,12 +33,17 @@ type alias Transition =
     }
 
 
-type alias Model =
+type alias History =
     { before : List Page
     , current : Page
     , after : List Page
     , transition : Maybe Transition
-    , fables : List Fable
+    }
+
+
+type alias Model =
+    { history : History
+    , data : List Fable
     }
 
 
@@ -47,10 +52,14 @@ type Direction
     | Backward
 
 
-type Msg
+type HistoryMsg
     = Enter Int
     | Back
     | Tick Time
+
+
+type Msg
+    = HistoryMsgWrapper HistoryMsg
 
 
 type alias MarkdownString =
@@ -68,7 +77,7 @@ type alias Fable =
 titleView : Fable -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 titleView fable =
     div
-        [ onClick (Enter fable.id)
+        [ onClick (HistoryMsgWrapper (Enter fable.id))
         , style
             [ Elegant.cursorPointer
             , borderBottom gray
@@ -82,7 +91,7 @@ titleView fable =
 header : Node interactiveContent phrasingContent Spanning NotListElement Msg
 header =
     div
-        [ onClick Back
+        [ onClick (HistoryMsgWrapper Back)
         , style
             [ Elegant.backgroundColor Color.white
             , Elegant.textColor Color.black
@@ -196,16 +205,16 @@ easeInOut t =
 
 
 view : Model -> Node Interactive NotPhrasing Spanning NotListElement Msg
-view model =
+view { history, data } =
     let
         total =
-            model.before ++ [ model.current ] ++ model.after
+            history.before ++ [ history.current ] ++ history.after
 
         totalSize =
             total |> List.length |> toFloat
 
         beforeSize =
-            model.before |> List.length |> toFloat
+            history.before |> List.length |> toFloat
     in
         div [ style [ Elegant.overflowHidden ] ]
             [ div
@@ -214,7 +223,7 @@ view model =
                     , Elegant.width
                         (Percent
                             (100
-                                * (if model.transition |> isRunning then
+                                * (if history.transition |> isRunning then
                                     totalSize
                                    else
                                     1
@@ -224,24 +233,24 @@ view model =
                     , Elegant.right
                         (Percent
                             (100
-                                * ((if model.transition |> isRunning then
+                                * ((if history.transition |> isRunning then
                                         beforeSize
                                     else
                                         0
                                    )
-                                    + getMaybeTransitionValue model.transition
+                                    + getMaybeTransitionValue history.transition
                                   )
                             )
                         )
                     , Elegant.positionRelative
                     ]
                 ]
-                (if model.transition |> isRunning then
+                (if history.transition |> isRunning then
                     (Tuple.second
                         (List.foldl
                             (\page ( sizeUntilNow, views ) ->
                                 ( sizeUntilNow + 1
-                                , views ++ (pageView sizeUntilNow beforeSize model.transition page model.current model.fables)
+                                , views ++ (pageView sizeUntilNow beforeSize history.transition page history.current data)
                                 )
                             )
                             ( 0, [] )
@@ -249,7 +258,7 @@ view model =
                         )
                     )
                  else
-                    pageView 0 0 model.transition model.current model.current model.fables
+                    pageView 0 0 history.transition history.current history.current data
                 )
             ]
 
@@ -264,19 +273,20 @@ isRunning transition =
             transition.timer /= 0
 
 
-push : Page -> Model -> Model
-push el model =
-    if isRunning model.transition then
-        model
+push : Page -> History -> History
+push el history =
+    if isRunning history.transition then
+        history
     else
-        { model
-            | before = model.current :: model.before
+        { history
+            | before = history.current :: history.before
             , current = el
             , after = []
             , transition = Just (transition Forward basicLength EaseInOut)
         }
 
 
+basicLength : number
 basicLength =
     250
 
@@ -286,20 +296,20 @@ transition direction length easing =
     { direction = direction, length = length, timer = length, easing = easing }
 
 
-pull : Model -> Model
-pull model =
-    if isRunning model.transition then
-        model
+pull : History -> History
+pull history =
+    if isRunning history.transition then
+        history
     else
-        case model.before of
+        case history.before of
             [] ->
-                model
+                history
 
             head :: tail ->
-                { model
+                { history
                     | before = tail
                     , current = head
-                    , after = model.current :: model.after
+                    , after = history.current :: history.after
                     , transition = Just (transition Backward basicLength EaseInOut)
                 }
 
@@ -316,19 +326,19 @@ timeDiff diff ({ timer } as transition) =
         { transition | timer = newTimer }
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
-update msg model =
-    case msg of
+handleHistory : HistoryMsg -> History -> History
+handleHistory val history =
+    case val of
         Enter val ->
-            ( model |> push (Show val), Cmd.none )
+            history |> push (Show val)
 
         Back ->
-            ( model |> pull, Cmd.none )
+            history |> pull
 
         Tick diff ->
-            ( (case model.transition of
+            (case history.transition of
                 Nothing ->
-                    model
+                    history
 
                 Just transition ->
                     let
@@ -336,31 +346,42 @@ update msg model =
                             (transition |> timeDiff diff)
                     in
                         if newTransition.timer > 0 then
-                            { model | transition = Just newTransition }
+                            { history | transition = Just newTransition }
                         else
-                            { model | transition = Nothing }
-              )
-            , Cmd.none
+                            { history | transition = Nothing }
             )
+
+
+update : Msg -> Model -> ( Model, Cmd msg )
+update msg model =
+    case msg of
+        HistoryMsgWrapper val ->
+            ( { model | history = handleHistory val model.history }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    case model.transition of
+    case model.history.transition of
         Nothing ->
             Sub.none
 
         Just transition ->
-            AnimationFrame.diffs Tick
+            AnimationFrame.diffs (HistoryMsgWrapper << Tick)
 
 
-init : Model
-init =
+initHistory : History
+initHistory =
     { before = []
     , current = Index
     , after = []
     , transition = Nothing
-    , fables =
+    }
+
+
+init : Model
+init =
+    { history = initHistory
+    , data =
         [ { id = 1
           , title = "La cigale et la fourmi"
           , content = "La Cigale, ayant chanté\nTout l'Été,\nSe trouva fort dépourvue\nQuand la bise fut venue.\nPas un seul petit morceau\nDe mouche ou de vermisseau.\nElle alla crier famine\nChez la Fourmi sa voisine,\nLa priant de lui prêter\nQuelque grain pour subsister\nJusqu'à la saison nouvelle.\nJe vous paierai, lui dit-elle,\nAvant l'Oût, foi d'animal,\nIntérêt et principal.\nLa Fourmi n'est pas prêteuse ;\nC'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ?\nDit-elle à cette emprunteuse.\n— Nuit et jour à tout venant\nJe chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise.\nEh bien !dansez maintenant. »\n"
