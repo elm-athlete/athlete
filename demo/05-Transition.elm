@@ -339,17 +339,42 @@ pageView sizeUntilNow beforeSize transition page current fables =
         ]
 
 
+putHeadInListIfExists : List a -> List a
+putHeadInListIfExists list =
+    case list of
+        [] ->
+            []
+
+        head :: _ ->
+            [ head ]
+
+
+visiblePages : History -> List Page
+visiblePages { transition, before, current, after } =
+    case transition of
+        Nothing ->
+            [ current ]
+
+        Just transition ->
+            case transition.direction of
+                Forward ->
+                    (putHeadInListIfExists before) ++ [ current ]
+
+                Backward ->
+                    [ current ] ++ (putHeadInListIfExists after)
+
+
 tableView :
     History
     -> List Fable
     -> Node interactiveContent Phrasing Spanning NotListElement Msg
 tableView history fables =
     let
-        total =
-            history.before ++ [ history.current ] ++ history.after
+        visiblePages_ =
+            visiblePages history
 
-        totalSize =
-            total |> List.length |> toFloat
+        visiblePagesSize =
+            visiblePages_ |> List.length |> toFloat
 
         beforeSize =
             history.before |> List.length |> toFloat
@@ -358,16 +383,7 @@ tableView history fables =
             [ div
                 [ style
                     [ Elegant.displayFlex
-                    , Elegant.width
-                        (Percent
-                            (100
-                                * (if history.transition |> isRunning then
-                                    totalSize
-                                   else
-                                    1
-                                  )
-                            )
-                        )
+                    , Elegant.width (Percent (100 * visiblePagesSize))
                     , Elegant.right
                         (Percent
                             (100
@@ -388,11 +404,11 @@ tableView history fables =
                         (List.foldl
                             (\page ( sizeUntilNow, views ) ->
                                 ( sizeUntilNow + 1
-                                , views ++ (pageView sizeUntilNow beforeSize history.transition page history.current fables)
+                                , views ++ (pageView sizeUntilNow beforeSize history.transition page visiblePages_ fables)
                                 )
                             )
                             ( 0, [] )
-                            total
+                            visiblePages_
                         )
                     )
                  else
