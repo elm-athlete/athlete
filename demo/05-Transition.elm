@@ -341,17 +341,15 @@ insidePageView page fables =
 
 pageView : Maybe Transition -> List Fable -> Page -> List (Node Interactive Phrasing Spanning NotListElement Msg)
 pageView transition fables page =
-    let
-        boxShadowIfRunning =
-            if isRunning transition then
-                [ Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale (abs (transition |> getMaybeTransitionValue))) ]
-            else
-                []
-    in
-        [ div
-            [ style ([ Elegant.fullWidth ] ++ boxShadowIfRunning) ]
-            [ insidePageView page fables ]
+    [ div
+        [ style
+            ([ Elegant.fullWidth
+             , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
+             ]
+            )
         ]
+        [ insidePageView page fables ]
+    ]
 
 
 putHeadInListIfExists : List a -> List a
@@ -379,6 +377,11 @@ visiblePages { transition, before, current, after } =
                     current :: putHeadInListIfExists after
 
 
+percentage : Float -> SizeUnit
+percentage a =
+    (Percent (100 * (a)))
+
+
 historyView :
     History
     -> List Fable
@@ -392,9 +395,9 @@ historyView history fables =
             [ div
                 [ style
                     [ Elegant.displayFlex
-                    , Elegant.width (Percent (100 * (visiblePages_ |> List.length |> toFloat)))
+                    , Elegant.width (percentage (visiblePages_ |> List.length |> toFloat))
                     , Elegant.positionRelative
-                    , Elegant.right (Percent (100 * (getMaybeTransitionValue history.transition)))
+                    , Elegant.right (percentage (getMaybeTransitionValue history.transition))
                     ]
                 ]
                 (List.concatMap (pageView history.transition fables) visiblePages_)
