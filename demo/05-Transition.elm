@@ -33,9 +33,14 @@ type Easing
     | Linear
 
 
+type Kind
+    = SlideFromLeftToRight
+
+
 type alias Transition =
     { timer : Float
     , length : Float
+    , kind : Kind
     , direction : Direction
     , easing : Easing
     }
@@ -169,7 +174,7 @@ basicDuration =
     250
 
 
-customTransition : Float -> Direction -> Easing -> Transition
+customTransition : Float -> Kind -> Direction -> Easing -> Transition
 customTransition duration =
     Transition duration duration
 
@@ -211,7 +216,7 @@ opposite maybeTransition =
 
 defaultTransition : Maybe Transition
 defaultTransition =
-    Just <| customTransition basicDuration Forward EaseInOut
+    Just <| customTransition basicDuration SlideFromLeftToRight Forward EaseInOut
 
 
 pageWithDefaultTransition : Route -> Page
@@ -437,19 +442,6 @@ insidePageView page fables =
                 ]
 
 
-pageView : Maybe Transition -> List Fable -> Page -> List (Node Interactive Phrasing Spanning NotListElement Msg)
-pageView transition fables page =
-    [ div
-        [ style
-            ([ Elegant.fullWidth
-             , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
-             ]
-            )
-        ]
-        [ insidePageView page fables ]
-    ]
-
-
 putHeadInListIfExists : List a -> List a
 putHeadInListIfExists list =
     case list of
@@ -480,6 +472,18 @@ percentage a =
     Percent <| 100 * a
 
 
+pageView : Maybe Transition -> List Fable -> Page -> Node Interactive Phrasing Spanning NotListElement Msg
+pageView transition fables page =
+    div
+        [ style
+            ([ Elegant.fullWidth
+             , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
+             ]
+            )
+        ]
+        [ insidePageView page fables ]
+
+
 historyView :
     History
     -> List Fable
@@ -498,7 +502,7 @@ historyView history fables =
                     , Elegant.right <| percentage <| getMaybeTransitionValue <| history.transition
                     ]
                 ]
-                (List.concatMap (pageView history.transition fables) visiblePages_)
+                (List.map (pageView history.transition fables) visiblePages_)
             ]
 
 
