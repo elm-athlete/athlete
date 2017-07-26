@@ -15,11 +15,17 @@ import Color
 import Time exposing (Time)
 
 
-type Page
+type Route
     = Index
     | Show Int
     | ShowImg String
     | ShowNotes Int
+
+
+type alias Page =
+    { maybeTransition : Maybe Transition
+    , route : Route
+    }
 
 
 type Easing
@@ -177,8 +183,50 @@ push el ({ transition, before, current, after } as history) =
             | before = current :: before
             , current = el
             , after = []
-            , transition = Just <| customTransition basicDuration Forward EaseInOut
+            , transition = el.maybeTransition
         }
+
+
+oppositeDirection : Direction -> Direction
+oppositeDirection direction =
+    if direction == Backward then
+        Forward
+    else
+        Backward
+
+
+opposite : Maybe Transition -> Maybe Transition
+opposite maybeTransition =
+    case maybeTransition of
+        Nothing ->
+            Nothing
+
+        Just transition ->
+            Just
+                { transition
+                    | direction =
+                        oppositeDirection transition.direction
+                }
+
+
+defaultTransition : Maybe Transition
+defaultTransition =
+    Just <| customTransition basicDuration Forward EaseInOut
+
+
+pageWithDefaultTransition : Route -> Page
+pageWithDefaultTransition =
+    Page defaultTransition
+
+
+pageWithoutTransition : Route -> Page
+pageWithoutTransition =
+    Page Nothing
+
+
+pageWithTransition : Transition -> Route -> Page
+pageWithTransition transition =
+    Page (Just transition)
 
 
 pull : History -> History
@@ -195,7 +243,7 @@ pull ({ transition, before, current, after } as history) =
                     | before = tail
                     , current = head
                     , after = current :: after
-                    , transition = Just <| customTransition basicDuration Backward EaseInOut
+                    , transition = opposite current.maybeTransition
                 }
 
 
@@ -203,13 +251,13 @@ handleHistory : HistoryMsg -> History -> History
 handleHistory val history =
     case val of
         Enter val ->
-            history |> push (Show val)
+            history |> push (pageWithDefaultTransition (Show val))
 
         ShowImage image ->
-            history |> push (ShowImg image)
+            history |> push (pageWithDefaultTransition (ShowImg image))
 
         EnterNotes val ->
-            history |> push (ShowNotes val)
+            history |> push (pageWithDefaultTransition (ShowNotes val))
 
         Back ->
             history |> pull
@@ -239,7 +287,7 @@ historySubscriptions history =
 initHistory : History
 initHistory =
     { before = []
-    , current = Index
+    , current = pageWithoutTransition Index
     , after = []
     , transition = Nothing
     }
@@ -337,7 +385,12 @@ fableBodyView { image, content, id, notes } =
                             []
 
                         Just notes_ ->
-                            [ div [ onClick <| HistoryMsgWrapper <| EnterNotes id, style [ Elegant.cursorPointer, Elegant.underline ] ] [ text "Show notes..." ] ]
+                            [ div
+                                [ onClick <| HistoryMsgWrapper <| EnterNotes id
+                                , style [ Elegant.cursorPointer, Elegant.underline ]
+                                ]
+                                [ text "Show notes..." ]
+                            ]
                    )
             )
          ]
@@ -359,7 +412,7 @@ fableNotesView { notes } =
 
 insidePageView : Page -> List Fable -> Node Interactive Phrasing Spanning NotListElement Msg
 insidePageView page fables =
-    case page of
+    case page.route of
         Index ->
             div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
                 (fables |> List.map titleView)
