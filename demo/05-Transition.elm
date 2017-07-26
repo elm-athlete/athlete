@@ -263,7 +263,7 @@ handleHistory val history =
             history |> pull
 
         Tick diff ->
-            (case history.transition of
+            case history.transition of
                 Nothing ->
                     history
 
@@ -276,7 +276,6 @@ handleHistory val history =
                             { history | transition = Just newTransition }
                         else
                             { history | transition = Nothing }
-            )
 
 
 historySubscriptions : History -> Sub Msg
