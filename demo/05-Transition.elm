@@ -34,7 +34,8 @@ type Easing
 
 
 type Kind
-    = SlideFromLeftToRight
+    = SlideRight
+    | SlideUp
 
 
 type alias Transition =
@@ -216,7 +217,7 @@ opposite maybeTransition =
 
 defaultTransition : Maybe Transition
 defaultTransition =
-    Just <| customTransition basicDuration SlideFromLeftToRight Forward EaseInOut
+    Just <| customTransition basicDuration SlideRight Forward EaseInOut
 
 
 pageWithDefaultTransition : Route -> Page
@@ -484,6 +485,15 @@ pageView transition fables page =
         [ insidePageView page fables ]
 
 
+overflowHiddenContainer :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+overflowHiddenContainer attributes content =
+    div [ style [ Elegant.overflowHidden ] ]
+        [ div attributes content ]
+
+
 historyView :
     History
     -> List Fable
@@ -493,17 +503,33 @@ historyView history fables =
         visiblePages_ =
             visiblePages history
     in
-        div [ style [ Elegant.overflowHidden ] ]
-            [ div
-                [ style
-                    [ Elegant.displayFlex
-                    , Elegant.width <| percentage <| toFloat <| List.length <| visiblePages_
-                    , Elegant.positionRelative
-                    , Elegant.right <| percentage <| getMaybeTransitionValue <| history.transition
-                    ]
-                ]
-                (List.map (pageView history.transition fables) visiblePages_)
-            ]
+        case history.transition of
+            Nothing ->
+                overflowHiddenContainer [] [ pageView history.transition fables history.current ]
+
+            Just transition ->
+                case transition.kind of
+                    SlideUp ->
+                        overflowHiddenContainer
+                            [ style
+                                [ Elegant.displayFlex
+                                , Elegant.width <| percentage <| toFloat <| List.length <| visiblePages_
+                                , Elegant.positionRelative
+                                , Elegant.right <| percentage <| getMaybeTransitionValue <| history.transition
+                                ]
+                            ]
+                            (List.map (pageView history.transition fables) visiblePages_)
+
+                    SlideRight ->
+                        overflowHiddenContainer
+                            [ style
+                                [ Elegant.displayFlex
+                                , Elegant.width <| percentage <| toFloat <| List.length <| visiblePages_
+                                , Elegant.positionRelative
+                                , Elegant.right <| percentage <| getMaybeTransitionValue <| history.transition
+                                ]
+                            ]
+                            (List.map (pageView history.transition fables) visiblePages_)
 
 
 view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
