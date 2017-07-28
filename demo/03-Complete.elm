@@ -47,6 +47,36 @@ exampleGridContent content =
     ]
 
 
+customCounter title min max step val msg =
+    div [ style [ textCenter ] ]
+        [ h3 [ style [ fontSize (Px 14), uppercase ] ] [ text title ]
+        , inputRange
+            [ style [ Elegant.displayInlineBlock ]
+            , value val
+            , onInput msg
+            , BodyBuilder.min min
+            , BodyBuilder.max max
+            , BodyBuilder.step step
+            ]
+        , span [ style [ paddingHorizontal tiny ] ] []
+        , inputNumber
+            [ style
+                [ Elegant.displayInlineBlock
+                , Elegant.borderRadius 4
+                , Elegant.Elements.border (Color.rgba 149 152 154 0.23)
+                , Elegant.paddingVertical (Px 15)
+                , Elegant.paddingHorizontal (Px 10)
+                , textCenter
+                ]
+            , value val
+            , onInput msg
+            , BodyBuilder.min min
+            , BodyBuilder.max max
+            , BodyBuilder.step step
+            ]
+        ]
+
+
 view :
     Model
     -> BodyBuilder.Node BodyBuilder.Interactive BodyBuilder.NotPhrasing BodyBuilder.Spanning BodyBuilder.NotListElement Msg
@@ -209,16 +239,15 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
         , inputRadio [ style [ Elegant.displayBlock ], value "Test" ]
         , inputUrl [ style [ Elegant.displayBlock ], name "inputUrl" ]
         , inputSubmit [ style [ Elegant.displayBlock ], value "Submit Form" ]
-        , h2 [ style [ paddingTop medium ] ] [ text "Parametrable grid !" ]
-        , h3 [] [ text "Gutter width (default 12 px)" ]
-        , inputRange [ style [ Elegant.displayInlineBlock ], value gutterWidth, onInput ChangeGutter ]
-        , inputNumber [ style [ Elegant.displayInlineBlock ], value gutterWidth, onInput ChangeGutter ]
-        , h3 [] [ text "Columns number (default 12)" ]
-        , inputRange [ style [ Elegant.displayInlineBlock ], value columnsNumber, BodyBuilder.min 6, BodyBuilder.max 12, BodyBuilder.step 2, onInput ChangeColumnsNumber ]
-        , inputNumber [ style [ Elegant.displayInlineBlock ], value columnsNumber, BodyBuilder.min 6, BodyBuilder.max 12, BodyBuilder.step 2, onInput ChangeColumnsNumber ]
-        , h3 [] [ text "Columns width : number of units by column (default 2)" ]
-        , inputRange [ style [ Elegant.displayInlineBlock ], value columnWidth, BodyBuilder.min 2, BodyBuilder.max 6, onInput ChangeWidth ]
-        , inputNumber [ style [ Elegant.displayInlineBlock ], value columnWidth, BodyBuilder.min 2, BodyBuilder.max 6, onInput ChangeWidth ]
+        , h2 [ style [ paddingVertical (Px 75), fontSize (Px 64), textCenter, uppercase, bold ] ] [ text "Parametrable grid" ]
+        , grid (Px 26)
+            [ (col 3 1)
+                [ customCounter "Gutter width" 0 100 1 gutterWidth ChangeGutter ]
+            , (col 3 1)
+                [ customCounter "Columns number" 6 12 2 columnsNumber ChangeColumnsNumber ]
+            , (col 3 1)
+                [ customCounter "Columns width :number of units by column" 2 6 1 columnWidth ChangeWidth ]
+            ]
         , textarea [ value (gutterWidth |> toString) ]
         , grid (Px gutterWidth)
             [ col columnsNumber columnWidth (exampleGridContent "BodyBuilder")
