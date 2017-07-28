@@ -48,33 +48,35 @@ exampleGridContent content =
 
 
 customCounter title min max step val msg =
-    div [ style [ textCenter ] ]
-        [ h3 [ style [ fontSize (Px 14), uppercase ] ] [ text title ]
-        , inputRange
-            [ style [ Elegant.displayInlineBlock ]
-            , value val
-            , onInput msg
+    let
+        customNumberFieldParameters =
+            [ BodyBuilder.value val
+            , BodyBuilder.onInput msg
             , BodyBuilder.min min
             , BodyBuilder.max max
             , BodyBuilder.step step
             ]
-        , span [ style [ paddingHorizontal tiny ] ] []
-        , inputNumber
-            [ style
-                [ Elegant.displayInlineBlock
-                , Elegant.borderRadius 4
-                , Elegant.Elements.border (Color.rgba 149 152 154 0.23)
-                , Elegant.paddingVertical (Px 15)
-                , Elegant.paddingHorizontal (Px 10)
-                , textCenter
+                |> compose
+    in
+        div [ style [ textCenter ] ]
+            [ h3 [ style [ fontSize (Px 14), uppercase ] ] [ text title ]
+            , inputRange
+                [ style [ Elegant.displayInlineBlock ]
+                , customNumberFieldParameters
                 ]
-            , value val
-            , onInput msg
-            , BodyBuilder.min min
-            , BodyBuilder.max max
-            , BodyBuilder.step step
+            , span [ style [ paddingHorizontal tiny ] ] []
+            , inputNumber
+                [ style
+                    [ Elegant.displayInlineBlock
+                    , Elegant.borderRadius 4
+                    , Elegant.Elements.border (Color.rgba 149 152 154 0.23)
+                    , Elegant.paddingVertical (Px 15)
+                    , Elegant.paddingHorizontal (Px 10)
+                    , textCenter
+                    ]
+                , customNumberFieldParameters
+                ]
             ]
-        ]
 
 
 view :

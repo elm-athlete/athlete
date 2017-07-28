@@ -253,6 +253,10 @@ pull ({ transition, before, current, after } as history) =
                 }
 
 
+slideUp =
+    customTransition basicDuration SlideUp Forward EaseInOut
+
+
 handleHistory : HistoryMsg -> History -> History
 handleHistory val history =
     case val of
@@ -263,7 +267,7 @@ handleHistory val history =
             history |> push (pageWithDefaultTransition (ShowImg image))
 
         EnterNotes val ->
-            history |> push (pageWithDefaultTransition (ShowNotes val))
+            history |> push (pageWithTransition slideUp (ShowNotes val))
 
         Back ->
             history |> pull
@@ -494,6 +498,32 @@ overflowHiddenContainer attributes content =
         [ div attributes content ]
 
 
+beforeTransition : History -> List Page
+beforeTransition history =
+    case history.transition of
+        Nothing ->
+            []
+
+        Just transition ->
+            if transition.direction == Backward then
+                [ history.current ]
+            else
+                putHeadInListIfExists history.before
+
+
+afterTransition : History -> List Page
+afterTransition history =
+    case history.transition of
+        Nothing ->
+            []
+
+        Just transition ->
+            if transition.direction == Backward then
+                putHeadInListIfExists history.after
+            else
+                [ history.current ]
+
+
 historyView :
     History
     -> List Fable
@@ -505,20 +535,28 @@ historyView history fables =
     in
         case history.transition of
             Nothing ->
-                overflowHiddenContainer [] [ pageView history.transition fables history.current ]
+                overflowHiddenContainer [] [ pageView Nothing fables history.current ]
 
             Just transition ->
                 case transition.kind of
                     SlideUp ->
                         overflowHiddenContainer
-                            [ style
-                                [ Elegant.displayFlex
-                                , Elegant.width <| percentage <| toFloat <| List.length <| visiblePages_
-                                , Elegant.positionRelative
-                                , Elegant.right <| percentage <| getMaybeTransitionValue <| history.transition
+                            []
+                            [ div
+                                [ style
+                                    [ Elegant.width (Percent 100)
+                                    ]
                                 ]
+                                (List.map (pageView history.transition fables) (history |> beforeTransition))
+                            , div
+                                [ style
+                                    [ Elegant.bottom <| percentage ((getMaybeTransitionValue <| history.transition) - 1)
+                                    , Elegant.positionAbsolute
+                                    , Elegant.width (Percent 100)
+                                    ]
+                                ]
+                                (List.map (pageView history.transition fables) (history |> afterTransition))
                             ]
-                            (List.map (pageView history.transition fables) visiblePages_)
 
                     SlideRight ->
                         overflowHiddenContainer
