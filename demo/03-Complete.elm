@@ -238,6 +238,7 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
         , inputPassword [ style [ Elegant.displayBlock ], value "" ]
         , inputRadio [ style [ Elegant.displayBlock ], value "Test" ]
         , inputUrl [ style [ Elegant.displayBlock ], name "inputUrl" ]
+        , textarea []
         , inputSubmit [ style [ Elegant.displayBlock ], value "Submit Form" ]
         , h2 [ style [ paddingVertical (Px 75), fontSize (Px 64), textCenter, uppercase, bold ] ] [ text "Parametrable grid" ]
         , grid (Px 26)
@@ -246,9 +247,8 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
             , (col 3 1)
                 [ customCounter "Columns number" 6 12 2 columnsNumber ChangeColumnsNumber ]
             , (col 3 1)
-                [ customCounter "Columns width :number of units by column" 2 6 1 columnWidth ChangeWidth ]
+                [ customCounter "Columns width : number of units by column" 2 6 1 columnWidth ChangeWidth ]
             ]
-        , textarea [ value (gutterWidth |> toString) ]
         , grid (Px gutterWidth)
             [ col columnsNumber columnWidth (exampleGridContent "BodyBuilder")
             , col columnsNumber (columnWidth) (exampleGridContent "is")
