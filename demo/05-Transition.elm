@@ -251,15 +251,19 @@ percentage a =
 
 
 type Route
-    = Index
-    | Show Int
-    | ShowImg String
-    | ShowNotes Int
+    = FablesIndex
+    | FablesShow Int
+    | FablesShowImg String
+    | FablesShowNotes Int
+
+
+type alias Data =
+    { fables : List Fable }
 
 
 type alias Model =
     { history : History Route
-    , fables : List Fable
+    , data : Data
     }
 
 
@@ -391,13 +395,13 @@ handleHistory : HistoryMsg -> History Route -> History Route
 handleHistory val history =
     case val of
         Enter val ->
-            history |> push (pageWithDefaultTransition (Show val))
+            history |> push (pageWithDefaultTransition (FablesShow val))
 
         ShowImage image ->
-            history |> push (pageWithDefaultTransition (ShowImg image))
+            history |> push (pageWithDefaultTransition (FablesShowImg image))
 
         EnterNotes val ->
-            history |> push (pageWithTransition slideUp (ShowNotes val))
+            history |> push (pageWithTransition slideUp (FablesShowNotes val))
 
         Back ->
             history |> pull
@@ -423,10 +427,10 @@ historySubscriptions history =
     maybeTransitionSubscription history.transition
 
 
-initHistory : History Route
-initHistory =
+initHistory : route -> History route
+initHistory currentPage =
     { before = []
-    , current = pageWithoutTransition Index
+    , current = pageWithoutTransition currentPage
     , after = []
     , transition = Nothing
     }
@@ -549,38 +553,42 @@ fableNotesView { notes } =
                 ]
 
 
-insidePageView : Page Route -> List Fable -> Node Interactive Phrasing Spanning NotListElement Msg
-insidePageView page fables =
-    case page.route of
-        Index ->
-            div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
-                (fables |> List.map titleView)
+insidePageView : Page Route -> Data -> Node Interactive Phrasing Spanning NotListElement Msg
+insidePageView page data =
+    let
+        fables =
+            data.fables
+    in
+        case page.route of
+            FablesIndex ->
+                div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
+                    (fables |> List.map titleView)
 
-        Show val ->
-            div []
-                (fables
-                    |> List.filter (\e -> e.id == val)
-                    |> List.map (showView fableBodyView)
-                )
+            FablesShow val ->
+                div []
+                    (fables
+                        |> List.filter (\e -> e.id == val)
+                        |> List.map (showView fableBodyView)
+                    )
 
-        ShowNotes val ->
-            div []
-                (fables
-                    |> List.filter (\e -> e.id == val)
-                    |> List.map (showView fableNotesView)
-                )
+            FablesShowNotes val ->
+                div []
+                    (fables
+                        |> List.filter (\e -> e.id == val)
+                        |> List.map (showView fableNotesView)
+                    )
 
-        ShowImg src ->
-            div []
-                [ header
-                , img "" src [ style [ Elegant.fullWidth ] ]
-                ]
+            FablesShowImg src ->
+                div []
+                    [ header
+                    , img "" src [ style [ Elegant.fullWidth ] ]
+                    ]
 
 
 view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
-view { history, fables } =
+view { history, data } =
     div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
-        [ historyView insidePageView history fables ]
+        [ historyView insidePageView history data ]
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
@@ -595,24 +603,31 @@ subscriptions model =
     historySubscriptions model.history
 
 
-init : Model
-init =
-    { history = initHistory
-    , fables =
-        [ { id = 1
-          , title = "La cigale et la fourmi"
-          , content = "La Cigale, ayant chanté\nTout l'Été,\nSe trouva fort dépourvue\nQuand la bise fut venue.\nPas un seul petit morceau\nDe mouche ou de vermisseau.\nElle alla crier famine\nChez la Fourmi sa voisine,\nLa priant de lui prêter\nQuelque grain pour subsister\nJusqu'à la saison nouvelle.\nJe vous paierai, lui dit-elle,\nAvant l'Oût, foi d'animal,\nIntérêt et principal.\nLa Fourmi n'est pas prêteuse ;\nC'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ?\nDit-elle à cette emprunteuse.\n— Nuit et jour à tout venant\nJe chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise.\nEh bien !dansez maintenant. »\n"
-          , notes = Just "Cette fable est la première du premier recueil (124 fables, divisées en 6 livres) paru en mars 1668. Ce recueil est dédié au Dauphin, le fils de Louis XIV et de Marie-Thérèse, alors âgé de 6 ans et demi. La dédicace est en prose, suivie de la Préface au lecteur, de la traduction libre de la 'Vie d'Esope', et se termine par un compliment en vers reprenant et résumant l'essentiel de la dédicace en prose.\n'Ainsi ces fables sont un tableau où chacun de nous se trouve dépeint'\n'Je chante les héros dont Esope est le père'....sont des extraits célèbres de cette dédicace\n"
-          , image = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Snodgrass_Magicicada_septendecim.jpg/1024px-Snodgrass_Magicicada_septendecim.jpg"
-          }
-        , { id = 2
-          , title = "Le corbeau et le renard"
-          , content = "Maître Corbeau, sur un arbre perché,\nTenait en son bec un fromage.\nMaître Renard, par l'odeur alléché,\nLui tint à peu près ce langage :\nEt bonjour, Monsieur du Corbeau.\nQue vous êtes joli ! que vous me semblez beau !\nSans mentir, si votre ramage\nSe rapporte à votre plumage,\nVous êtes le Phénix des hôtes de ces bois.\nÀ ces mots, le Corbeau ne se sent pas de joie ;\nEt pour montrer sa belle voix,\nIl ouvre un large bec, laisse tomber sa proie.\nLe Renard s'en saisit, et dit : Mon bon Monsieur,\nApprenez que tout flatteur\nVit aux dépens de celui qui l'écoute.\nCette leçon vaut bien un fromage, sans doute.\nLe Corbeau honteux et confus\nJura, mais un peu tard, qu'on ne l'y prendrait plus."
-          , notes = Nothing
-          , image = "https://upload.wikimedia.org/wikipedia/commons/4/47/Karga_9107.svg"
-          }
-        ]
+initHistoryAndData : a -> b -> { data : b, history : History a }
+initHistoryAndData route data =
+    { history = initHistory route
+    , data = data
     }
+
+
+init : { data : Data, history : History Route }
+init =
+    initHistoryAndData FablesIndex
+        { fables =
+            [ { id = 1
+              , title = "La cigale et la fourmi"
+              , content = "La Cigale, ayant chanté\nTout l'Été,\nSe trouva fort dépourvue\nQuand la bise fut venue.\nPas un seul petit morceau\nDe mouche ou de vermisseau.\nElle alla crier famine\nChez la Fourmi sa voisine,\nLa priant de lui prêter\nQuelque grain pour subsister\nJusqu'à la saison nouvelle.\nJe vous paierai, lui dit-elle,\nAvant l'Oût, foi d'animal,\nIntérêt et principal.\nLa Fourmi n'est pas prêteuse ;\nC'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ?\nDit-elle à cette emprunteuse.\n— Nuit et jour à tout venant\nJe chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise.\nEh bien !dansez maintenant. »\n"
+              , notes = Just "Cette fable est la première du premier recueil (124 fables, divisées en 6 livres) paru en mars 1668. Ce recueil est dédié au Dauphin, le fils de Louis XIV et de Marie-Thérèse, alors âgé de 6 ans et demi. La dédicace est en prose, suivie de la Préface au lecteur, de la traduction libre de la 'Vie d'Esope', et se termine par un compliment en vers reprenant et résumant l'essentiel de la dédicace en prose.\n'Ainsi ces fables sont un tableau où chacun de nous se trouve dépeint'\n'Je chante les héros dont Esope est le père'....sont des extraits célèbres de cette dédicace\n"
+              , image = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Snodgrass_Magicicada_septendecim.jpg/1024px-Snodgrass_Magicicada_septendecim.jpg"
+              }
+            , { id = 2
+              , title = "Le corbeau et le renard"
+              , content = "Maître Corbeau, sur un arbre perché,\nTenait en son bec un fromage.\nMaître Renard, par l'odeur alléché,\nLui tint à peu près ce langage :\nEt bonjour, Monsieur du Corbeau.\nQue vous êtes joli ! que vous me semblez beau !\nSans mentir, si votre ramage\nSe rapporte à votre plumage,\nVous êtes le Phénix des hôtes de ces bois.\nÀ ces mots, le Corbeau ne se sent pas de joie ;\nEt pour montrer sa belle voix,\nIl ouvre un large bec, laisse tomber sa proie.\nLe Renard s'en saisit, et dit : Mon bon Monsieur,\nApprenez que tout flatteur\nVit aux dépens de celui qui l'écoute.\nCette leçon vaut bien un fromage, sans doute.\nLe Corbeau honteux et confus\nJura, mais un peu tard, qu'on ne l'y prendrait plus."
+              , notes = Nothing
+              , image = "https://upload.wikimedia.org/wikipedia/commons/4/47/Karga_9107.svg"
+              }
+            ]
+        }
 
 
 main : Program Basics.Never Model Msg
