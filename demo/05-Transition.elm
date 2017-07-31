@@ -123,13 +123,9 @@ timeDiff diff ({ timer } as transition) =
 
 
 maybeTransitionSubscription : Maybe Transition -> Sub Msg
-maybeTransitionSubscription transition =
-    case transition of
-        Nothing ->
-            Sub.none
-
-        Just transition ->
-            AnimationFrame.diffs <| HistoryMsgWrapper << Tick
+maybeTransitionSubscription =
+    Maybe.map (\transition -> AnimationFrame.diffs <| (StandardHistoryWrapper << Tick))
+        >> Maybe.withDefault Sub.none
 
 
 basicDuration : number
@@ -268,15 +264,19 @@ type alias Model =
 
 
 type HistoryMsg
-    = Enter Int
+    = FableShow Int
     | EnterNotes Int
-    | Back
     | ShowImage String
-    | Tick Time
+
+
+type StandardHistoryMsg
+    = Tick Time
+    | Back
 
 
 type Msg
     = HistoryMsgWrapper HistoryMsg
+    | StandardHistoryWrapper StandardHistoryMsg
 
 
 type alias MarkdownString =
@@ -391,18 +391,23 @@ historyView insidePageView_ history data =
                             (List.map (pageView insidePageView_ history.transition data) visiblePages_)
 
 
-handleHistory : HistoryMsg -> History Route -> History Route
-handleHistory val history =
-    case val of
-        Enter val ->
-            history |> push (pageWithDefaultTransition (FablesShow val))
+historySubscriptions : History route -> Sub Msg
+historySubscriptions history =
+    maybeTransitionSubscription history.transition
 
-        ShowImage image ->
-            history |> push (pageWithDefaultTransition (FablesShowImg image))
 
-        EnterNotes val ->
-            history |> push (pageWithTransition slideUp (FablesShowNotes val))
+initHistory : route -> History route
+initHistory currentPage =
+    { before = []
+    , current = pageWithoutTransition currentPage
+    , after = []
+    , transition = Nothing
+    }
 
+
+standardHandleHistory : StandardHistoryMsg -> History route -> History route
+standardHandleHistory historyMsg history =
+    case historyMsg of
         Back ->
             history |> pull
 
@@ -422,18 +427,29 @@ handleHistory val history =
                             { history | transition = Nothing }
 
 
-historySubscriptions : History route -> Sub Msg
-historySubscriptions history =
-    maybeTransitionSubscription history.transition
+handleStandardHistory : StandardHistoryMsg -> { a | history : History route } -> ( { a | history : History route }, Cmd msg )
+handleStandardHistory historyMsg model =
+    ( { model | history = standardHandleHistory historyMsg model.history }, Cmd.none )
 
 
-initHistory : route -> History route
-initHistory currentPage =
-    { before = []
-    , current = pageWithoutTransition currentPage
-    , after = []
-    , transition = Nothing
+initHistoryAndData : route -> data -> { history : History route, data : data }
+initHistoryAndData route data =
+    { history = initHistory route
+    , data = data
     }
+
+
+handleHistory : HistoryMsg -> History Route -> History Route
+handleHistory val history =
+    case val of
+        FableShow val ->
+            history |> push (pageWithDefaultTransition (FablesShow val))
+
+        ShowImage image ->
+            history |> push (pageWithDefaultTransition (FablesShowImg image))
+
+        EnterNotes val ->
+            history |> push (pageWithTransition slideUp (FablesShowNotes val))
 
 
 gray : Color.Color
@@ -444,7 +460,7 @@ gray =
 titleView : Fable -> Node Interactive phrasingContent Spanning NotListElement Msg
 titleView fable =
     button
-        [ onClick <| HistoryMsgWrapper <| Enter fable.id
+        [ onClick <| HistoryMsgWrapper <| FableShow fable.id
         , style
             [ Elegant.cursorPointer
             , Elegant.borderNone
@@ -465,7 +481,7 @@ titleView fable =
 header : Node interactiveContent phrasingContent Spanning NotListElement Msg
 header =
     div
-        [ onClick <| HistoryMsgWrapper Back
+        [ onClick <| StandardHistoryWrapper Back
         , style
             [ Elegant.backgroundColor Color.white
             , Elegant.textColor Color.black
@@ -564,17 +580,17 @@ insidePageView page data =
                 div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
                     (fables |> List.map titleView)
 
-            FablesShow val ->
+            FablesShow id ->
                 div []
                     (fables
-                        |> List.filter (\e -> e.id == val)
+                        |> List.filter (\e -> e.id == id)
                         |> List.map (showView fableBodyView)
                     )
 
-            FablesShowNotes val ->
+            FablesShowNotes id ->
                 div []
                     (fables
-                        |> List.filter (\e -> e.id == val)
+                        |> List.filter (\e -> e.id == id)
                         |> List.map (showView fableNotesView)
                     )
 
@@ -597,37 +613,40 @@ update msg model =
         HistoryMsgWrapper historyMsg ->
             ( { model | history = handleHistory historyMsg model.history }, Cmd.none )
 
+        StandardHistoryWrapper historyMsg ->
+            model |> handleStandardHistory historyMsg
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     historySubscriptions model.history
 
 
-initHistoryAndData : a -> b -> { data : b, history : History a }
-initHistoryAndData route data =
-    { history = initHistory route
-    , data = data
-    }
+initFables : List Fable
+initFables =
+    [ { id = 1
+      , title = "La cigale et la fourmi"
+      , content = "La Cigale, ayant chanté\nTout l'Été,\nSe trouva fort dépourvue\nQuand la bise fut venue.\nPas un seul petit morceau\nDe mouche ou de vermisseau.\nElle alla crier famine\nChez la Fourmi sa voisine,\nLa priant de lui prêter\nQuelque grain pour subsister\nJusqu'à la saison nouvelle.\nJe vous paierai, lui dit-elle,\nAvant l'Oût, foi d'animal,\nIntérêt et principal.\nLa Fourmi n'est pas prêteuse ;\nC'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ?\nDit-elle à cette emprunteuse.\n— Nuit et jour à tout venant\nJe chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise.\nEh bien !dansez maintenant. »\n"
+      , notes = Just "Cette fable est la première du premier recueil (124 fables, divisées en 6 livres) paru en mars 1668. Ce recueil est dédié au Dauphin, le fils de Louis XIV et de Marie-Thérèse, alors âgé de 6 ans et demi. La dédicace est en prose, suivie de la Préface au lecteur, de la traduction libre de la 'Vie d'Esope', et se termine par un compliment en vers reprenant et résumant l'essentiel de la dédicace en prose.\n'Ainsi ces fables sont un tableau où chacun de nous se trouve dépeint'\n'Je chante les héros dont Esope est le père'....sont des extraits célèbres de cette dédicace\n"
+      , image = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Snodgrass_Magicicada_septendecim.jpg/1024px-Snodgrass_Magicicada_septendecim.jpg"
+      }
+    , { id = 2
+      , title = "Le corbeau et le renard"
+      , content = "Maître Corbeau, sur un arbre perché,\nTenait en son bec un fromage.\nMaître Renard, par l'odeur alléché,\nLui tint à peu près ce langage :\nEt bonjour, Monsieur du Corbeau.\nQue vous êtes joli ! que vous me semblez beau !\nSans mentir, si votre ramage\nSe rapporte à votre plumage,\nVous êtes le Phénix des hôtes de ces bois.\nÀ ces mots, le Corbeau ne se sent pas de joie ;\nEt pour montrer sa belle voix,\nIl ouvre un large bec, laisse tomber sa proie.\nLe Renard s'en saisit, et dit : Mon bon Monsieur,\nApprenez que tout flatteur\nVit aux dépens de celui qui l'écoute.\nCette leçon vaut bien un fromage, sans doute.\nLe Corbeau honteux et confus\nJura, mais un peu tard, qu'on ne l'y prendrait plus."
+      , notes = Nothing
+      , image = "https://upload.wikimedia.org/wikipedia/commons/4/47/Karga_9107.svg"
+      }
+    ]
+
+
+initData : Data
+initData =
+    { fables = initFables }
 
 
 init : { data : Data, history : History Route }
 init =
-    initHistoryAndData FablesIndex
-        { fables =
-            [ { id = 1
-              , title = "La cigale et la fourmi"
-              , content = "La Cigale, ayant chanté\nTout l'Été,\nSe trouva fort dépourvue\nQuand la bise fut venue.\nPas un seul petit morceau\nDe mouche ou de vermisseau.\nElle alla crier famine\nChez la Fourmi sa voisine,\nLa priant de lui prêter\nQuelque grain pour subsister\nJusqu'à la saison nouvelle.\nJe vous paierai, lui dit-elle,\nAvant l'Oût, foi d'animal,\nIntérêt et principal.\nLa Fourmi n'est pas prêteuse ;\nC'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ?\nDit-elle à cette emprunteuse.\n— Nuit et jour à tout venant\nJe chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise.\nEh bien !dansez maintenant. »\n"
-              , notes = Just "Cette fable est la première du premier recueil (124 fables, divisées en 6 livres) paru en mars 1668. Ce recueil est dédié au Dauphin, le fils de Louis XIV et de Marie-Thérèse, alors âgé de 6 ans et demi. La dédicace est en prose, suivie de la Préface au lecteur, de la traduction libre de la 'Vie d'Esope', et se termine par un compliment en vers reprenant et résumant l'essentiel de la dédicace en prose.\n'Ainsi ces fables sont un tableau où chacun de nous se trouve dépeint'\n'Je chante les héros dont Esope est le père'....sont des extraits célèbres de cette dédicace\n"
-              , image = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Snodgrass_Magicicada_septendecim.jpg/1024px-Snodgrass_Magicicada_septendecim.jpg"
-              }
-            , { id = 2
-              , title = "Le corbeau et le renard"
-              , content = "Maître Corbeau, sur un arbre perché,\nTenait en son bec un fromage.\nMaître Renard, par l'odeur alléché,\nLui tint à peu près ce langage :\nEt bonjour, Monsieur du Corbeau.\nQue vous êtes joli ! que vous me semblez beau !\nSans mentir, si votre ramage\nSe rapporte à votre plumage,\nVous êtes le Phénix des hôtes de ces bois.\nÀ ces mots, le Corbeau ne se sent pas de joie ;\nEt pour montrer sa belle voix,\nIl ouvre un large bec, laisse tomber sa proie.\nLe Renard s'en saisit, et dit : Mon bon Monsieur,\nApprenez que tout flatteur\nVit aux dépens de celui qui l'écoute.\nCette leçon vaut bien un fromage, sans doute.\nLe Corbeau honteux et confus\nJura, mais un peu tard, qu'on ne l'y prendrait plus."
-              , notes = Nothing
-              , image = "https://upload.wikimedia.org/wikipedia/commons/4/47/Karga_9107.svg"
-              }
-            ]
-        }
+    initHistoryAndData FablesIndex initData
 
 
 main : Program Basics.Never Model Msg
