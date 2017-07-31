@@ -15,16 +15,9 @@ import Color
 import Time exposing (Time)
 
 
-type Route
-    = Index
-    | Show Int
-    | ShowImg String
-    | ShowNotes Int
-
-
-type alias Page =
+type alias Page customRoute =
     { maybeTransition : Maybe Transition
-    , route : Route
+    , route : customRoute
     }
 
 
@@ -47,48 +40,17 @@ type alias Transition =
     }
 
 
-type alias History =
-    { before : List Page
-    , current : Page
-    , after : List Page
+type alias History route =
+    { before : List (Page route)
+    , current : Page route
+    , after : List (Page route)
     , transition : Maybe Transition
-    }
-
-
-type alias Model =
-    { history : History
-    , fables : List Fable
     }
 
 
 type Direction
     = Forward
     | Backward
-
-
-type HistoryMsg
-    = Enter Int
-    | EnterNotes Int
-    | Back
-    | ShowImage String
-    | Tick Time
-
-
-type Msg
-    = HistoryMsgWrapper HistoryMsg
-
-
-type alias MarkdownString =
-    String
-
-
-type alias Fable =
-    { id : Int
-    , title : String
-    , content : MarkdownString
-    , notes : Maybe String
-    , image : String
-    }
 
 
 easingFun : Easing -> Float -> Float
@@ -180,7 +142,7 @@ customTransition duration =
     Transition duration duration
 
 
-push : Page -> History -> History
+push : Page route -> History route -> History route
 push el ({ transition, before, current, after } as history) =
     if isRunning transition then
         history
@@ -220,22 +182,22 @@ defaultTransition =
     Just <| customTransition basicDuration SlideRight Forward EaseInOut
 
 
-pageWithDefaultTransition : Route -> Page
+pageWithDefaultTransition : route -> Page route
 pageWithDefaultTransition =
     Page defaultTransition
 
 
-pageWithoutTransition : Route -> Page
+pageWithoutTransition : route -> Page route
 pageWithoutTransition =
     Page Nothing
 
 
-pageWithTransition : Transition -> Route -> Page
+pageWithTransition : Transition -> route -> Page route
 pageWithTransition transition =
     Page (Just transition)
 
 
-pull : History -> History
+pull : History route -> History route
 pull ({ transition, before, current, after } as history) =
     if isRunning transition then
         history
@@ -253,11 +215,179 @@ pull ({ transition, before, current, after } as history) =
                 }
 
 
+slideUp : Transition
 slideUp =
     customTransition basicDuration SlideUp Forward EaseInOut
 
 
-handleHistory : HistoryMsg -> History -> History
+putHeadInListIfExists : List a -> List a
+putHeadInListIfExists list =
+    case list of
+        [] ->
+            []
+
+        head :: _ ->
+            [ head ]
+
+
+visiblePages : History route -> List (Page route)
+visiblePages { transition, before, current, after } =
+    case transition of
+        Nothing ->
+            [ current ]
+
+        Just transition ->
+            case transition.direction of
+                Forward ->
+                    (putHeadInListIfExists before) ++ [ current ]
+
+                Backward ->
+                    current :: putHeadInListIfExists after
+
+
+percentage : Float -> SizeUnit
+percentage a =
+    Percent <| 100 * a
+
+
+type Route
+    = Index
+    | Show Int
+    | ShowImg String
+    | ShowNotes Int
+
+
+type alias Model =
+    { history : History Route
+    , fables : List Fable
+    }
+
+
+type HistoryMsg
+    = Enter Int
+    | EnterNotes Int
+    | Back
+    | ShowImage String
+    | Tick Time
+
+
+type Msg
+    = HistoryMsgWrapper HistoryMsg
+
+
+type alias MarkdownString =
+    String
+
+
+type alias Fable =
+    { id : Int
+    , title : String
+    , content : MarkdownString
+    , notes : Maybe String
+    , image : String
+    }
+
+
+pageView :
+    (a -> b -> Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> Maybe Transition
+    -> b
+    -> a
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+pageView insidePageView_ transition data page =
+    div
+        [ style
+            ([ Elegant.fullWidth
+             , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
+             ]
+            )
+        ]
+        [ insidePageView_ page data ]
+
+
+overflowHiddenContainer :
+    List (FlowAttributes msg -> FlowAttributes msg)
+    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+overflowHiddenContainer attributes content =
+    div [ style [ Elegant.overflowHidden ] ]
+        [ div attributes content ]
+
+
+beforeTransition : History route -> List (Page route)
+beforeTransition history =
+    case history.transition of
+        Nothing ->
+            []
+
+        Just transition ->
+            if transition.direction == Backward then
+                [ history.current ]
+            else
+                putHeadInListIfExists history.before
+
+
+afterTransition : History route -> List (Page route)
+afterTransition history =
+    case history.transition of
+        Nothing ->
+            []
+
+        Just transition ->
+            if transition.direction == Backward then
+                putHeadInListIfExists history.after
+            else
+                [ history.current ]
+
+
+historyView :
+    (Page route -> a -> Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> History route
+    -> a
+    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+historyView insidePageView_ history data =
+    let
+        visiblePages_ =
+            visiblePages history
+    in
+        case history.transition of
+            Nothing ->
+                overflowHiddenContainer [] [ pageView insidePageView_ Nothing data history.current ]
+
+            Just transition ->
+                case transition.kind of
+                    SlideUp ->
+                        overflowHiddenContainer
+                            []
+                            [ div
+                                [ style
+                                    [ Elegant.width (Percent 100)
+                                    ]
+                                ]
+                                (List.map (pageView insidePageView_ history.transition data) (history |> beforeTransition))
+                            , div
+                                [ style
+                                    [ Elegant.bottom <| percentage ((getMaybeTransitionValue <| history.transition) - 1)
+                                    , Elegant.positionAbsolute
+                                    , Elegant.width (Percent 100)
+                                    ]
+                                ]
+                                (List.map (pageView insidePageView_ history.transition data) (history |> afterTransition))
+                            ]
+
+                    SlideRight ->
+                        overflowHiddenContainer
+                            [ style
+                                [ Elegant.displayFlex
+                                , Elegant.width <| percentage <| toFloat <| List.length <| visiblePages_
+                                , Elegant.positionRelative
+                                , Elegant.right <| percentage <| getMaybeTransitionValue <| history.transition
+                                ]
+                            ]
+                            (List.map (pageView insidePageView_ history.transition data) visiblePages_)
+
+
+handleHistory : HistoryMsg -> History Route -> History Route
 handleHistory val history =
     case val of
         Enter val ->
@@ -288,12 +418,12 @@ handleHistory val history =
                             { history | transition = Nothing }
 
 
-historySubscriptions : History -> Sub Msg
+historySubscriptions : History route -> Sub Msg
 historySubscriptions history =
     maybeTransitionSubscription history.transition
 
 
-initHistory : History
+initHistory : History Route
 initHistory =
     { before = []
     , current = pageWithoutTransition Index
@@ -419,7 +549,7 @@ fableNotesView { notes } =
                 ]
 
 
-insidePageView : Page -> List Fable -> Node Interactive Phrasing Spanning NotListElement Msg
+insidePageView : Page Route -> List Fable -> Node Interactive Phrasing Spanning NotListElement Msg
 insidePageView page fables =
     case page.route of
         Index ->
@@ -447,133 +577,10 @@ insidePageView page fables =
                 ]
 
 
-putHeadInListIfExists : List a -> List a
-putHeadInListIfExists list =
-    case list of
-        [] ->
-            []
-
-        head :: _ ->
-            [ head ]
-
-
-visiblePages : History -> List Page
-visiblePages { transition, before, current, after } =
-    case transition of
-        Nothing ->
-            [ current ]
-
-        Just transition ->
-            case transition.direction of
-                Forward ->
-                    (putHeadInListIfExists before) ++ [ current ]
-
-                Backward ->
-                    current :: putHeadInListIfExists after
-
-
-percentage : Float -> SizeUnit
-percentage a =
-    Percent <| 100 * a
-
-
-pageView : Maybe Transition -> List Fable -> Page -> Node Interactive Phrasing Spanning NotListElement Msg
-pageView transition fables page =
-    div
-        [ style
-            ([ Elegant.fullWidth
-             , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
-             ]
-            )
-        ]
-        [ insidePageView page fables ]
-
-
-overflowHiddenContainer :
-    List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
-overflowHiddenContainer attributes content =
-    div [ style [ Elegant.overflowHidden ] ]
-        [ div attributes content ]
-
-
-beforeTransition : History -> List Page
-beforeTransition history =
-    case history.transition of
-        Nothing ->
-            []
-
-        Just transition ->
-            if transition.direction == Backward then
-                [ history.current ]
-            else
-                putHeadInListIfExists history.before
-
-
-afterTransition : History -> List Page
-afterTransition history =
-    case history.transition of
-        Nothing ->
-            []
-
-        Just transition ->
-            if transition.direction == Backward then
-                putHeadInListIfExists history.after
-            else
-                [ history.current ]
-
-
-historyView :
-    History
-    -> List Fable
-    -> Node Interactive Phrasing Spanning NotListElement Msg
-historyView history fables =
-    let
-        visiblePages_ =
-            visiblePages history
-    in
-        case history.transition of
-            Nothing ->
-                overflowHiddenContainer [] [ pageView Nothing fables history.current ]
-
-            Just transition ->
-                case transition.kind of
-                    SlideUp ->
-                        overflowHiddenContainer
-                            []
-                            [ div
-                                [ style
-                                    [ Elegant.width (Percent 100)
-                                    ]
-                                ]
-                                (List.map (pageView history.transition fables) (history |> beforeTransition))
-                            , div
-                                [ style
-                                    [ Elegant.bottom <| percentage ((getMaybeTransitionValue <| history.transition) - 1)
-                                    , Elegant.positionAbsolute
-                                    , Elegant.width (Percent 100)
-                                    ]
-                                ]
-                                (List.map (pageView history.transition fables) (history |> afterTransition))
-                            ]
-
-                    SlideRight ->
-                        overflowHiddenContainer
-                            [ style
-                                [ Elegant.displayFlex
-                                , Elegant.width <| percentage <| toFloat <| List.length <| visiblePages_
-                                , Elegant.positionRelative
-                                , Elegant.right <| percentage <| getMaybeTransitionValue <| history.transition
-                                ]
-                            ]
-                            (List.map (pageView history.transition fables) visiblePages_)
-
-
 view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
 view { history, fables } =
     div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
-        [ historyView history fables ]
+        [ historyView insidePageView history fables ]
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
