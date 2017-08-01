@@ -53,6 +53,11 @@ type Direction
     | Backward
 
 
+type StandardHistoryMsg
+    = Tick Time
+    | Back
+
+
 easingFun : Easing -> Float -> Float
 easingFun easing =
     case easing of
@@ -269,11 +274,6 @@ type HistoryMsg
     | ShowImage String
 
 
-type StandardHistoryMsg
-    = Tick Time
-    | Back
-
-
 type Msg
     = HistoryMsgWrapper HistoryMsg
     | StandardHistoryWrapper StandardHistoryMsg
@@ -439,6 +439,10 @@ initHistoryAndData route data =
     }
 
 
+
+--- Custom
+
+
 handleHistory : HistoryMsg -> History Route -> History Route
 handleHistory val history =
     case val of
@@ -495,22 +499,27 @@ header =
 
 body :
     (a -> Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> a
+    -> Maybe a
     -> Node interactiveContent phrasingContent Spanning NotListElement msg
-body bodyFun data =
+body bodyFun maybeData =
     div
         [ style
             [ Elegant.overflowYScroll
             , Elegant.fullWidth
             ]
         ]
-        [ bodyFun data
+        [ case maybeData of
+            Just data ->
+                bodyFun data
+
+            Nothing ->
+                text "Error, no val"
         ]
 
 
 showView :
     (a -> Node interactiveContent phrasingContent Spanning NotListElement Msg)
-    -> a
+    -> Maybe a
     -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 showView bodyFun data =
     div
@@ -569,6 +578,41 @@ fableNotesView { notes } =
                 ]
 
 
+fablesIndex :
+    List Fable
+    -> Node Interactive phrasingContent Spanning NotListElement Msg
+fablesIndex fables =
+    div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
+        (fables |> List.map titleView)
+
+
+find_by : (a -> b) -> b -> List a -> Maybe a
+find_by insideDataFun data =
+    List.filter (\e -> insideDataFun e == data)
+        >> List.head
+
+
+fablesShow :
+    Int
+    -> List Fable
+    -> Node interactiveContent Phrasing Spanning NotListElement Msg
+fablesShow id fables =
+    div [] [ showView fableBodyView (fables |> find_by .id id) ]
+
+
+fablesShowNotes : Int -> List Fable -> Node interactiveContent Phrasing Spanning NotListElement Msg
+fablesShowNotes id fables =
+    div [] [ showView fableNotesView (fables |> find_by .id id) ]
+
+
+fablesShowImg : String -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+fablesShowImg src =
+    div []
+        [ header
+        , img "" src [ style [ Elegant.fullWidth ] ]
+        ]
+
+
 insidePageView : Page Route -> Data -> Node Interactive Phrasing Spanning NotListElement Msg
 insidePageView page data =
     let
@@ -577,28 +621,16 @@ insidePageView page data =
     in
         case page.route of
             FablesIndex ->
-                div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
-                    (fables |> List.map titleView)
+                fablesIndex fables
 
             FablesShow id ->
-                div []
-                    (fables
-                        |> List.filter (\e -> e.id == id)
-                        |> List.map (showView fableBodyView)
-                    )
+                fablesShow id fables
 
             FablesShowNotes id ->
-                div []
-                    (fables
-                        |> List.filter (\e -> e.id == id)
-                        |> List.map (showView fableNotesView)
-                    )
+                fablesShowNotes id fables
 
             FablesShowImg src ->
-                div []
-                    [ header
-                    , img "" src [ style [ Elegant.fullWidth ] ]
-                    ]
+                fablesShowImg src
 
 
 view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
