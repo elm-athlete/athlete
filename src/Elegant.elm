@@ -156,6 +156,7 @@ module Elegant
         , overflowYVisible
         , overflowYHidden
         , overflowYScroll
+        , textOverflowEllipsis
         , listStyleNone
         , listStyleDisc
         , listStyleCircle
@@ -369,6 +370,8 @@ module Elegant
 @docs overflowYVisible
 @docs overflowYHidden
 @docs overflowYScroll
+@docs textOverflowEllipsis
+
 
 ## List Style Type
 @docs listStyleNone
@@ -685,6 +688,10 @@ type WhiteSpace
     = WhiteSpaceNoWrap
 
 
+type TextOverflow
+    = TextOverflowEllipsis
+
+
 type UserSelect
     = UserSelectNone
     | UserSelectAll
@@ -739,6 +746,7 @@ type Style
         , opacity : Maybe Float
         , overflowX : Maybe Overflow
         , overflowY : Maybe Overflow
+        , textOverflow : Maybe TextOverflow
         , listStyleType : Maybe ListStyleType
         , verticalAlign : Maybe String
         , textAlign : Maybe TextAlign
@@ -902,6 +910,7 @@ defaultStyle =
         , opacity = Nothing
         , overflowX = Nothing
         , overflowY = Nothing
+        , textOverflow = Nothing
         , listStyleType = Nothing
         , verticalAlign = Nothing
         , textAlign = Nothing
@@ -1162,6 +1171,16 @@ textAlignToString =
 
                 TextAlignJustify ->
                     "justify"
+        )
+
+
+textOverflowToString : Maybe TextOverflow -> Maybe String
+textOverflowToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                TextOverflowEllipsis ->
+                    "ellipsis"
         )
 
 
@@ -1430,6 +1449,7 @@ getStyles (Style styleValues) =
     , ( "opacity", maybeToString << .opacity )
     , ( "overflow-x", overflowToString << .overflowX )
     , ( "overflow-y", overflowToString << .overflowY )
+    , ( "text-overflow", textOverflowToString << .textOverflow )
     , ( "text-align", textAlignToString << .textAlign )
     , ( "text-transform", textTransformToString << .textTransform )
     , ( "text-decoration", textDecorationToString << .textDecoration )
@@ -2030,6 +2050,17 @@ whiteSpace value (Style style) =
 whiteSpaceNoWrap : Style -> Style
 whiteSpaceNoWrap =
     whiteSpace WhiteSpaceNoWrap
+
+
+textOverflow : TextOverflow -> Style -> Style
+textOverflow value (Style style) =
+    Style { style | textOverflow = Just value }
+
+
+{-| -}
+textOverflowEllipsis : Style -> Style
+textOverflowEllipsis =
+    textOverflow TextOverflowEllipsis
 
 
 {-| -}
