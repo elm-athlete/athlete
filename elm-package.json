@@ -22,6 +22,7 @@
         "elm-lang/core": "5.0.0 <= v < 6.0.0",
         "elm-lang/html": "2.0.0 <= v < 3.0.0",
         "elm-lang/window": "1.0.1 <= v < 2.0.0",
+        "justinmimbs/elm-date-extra": "2.0.3 <= v < 3.0.0",
         "eskimoblood/elm-color-extra": "5.0.0 <= v < 6.0.0",
         "fredcy/elm-parseint": "2.0.0 <= v < 3.0.0"
     },

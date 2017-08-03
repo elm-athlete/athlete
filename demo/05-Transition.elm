@@ -13,6 +13,9 @@ import Elegant.Elements exposing (borderBottom)
 import AnimationFrame
 import Color
 import Time exposing (Time)
+import Date
+import Date exposing (Month(..))
+import Date.Extra as Date
 
 
 type alias Page customRoute =
@@ -252,14 +255,13 @@ percentage a =
 
 
 type Route
-    = FablesIndex
-    | FablesShow Int
-    | FablesShowImg String
-    | FablesShowNotes Int
+    = BlogpostsIndex
+    | BlogpostsShow Int
+    | BlogpostsShowImg String
 
 
 type alias Data =
-    { fables : List Fable }
+    { fables : List Blogpost }
 
 
 type alias Model =
@@ -269,8 +271,7 @@ type alias Model =
 
 
 type HistoryMsg
-    = FableShow Int
-    | EnterNotes Int
+    = BlogpostShow Int
     | ShowImage String
 
 
@@ -283,11 +284,11 @@ type alias MarkdownString =
     String
 
 
-type alias Fable =
+type alias Blogpost =
     { id : Int
     , title : String
     , content : MarkdownString
-    , notes : Maybe String
+    , publishedAt : Maybe Date.Date
     , image : String
     }
 
@@ -446,14 +447,11 @@ initHistoryAndData route data =
 handleHistory : HistoryMsg -> History Route -> History Route
 handleHistory val history =
     case val of
-        FableShow val ->
-            history |> push (pageWithDefaultTransition (FablesShow val))
+        BlogpostShow val ->
+            history |> push (pageWithDefaultTransition (BlogpostsShow val))
 
         ShowImage image ->
-            history |> push (pageWithDefaultTransition (FablesShowImg image))
-
-        EnterNotes val ->
-            history |> push (pageWithTransition slideUp (FablesShowNotes val))
+            history |> push (pageWithDefaultTransition (BlogpostsShowImg image))
 
 
 gray : Color.Color
@@ -461,10 +459,10 @@ gray =
     Color.grayscale 0.9
 
 
-titleView : Fable -> Node Interactive phrasingContent Spanning NotListElement Msg
+titleView : Blogpost -> Node Interactive phrasingContent Spanning NotListElement Msg
 titleView fable =
     button
-        [ onClick <| HistoryMsgWrapper <| FableShow fable.id
+        [ onClick <| HistoryMsgWrapper <| BlogpostShow fable.id
         , style
             [ Elegant.cursorPointer
             , Elegant.borderNone
@@ -484,16 +482,32 @@ titleView fable =
 
 header : Node interactiveContent phrasingContent Spanning NotListElement Msg
 header =
-    div
-        [ onClick <| StandardHistoryWrapper Back
-        , style
-            [ Elegant.backgroundColor Color.white
-            , Elegant.textColor Color.black
-            , Elegant.padding Elegant.medium
-            , Elegant.cursorPointer
+    div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow ] ]
+        [ div
+            [ onClick <| StandardHistoryWrapper Back
+            , style
+                [ Elegant.backgroundColor Color.white
+                , Elegant.textColor Color.black
+                , Elegant.padding Elegant.medium
+                , Elegant.cursorPointer
+                , Elegant.fontSize (Px 12)
+                ]
             ]
-        ]
-        [ text "< back"
+            [ text "← BACK"
+            ]
+        , div
+            [ onClick <| StandardHistoryWrapper Back
+            , style
+                [ Elegant.backgroundColor Color.white
+                , Elegant.textColor Color.black
+                , Elegant.padding Elegant.medium
+                , Elegant.cursorPointer
+                , Elegant.fontSize (Px 12)
+                , Elegant.textCenter
+                ]
+            ]
+            [ text "TRAAAVEL"
+            ]
         ]
 
 
@@ -542,44 +556,18 @@ textToHtml =
         (List.foldl (\e accu -> accu ++ [ text e, br [] ]) [])
 
 
-fableBodyView : Fable -> Node interactiveContent Phrasing Spanning NotListElement Msg
-fableBodyView { image, content, id, notes } =
+fableBodyView : Blogpost -> Node interactiveContent Phrasing Spanning NotListElement Msg
+fableBodyView { image, content, id } =
     div []
         ([ img "" image [ style [ Elegant.fullWidth ] ]
          , div [ style [ Elegant.padding Elegant.medium ] ]
-            ((textToHtml content)
-                ++ (case notes of
-                        Nothing ->
-                            []
-
-                        Just notes_ ->
-                            [ div
-                                [ onClick <| HistoryMsgWrapper <| EnterNotes id
-                                , style [ Elegant.cursorPointer, Elegant.underline ]
-                                ]
-                                [ text "Show notes..." ]
-                            ]
-                   )
-            )
+            (textToHtml content)
          ]
         )
 
 
-fableNotesView : Fable -> Node interactiveContent Phrasing Spanning NotListElement msg
-fableNotesView { notes } =
-    case notes of
-        Nothing ->
-            text ""
-
-        Just notes_ ->
-            div []
-                [ div [ style [ Elegant.padding Elegant.medium ] ]
-                    (textToHtml notes_)
-                ]
-
-
 fablesIndex :
-    List Fable
+    List Blogpost
     -> Node Interactive phrasingContent Spanning NotListElement Msg
 fablesIndex fables =
     div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
@@ -594,15 +582,10 @@ find_by insideDataFun data =
 
 fablesShow :
     Int
-    -> List Fable
+    -> List Blogpost
     -> Node interactiveContent Phrasing Spanning NotListElement Msg
 fablesShow id fables =
     div [] [ showView fableBodyView (fables |> find_by .id id) ]
-
-
-fablesShowNotes : Int -> List Fable -> Node interactiveContent Phrasing Spanning NotListElement Msg
-fablesShowNotes id fables =
-    div [] [ showView fableNotesView (fables |> find_by .id id) ]
 
 
 fablesShowImg : String -> Node interactiveContent phrasingContent Spanning NotListElement Msg
@@ -620,16 +603,13 @@ insidePageView page data =
             data.fables
     in
         case page.route of
-            FablesIndex ->
+            BlogpostsIndex ->
                 fablesIndex fables
 
-            FablesShow id ->
+            BlogpostsShow id ->
                 fablesShow id fables
 
-            FablesShowNotes id ->
-                fablesShowNotes id fables
-
-            FablesShowImg src ->
+            BlogpostsShowImg src ->
                 fablesShowImg src
 
 
@@ -654,18 +634,18 @@ subscriptions model =
     historySubscriptions model.history
 
 
-initFables : List Fable
-initFables =
+initBlogposts : List Blogpost
+initBlogposts =
     [ { id = 1
       , title = "La cigale et la fourmi"
+      , publishedAt = Just <| Date.fromCalendarDate 2017 Aug 10
       , content = "La Cigale, ayant chanté\nTout l'Été,\nSe trouva fort dépourvue\nQuand la bise fut venue.\nPas un seul petit morceau\nDe mouche ou de vermisseau.\nElle alla crier famine\nChez la Fourmi sa voisine,\nLa priant de lui prêter\nQuelque grain pour subsister\nJusqu'à la saison nouvelle.\nJe vous paierai, lui dit-elle,\nAvant l'Oût, foi d'animal,\nIntérêt et principal.\nLa Fourmi n'est pas prêteuse ;\nC'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ?\nDit-elle à cette emprunteuse.\n— Nuit et jour à tout venant\nJe chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise.\nEh bien !dansez maintenant. »\n"
-      , notes = Just "Cette fable est la première du premier recueil (124 fables, divisées en 6 livres) paru en mars 1668. Ce recueil est dédié au Dauphin, le fils de Louis XIV et de Marie-Thérèse, alors âgé de 6 ans et demi. La dédicace est en prose, suivie de la Préface au lecteur, de la traduction libre de la 'Vie d'Esope', et se termine par un compliment en vers reprenant et résumant l'essentiel de la dédicace en prose.\n'Ainsi ces fables sont un tableau où chacun de nous se trouve dépeint'\n'Je chante les héros dont Esope est le père'....sont des extraits célèbres de cette dédicace\n"
       , image = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Snodgrass_Magicicada_septendecim.jpg/1024px-Snodgrass_Magicicada_septendecim.jpg"
       }
     , { id = 2
       , title = "Le corbeau et le renard"
       , content = "Maître Corbeau, sur un arbre perché,\nTenait en son bec un fromage.\nMaître Renard, par l'odeur alléché,\nLui tint à peu près ce langage :\nEt bonjour, Monsieur du Corbeau.\nQue vous êtes joli ! que vous me semblez beau !\nSans mentir, si votre ramage\nSe rapporte à votre plumage,\nVous êtes le Phénix des hôtes de ces bois.\nÀ ces mots, le Corbeau ne se sent pas de joie ;\nEt pour montrer sa belle voix,\nIl ouvre un large bec, laisse tomber sa proie.\nLe Renard s'en saisit, et dit : Mon bon Monsieur,\nApprenez que tout flatteur\nVit aux dépens de celui qui l'écoute.\nCette leçon vaut bien un fromage, sans doute.\nLe Corbeau honteux et confus\nJura, mais un peu tard, qu'on ne l'y prendrait plus."
-      , notes = Nothing
+      , publishedAt = Just <| Date.fromCalendarDate 2017 Aug 10
       , image = "https://upload.wikimedia.org/wikipedia/commons/4/47/Karga_9107.svg"
       }
     ]
@@ -673,12 +653,12 @@ initFables =
 
 initData : Data
 initData =
-    { fables = initFables }
+    { fables = initBlogposts }
 
 
 init : { data : Data, history : History Route }
 init =
-    initHistoryAndData FablesIndex initData
+    initHistoryAndData (BlogpostsShow 1) initData
 
 
 main : Program Basics.Never Model Msg
