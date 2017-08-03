@@ -491,6 +491,10 @@ header =
                 , Elegant.padding Elegant.medium
                 , Elegant.cursorPointer
                 , Elegant.fontSize (Px 12)
+                , Elegant.whiteSpaceNoWrap
+                , Elegant.overflowHidden
+                , Elegant.width (Percent 30)
+                , Elegant.textOverflowEllipsis
                 ]
             ]
             [ text "← BACK"
@@ -504,9 +508,24 @@ header =
                 , Elegant.cursorPointer
                 , Elegant.fontSize (Px 12)
                 , Elegant.textCenter
+                , Elegant.width (Percent 40)
                 ]
             ]
             [ text "TRAAAVEL"
+            ]
+        , div
+            [ onClick <| StandardHistoryWrapper Back
+            , style
+                [ Elegant.backgroundColor Color.white
+                , Elegant.textColor Color.black
+                , Elegant.padding Elegant.medium
+                , Elegant.cursorPointer
+                , Elegant.fontSize (Px 12)
+                , Elegant.textCenter
+                , Elegant.width (Percent 30)
+                ]
+            ]
+            [ text ""
             ]
         ]
 
@@ -520,6 +539,7 @@ body bodyFun maybeData =
         [ style
             [ Elegant.overflowYScroll
             , Elegant.fullWidth
+            , Elegant.flexShrink 10
             ]
         ]
         [ case maybeData of
@@ -590,7 +610,8 @@ fablesShow id fables =
 
 fablesShowImg : String -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 fablesShowImg src =
-    div []
+    div
+        []
         [ header
         , img "" src [ style [ Elegant.fullWidth ] ]
         ]
