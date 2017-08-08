@@ -16,6 +16,7 @@ import Time exposing (Time)
 import Date
 import Date exposing (Month(..))
 import Date.Extra as Date
+import Json.Decode as Decode
 
 
 type alias Page customRoute =
@@ -261,7 +262,9 @@ type Route
 
 
 type alias Data =
-    { fables : List Blogpost }
+    { blogposts : List Blogpost
+    , scrollEvent : ScrollEvent
+    }
 
 
 type alias Model =
@@ -278,6 +281,7 @@ type HistoryMsg
 type Msg
     = HistoryMsgWrapper HistoryMsg
     | StandardHistoryWrapper StandardHistoryMsg
+    | Scroll ScrollEvent
 
 
 type alias MarkdownString =
@@ -460,9 +464,9 @@ gray =
 
 
 titleView : Blogpost -> Node Interactive phrasingContent Spanning NotListElement Msg
-titleView fable =
+titleView blogpost =
     button
-        [ onClick <| HistoryMsgWrapper <| BlogpostShow fable.id
+        [ onClick <| HistoryMsgWrapper <| BlogpostShow blogpost.id
         , style
             [ Elegant.cursorPointer
             , Elegant.borderNone
@@ -477,7 +481,7 @@ titleView fable =
             ]
         , focusStyle [ Elegant.backgroundColor <| Color.grayscale 0.05 ]
         ]
-        [ text fable.title ]
+        [ text blogpost.title ]
 
 
 header : Node interactiveContent phrasingContent Spanning NotListElement Msg
@@ -530,30 +534,22 @@ header =
         ]
 
 
-body :
-    (a -> Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Maybe a
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
-body bodyFun maybeData =
-    div
-        [ style
-            [ Elegant.overflowYScroll
-            , Elegant.fullWidth
-            , Elegant.flexShrink 10
-            ]
-        ]
-        [ case maybeData of
-            Just data ->
-                bodyFun data
+onScroll : (ScrollEvent -> value) -> OnEvent value a -> OnEvent value a
+onScroll tagger =
+    on "scroll" (Decode.map tagger onScrollJsonParser)
 
-            Nothing ->
-                text "Error, no val"
-        ]
+
+onScrollJsonParser : Decode.Decoder ScrollEvent
+onScrollJsonParser =
+    Decode.map3 ScrollEvent
+        (Decode.at [ "target", "scrollHeight" ] Decode.int)
+        (Decode.at [ "target", "scrollTop" ] Decode.int)
+        (Decode.at [ "target", "clientHeight" ] Decode.int)
 
 
 showView :
     (a -> Node interactiveContent phrasingContent Spanning NotListElement Msg)
-    -> Maybe a
+    -> a
     -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 showView bodyFun data =
     div
@@ -565,7 +561,16 @@ showView bodyFun data =
             ]
         ]
         [ header
-        , body bodyFun data
+        , div
+            [ style
+                [ Elegant.overflowYScroll
+                , Elegant.fullWidth
+                , Elegant.flexShrink 1000000
+                ]
+            , onScroll Scroll
+            ]
+            [ bodyFun data
+            ]
         ]
 
 
@@ -576,22 +581,58 @@ textToHtml =
         (List.foldl (\e accu -> accu ++ [ text e, br [] ]) [])
 
 
-fableBodyView : Blogpost -> Node interactiveContent Phrasing Spanning NotListElement Msg
-fableBodyView { image, content, id } =
-    div []
-        ([ img "" image [ style [ Elegant.fullWidth ] ]
-         , div [ style [ Elegant.padding Elegant.medium ] ]
-            (textToHtml content)
-         ]
-        )
+verticalParallax speed scrollEvent el =
+    let
+        toto =
+            Basics.max ((scrollEvent.scrollPos |> toFloat) * speed |> round) 0
+    in
+        div [ style [ Elegant.positionAbsolute ] ]
+            [ div [ style [ Elegant.marginTop (Px -toto) ] ] []
+            , el
+            , div
+                [ style [ Elegant.marginTop (Px toto) ] ]
+                []
+            ]
 
 
-fablesIndex :
+blogpostBodyView : { b | maybeBlogpost : Maybe Blogpost, scrollEvent : ScrollEvent } -> Node interactiveContent Phrasing Spanning NotListElement msg
+blogpostBodyView data =
+    case data.maybeBlogpost of
+        Nothing ->
+            text ""
+
+        Just blogpost ->
+            div []
+                ([ img ""
+                    blogpost.image
+                    [ style [ Elegant.fullWidth ] ]
+
+                 --  , text (data.scrollEvent |> toString)
+                 , (verticalParallax 1.5
+                        data.scrollEvent
+                        (div [ style [ Elegant.padding Elegant.medium ] ]
+                            (textToHtml blogpost.content)
+                        )
+                   )
+                 , (verticalParallax 1.2
+                        data.scrollEvent
+                        (div [ style [ Elegant.padding Elegant.medium ] ]
+                            (textToHtml blogpost.content)
+                        )
+                   )
+
+                 --  , div [ style [ Elegant.marginBottom (Px ((data.scrollEvent.scrollPos |> toFloat) * 1.5 |> round)) ] ] []
+                 --  , div [ style [ Elegant.height (Px (Basics.max (100 - data.scrollEvent.scrollPos) 0)) ] ] []
+                 ]
+                )
+
+
+blogpostsIndex :
     List Blogpost
     -> Node Interactive phrasingContent Spanning NotListElement Msg
-fablesIndex fables =
+blogpostsIndex blogposts =
     div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
-        (fables |> List.map titleView)
+        (blogposts |> List.map titleView)
 
 
 find_by : (a -> b) -> b -> List a -> Maybe a
@@ -600,16 +641,25 @@ find_by insideDataFun data =
         >> List.head
 
 
-fablesShow :
-    Int
-    -> List Blogpost
-    -> Node interactiveContent Phrasing Spanning NotListElement Msg
-fablesShow id fables =
-    div [] [ showView fableBodyView (fables |> find_by .id id) ]
+type alias ScrollEvent =
+    { scrollHeight : Int
+    , scrollPos : Int
+    , visibleHeight : Int
+    }
 
 
-fablesShowImg : String -> Node interactiveContent phrasingContent Spanning NotListElement Msg
-fablesShowImg src =
+visiblePortion : ScrollEvent -> Float
+visiblePortion { scrollPos, scrollHeight, visibleHeight } =
+    (scrollPos |> toFloat) / ((scrollHeight - visibleHeight) |> toFloat)
+
+
+blogpostsShow : Int -> List Blogpost -> ScrollEvent -> Node interactiveContent Phrasing Spanning NotListElement Msg
+blogpostsShow id blogposts scrollEvent =
+    div [] [ showView blogpostBodyView { maybeBlogpost = (blogposts |> find_by .id id), scrollEvent = scrollEvent } ]
+
+
+blogpostsShowImg : String -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+blogpostsShowImg src =
     div
         []
         [ header
@@ -620,18 +670,18 @@ fablesShowImg src =
 insidePageView : Page Route -> Data -> Node Interactive Phrasing Spanning NotListElement Msg
 insidePageView page data =
     let
-        fables =
-            data.fables
+        blogposts =
+            data.blogposts
     in
         case page.route of
             BlogpostsIndex ->
-                fablesIndex fables
+                blogpostsIndex blogposts
 
             BlogpostsShow id ->
-                fablesShow id fables
+                blogpostsShow id blogposts data.scrollEvent
 
             BlogpostsShowImg src ->
-                fablesShowImg src
+                blogpostsShowImg src
 
 
 view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
@@ -648,6 +698,16 @@ update msg model =
 
         StandardHistoryWrapper historyMsg ->
             model |> handleStandardHistory historyMsg
+
+        Scroll scrollEvent ->
+            let
+                data =
+                    model.data
+
+                newData =
+                    { data | scrollEvent = scrollEvent }
+            in
+                ( { model | data = newData }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -674,7 +734,7 @@ initBlogposts =
 
 initData : Data
 initData =
-    { fables = initBlogposts }
+    { blogposts = initBlogposts, scrollEvent = (ScrollEvent 0 0 0) }
 
 
 init : { data : Data, history : History Route }
