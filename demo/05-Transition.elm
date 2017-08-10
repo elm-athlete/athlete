@@ -486,7 +486,7 @@ titleView blogpost =
 
 header : Node interactiveContent phrasingContent Spanning NotListElement Msg
 header =
-    div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow ] ]
+    div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow, Elegant.fullWidth ] ]
         [ div
             [ onClick <| StandardHistoryWrapper Back
             , style
@@ -499,6 +499,8 @@ header =
                 , Elegant.overflowHidden
                 , Elegant.width (Percent 30)
                 , Elegant.textOverflowEllipsis
+                , Elegant.positionFixed
+                , Elegant.fullWidth
                 ]
             ]
             [ text "← BACK"
