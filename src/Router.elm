@@ -144,10 +144,12 @@ push el ({ transition, before, current, after } as history) =
 
 oppositeDirection : Direction -> Direction
 oppositeDirection direction =
-    if direction == Backward then
-        Forward
-    else
-        Backward
+    case direction of
+        Backward ->
+            Forward
+
+        Forward ->
+            Backward
 
 
 opposite : Maybe Transition -> Maybe Transition
@@ -273,7 +275,7 @@ overflowHiddenContainer attributes content =
 
 
 pageView :
-    (a -> b -> Node interactiveContent phrasingContent Spanning NotListElement msg)
+    (a -> b -> Float -> Node interactiveContent phrasingContent Spanning NotListElement msg)
     -> Maybe Transition
     -> b
     -> a
@@ -286,11 +288,11 @@ pageView insidePageView_ transition data page =
              ]
             )
         ]
-        [ insidePageView_ page data ]
+        [ insidePageView_ page data (getMaybeTransitionValue transition) ]
 
 
 historyView :
-    (Page route -> a -> Node interactiveContent phrasingContent Spanning NotListElement msg)
+    (Page route -> a -> Float -> Node interactiveContent phrasingContent Spanning NotListElement msg)
     -> History route
     -> a
     -> Node interactiveContent phrasingContent Spanning NotListElement msg

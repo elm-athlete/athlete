@@ -57,10 +57,10 @@ type alias Blogpost =
 
 
 handleHistory : HistoryMsg -> History Route -> History Route
-handleHistory val history =
-    case val of
-        BlogpostShow val ->
-            history |> push (pageWithDefaultTransition (BlogpostsShow val))
+handleHistory route history =
+    case route of
+        BlogpostShow id ->
+            history |> push (pageWithDefaultTransition (BlogpostsShow id))
 
 
 gray : Color.Color
@@ -198,17 +198,8 @@ blogpostsShow id blogposts =
     div [] [ showView blogpostBodyView { maybeBlogpost = (blogposts |> find_by .id id) } ]
 
 
-blogpostsShowImg : String -> Node interactiveContent phrasingContent Spanning NotListElement Msg
-blogpostsShowImg src =
-    div
-        []
-        [ header
-        , img "" src [ style [ Elegant.fullWidth ] ]
-        ]
-
-
-insidePageView : Page Route -> Data -> Node Interactive Phrasing Spanning NotListElement Msg
-insidePageView page data =
+insidePageView : Page Route -> Data -> Float -> Node Interactive Phrasing Spanning NotListElement Msg
+insidePageView page data transitionValue =
     let
         blogposts =
             data.blogposts
