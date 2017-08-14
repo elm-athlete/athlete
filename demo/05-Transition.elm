@@ -10,258 +10,22 @@ module Transition exposing (..)
 import BodyBuilder exposing (..)
 import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
 import Elegant.Elements exposing (borderBottom)
-import AnimationFrame
 import Color
-import Time exposing (Time)
 import Date
 import Date exposing (Month(..))
 import Date.Extra as Date
-
-
-type alias Page customRoute =
-    { maybeTransition : Maybe Transition
-    , route : customRoute
-    }
-
-
-type Easing
-    = EaseInOut
-    | Linear
-
-
-type Kind
-    = SlideRight
-    | SlideUp
-
-
-type alias Transition =
-    { timer : Float
-    , length : Float
-    , kind : Kind
-    , direction : Direction
-    , easing : Easing
-    }
-
-
-type alias History route =
-    { before : List (Page route)
-    , current : Page route
-    , after : List (Page route)
-    , transition : Maybe Transition
-    }
-
-
-type Direction
-    = Forward
-    | Backward
-
-
-type StandardHistoryMsg
-    = Tick Time
-    | Back
-
-
-easingFun : Easing -> Float -> Float
-easingFun easing =
-    case easing of
-        EaseInOut ->
-            easeInOut
-
-        Linear ->
-            identity
-
-
-easeInOut : Float -> Float
-easeInOut t =
-    if t < 0.5 then
-        2 * t * t
-    else
-        -1 + (4 - 2 * t) * t
-
-
-getMaybeTransitionValue : Maybe Transition -> Float
-getMaybeTransitionValue maybeTransition =
-    case maybeTransition of
-        Nothing ->
-            0
-
-        Just transition ->
-            transition |> getTransitionValue
-
-
-getTransitionValue : Transition -> Float
-getTransitionValue { direction, timer, length, easing } =
-    (case direction of
-        Forward ->
-            negate
-
-        Backward ->
-            identity
-    )
-        (easingFun easing <| timer / length)
-        + (case direction of
-            Forward ->
-                1
-
-            Backward ->
-                0
-          )
-
-
-isRunning : Maybe Transition -> Bool
-isRunning transition =
-    case transition of
-        Nothing ->
-            False
-
-        Just transition ->
-            transition.timer > 0
-
-
-timeDiff : Float -> Transition -> Transition
-timeDiff diff ({ timer } as transition) =
-    let
-        newTimer =
-            if timer - diff <= 0 then
-                0
-            else
-                timer - diff
-    in
-        { transition | timer = newTimer }
-
-
-maybeTransitionSubscription : Maybe Transition -> Sub Msg
-maybeTransitionSubscription =
-    Maybe.map (\transition -> AnimationFrame.diffs <| (StandardHistoryWrapper << Tick))
-        >> Maybe.withDefault Sub.none
-
-
-basicDuration : number
-basicDuration =
-    250
-
-
-customTransition : Float -> Kind -> Direction -> Easing -> Transition
-customTransition duration =
-    Transition duration duration
-
-
-push : Page route -> History route -> History route
-push el ({ transition, before, current, after } as history) =
-    if isRunning transition then
-        history
-    else
-        { history
-            | before = current :: before
-            , current = el
-            , after = []
-            , transition = el.maybeTransition
-        }
-
-
-oppositeDirection : Direction -> Direction
-oppositeDirection direction =
-    if direction == Backward then
-        Forward
-    else
-        Backward
-
-
-opposite : Maybe Transition -> Maybe Transition
-opposite maybeTransition =
-    case maybeTransition of
-        Nothing ->
-            Nothing
-
-        Just transition ->
-            Just
-                { transition
-                    | direction =
-                        oppositeDirection transition.direction
-                }
-
-
-defaultTransition : Maybe Transition
-defaultTransition =
-    Just <| customTransition basicDuration SlideRight Forward EaseInOut
-
-
-pageWithDefaultTransition : route -> Page route
-pageWithDefaultTransition =
-    Page defaultTransition
-
-
-pageWithoutTransition : route -> Page route
-pageWithoutTransition =
-    Page Nothing
-
-
-pageWithTransition : Transition -> route -> Page route
-pageWithTransition transition =
-    Page (Just transition)
-
-
-pull : History route -> History route
-pull ({ transition, before, current, after } as history) =
-    if isRunning transition then
-        history
-    else
-        case before of
-            [] ->
-                history
-
-            head :: tail ->
-                { history
-                    | before = tail
-                    , current = head
-                    , after = current :: after
-                    , transition = opposite current.maybeTransition
-                }
-
-
-slideUp : Transition
-slideUp =
-    customTransition basicDuration SlideUp Forward EaseInOut
-
-
-putHeadInListIfExists : List a -> List a
-putHeadInListIfExists list =
-    case list of
-        [] ->
-            []
-
-        head :: _ ->
-            [ head ]
-
-
-visiblePages : History route -> List (Page route)
-visiblePages { transition, before, current, after } =
-    case transition of
-        Nothing ->
-            [ current ]
-
-        Just transition ->
-            case transition.direction of
-                Forward ->
-                    (putHeadInListIfExists before) ++ [ current ]
-
-                Backward ->
-                    current :: putHeadInListIfExists after
-
-
-percentage : Float -> SizeUnit
-percentage a =
-    Percent <| 100 * a
+import Router exposing (..)
+import Finders exposing (..)
 
 
 type Route
     = BlogpostsIndex
     | BlogpostsShow Int
-    | BlogpostsShowImg String
 
 
 type alias Data =
-    { fables : List Blogpost }
+    { blogposts : List Blogpost
+    }
 
 
 type alias Model =
@@ -272,7 +36,6 @@ type alias Model =
 
 type HistoryMsg
     = BlogpostShow Int
-    | ShowImage String
 
 
 type Msg
@@ -293,165 +56,11 @@ type alias Blogpost =
     }
 
 
-pageView :
-    (a -> b -> Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Maybe Transition
-    -> b
-    -> a
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
-pageView insidePageView_ transition data page =
-    div
-        [ style
-            ([ Elegant.fullWidth
-             , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
-             ]
-            )
-        ]
-        [ insidePageView_ page data ]
-
-
-overflowHiddenContainer :
-    List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
-overflowHiddenContainer attributes content =
-    div [ style [ Elegant.overflowHidden ] ]
-        [ div attributes content ]
-
-
-beforeTransition : History route -> List (Page route)
-beforeTransition history =
-    case history.transition of
-        Nothing ->
-            []
-
-        Just transition ->
-            if transition.direction == Backward then
-                [ history.current ]
-            else
-                putHeadInListIfExists history.before
-
-
-afterTransition : History route -> List (Page route)
-afterTransition history =
-    case history.transition of
-        Nothing ->
-            []
-
-        Just transition ->
-            if transition.direction == Backward then
-                putHeadInListIfExists history.after
-            else
-                [ history.current ]
-
-
-historyView :
-    (Page route -> a -> Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> History route
-    -> a
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
-historyView insidePageView_ history data =
-    let
-        visiblePages_ =
-            visiblePages history
-    in
-        case history.transition of
-            Nothing ->
-                overflowHiddenContainer [] [ pageView insidePageView_ Nothing data history.current ]
-
-            Just transition ->
-                case transition.kind of
-                    SlideUp ->
-                        overflowHiddenContainer
-                            []
-                            [ div
-                                [ style
-                                    [ Elegant.width (Percent 100)
-                                    ]
-                                ]
-                                (List.map (pageView insidePageView_ history.transition data) (history |> beforeTransition))
-                            , div
-                                [ style
-                                    [ Elegant.bottom <| percentage ((getMaybeTransitionValue <| history.transition) - 1)
-                                    , Elegant.positionAbsolute
-                                    , Elegant.width (Percent 100)
-                                    ]
-                                ]
-                                (List.map (pageView insidePageView_ history.transition data) (history |> afterTransition))
-                            ]
-
-                    SlideRight ->
-                        overflowHiddenContainer
-                            [ style
-                                [ Elegant.displayFlex
-                                , Elegant.width <| percentage <| toFloat <| List.length <| visiblePages_
-                                , Elegant.positionRelative
-                                , Elegant.right <| percentage <| getMaybeTransitionValue <| history.transition
-                                ]
-                            ]
-                            (List.map (pageView insidePageView_ history.transition data) visiblePages_)
-
-
-historySubscriptions : History route -> Sub Msg
-historySubscriptions history =
-    maybeTransitionSubscription history.transition
-
-
-initHistory : route -> History route
-initHistory currentPage =
-    { before = []
-    , current = pageWithoutTransition currentPage
-    , after = []
-    , transition = Nothing
-    }
-
-
-standardHandleHistory : StandardHistoryMsg -> History route -> History route
-standardHandleHistory historyMsg history =
-    case historyMsg of
-        Back ->
-            history |> pull
-
-        Tick diff ->
-            case history.transition of
-                Nothing ->
-                    history
-
-                Just transition ->
-                    let
-                        newTransition =
-                            (transition |> timeDiff diff)
-                    in
-                        if newTransition.timer > 0 then
-                            { history | transition = Just newTransition }
-                        else
-                            { history | transition = Nothing }
-
-
-handleStandardHistory : StandardHistoryMsg -> { a | history : History route } -> ( { a | history : History route }, Cmd msg )
-handleStandardHistory historyMsg model =
-    ( { model | history = standardHandleHistory historyMsg model.history }, Cmd.none )
-
-
-initHistoryAndData : route -> data -> { history : History route, data : data }
-initHistoryAndData route data =
-    { history = initHistory route
-    , data = data
-    }
-
-
-
---- Custom
-
-
 handleHistory : HistoryMsg -> History Route -> History Route
 handleHistory val history =
     case val of
         BlogpostShow val ->
             history |> push (pageWithDefaultTransition (BlogpostsShow val))
-
-        ShowImage image ->
-            history |> push (pageWithDefaultTransition (BlogpostsShowImg image))
 
 
 gray : Color.Color
@@ -460,9 +69,9 @@ gray =
 
 
 titleView : Blogpost -> Node Interactive phrasingContent Spanning NotListElement Msg
-titleView fable =
+titleView blogpost =
     button
-        [ onClick <| HistoryMsgWrapper <| BlogpostShow fable.id
+        [ onClick <| HistoryMsgWrapper <| BlogpostShow blogpost.id
         , style
             [ Elegant.cursorPointer
             , Elegant.borderNone
@@ -477,83 +86,61 @@ titleView fable =
             ]
         , focusStyle [ Elegant.backgroundColor <| Color.grayscale 0.05 ]
         ]
-        [ text fable.title ]
+        [ text blogpost.title ]
 
 
 header : Node interactiveContent phrasingContent Spanning NotListElement Msg
 header =
-    div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow ] ]
-        [ div
-            [ onClick <| StandardHistoryWrapper Back
-            , style
-                [ Elegant.backgroundColor Color.white
-                , Elegant.textColor Color.black
-                , Elegant.padding Elegant.medium
-                , Elegant.cursorPointer
-                , Elegant.fontSize (Px 12)
-                , Elegant.whiteSpaceNoWrap
-                , Elegant.overflowHidden
-                , Elegant.width (Percent 30)
-                , Elegant.textOverflowEllipsis
+    div [ style [ Elegant.positionFixed, Elegant.fullWidth, Elegant.backgroundColor (Color.rgba 255 255 255 0.9) ] ]
+        [ div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow, Elegant.fullWidth ] ]
+            [ div
+                [ onClick <| StandardHistoryWrapper Back
+                , style
+                    [ Elegant.textColor Color.black
+                    , Elegant.padding Elegant.medium
+                    , Elegant.cursorPointer
+                    , Elegant.fontSize (Px 12)
+                    , Elegant.whiteSpaceNoWrap
+                    , Elegant.overflowHidden
+                    , Elegant.width (Percent 30)
+                    , Elegant.textOverflowEllipsis
+                    ]
+                ]
+                [ text "← BACK"
+                ]
+            , div
+                [ onClick <| StandardHistoryWrapper Back
+                , style
+                    [ Elegant.textColor Color.black
+                    , Elegant.padding Elegant.medium
+                    , Elegant.cursorPointer
+                    , Elegant.fontSize (Px 12)
+                    , Elegant.textCenter
+                    , Elegant.width (Percent 40)
+                    ]
+                ]
+                [ text "TRAAAVEL"
+                ]
+            , div
+                [ onClick <| StandardHistoryWrapper Back
+                , style
+                    [ Elegant.textColor Color.black
+                    , Elegant.padding Elegant.medium
+                    , Elegant.cursorPointer
+                    , Elegant.fontSize (Px 12)
+                    , Elegant.textCenter
+                    , Elegant.width (Percent 30)
+                    ]
+                ]
+                [ text ""
                 ]
             ]
-            [ text "← BACK"
-            ]
-        , div
-            [ onClick <| StandardHistoryWrapper Back
-            , style
-                [ Elegant.backgroundColor Color.white
-                , Elegant.textColor Color.black
-                , Elegant.padding Elegant.medium
-                , Elegant.cursorPointer
-                , Elegant.fontSize (Px 12)
-                , Elegant.textCenter
-                , Elegant.width (Percent 40)
-                ]
-            ]
-            [ text "TRAAAVEL"
-            ]
-        , div
-            [ onClick <| StandardHistoryWrapper Back
-            , style
-                [ Elegant.backgroundColor Color.white
-                , Elegant.textColor Color.black
-                , Elegant.padding Elegant.medium
-                , Elegant.cursorPointer
-                , Elegant.fontSize (Px 12)
-                , Elegant.textCenter
-                , Elegant.width (Percent 30)
-                ]
-            ]
-            [ text ""
-            ]
-        ]
-
-
-body :
-    (a -> Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Maybe a
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
-body bodyFun maybeData =
-    div
-        [ style
-            [ Elegant.overflowYScroll
-            , Elegant.fullWidth
-            , Elegant.flexShrink 10
-            ]
-        ]
-        [ case maybeData of
-            Just data ->
-                bodyFun data
-
-            Nothing ->
-                text "Error, no val"
         ]
 
 
 showView :
     (a -> Node interactiveContent phrasingContent Spanning NotListElement Msg)
-    -> Maybe a
+    -> a
     -> Node interactiveContent phrasingContent Spanning NotListElement Msg
 showView bodyFun data =
     div
@@ -565,7 +152,15 @@ showView bodyFun data =
             ]
         ]
         [ header
-        , body bodyFun data
+        , div
+            [ style
+                [ Elegant.overflowYScroll
+                , Elegant.fullWidth
+                , Elegant.flexShrink 1000000
+                ]
+            ]
+            [ bodyFun data
+            ]
         ]
 
 
@@ -576,40 +171,35 @@ textToHtml =
         (List.foldl (\e accu -> accu ++ [ text e, br [] ]) [])
 
 
-fableBodyView : Blogpost -> Node interactiveContent Phrasing Spanning NotListElement Msg
-fableBodyView { image, content, id } =
-    div []
-        ([ img "" image [ style [ Elegant.fullWidth ] ]
-         , div [ style [ Elegant.padding Elegant.medium ] ]
-            (textToHtml content)
-         ]
-        )
+blogpostBodyView : { b | maybeBlogpost : Maybe Blogpost } -> Node interactiveContent Phrasing Spanning NotListElement msg
+blogpostBodyView data =
+    case data.maybeBlogpost of
+        Nothing ->
+            text ""
+
+        Just blogpost ->
+            div []
+                ([ img ""
+                    blogpost.image
+                    [ style [ Elegant.fullWidth ] ]
+                 , div [] (textToHtml blogpost.content)
+                 ]
+                )
 
 
-fablesIndex :
-    List Blogpost
-    -> Node Interactive phrasingContent Spanning NotListElement Msg
-fablesIndex fables =
+blogpostsIndex : List Blogpost -> Node Interactive phrasingContent Spanning NotListElement Msg
+blogpostsIndex blogposts =
     div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
-        (fables |> List.map titleView)
+        (blogposts |> List.map titleView)
 
 
-find_by : (a -> b) -> b -> List a -> Maybe a
-find_by insideDataFun data =
-    List.filter (\e -> insideDataFun e == data)
-        >> List.head
+blogpostsShow : Int -> List Blogpost -> Node interactiveContent Phrasing Spanning NotListElement Msg
+blogpostsShow id blogposts =
+    div [] [ showView blogpostBodyView { maybeBlogpost = (blogposts |> find_by .id id) } ]
 
 
-fablesShow :
-    Int
-    -> List Blogpost
-    -> Node interactiveContent Phrasing Spanning NotListElement Msg
-fablesShow id fables =
-    div [] [ showView fableBodyView (fables |> find_by .id id) ]
-
-
-fablesShowImg : String -> Node interactiveContent phrasingContent Spanning NotListElement Msg
-fablesShowImg src =
+blogpostsShowImg : String -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+blogpostsShowImg src =
     div
         []
         [ header
@@ -620,18 +210,15 @@ fablesShowImg src =
 insidePageView : Page Route -> Data -> Node Interactive Phrasing Spanning NotListElement Msg
 insidePageView page data =
     let
-        fables =
-            data.fables
+        blogposts =
+            data.blogposts
     in
         case page.route of
             BlogpostsIndex ->
-                fablesIndex fables
+                blogpostsIndex blogposts
 
             BlogpostsShow id ->
-                fablesShow id fables
-
-            BlogpostsShowImg src ->
-                fablesShowImg src
+                blogpostsShow id blogposts
 
 
 view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
@@ -652,7 +239,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    historySubscriptions model.history
+    maybeTransitionSubscription StandardHistoryWrapper model.history.transition
 
 
 initBlogposts : List Blogpost
@@ -674,12 +261,12 @@ initBlogposts =
 
 initData : Data
 initData =
-    { fables = initBlogposts }
+    { blogposts = initBlogposts }
 
 
 init : { data : Data, history : History Route }
 init =
-    initHistoryAndData (BlogpostsShow 1) initData
+    initHistoryAndData BlogpostsIndex initData
 
 
 main : Program Basics.Never Model Msg
