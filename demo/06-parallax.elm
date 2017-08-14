@@ -1,2 +1,0 @@
--- https://www.w3schools.com/howto/tryhow_css_parallax_demo.htm
--- https://codepen.io/joeaugie/pen/RWbPzo

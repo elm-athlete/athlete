@@ -22,6 +22,7 @@ module Elegant
         , positionRelative
         , positionFixed
         , positionStatic
+        , positionSticky
         , left
         , right
         , top
@@ -227,6 +228,7 @@ module Elegant
 @docs positionAbsolute
 @docs positionRelative
 @docs positionFixed
+@docs positionSticky
 @docs left
 @docs right
 @docs top
@@ -594,6 +596,7 @@ type Position
     | PositionRelative
     | PositionFixed
     | PositionStatic
+    | PositionSticky
 
 
 type Display
@@ -961,6 +964,9 @@ positionToString =
 
                 PositionStatic ->
                     "static"
+
+                PositionSticky ->
+                    "sticky"
         )
 
 
@@ -1559,6 +1565,12 @@ position value (Style style) =
 positionAbsolute : Style -> Style
 positionAbsolute =
     position PositionAbsolute
+
+
+{-| -}
+positionSticky : Style -> Style
+positionSticky =
+    position PositionSticky
 
 
 {-| -}
