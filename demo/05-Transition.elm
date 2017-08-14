@@ -198,8 +198,8 @@ blogpostsShow id blogposts =
     div [] [ showView blogpostBodyView { maybeBlogpost = (blogposts |> find_by .id id) } ]
 
 
-insidePageView : Page Route -> Data -> Float -> Node Interactive Phrasing Spanning NotListElement Msg
-insidePageView page data transitionValue =
+insidePageView : Page Route -> Data -> Maybe Transition -> Node Interactive Phrasing Spanning NotListElement Msg
+insidePageView page data transition =
     let
         blogposts =
             data.blogposts

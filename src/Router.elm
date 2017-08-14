@@ -275,7 +275,7 @@ overflowHiddenContainer attributes content =
 
 
 pageView :
-    (a -> b -> Float -> Node interactiveContent phrasingContent Spanning NotListElement msg)
+    (a -> b -> Maybe Transition -> Node interactiveContent phrasingContent Spanning NotListElement msg)
     -> Maybe Transition
     -> b
     -> a
@@ -288,11 +288,11 @@ pageView insidePageView_ transition data page =
              ]
             )
         ]
-        [ insidePageView_ page data (getMaybeTransitionValue transition) ]
+        [ insidePageView_ page data transition ]
 
 
 historyView :
-    (Page route -> a -> Float -> Node interactiveContent phrasingContent Spanning NotListElement msg)
+    (Page route -> a -> Maybe Transition -> Node interactiveContent phrasingContent Spanning NotListElement msg)
     -> History route
     -> a
     -> Node interactiveContent phrasingContent Spanning NotListElement msg
