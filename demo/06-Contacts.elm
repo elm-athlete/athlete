@@ -196,7 +196,7 @@ filterByInitial =
 
 initialView : ( Char, List Contact ) -> Node Interactive phrasingContent Spanning NotListElement Msg
 initialView ( initial, contacts ) =
-    stickyView [ Elegant.backgroundColor gray, Elegant.paddingLeft (Px 24) ] (String.fromChar initial) (contacts |> List.map titleView)
+    stickyView [ Elegant.backgroundColor gray, Elegant.paddingLeft Elegant.large ] (String.fromChar initial) (contacts |> List.map titleView)
 
 
 contactsView : List Contact -> List (Node Interactive phrasingContent Spanning NotListElement Msg)
