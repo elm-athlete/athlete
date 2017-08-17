@@ -64,7 +64,7 @@ handleHistory route history =
 
 gray : Color.Color
 gray =
-    Color.grayscale 0.9
+    Color.grayscale 0.1
 
 
 titleView : Contact -> Node Interactive phrasingContent Spanning NotListElement Msg
@@ -118,7 +118,7 @@ header =
                     , Elegant.width (Percent 40)
                     ]
                 ]
-                [ text "TRAAAVEL"
+                [ text "POKEMON"
                 ]
             , div
                 [ onClick <| StandardHistoryWrapper Back
@@ -163,6 +163,7 @@ showView bodyFun data =
         ]
 
 
+pageCenter : Elegant.Style -> Elegant.Style
 pageCenter =
     [ Elegant.displayFlex
     , Elegant.alignItemsCenter
@@ -193,7 +194,7 @@ filterByInitial =
 
 initialView : ( Char, List Contact ) -> Node Interactive phrasingContent Spanning NotListElement Msg
 initialView ( initial, contacts ) =
-    stickyView [ Elegant.backgroundColor Color.red ] (String.fromChar initial) (contacts |> List.map titleView)
+    stickyView [ Elegant.backgroundColor gray, Elegant.paddingLeft (Px 24) ] (String.fromChar initial) (contacts |> List.map titleView)
 
 
 initialsView : Dict Char (List Contact) -> List (Node Interactive phrasingContent Spanning NotListElement Msg)
