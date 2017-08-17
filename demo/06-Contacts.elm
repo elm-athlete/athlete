@@ -183,13 +183,15 @@ contactBodyView data =
             div [ style [ pageCenter ] ] [ text contact.name, br [], text contact.phoneNumber ]
 
 
-filterByInitial : List Contact -> Dict Char (List Contact)
+filterByInitial : List Contact -> List ( Char, List Contact )
 filterByInitial =
-    Dict.filterGroupBy
+    (Dict.filterGroupBy
         (.name
             >> String.uncons
             >> Maybe.map Tuple.first
         )
+    )
+        >> Dict.toList
 
 
 initialView : ( Char, List Contact ) -> Node Interactive phrasingContent Spanning NotListElement Msg
@@ -197,18 +199,9 @@ initialView ( initial, contacts ) =
     stickyView [ Elegant.backgroundColor gray, Elegant.paddingLeft (Px 24) ] (String.fromChar initial) (contacts |> List.map titleView)
 
 
-initialsView : Dict Char (List Contact) -> List (Node Interactive phrasingContent Spanning NotListElement Msg)
-initialsView initialAndContactsList =
-    initialAndContactsList
-        |> Dict.toList
-        |> List.map initialView
-
-
 contactsView : List Contact -> List (Node Interactive phrasingContent Spanning NotListElement Msg)
-contactsView contacts =
-    contacts
-        |> filterByInitial
-        |> initialsView
+contactsView =
+    filterByInitial >> List.map initialView
 
 
 contactsIndex : List Contact -> Node Interactive phrasingContent Spanning NotListElement Msg
