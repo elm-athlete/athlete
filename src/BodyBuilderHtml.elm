@@ -302,10 +302,22 @@ getAllStyles =
         []
 
 
+htmlAttributeToCss : String -> Html.Html msg
+htmlAttributeToCss val =
+    Html.node "style" [] [ Html.text val ]
+
+
 htmlAttributesToCss : HtmlAttributes msg -> Html.Html msg
 htmlAttributesToCss val =
-    Html.text
-        (Elegant.stylesToCss (getAllStyles val))
+    let
+        csses : List String
+        csses =
+            (Elegant.stylesToCss (getAllStyles val))
+    in
+        Html.div []
+            (csses
+                |> List.map htmlAttributeToCss
+            )
 
 
 addLabelContent : Label msg -> HtmlAttributes msg -> List (HtmlAttributes msg)
@@ -388,7 +400,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
 view : HtmlAttributes msg -> Html.Html msg
 view val =
     Html.div []
-        [ Html.node "style" [] [ htmlAttributesToCss val ]
+        [ htmlAttributesToCss val
         , htmlAttributesToHtml val
         ]
 

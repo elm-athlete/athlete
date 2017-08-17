@@ -2945,20 +2945,19 @@ compileAtomicClass { mediaQuery, className, mediaQueryId, selector, property } =
 
 {-| Generate all the css from a list of tuple : styles and hover
 -}
-stylesToCss : List ConditionalStyle -> String
+stylesToCss : List ConditionalStyle -> List String
 stylesToCss styles =
     styles
         |> List.concatMap compileScreenWidths
         |> List.concatMap compileConditionalStyle
         |> List.map compileAtomicClass
+        |> List.append [ boxSizingCss ]
         |> List.Extra.unique
-        |> String.join "\n"
-        |> (++) boxSizingCss
 
 
 boxSizingCss : String
 boxSizingCss =
-    "*{box-sizing: border-box;}\n"
+    "*{box-sizing: border-box;}"
 
 
 screenWidthToCompiledStyle :
