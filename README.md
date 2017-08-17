@@ -28,6 +28,8 @@ BodyBuilder also prevent html mistakes, like putting `button` inside `a`.
 
 But the most impressive thing of BodyBuilder is that it allows the use of elegant.
 
+Look at the demo folder for more impressive elegant and bodybuilder demos.
+
 # How ?
 
 ```elm
