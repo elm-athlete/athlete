@@ -21,11 +21,44 @@ isBetween low high char =
 
 isValidInCssName : Char -> Bool
 isValidInCssName char =
-    Char.isDigit char
-        || isBetween 'a' 'z' char
-        || isBetween 'A' 'Z' char
-        || (char == '-')
-        || (char == '_')
+    isAlphaNum char || char == '-' || char == '_'
+
+
+isAlphaNum : Char -> Bool
+isAlphaNum char =
+    isLower char || isUpper char || isDigit char
+
+
+isLower : Char -> Bool
+isLower char =
+    let
+        code =
+            toCode char
+    in
+        0x61 <= code && code <= 0x7A
+
+
+isUpper : Char -> Bool
+isUpper char =
+    let
+        code =
+            toCode char
+    in
+        code <= 0x5A && 0x41 <= code
+
+
+isDigit : Char -> Bool
+isDigit char =
+    let
+        code =
+            toCode char
+    in
+        code <= 0x39 && 0x30 <= code
+
+
+toCode : Char -> Int
+toCode =
+    Char.toCode
 
 
 emptyListOrApply : (a -> b) -> Maybe a -> List b
