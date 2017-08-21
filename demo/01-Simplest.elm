@@ -1,12 +1,13 @@
 module Simplest exposing (..)
 
 import BodyBuilder exposing (..)
-import Elegant exposing (textCenter)
+import Elegant exposing (textColor)
+import Color
 
 
 view : a -> Node interactiveContent phrasingContent Spanning NotListElement msg
 view model =
-    div [ style [ textCenter ] ] [ text "I'm Elegantly styled by css, but my style is set inline" ]
+    div [ style [ textColor Color.blue ], hoverStyle [ textColor Color.red ] ] [ text "I'm Elegantly styled by css, but my style is set inline" ]
 
 
 main : Program Basics.Never number msg
