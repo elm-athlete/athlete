@@ -85,6 +85,7 @@ module BodyBuilder
         , container
         , olLi
         , ulLi
+        , script
         , inputHidden
         , inputText
         , inputNumber
@@ -106,6 +107,8 @@ module BodyBuilder
         , title
         , tabindex
         , id
+        , data
+        , src
         , disabled
         , min
         , max
@@ -232,6 +235,9 @@ module BodyBuilder
 @docs container
 @docs olLi
 @docs ulLi
+@docs script
+@docs data
+@docs src
 @docs inputHidden
 @docs inputText
 @docs inputNumber
@@ -622,6 +628,10 @@ type alias PositionAttribute a =
     { a | position : Position }
 
 
+type alias DataAttribute a =
+    { a | data : List ( String, String ) }
+
+
 {-| -}
 type Position
     = Before
@@ -646,6 +656,10 @@ type alias AAttributes msg =
 {-| -}
 type alias FlowAttributes msg =
     VisibleAttributesAndEvents msg {}
+
+
+type alias ScriptAttributes msg =
+    DataAttribute (SrcAttribute (VisibleAttributesAndEvents msg {}))
 
 
 {-| -}
@@ -808,6 +822,7 @@ type Node interactiveContent phrasingContent spanningContent listContent msg
     | Img (ImgAttributes msg)
     | Canvas (CanvasAttributes msg)
     | Textarea (TextareaAttributes msg)
+    | Script (ScriptAttributes msg)
     | InputHidden InputHiddenAttributes
     | InputText (InputTextAttributes msg {})
     | InputNumber (InputNumberAttributes msg)
@@ -1169,6 +1184,24 @@ ulLi :
     -> Node interactiveContent phrasingContent Spanning NotListElement msg
 ulLi attributes insideLis =
     ul attributes (mapLis insideLis)
+
+
+{-| -}
+script :
+    List (ScriptAttributes msg -> ScriptAttributes msg)
+    -> Node interactiveContent phrasingContent spanningContent listContent msg
+script =
+    Script
+        << defaultsComposedToAttrs
+            { universal = defaultUniversalAttributes
+            , src = ""
+            , style = defaultStyleAttribute
+            , onMouseEvents = defaultOnMouseEvents
+            , onEvent = Nothing
+            , onBlurEvent = Nothing
+            , onFocusEvent = Nothing
+            , data = []
+            }
 
 
 {-| -}
@@ -1569,6 +1602,18 @@ id val ({ universal } as attrs) =
 
 
 {-| -}
+data : a -> { c | data : b } -> { c | data : a }
+data newData attrs =
+    { attrs | data = newData }
+
+
+{-| -}
+src : a -> { c | src : b } -> { c | src : a }
+src newSrc attrs =
+    { attrs | src = newSrc }
+
+
+{-| -}
 disabled :
     DisabledAttribute a
     -> DisabledAttribute a
@@ -1900,6 +1945,11 @@ handleStyle { style } =
         , BodyBuilderHtml.focusStyle focus
         ]
             |> compose
+
+
+handleData : DataAttribute a -> HtmlAttributes msg -> HtmlAttributes msg
+handleData { data } =
+    BodyBuilderHtml.data data
 
 
 handleMouseEvents :
@@ -2409,6 +2459,16 @@ toTree node =
                     |> List.append
                         [ handleWidth
                         , handleHeight
+                        ]
+                )
+
+        Script attributes ->
+            childToHtml attributes
+                "script"
+                (baseHandling
+                    |> List.append
+                        [ handleData
+                        , handleSrc
                         ]
                 )
 

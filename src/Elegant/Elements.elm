@@ -4,6 +4,8 @@ module Elegant.Elements
         , borderBottom
         , flexnav
         , link
+        , pageCenter
+        , centerHorizontal
         )
 
 {-| @docs border
@@ -11,6 +13,8 @@ module Elegant.Elements
 @docs border
 @docs borderBottom
 @docs link
+@docs pageCenter
+@docs centerHorizontal
 -}
 
 import Elegant exposing (..)
@@ -61,6 +65,28 @@ flexnav =
     , alignItemsCenter
     , justifyContentSpaceBetween
     , widthPercent 100
+    ]
+        |> compose
+
+
+{-| Create a centered element (vertically and horizontally)
+-}
+pageCenter : Style -> Style
+pageCenter =
+    [ displayFlex
+    , alignItemsCenter
+    , justifyContentCenter
+    , height (Vh 100)
+    ]
+        |> compose
+
+
+{-| Create a centered element (vertically and horizontally)
+-}
+centerHorizontal : Style -> Style
+centerHorizontal =
+    [ displayFlex
+    , justifyContentCenter
     ]
         |> compose
 

@@ -51,6 +51,7 @@ module BodyBuilderHtml
         , onBlur
         , onFocus
         , on
+        , data
         )
 
 {-|
@@ -109,7 +110,7 @@ module BodyBuilderHtml
 @docs onBlur
 @docs onFocus
 @docs on
-
+@docs data
 -}
 
 import Html
@@ -150,6 +151,7 @@ type alias Tree msg =
     , placeholder : Maybe String
     , autocomplete : Bool
     , label : Maybe (Label msg)
+    , data : List ( String, String )
 
     -- Html Events
     , onInput : Maybe (String -> msg)
@@ -204,6 +206,7 @@ base =
         , src = Nothing
         , alt = Nothing
         , class = []
+        , data = []
         , id = Nothing
         , name = Nothing
         , selected = Nothing
@@ -336,7 +339,6 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 |> label_.attributes
                 |> content (HtmlAttributes val |> removeLabel |> addLabelContent label_)
                 |> tag "label"
-                |> Debug.log "test"
                 |> htmlAttributesToHtml
 
         Nothing ->
@@ -391,6 +393,7 @@ htmlAttributesToHtml (HtmlAttributes val) =
                             , Helpers.emptyListOrApply Html.Events.onFocus val.onFocus
                             , Helpers.emptyListOrApply Html.Events.onBlur val.onBlur
                             , Helpers.emptyListOrApply (\( event, decoder ) -> Html.Events.on event decoder) val.on
+                            , (val.data |> List.map (\( key, value ) -> Html.Attributes.attribute ("data-" ++ key) value))
                             ]
                         )
                         (val.content |> List.map htmlAttributesToHtml)
@@ -409,6 +412,12 @@ view val =
 tag : String -> HtmlAttributes msg -> HtmlAttributes msg
 tag val (HtmlAttributes attrs) =
     HtmlAttributes { attrs | tag = Just val }
+
+
+{-| -}
+data : List ( String, String ) -> HtmlAttributes msg -> HtmlAttributes msg
+data val (HtmlAttributes attrs) =
+    HtmlAttributes { attrs | data = val }
 
 
 {-| -}

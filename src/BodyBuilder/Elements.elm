@@ -3,6 +3,7 @@ module BodyBuilder.Elements exposing (..)
 import Elegant exposing (..)
 import BodyBuilder exposing (..)
 import Function exposing (..)
+import Color exposing (..)
 
 
 stickyView : List (Elegant.Style -> Elegant.Style) -> String -> List (Node interactiveContent phrasingContent Spanning NotListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
@@ -19,3 +20,21 @@ stickyView sectionStyle sectionName elements =
             [ text sectionName ]
         , div [] elements
         ]
+
+
+invertableButton :
+    Color
+    -> Color
+    -> { a | style : StyleAttribute }
+    -> { a | style : StyleAttribute }
+invertableButton bg fg =
+    [ style [ textColor bg, backgroundColor fg, button ]
+    , hoverStyle [ textColor fg, backgroundColor bg ]
+    ]
+        |> compose
+
+
+button : Style -> Style
+button =
+    [ cursorPointer ]
+        |> compose
