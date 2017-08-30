@@ -88,7 +88,7 @@ getStripeData stripePlan =
     case stripePlan of
         Mensual ->
             [ ( "image", "https://stripe.com/img/documentation/checkout/marketplace.png" )
-            , ( "key", "pk_test_1MCYLYHQDa4DwnBoKd5CqoaP" )
+            , ( "key", "pk_test_1" )
             , ( "name", "Sponsoring mensuel" )
             , ( "description", "450€ HT / mois" )
             , ( "panel-label", "Sponsoriser" )
@@ -100,7 +100,7 @@ getStripeData stripePlan =
 
         Semestrial ->
             [ ( "image", "https://stripe.com/img/documentation/checkout/marketplace.png" )
-            , ( "key", "pk_test_1MCYLYHQDa4DwnBoKd5CqoaP" )
+            , ( "key", "pk_test_2" )
             , ( "name", "Sponsoring 6 mois" )
             , ( "description", "425€ HT / mois" )
             , ( "panel-label", "Sponsoriser" )
@@ -112,7 +112,7 @@ getStripeData stripePlan =
 
         Annual ->
             [ ( "image", "https://stripe.com/img/documentation/checkout/marketplace.png" )
-            , ( "key", "pk_test_1MCYLYHQDa4DwnBoKd5CqoaP" )
+            , ( "key", "pk_test_3" )
             , ( "name", "Sponsoring annuel" )
             , ( "description", "405€ HT / mois" )
             , ( "panel-label", "Sponsoriser" )
