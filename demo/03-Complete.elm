@@ -219,7 +219,7 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
             [ text "I am round, strong and uppercase" ]
         , inputColor [ style [ Elegant.displayBlock ], value color, onInput ChangeColor ]
         , BodyBuilder.button
-            [ buttonStyle color ]
+            [ buttonStyle color, hoverStyle [ textColor Color.blue ] ]
             [ text "Push me" ]
         , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_" ]
         , div []

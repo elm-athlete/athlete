@@ -10,13 +10,12 @@ module Blog exposing (..)
 import BodyBuilder exposing (..)
 import BodyBuilder.Elements exposing (..)
 import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
-import Elegant.Elements exposing (borderBottom)
+import Elegant.Elements exposing (borderBottom, pageCenter)
 import Color
 import Router exposing (..)
 import Finders exposing (..)
 import Dict exposing (Dict)
 import Dict.Extra as Dict
-import Function exposing (compose)
 
 
 type Route
@@ -69,7 +68,7 @@ gray =
 
 titleView : Contact -> Node Interactive phrasingContent Spanning NotListElement Msg
 titleView contact =
-    button
+    BodyBuilder.button
         [ onClick <| HistoryMsgWrapper <| ContactShow contact.id
         , style
             [ Elegant.cursorPointer
@@ -161,16 +160,6 @@ showView bodyFun data =
             [ bodyFun data
             ]
         ]
-
-
-pageCenter : Elegant.Style -> Elegant.Style
-pageCenter =
-    [ Elegant.displayFlex
-    , Elegant.alignItemsCenter
-    , Elegant.justifyContentCenter
-    , Elegant.height (Vh 100)
-    ]
-        |> compose
 
 
 contactBodyView : { b | maybeContact : Maybe Contact } -> Node interactiveContent Phrasing Spanning NotListElement msg

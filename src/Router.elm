@@ -5,6 +5,7 @@ import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
 import AnimationFrame
 import Color
 import Time exposing (Time)
+import Function exposing (compose)
 
 
 type alias Page customRoute =
@@ -385,3 +386,61 @@ initHistoryAndData route data =
     { history = initHistory route
     , data = data
     }
+
+
+headerButtonStyle =
+    [ Elegant.textColor Color.black
+    , Elegant.padding Elegant.medium
+    , Elegant.cursorPointer
+    , Elegant.fontSize (Px 12)
+    , Elegant.overflowHidden
+    , Elegant.textOverflowEllipsis
+    ]
+        |> compose
+
+
+headerButtonStyleLeft =
+    [ style
+        [ headerButtonStyle
+        , Elegant.width (Percent 30)
+        ]
+    ]
+        |> compose
+
+
+headerButtonStyleCenter =
+    [ style
+        [ headerButtonStyle
+        , Elegant.width (Percent 40)
+        , Elegant.textCenter
+        ]
+    ]
+        |> compose
+
+
+headerButtonStyleRight =
+    [ style
+        [ headerButtonStyle
+        , Elegant.width (Percent 30)
+        , Elegant.textRight
+        ]
+    ]
+        |> compose
+
+
+headerElement { left, center, right } =
+    div [ style [ Elegant.positionSticky, Elegant.fullWidth ] ]
+        [ div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow, Elegant.fullWidth ] ]
+            [ div [ headerButtonStyleLeft ] [ left ]
+            , div [ headerButtonStyleCenter ] [ center ]
+            , div [ headerButtonStyleRight ] [ right ]
+            ]
+        ]
+
+
+headerButton msg content =
+    div
+        [ onClick <| msg
+        ]
+        [ text content
+        ]
