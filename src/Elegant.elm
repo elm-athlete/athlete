@@ -182,6 +182,8 @@ module Elegant
         , maxWidth
         , minWidth
         , height
+        , fullHeight
+        , fullViewportHeight
         , heightPercent
         , maxHeight
         , minHeight
@@ -413,6 +415,8 @@ module Elegant
 @docs maxHeight
 @docs minHeight
 @docs fullWidth
+@docs fullHeight
+@docs fullViewportHeight
 
 ## Z-Index
 @docs zIndex
@@ -2750,9 +2754,21 @@ minHeight value (Style style) =
 
 
 {-| -}
-heightPercent : Int -> Style -> Style
+heightPercent : Float -> Style -> Style
 heightPercent =
-    height << Px
+    height << Percent
+
+
+{-| -}
+fullHeight : Style -> Style
+fullHeight =
+    heightPercent 100
+
+
+{-| -}
+fullViewportHeight : Style -> Style
+fullViewportHeight =
+    height (Vh 100)
 
 
 {-| -}
