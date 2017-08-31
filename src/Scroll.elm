@@ -21,8 +21,8 @@ onScrollJsonParser =
 verticalParallax :
     Float
     -> { a | scrollPos : Int }
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> Node msg
+    -> Node msg
 verticalParallax speed scrollEvent el =
     let
         toto =
