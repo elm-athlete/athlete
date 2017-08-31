@@ -230,6 +230,7 @@ minSalary model =
     (model |> monthlyBankDebt) * 3
 
 
+pad : { a | style : StyleAttribute } -> { a | style : StyleAttribute }
 pad =
     style [ padding Elegant.medium ]
 
@@ -243,15 +244,17 @@ result label value =
         ]
 
 
-yearlyRent : { a | collocs : number, monthlyRent : number } -> number
+yearlyRent : AppartmentAttributes -> Int
 yearlyRent model =
     (totalMonthlyRent model) * 12
 
 
+totalMonthlyRent : AppartmentAttributes -> Int
 totalMonthlyRent { collocs, monthlyRent } =
     monthlyRent * collocs
 
 
+appartmentEditBodyView : Appartment -> Node Msg
 appartmentEditBodyView ({ attributes } as appartment) =
     div []
         [ result "Renta standard en % : " (renta attributes.collocs)
@@ -307,6 +310,7 @@ toPositiveInt i =
 -- assurance : Generali
 
 
+mainElement : Node msg -> Node msg
 mainElement html =
     div
         [ style
@@ -318,6 +322,7 @@ mainElement html =
         ]
 
 
+pageWithHeader : Node msg -> Node msg -> Node msg
 pageWithHeader header page =
     div
         [ style
@@ -332,6 +337,7 @@ pageWithHeader header page =
         ]
 
 
+editView : { a | maybeAppartment : Maybe Appartment } -> Node Msg
 editView data =
     case data.maybeAppartment of
         Nothing ->
@@ -348,7 +354,7 @@ editView data =
                 (appartmentEditBodyView appartment)
 
 
-textToHtml : String -> List (Node interactiveContent Phrasing spanningContent NotListElement msg)
+textToHtml : String -> List (Node msg)
 textToHtml =
     (>>)
         (String.split "\n")
@@ -367,9 +373,9 @@ appartmentsIndex : List Appartment -> Node Msg
 appartmentsIndex appartments =
     pageWithHeader
         (headerElement
-            { left = headerButton (HistoryMsgWrapper AppartmentsIndexEditMsg) "Edit"
+            { left = headerButton (HistoryMsgWrapper AppartmentsIndexEditMsg) "edit"
             , center = div [] [ text "Rentabilize" ]
-            , right = headerButton (HistoryMsgWrapper AppartmentNewMsg) "New"
+            , right = headerButton (HistoryMsgWrapper AppartmentNewMsg) "new"
             }
         )
         (div [ style [ Elegant.backgroundColor gray ] ]
@@ -377,10 +383,11 @@ appartmentsIndex appartments =
         )
 
 
+appartmentsIndexEdit : List Appartment -> Node Msg
 appartmentsIndexEdit appartments =
     pageWithHeader
         (headerElement
-            { left = headerButton (StandardHistoryWrapper Back) "Done"
+            { left = headerButton (StandardHistoryWrapper Back) "done"
             , center = div [] [ text "Rentabilize" ]
             , right = text ""
             }
@@ -403,6 +410,7 @@ appartmentsEdit id appartments =
     div [] [ editView { maybeAppartment = (appartments |> find_by .id id) } ]
 
 
+appartmentsNew : AppartmentAttributes -> Node Msg
 appartmentsNew draftAppartment =
     pageWithHeader
         (headerElement
@@ -447,6 +455,7 @@ view { history, data } =
         [ historyView insidePageView history data ]
 
 
+updateAppartmentAttributesBasedOnMsg : UpdateAppartmentMsg -> AppartmentAttributes -> AppartmentAttributes
 updateAppartmentAttributesBasedOnMsg msg attributes =
     case msg of
         UpdateMonthlyRent monthlyRent ->
@@ -462,6 +471,7 @@ updateAppartmentAttributesBasedOnMsg msg attributes =
             { attributes | title = title }
 
 
+updateAppartmentBasedOnMsg : UpdateAppartmentMsg -> Appartment -> Appartment
 updateAppartmentBasedOnMsg msg appartment =
     let
         attributes =
@@ -493,6 +503,7 @@ updateAppartmentHelper appartment msg model =
         { model | data = newData }
 
 
+updateAppartment : Int -> UpdateAppartmentMsg -> Model -> Model
 updateAppartment id customMsg model =
     let
         maybeAppartment =
@@ -506,6 +517,7 @@ updateAppartment id customMsg model =
                 updateAppartmentHelper appartment customMsg model
 
 
+updateAppartmentAttributes : UpdateAppartmentMsg -> Model -> Model
 updateAppartmentAttributes customMsg model =
     let
         newAppartmentAttributes =
@@ -558,6 +570,7 @@ performSuccessfulTask msg =
     Task.perform identity (Task.succeed msg)
 
 
+destroyAppartment : Int -> Model -> Model
 destroyAppartment id model =
     let
         data =
@@ -628,6 +641,7 @@ initAppartments =
     ]
 
 
+initAppartmentAttributes : AppartmentAttributes
 initAppartmentAttributes =
     { title = "New"
     , details = ""
@@ -645,7 +659,7 @@ initData =
     }
 
 
-init : { data : Data, history : History Route }
+init : Model
 init =
     initHistoryAndData AppartmentsIndex initData
 
