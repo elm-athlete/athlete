@@ -619,7 +619,7 @@ type alias LabelAttribute msg a =
         | label :
             Maybe
                 { attributes : LabelAttributes msg
-                , content : Node NotInteractive Phrasing Spanning NotListElement msg
+                , content : Node msg
                 }
     }
 
@@ -804,18 +804,18 @@ positionToString position =
 
 
 {-| -}
-type Node interactiveContent phrasingContent spanningContent listContent msg
-    = A (AAttributes msg) (List (Node NotInteractive phrasingContent spanningContent NotListElement msg))
-    | Div (FlowAttributes msg) (List (Node interactiveContent phrasingContent Spanning NotListElement msg))
-    | P (FlowAttributes msg) (List (Node interactiveContent Phrasing Spanning NotListElement msg))
-    | Span (FlowAttributes msg) (List (Node interactiveContent Phrasing NotSpanning NotListElement msg))
-    | H Int (FlowAttributes msg) (List (Node interactiveContent Phrasing Spanning NotListElement msg))
-    | Ul (FlowAttributes msg) (List (Node interactiveContent phrasingContent spanningContent ListElement msg))
-    | Ol (FlowAttributes msg) (List (Node interactiveContent phrasingContent spanningContent ListElement msg))
-    | Li (FlowAttributes msg) (List (Node interactiveContent phrasingContent spanningContent NotListElement msg))
+type Node msg
+    = A (AAttributes msg) (List (Node msg))
+    | Div (FlowAttributes msg) (List (Node msg))
+    | P (FlowAttributes msg) (List (Node msg))
+    | Span (FlowAttributes msg) (List (Node msg))
+    | H Int (FlowAttributes msg) (List (Node msg))
+    | Ul (FlowAttributes msg) (List (Node msg))
+    | Ol (FlowAttributes msg) (List (Node msg))
+    | Li (FlowAttributes msg) (List (Node msg))
     | Br (FlowAttributes msg)
-    | Table (List (Node interactiveContent phrasingContent spanningContent listContent msg)) (List (List (Node interactiveContent phrasingContent spanningContent NotListElement msg)))
-    | Button (ButtonAttributes msg {}) (List (Node NotInteractive phrasingContent spanningContent NotListElement msg))
+    | Table (List (Node msg)) (List (List (Node msg)))
+    | Button (ButtonAttributes msg {}) (List (Node msg))
     | Progress (ProgressAttributes msg)
     | Audio (AudioAttributes msg)
     | Video (VideoAttributes msg)
@@ -896,8 +896,8 @@ flowDefaultsComposedToAttrs =
 {-| -}
 h1 :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
-    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 h1 =
     H 1 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h1S ])
 
@@ -905,8 +905,8 @@ h1 =
 {-| -}
 h2 :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
-    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 h2 =
     H 2 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h2S ])
 
@@ -914,8 +914,8 @@ h2 =
 {-| -}
 h3 :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
-    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 h3 =
     H 3 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h3S ])
 
@@ -923,8 +923,8 @@ h3 =
 {-| -}
 h4 :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
-    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 h4 =
     H 4 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h4S ])
 
@@ -932,8 +932,8 @@ h4 =
 {-| -}
 h5 :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
-    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 h5 =
     H 5 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h5S ])
 
@@ -941,8 +941,8 @@ h5 =
 {-| -}
 h6 :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
-    -> Node interactiveContent NotPhrasing Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 h6 =
     H 6 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h6S ])
 
@@ -950,8 +950,8 @@ h6 =
 {-| -}
 a :
     List (AAttributes msg -> AAttributes msg)
-    -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
-    -> Node Interactive phrasingContent spanningContent NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 a =
     A
         << defaultsComposedToAttrs
@@ -969,8 +969,8 @@ a =
 {-| -}
 button :
     List (ButtonAttributes msg {} -> ButtonAttributes msg {})
-    -> List (Node NotInteractive phrasingContent spanningContent NotListElement msg)
-    -> Node Interactive phrasingContent spanningContent NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 button =
     Button
         << defaultsComposedToAttrs
@@ -987,8 +987,8 @@ button =
 {-| -}
 div :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 div =
     Div << flowDefaultsComposedToAttrs
 
@@ -996,8 +996,8 @@ div =
 {-| -}
 ul :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning ListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 ul =
     Ul << flowDefaultsComposedToAttrs
 
@@ -1005,8 +1005,8 @@ ul =
 {-| -}
 ol :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning ListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 ol =
     Ol << flowDefaultsComposedToAttrs
 
@@ -1014,8 +1014,8 @@ ol =
 {-| -}
 li :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Node interactiveContent phrasingContent Spanning ListElement msg
+    -> List (Node msg)
+    -> Node msg
 li =
     Li << flowDefaultsComposedToAttrs
 
@@ -1023,8 +1023,8 @@ li =
 {-| -}
 p :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent Phrasing Spanning NotListElement msg)
-    -> Node interactiveContent NotPhrasing spanningContent NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 p =
     P << flowDefaultsComposedToAttrs
 
@@ -1032,7 +1032,7 @@ p =
 {-| -}
 br :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> Node interactiveContent Phrasing spanningContent NotListElement msg
+    -> Node msg
 br =
     Br << flowDefaultsComposedToAttrs
 
@@ -1040,8 +1040,8 @@ br =
 {-| -}
 span :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent Phrasing NotSpanning NotListElement msg)
-    -> Node interactiveContent phrasingContent spanningContent NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 span =
     Span << flowDefaultsComposedToAttrs
 
@@ -1049,7 +1049,7 @@ span =
 {-| -}
 textarea :
     List (TextareaAttributes msg -> TextareaAttributes msg)
-    -> Node Interactive phrasingContent spanningContent NotListElement msg
+    -> Node msg
 textarea =
     Textarea
         << defaultsComposedToAttrs
@@ -1071,7 +1071,7 @@ img :
     String
     -> String
     -> List (ImgAttributes msg -> ImgAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent NotListElement msg
+    -> Node msg
 img alt src =
     Img
         << defaultsComposedToAttrs
@@ -1091,7 +1091,7 @@ img alt src =
 {-| -}
 audio :
     List (AudioAttributes msg -> AudioAttributes msg)
-    -> Node Interactive phrasingContent spanningContent NotListElement msg
+    -> Node msg
 audio =
     Audio
         << defaultsComposedToAttrs
@@ -1108,7 +1108,7 @@ audio =
 {-| -}
 progress :
     List (ProgressAttributes msg -> ProgressAttributes msg)
-    -> Node Interactive phrasingContent spanningContent NotListElement msg
+    -> Node msg
 progress =
     Progress
         << defaultsComposedToAttrs
@@ -1123,15 +1123,15 @@ progress =
 
 {-| -}
 table :
-    List (Node interactiveContent phrasingContent spanningContent NotListElement msg)
-    -> List (List (Node interactiveContent phrasingContent spanningContent NotListElement msg))
-    -> Node interactiveContent phrasingContent spanningContent NotListElement msg
+    List (Node msg)
+    -> List (List (Node msg))
+    -> Node msg
 table =
     Table
 
 
 {-| -}
-text : String -> Node interactiveContent phrasingContent spanningContent NotListElement msg
+text : String -> Node msg
 text =
     Text
 
@@ -1139,8 +1139,8 @@ text =
 {-| -}
 node :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 node =
     div
 
@@ -1148,22 +1148,22 @@ node =
 {-| -}
 leaf :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> Node msg
 leaf =
     flip node []
 
 
 {-| -}
 container :
-    List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    List (Node msg)
+    -> Node msg
 container =
     node []
 
 
 mapLis :
-    List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> List (Node interactiveContent phrasingContent Spanning ListElement msg)
+    List (Node msg)
+    -> List (Node msg)
 mapLis =
     List.map (\content -> li [] [ content ])
 
@@ -1171,8 +1171,8 @@ mapLis =
 {-| -}
 olLi :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 olLi attributes insideLis =
     ol attributes (mapLis insideLis)
 
@@ -1180,8 +1180,8 @@ olLi attributes insideLis =
 {-| -}
 ulLi :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 ulLi attributes insideLis =
     ul attributes (mapLis insideLis)
 
@@ -1189,7 +1189,7 @@ ulLi attributes insideLis =
 {-| -}
 script :
     List (ScriptAttributes msg -> ScriptAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node msg
 script =
     Script
         << defaultsComposedToAttrs
@@ -1207,7 +1207,7 @@ script =
 {-| -}
 inputHidden :
     List (InputHiddenAttributes -> InputHiddenAttributes)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node msg
 inputHidden =
     InputHidden
         << defaultsComposedToAttrs
@@ -1221,7 +1221,7 @@ inputHidden =
 {-| -}
 inputText :
     List (InputTextAttributes msg {} -> InputTextAttributes msg {})
-    -> Node Interactive phrasingContent spanningContent listContent msg
+    -> Node msg
 inputText =
     InputText
         << defaultsComposedToAttrs
@@ -1245,7 +1245,7 @@ inputText =
 {-| -}
 inputNumber :
     List (InputNumberAttributes msg -> InputNumberAttributes msg)
-    -> Node Interactive phrasingContent spanningContent listContent msg
+    -> Node msg
 inputNumber =
     InputNumber
         << defaultsComposedToAttrs
@@ -1270,7 +1270,7 @@ inputNumber =
 {-| -}
 inputColor :
     List (InputColorAttributes msg -> InputColorAttributes msg)
-    -> Node Interactive phrasingContent spanningContent listContent msg
+    -> Node msg
 inputColor =
     InputColor
         << defaultsComposedToAttrs
@@ -1292,7 +1292,7 @@ inputColor =
 {-| -}
 inputCheckbox :
     List (InputCheckboxAttributes msg -> InputCheckboxAttributes msg)
-    -> Node Interactive phrasingContent spanningContent listContent msg
+    -> Node msg
 inputCheckbox =
     InputCheckbox
         << defaultsComposedToAttrs
@@ -1314,7 +1314,7 @@ inputCheckbox =
 {-| -}
 inputFile :
     List (InputFileAttributes msg -> InputFileAttributes msg)
-    -> Node Interactive phrasingContent spanningContent listContent msg
+    -> Node msg
 inputFile =
     InputFile
         << defaultsComposedToAttrs
@@ -1333,7 +1333,7 @@ inputFile =
 {-| -}
 inputPassword :
     List (InputPasswordAttributes msg -> InputPasswordAttributes msg)
-    -> Node Interactive phrasingContent spanningContent listContent msg
+    -> Node msg
 inputPassword =
     InputPassword
         << defaultsComposedToAttrs
@@ -1357,7 +1357,7 @@ inputPassword =
 {-| -}
 inputRadio :
     List (InputRadioAttributes msg -> InputRadioAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node msg
 inputRadio =
     InputRadio
         << defaultsComposedToAttrs
@@ -1377,7 +1377,7 @@ inputRadio =
 {-| -}
 inputRange :
     List (InputRangeAttributes msg -> InputRangeAttributes msg)
-    -> Node interactiveContent phrasingContent spanningContent listContent msg
+    -> Node msg
 inputRange =
     InputRange
         << defaultsComposedToAttrs
@@ -1402,7 +1402,7 @@ inputRange =
 {-| -}
 inputSubmit :
     List (InputSubmitAttributes msg -> InputSubmitAttributes msg)
-    -> Node Interactive phrasingContent spanningContent listContent msg
+    -> Node msg
 inputSubmit =
     InputSubmit
         << defaultsComposedToAttrs
@@ -1422,7 +1422,7 @@ inputSubmit =
 {-| -}
 inputUrl :
     List (InputUrlAttributes msg -> InputUrlAttributes msg)
-    -> Node Interactive phrasingContent spanningContent listContent msg
+    -> Node msg
 inputUrl =
     InputUrl
         << defaultsComposedToAttrs
@@ -1446,7 +1446,7 @@ inputUrl =
 {-| -}
 select :
     List (SelectAttributes msg -> SelectAttributes msg)
-    -> Node Interactive phrasingContent spanningContent listContent msg
+    -> Node msg
 select =
     Select
         << defaultsComposedToAttrs
@@ -1556,7 +1556,7 @@ tabindex val ({ universal } as attrs) =
 {-| -}
 label :
     List (LabelAttributes msg -> LabelAttributes msg)
-    -> Node NotInteractive Phrasing Spanning NotListElement msg
+    -> Node msg
     -> LabelAttribute msg a
     -> LabelAttribute msg a
 label attributes content attrs =
@@ -2274,7 +2274,7 @@ handleLabel { label } =
 
 
 buildNode :
-    List (Node interactiveContent phrasingContent spanningContent listContent msg)
+    List (Node msg)
     -> attributes
     -> String
     -> List (attributes -> HtmlAttributes msg -> HtmlAttributes msg)
@@ -2290,7 +2290,7 @@ buildNode children attributes tag usedBodyToBodyHtmlFunctions =
 
 
 parentToHtml :
-    List (Node interactiveContent phrasingContent spanningContent listContent msg)
+    List (Node msg)
     -> attributes
     -> String
     -> List (attributes -> HtmlAttributes msg -> HtmlAttributes msg)
@@ -2344,7 +2344,7 @@ inputAttributesHandling =
 
 {-| -}
 toTree :
-    Node interactiveContent phrasingContent spanningContent listContent msg
+    Node msg
     -> BodyBuilderHtml.HtmlAttributes msg
 toTree node =
     case node of
@@ -2613,7 +2613,7 @@ toTree node =
 
 {-| -}
 toHtml :
-    Node interactiveContent phrasingContent spanningContent listContent msg
+    Node msg
     -> Html.Html msg
 toHtml node =
     node
@@ -2622,16 +2622,16 @@ toHtml node =
 
 
 {-| -}
-type alias BodyBuilderProgramArgs model a b c msg =
+type alias BodyBuilderProgramArgs model msg =
     { init : ( model, Cmd msg )
     , subscriptions : model -> Sub msg
     , update : msg -> model -> ( model, Cmd msg )
-    , view : model -> Node a b c NotListElement msg
+    , view : model -> Node msg
     }
 
 
 {-| -}
-program : BodyBuilderProgramArgs model a b c msg -> Program Basics.Never model msg
+program : BodyBuilderProgramArgs model msg -> Program Basics.Never model msg
 program { init, update, subscriptions, view } =
     Html.program
         { init = init

@@ -122,7 +122,7 @@ standardCellStyle =
         |> compose
 
 
-titleView : Appartment -> Node Interactive phrasingContent Spanning NotListElement Msg
+titleView : Appartment -> Node Msg
 titleView appartment =
     button
         [ onClick <|
@@ -135,7 +135,7 @@ titleView appartment =
 
 titleViewWithDelete :
     Appartment
-    -> Node Interactive phrasingContent Spanning NotListElement Msg
+    -> Node Msg
 titleViewWithDelete appartment =
     button
         [ standardCellStyle
@@ -147,7 +147,7 @@ titleViewWithDelete appartment =
         ]
 
 
-showView : { b | maybeAppartment : Maybe Appartment } -> Node interactiveContent Phrasing Spanning NotListElement Msg
+showView : { b | maybeAppartment : Maybe Appartment } -> Node Msg
 showView data =
     case data.maybeAppartment of
         Nothing ->
@@ -234,7 +234,7 @@ pad =
     style [ padding Elegant.medium ]
 
 
-result : String -> a -> Node interactiveContent Phrasing Spanning NotListElement msg
+result : String -> a -> Node msg
 result label value =
     div [ pad ]
         [ text <| label
@@ -355,7 +355,7 @@ textToHtml =
         (List.foldl (\e accu -> accu ++ [ text e, br [] ]) [])
 
 
-appartmentBodyView : Appartment -> Node interactiveContent Phrasing Spanning NotListElement msg
+appartmentBodyView : Appartment -> Node msg
 appartmentBodyView appartment =
     div [ style [ Elegant.paddingHorizontal Elegant.medium ] ]
         ([ div [] (textToHtml appartment.attributes.details)
@@ -363,7 +363,7 @@ appartmentBodyView appartment =
         )
 
 
-appartmentsIndex : List Appartment -> Node Interactive phrasingContent Spanning NotListElement Msg
+appartmentsIndex : List Appartment -> Node Msg
 appartmentsIndex appartments =
     pageWithHeader
         (headerElement
@@ -390,7 +390,7 @@ appartmentsIndexEdit appartments =
         )
 
 
-appartmentsShow : Int -> List Appartment -> Node interactiveContent Phrasing Spanning NotListElement Msg
+appartmentsShow : Int -> List Appartment -> Node Msg
 appartmentsShow id appartments =
     div [] [ showView { maybeAppartment = (appartments |> find_by .id id) } ]
 
@@ -398,7 +398,7 @@ appartmentsShow id appartments =
 appartmentsEdit :
     Int
     -> List Appartment
-    -> Node Interactive Phrasing Spanning NotListElement Msg
+    -> Node Msg
 appartmentsEdit id appartments =
     div [] [ editView { maybeAppartment = (appartments |> find_by .id id) } ]
 
@@ -418,7 +418,7 @@ appartmentsNew draftAppartment =
         )
 
 
-insidePageView : Page Route -> Data -> Maybe Transition -> Node Interactive Phrasing Spanning NotListElement Msg
+insidePageView : Page Route -> Data -> Maybe Transition -> Node Msg
 insidePageView page data transition =
     let
         appartments =
@@ -441,7 +441,7 @@ insidePageView page data transition =
                 appartmentsNew data.draftAppartment
 
 
-view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
+view : Model -> Node Msg
 view { history, data } =
     div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
         [ historyView insidePageView history data ]

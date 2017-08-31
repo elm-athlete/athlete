@@ -5,7 +5,7 @@ import Elegant exposing (textColor)
 import Color
 
 
-view : a -> Node interactiveContent phrasingContent Spanning NotListElement msg
+view : a -> Node msg
 view model =
     div [ style [ textColor Color.blue ], hoverStyle [ textColor Color.red ] ] [ text "I'm Elegantly styled by css, but my style is set inline" ]
 

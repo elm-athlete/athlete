@@ -67,7 +67,7 @@ pageCenter =
         |> compose
 
 
-planBodyView : { b | maybePlan : Maybe Plan } -> Node interactiveContent Phrasing Spanning NotListElement msg
+planBodyView : { b | maybePlan : Maybe Plan } -> Node msg
 planBodyView data =
     case data.maybePlan of
         Nothing ->
@@ -127,7 +127,7 @@ selectionButton :
     StripePlan
     -> String
     -> Bool
-    -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+    -> Node Msg
 selectionButton msg label selected =
     div
         [ style
@@ -168,7 +168,7 @@ toId stripePlan =
             "annual"
 
 
-plansIndex : StripePlan -> Node Interactive phrasingContent Spanning NotListElement Msg
+plansIndex : StripePlan -> Node Msg
 plansIndex stripePlan =
     let
         stripeData =
@@ -210,7 +210,7 @@ plansIndex stripePlan =
 stripeButton :
     StripePlan
     -> StripePlan
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> Node msg
 stripeButton stripePlan currentStripePlan =
     div
         [ style
@@ -228,7 +228,7 @@ stripeButton stripePlan currentStripePlan =
         ]
 
 
-insidePageView : Page Route -> Data -> Maybe Transition -> Node Interactive Phrasing Spanning NotListElement Msg
+insidePageView : Page Route -> Data -> Maybe Transition -> Node Msg
 insidePageView page data transition =
     let
         stripePlan =
@@ -239,12 +239,12 @@ insidePageView page data transition =
                 plansIndex stripePlan
 
 
-mainContainer : List (Node interactiveContent phrasingContent Spanning NotListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
+mainContainer : List (Node msg) -> Node msg
 mainContainer =
     div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
 
 
-view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
+view : Model -> Node Msg
 view { history, data } =
     mainContainer
         [ historyView insidePageView history data ]

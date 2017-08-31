@@ -68,7 +68,7 @@ gray =
     Color.grayscale 0.9
 
 
-titleView : Blogpost -> Node Interactive phrasingContent Spanning NotListElement Msg
+titleView : Blogpost -> Node Msg
 titleView blogpost =
     button
         [ onClick <| HistoryMsgWrapper <| BlogpostShow blogpost.id
@@ -89,7 +89,7 @@ titleView blogpost =
         [ text blogpost.title ]
 
 
-header : Node interactiveContent phrasingContent Spanning NotListElement Msg
+header : Node Msg
 header =
     div [ style [ Elegant.positionFixed, Elegant.fullWidth, Elegant.backgroundColor (Color.rgba 255 255 255 0.9) ] ]
         [ div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow, Elegant.fullWidth ] ]
@@ -139,9 +139,9 @@ header =
 
 
 showView :
-    (a -> Node interactiveContent phrasingContent Spanning NotListElement Msg)
+    (a -> Node Msg)
     -> a
-    -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+    -> Node Msg
 showView bodyFun data =
     div
         [ style
@@ -164,14 +164,14 @@ showView bodyFun data =
         ]
 
 
-textToHtml : String -> List (Node interactiveContent Phrasing spanningContent NotListElement msg)
+textToHtml : String -> List (Node msg)
 textToHtml =
     (>>)
         (String.split "\n")
         (List.foldl (\e accu -> accu ++ [ text e, br [] ]) [])
 
 
-blogpostBodyView : { b | maybeBlogpost : Maybe Blogpost } -> Node interactiveContent Phrasing Spanning NotListElement msg
+blogpostBodyView : { b | maybeBlogpost : Maybe Blogpost } -> Node msg
 blogpostBodyView data =
     case data.maybeBlogpost of
         Nothing ->
@@ -187,18 +187,18 @@ blogpostBodyView data =
                 )
 
 
-blogpostsIndex : List Blogpost -> Node Interactive phrasingContent Spanning NotListElement Msg
+blogpostsIndex : List Blogpost -> Node Msg
 blogpostsIndex blogposts =
     div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
         (blogposts |> List.map titleView)
 
 
-blogpostsShow : Int -> List Blogpost -> Node interactiveContent Phrasing Spanning NotListElement Msg
+blogpostsShow : Int -> List Blogpost -> Node Msg
 blogpostsShow id blogposts =
     div [] [ showView blogpostBodyView { maybeBlogpost = (blogposts |> find_by .id id) } ]
 
 
-insidePageView : Page Route -> Data -> Maybe Transition -> Node Interactive Phrasing Spanning NotListElement Msg
+insidePageView : Page Route -> Data -> Maybe Transition -> Node Msg
 insidePageView page data transition =
     let
         blogposts =
@@ -212,7 +212,7 @@ insidePageView page data transition =
                 blogpostsShow id blogposts
 
 
-view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
+view : Model -> Node Msg
 view { history, data } =
     div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
         [ historyView insidePageView history data ]

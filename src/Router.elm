@@ -268,19 +268,19 @@ afterTransition history =
 
 overflowHiddenContainer :
     List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> List (Node msg)
+    -> Node msg
 overflowHiddenContainer attributes content =
     div [ style [ Elegant.overflowHidden ] ]
         [ div attributes content ]
 
 
 pageView :
-    (a -> b -> Maybe Transition -> Node interactiveContent phrasingContent Spanning NotListElement msg)
+    (a -> b -> Maybe Transition -> Node msg)
     -> Maybe Transition
     -> b
     -> a
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> Node msg
 pageView insidePageView_ transition data page =
     div
         [ style
@@ -293,10 +293,10 @@ pageView insidePageView_ transition data page =
 
 
 historyView :
-    (Page route -> a -> Maybe Transition -> Node interactiveContent phrasingContent Spanning NotListElement msg)
+    (Page route -> a -> Maybe Transition -> Node msg)
     -> History route
     -> a
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> Node msg
 historyView insidePageView_ history data =
     let
         visiblePages_ =

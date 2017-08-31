@@ -6,7 +6,7 @@ import Function exposing (..)
 import Color exposing (..)
 
 
-stickyView : List (Elegant.Style -> Elegant.Style) -> String -> List (Node interactiveContent phrasingContent Spanning NotListElement msg) -> Node interactiveContent phrasingContent Spanning NotListElement msg
+stickyView : List (Elegant.Style -> Elegant.Style) -> String -> List (Node msg) -> Node msg
 stickyView sectionStyle sectionName elements =
     div []
         [ div

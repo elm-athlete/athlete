@@ -17,7 +17,7 @@ buttonStyle =
         |> compose
 
 
-counter : a -> Node Interactive NotPhrasing Spanning NotListElement Msg
+counter : a -> Node Msg
 counter model =
     div [ style [ Elegant.displayInlineBlock ] ]
         [ div
@@ -49,7 +49,7 @@ counter model =
         ]
 
 
-view : a -> Node Interactive NotPhrasing Spanning NotListElement Msg
+view : a -> Node Msg
 view model =
     div [ style [ Elegant.displayFlex, Elegant.alignItemsCenter, Elegant.height (Vh 100), Elegant.justifyContentCenter ] ]
         [ counter model

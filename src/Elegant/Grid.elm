@@ -26,10 +26,10 @@ import Function exposing (compose)
 import BodyBuilder exposing (Node, Spanning, NotListElement, div, toHtml, text, style)
 
 
-type alias Column interactiveContent phrasingContent spanningContent listContent msg =
+type alias Column msg =
     { denominator : Int
     , numerator : Int
-    , content : List (Node interactiveContent phrasingContent spanningContent listContent msg)
+    , content : List (Node msg)
     }
 
 
@@ -55,18 +55,18 @@ columnToHtml :
     ->
         { a
             | content :
-                List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+                List (Node msg)
             , denominator : Int
             , numerator : Int
         }
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> Node msg
 columnToHtml gutter { denominator, numerator, content } =
     div [ style [ columnStyle gutter denominator numerator ] ] content
 
 
 exampleContent :
     String
-    -> List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+    -> List (Node msg)
 exampleContent content =
     [ div [ style [ paddingBottom medium ] ]
         [ div [ style [ Elements.border Color.black ] ]
@@ -76,7 +76,7 @@ exampleContent content =
     ]
 
 
-example : Node interactiveContent phrasingContent Spanning NotListElement msg
+example : Node msg
 example =
     div [ style [ maxWidth (Px 800), marginAuto ] ]
         [ div [ style [ fullWidth ] ]
@@ -110,8 +110,8 @@ main =
 col :
     Int
     -> Int
-    -> List (Node interactiveIn phrasingIn spanningIn listIn msg)
-    -> Column interactiveIn phrasingIn spanningIn listIn msg
+    -> List (Node msg)
+    -> Column msg
 col =
     Column
 
@@ -124,11 +124,11 @@ grid :
         List
             { a
                 | content :
-                    List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+                    List (Node msg)
                 , denominator : Int
                 , numerator : Int
             }
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> Node msg
 grid gutter columns =
     div [ style [ layoutStyle gutter ] ]
         (columns |> List.map (columnToHtml gutter))
@@ -140,11 +140,11 @@ standardGrid :
     List
         { a
             | content :
-                List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+                List (Node msg)
             , denominator : Int
             , numerator : Int
         }
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> Node msg
 standardGrid =
     grid medium
 
@@ -155,10 +155,10 @@ fullGrid :
     List
         { a
             | content :
-                List (Node interactiveContent phrasingContent Spanning NotListElement msg)
+                List (Node msg)
             , denominator : Int
             , numerator : Int
         }
-    -> Node interactiveContent phrasingContent Spanning NotListElement msg
+    -> Node msg
 fullGrid =
     grid zero

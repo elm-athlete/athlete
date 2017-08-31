@@ -66,7 +66,7 @@ gray =
     Color.grayscale 0.1
 
 
-titleView : Contact -> Node Interactive phrasingContent Spanning NotListElement Msg
+titleView : Contact -> Node Msg
 titleView contact =
     BodyBuilder.button
         [ onClick <| HistoryMsgWrapper <| ContactShow contact.id
@@ -87,7 +87,7 @@ titleView contact =
         [ text contact.name ]
 
 
-header : Node interactiveContent phrasingContent Spanning NotListElement Msg
+header : Node Msg
 header =
     div [ style [ Elegant.positionFixed, Elegant.fullWidth, Elegant.backgroundColor (Color.rgba 255 255 255 0.9) ] ]
         [ div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow, Elegant.fullWidth ] ]
@@ -137,9 +137,9 @@ header =
 
 
 showView :
-    (a -> Node interactiveContent phrasingContent Spanning NotListElement Msg)
+    (a -> Node Msg)
     -> a
-    -> Node interactiveContent phrasingContent Spanning NotListElement Msg
+    -> Node Msg
 showView bodyFun data =
     div
         [ style
@@ -162,7 +162,7 @@ showView bodyFun data =
         ]
 
 
-contactBodyView : { b | maybeContact : Maybe Contact } -> Node interactiveContent Phrasing Spanning NotListElement msg
+contactBodyView : { b | maybeContact : Maybe Contact } -> Node msg
 contactBodyView data =
     case data.maybeContact of
         Nothing ->
@@ -183,17 +183,17 @@ filterByInitial =
         >> Dict.toList
 
 
-initialView : ( Char, List Contact ) -> Node Interactive phrasingContent Spanning NotListElement Msg
+initialView : ( Char, List Contact ) -> Node Msg
 initialView ( initial, contacts ) =
     stickyView [ Elegant.backgroundColor gray, Elegant.paddingLeft Elegant.large ] (String.fromChar initial) (contacts |> List.map titleView)
 
 
-contactsView : List Contact -> List (Node Interactive phrasingContent Spanning NotListElement Msg)
+contactsView : List Contact -> List (Node Msg)
 contactsView =
     filterByInitial >> List.map initialView
 
 
-contactsIndex : List Contact -> Node Interactive phrasingContent Spanning NotListElement Msg
+contactsIndex : List Contact -> Node Msg
 contactsIndex contacts =
     div
         [ style
@@ -206,12 +206,12 @@ contactsIndex contacts =
         (contacts |> contactsView)
 
 
-contactsShow : Int -> List Contact -> Node interactiveContent Phrasing Spanning NotListElement Msg
+contactsShow : Int -> List Contact -> Node Msg
 contactsShow id contacts =
     div [] [ showView contactBodyView { maybeContact = (contacts |> find_by .id id) } ]
 
 
-insidePageView : Page Route -> Data -> Maybe Transition -> Node Interactive Phrasing Spanning NotListElement Msg
+insidePageView : Page Route -> Data -> Maybe Transition -> Node Msg
 insidePageView page data transition =
     let
         contacts =
@@ -225,7 +225,7 @@ insidePageView page data transition =
                 contactsShow id contacts
 
 
-view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
+view : Model -> Node Msg
 view { history, data } =
     div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
         [ historyView insidePageView history data ]

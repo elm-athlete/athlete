@@ -81,7 +81,7 @@ customCounter title min max step val msg =
 
 view :
     Model
-    -> BodyBuilder.Node BodyBuilder.Interactive BodyBuilder.NotPhrasing BodyBuilder.Spanning BodyBuilder.NotListElement Msg
+    -> BodyBuilder.Node Msg
 view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstrapState } =
     div
         [ style
