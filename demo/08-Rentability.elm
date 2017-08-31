@@ -63,7 +63,7 @@ type alias MarkdownString =
 
 
 type alias Persisted a =
-    { a | id : Int, createdAt : Time, updatedAt : Time }
+    { id : Int, createdAt : Time, updatedAt : Time, attributes : a }
 
 
 type alias Appartment =
@@ -130,7 +130,7 @@ titleView appartment =
                 AppartmentShowMsg appartment.id
         , standardCellStyle
         ]
-        [ text appartment.title ]
+        [ text appartment.attributes.title ]
 
 
 titleViewWithDelete appartment =
@@ -139,7 +139,7 @@ titleViewWithDelete appartment =
         ]
         [ div [ style [ Elegant.displayFlex ] ]
             [ div [ onClick <| DestroyAppartment appartment.id ] [ text "⛔" ]
-            , div [ style [ Elegant.paddingLeft Elegant.medium ] ] [ text appartment.title ]
+            , div [ style [ Elegant.paddingLeft Elegant.medium ] ] [ text appartment.attributes.title ]
             ]
         ]
 
@@ -157,7 +157,7 @@ showView data =
                     , center =
                         div
                             []
-                            [ text appartment.title
+                            [ text appartment.attributes.title
                             ]
                     , right = headerButton (HistoryMsgWrapper (AppartmentEditMsg appartment.id)) "Edit"
                     }
@@ -197,9 +197,9 @@ renta collocs =
         rentaSimple
 
 
-maxPrice : Appartment -> Float
-maxPrice ({ collocs } as model) =
-    (yearlyRent model |> toFloat) / ((renta collocs) / 100)
+maxPrice : DraftAppartment -> Float
+maxPrice appartment =
+    (yearlyRent appartment |> toFloat) / ((renta appartment.collocs) / 100)
 
 
 yearsOfDebt : number
@@ -207,7 +207,7 @@ yearsOfDebt =
     25
 
 
-monthlyBankDebt : Appartment -> Int
+monthlyBankDebt : DraftAppartment -> Int
 monthlyBankDebt model =
     let
         k =
@@ -222,7 +222,7 @@ monthlyBankDebt model =
         (k * (t / 12)) / (1 - ((1 + t / 12) ^ (-n))) |> round
 
 
-minSalary : Appartment -> Int
+minSalary : DraftAppartment -> Int
 minSalary model =
     (model |> monthlyBankDebt) * 3
 
@@ -239,24 +239,22 @@ result label value =
         ]
 
 
-yearlyRent : Appartment -> Int
 yearlyRent model =
     (totalMonthlyRent model) * 12
 
 
-totalMonthlyRent : Appartment -> Int
 totalMonthlyRent { collocs, monthlyRent } =
     monthlyRent * collocs
 
 
-appartmentEditBodyView model =
+appartmentEditBodyView ({ attributes } as appartment) =
     div []
-        [ result "Renta standard en % : " (renta model.collocs)
+        [ result "Renta standard en % : " (renta attributes.collocs)
         , div [ pad ]
             [ div []
                 [ text
                     ("Loyer mensuel "
-                        ++ (if model.collocs > 1 then
+                        ++ (if attributes.collocs > 1 then
                                 " (par locataire)"
                             else
                                 ""
@@ -264,31 +262,31 @@ appartmentEditBodyView model =
                     )
                 ]
             , inputNumber
-                [ value (model.monthlyRent)
-                , onInput (UpdateAppartment model.id << UpdateMonthlyRent)
+                [ value (attributes.monthlyRent)
+                , onInput (UpdateAppartment appartment.id << UpdateMonthlyRent)
                 ]
             ]
         , div [ pad ]
             [ div [] [ text "Nombre de locataires" ]
             , inputNumber
-                [ value (model.collocs)
-                , onInput (UpdateAppartment model.id << UpdateCollocs)
+                [ value (attributes.collocs)
+                , onInput (UpdateAppartment appartment.id << UpdateCollocs)
                 ]
             ]
         , div [ pad ]
             [ div [] [ text "Travaux" ]
             , inputNumber
-                [ value (model.works)
-                , onInput (UpdateAppartment model.id << UpdateWorks)
+                [ value (attributes.works)
+                , onInput (UpdateAppartment appartment.id << UpdateWorks)
                 ]
             ]
-        , result "Loyer mensuel total : " (totalMonthlyRent model)
-        , result "Loyer annuel : " (yearlyRent model)
-        , result "Prix d'acquisition global (travaux compris) max conseillé : " (maxPrice model)
-        , result "Prix d'acquisition global (sans travaux) max conseillé : " (maxPrice model - (model.works |> toFloat))
-        , result "Prix d'acquisition global (avant frais notaires) max conseillé : " ((maxPrice model - (model.works |> toFloat)) / 1.08)
-        , result "Mensualités moyennes à payer à la banque (20 ans) : " (monthlyBankDebt model)
-        , result "Revenus minimum pour endettement : " (minSalary model)
+        , result "Loyer mensuel total : " (totalMonthlyRent attributes)
+        , result "Loyer annuel : " (yearlyRent attributes)
+        , result "Prix d'acquisition global (travaux compris) max conseillé : " (maxPrice attributes)
+        , result "Prix d'acquisition global (sans travaux) max conseillé : " (maxPrice attributes - (attributes.works |> toFloat))
+        , result "Prix d'acquisition global (avant frais notaires) max conseillé : " ((maxPrice attributes - (attributes.works |> toFloat)) / 1.08)
+        , result "Mensualités moyennes à payer à la banque (20 ans) : " (monthlyBankDebt attributes)
+        , result "Revenus minimum pour endettement : " (minSalary attributes)
         ]
 
 
@@ -338,7 +336,7 @@ editView data =
             pageWithHeader
                 (headerElement
                     { left = headerButton (StandardHistoryWrapper Back) "x"
-                    , center = div [] [ text appartment.title ]
+                    , center = div [] [ text appartment.attributes.title ]
                     , right = div [] []
                     }
                 )
@@ -355,7 +353,7 @@ textToHtml =
 appartmentBodyView : Appartment -> Node interactiveContent Phrasing Spanning NotListElement msg
 appartmentBodyView appartment =
     div [ style [ Elegant.paddingHorizontal Elegant.medium ] ]
-        ([ div [] (textToHtml appartment.details)
+        ([ div [] (textToHtml appartment.attributes.details)
          ]
         )
 
@@ -444,19 +442,30 @@ view { history, data } =
         [ historyView insidePageView history data ]
 
 
-updateAppartmentBasedOnMsg msg appartment =
+updateAppartmentAttributesBasedOnMsg msg attributes =
     case msg of
         UpdateMonthlyRent monthlyRent ->
-            { appartment | monthlyRent = monthlyRent }
+            { attributes | monthlyRent = monthlyRent }
 
         UpdateCollocs collocs ->
-            { appartment | collocs = collocs |> toPositiveInt }
+            { attributes | collocs = collocs |> toPositiveInt }
 
         UpdateWorks works ->
-            { appartment | works = works }
+            { attributes | works = works }
 
         UpdateTitle title ->
-            { appartment | title = title }
+            { attributes | title = title }
+
+
+updateAppartmentBasedOnMsg msg appartment =
+    let
+        attributes =
+            appartment.attributes
+    in
+        { appartment
+            | attributes =
+                updateAppartmentAttributesBasedOnMsg msg attributes
+        }
 
 
 updateAppartmentHelper : Appartment -> UpdateAppartmentMsg -> Model -> Model
@@ -495,7 +504,7 @@ updateAppartment id customMsg model =
 updateDraftAppartment customMsg model =
     let
         newDraftAppartment =
-            updateAppartmentBasedOnMsg customMsg model.data.draftAppartment
+            updateAppartmentAttributesBasedOnMsg customMsg model.data.draftAppartment
 
         data =
             model.data
@@ -511,12 +520,7 @@ draftAppartmentToAppartment { newId, createdAt } draftAppartment =
     { id = newId
     , createdAt = createdAt
     , updatedAt = createdAt
-    , title = draftAppartment.title
-    , details = draftAppartment.details
-    , monthlyRent = draftAppartment.monthlyRent
-    , collocs = draftAppartment.collocs
-    , works = draftAppartment.works
-    , rate = draftAppartment.rate
+    , attributes = draftAppartment
     }
 
 
@@ -593,24 +597,28 @@ subscriptions model =
 initAppartments : List Appartment
 initAppartments =
     [ { id = 1
-      , title = "Immeuble rapport (Belfort)"
       , createdAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
       , updatedAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
-      , details = "details"
-      , monthlyRent = defaultMonthlyRent
-      , collocs = defaultCollocs
-      , works = 0
-      , rate = 0.0175
+      , attributes =
+            { title = "Immeuble rapport (Belfort)"
+            , details = "details"
+            , monthlyRent = defaultMonthlyRent
+            , collocs = defaultCollocs
+            , works = 0
+            , rate = 0.0175
+            }
       }
     , { id = 2
-      , title = "Immeuble rapport 2 (Belfort)"
       , createdAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
       , updatedAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
-      , details = "details"
-      , monthlyRent = defaultMonthlyRent
-      , collocs = defaultCollocs
-      , works = 0
-      , rate = 0.0175
+      , attributes =
+            { title = "Immeuble rapport 2 (Belfort)"
+            , details = "details"
+            , monthlyRent = defaultMonthlyRent
+            , collocs = defaultCollocs
+            , works = 0
+            , rate = 0.0175
+            }
       }
     ]
 
