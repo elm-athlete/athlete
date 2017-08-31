@@ -6,20 +6,25 @@ import Elegant.Elements exposing (borderBottom)
 import Color
 import Date
 import Date exposing (Month(..))
+import Time exposing (Time)
 import Date.Extra as Date
 import Router exposing (..)
 import Finders exposing (..)
 import Function exposing (compose)
+import Task
 
 
 type Route
     = AppartmentsIndex
     | AppartmentsShow Int
     | AppartmentsEdit Int
+    | AppartmentsNew
+    | AppartmentsIndexEdit
 
 
 type alias Data =
     { appartments : List Appartment
+    , draftAppartment : DraftAppartment
     }
 
 
@@ -30,47 +35,65 @@ type alias Model =
 
 
 type HistoryMsg
-    = AppartmentShow Int
-    | AppartmentEdit Int
+    = AppartmentShowMsg Int
+    | AppartmentEditMsg Int
+    | AppartmentNewMsg
+    | AppartmentsIndexEditMsg
 
 
 type UpdateAppartmentMsg
     = UpdateCollocs Int
     | UpdateMonthlyRent Int
     | UpdateWorks Int
+    | UpdateTitle String
 
 
 type Msg
     = HistoryMsgWrapper HistoryMsg
     | StandardHistoryWrapper StandardHistoryMsg
     | UpdateAppartment Int UpdateAppartmentMsg
+    | UpdateDraftAppartment UpdateAppartmentMsg
+    | DestroyAppartment Int
+    | SaveDraftAppartment
+    | SaveDraftAppartmentHelper Time
 
 
 type alias MarkdownString =
     String
 
 
+type alias Persisted a =
+    { a | id : Int, createdAt : Time, updatedAt : Time }
+
+
 type alias Appartment =
-    { id : Int
-    , title : String
+    Persisted DraftAppartment
+
+
+type alias DraftAppartment =
+    { title : String
     , details : MarkdownString
     , monthlyRent : Int
     , collocs : Int
     , works : Int
     , rate : Float
-    , createdAt : Date.Date
-    , updatedAt : Date.Date
     }
 
 
 handleHistory : HistoryMsg -> History Route -> History Route
 handleHistory route history =
     case route of
-        AppartmentShow id ->
+        AppartmentShowMsg id ->
             history |> push (pageWithDefaultTransition (AppartmentsShow id))
 
-        AppartmentEdit id ->
+        AppartmentEditMsg id ->
             history |> push (pageWithTransition (slideUp) (AppartmentsEdit id))
+
+        AppartmentNewMsg ->
+            history |> push (pageWithTransition (slideUp) AppartmentsNew)
+
+        AppartmentsIndexEditMsg ->
+            history |> push (pageWithoutTransition AppartmentsIndexEdit)
 
 
 gray : Color.Color
@@ -104,25 +127,21 @@ titleView appartment =
     button
         [ onClick <|
             HistoryMsgWrapper <|
-                AppartmentShow appartment.id
+                AppartmentShowMsg appartment.id
         , standardCellStyle
         ]
         [ text appartment.title ]
 
 
-header :
-    { a | id : Int, title : String }
-    -> Node interactiveContent phrasingContent Spanning NotListElement Msg
-header { id, title } =
-    headerElement
-        { left = headerButton (StandardHistoryWrapper Back) "← BACK"
-        , center =
-            div
-                []
-                [ text title
-                ]
-        , right = headerButton (HistoryMsgWrapper (AppartmentEdit id)) "Edit"
-        }
+titleViewWithDelete appartment =
+    button
+        [ standardCellStyle
+        ]
+        [ div [ style [ Elegant.displayFlex ] ]
+            [ div [ onClick <| DestroyAppartment appartment.id ] [ text "⛔" ]
+            , div [ style [ Elegant.paddingLeft Elegant.medium ] ] [ text appartment.title ]
+            ]
+        ]
 
 
 showView : { b | maybeAppartment : Maybe Appartment } -> Node interactiveContent Phrasing Spanning NotListElement Msg
@@ -132,25 +151,18 @@ showView data =
             div [] [ text "Error" ]
 
         Just appartment ->
-            div
-                [ style
-                    [ Elegant.backgroundColor Color.white
-                    , Elegant.height (Vh 100)
-                    , Elegant.displayFlex
-                    , Elegant.flexDirectionColumn
-                    ]
-                ]
-                [ header appartment
-                , div
-                    [ style
-                        [ Elegant.overflowYScroll
-                        , Elegant.fullWidth
-                        , Elegant.flexShrink 1000000
-                        ]
-                    ]
-                    [ appartmentBodyView appartment
-                    ]
-                ]
+            pageWithHeader
+                (headerElement
+                    { left = headerButton (StandardHistoryWrapper Back) "← BACK"
+                    , center =
+                        div
+                            []
+                            [ text appartment.title
+                            ]
+                    , right = headerButton (HistoryMsgWrapper (AppartmentEditMsg appartment.id)) "Edit"
+                    }
+                )
+                (appartmentBodyView appartment)
 
 
 
@@ -292,31 +304,45 @@ toPositiveInt i =
 -- assurance : Generali
 
 
+mainElement html =
+    div
+        [ style
+            [ Elegant.overflowYScroll
+            , Elegant.fullWidth
+            ]
+        ]
+        [ html
+        ]
+
+
+pageWithHeader header page =
+    div
+        [ style
+            [ Elegant.backgroundColor Color.white
+            , Elegant.height (Vh 100)
+            , Elegant.displayFlex
+            , Elegant.flexDirectionColumn
+            ]
+        ]
+        [ header
+        , mainElement page
+        ]
+
+
 editView data =
     case data.maybeAppartment of
         Nothing ->
             div [] [ text "Error" ]
 
         Just appartment ->
-            div
-                [ style
-                    [ Elegant.backgroundColor Color.white
-                    , Elegant.height (Vh 100)
-                    , Elegant.displayFlex
-                    , Elegant.flexDirectionColumn
-                    ]
-                ]
-                [ headerElement { left = headerButton (StandardHistoryWrapper Back) "x", center = div [] [ text appartment.title ], right = div [] [] }
-                , div
-                    [ style
-                        [ Elegant.overflowYScroll
-                        , Elegant.fullWidth
-                        , Elegant.flexShrink 1000000
-                        ]
-                    ]
-                    [ appartmentEditBodyView appartment
-                    ]
-                ]
+            pageWithHeader
+                (headerElement
+                    { left = headerButton (StandardHistoryWrapper Back) "x"
+                    , center = div [] [ text appartment.title ]
+                    , right = div [] []
+                    }
+                )
+                (appartmentEditBodyView appartment)
 
 
 textToHtml : String -> List (Node interactiveContent Phrasing spanningContent NotListElement msg)
@@ -336,8 +362,29 @@ appartmentBodyView appartment =
 
 appartmentsIndex : List Appartment -> Node Interactive phrasingContent Spanning NotListElement Msg
 appartmentsIndex appartments =
-    div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
-        (appartments |> List.map titleView)
+    pageWithHeader
+        (headerElement
+            { left = headerButton (HistoryMsgWrapper AppartmentsIndexEditMsg) "Edit"
+            , center = div [] [ text "Rentabilize" ]
+            , right = headerButton (HistoryMsgWrapper AppartmentNewMsg) "New"
+            }
+        )
+        (div [ style [ Elegant.backgroundColor gray ] ]
+            (appartments |> List.map titleView)
+        )
+
+
+appartmentsIndexEdit appartments =
+    pageWithHeader
+        (headerElement
+            { left = headerButton (StandardHistoryWrapper Back) "Done"
+            , center = div [] [ text "Rentabilize" ]
+            , right = text ""
+            }
+        )
+        (div [ style [ Elegant.backgroundColor gray ] ]
+            (appartments |> List.map titleViewWithDelete)
+        )
 
 
 appartmentsShow : Int -> List Appartment -> Node interactiveContent Phrasing Spanning NotListElement Msg
@@ -353,6 +400,21 @@ appartmentsEdit id appartments =
     div [] [ editView { maybeAppartment = (appartments |> find_by .id id) } ]
 
 
+appartmentsNew draftAppartment =
+    pageWithHeader
+        (headerElement
+            { left = headerButton (StandardHistoryWrapper Back) "cancel"
+            , center = div [] [ text draftAppartment.title ]
+            , right = headerButton SaveDraftAppartment "save"
+            }
+        )
+        (div
+            []
+            [ inputText [ value draftAppartment.title, onInput (UpdateDraftAppartment << UpdateTitle) ]
+            ]
+        )
+
+
 insidePageView : Page Route -> Data -> Maybe Transition -> Node Interactive Phrasing Spanning NotListElement Msg
 insidePageView page data transition =
     let
@@ -363,11 +425,17 @@ insidePageView page data transition =
             AppartmentsIndex ->
                 appartmentsIndex appartments
 
+            AppartmentsIndexEdit ->
+                appartmentsIndexEdit appartments
+
             AppartmentsShow id ->
                 appartmentsShow id appartments
 
             AppartmentsEdit id ->
                 appartmentsEdit id appartments
+
+            AppartmentsNew ->
+                appartmentsNew data.draftAppartment
 
 
 view : Model -> Node Interactive Phrasing Spanning NotListElement Msg
@@ -376,19 +444,26 @@ view { history, data } =
         [ historyView insidePageView history data ]
 
 
+updateAppartmentBasedOnMsg msg appartment =
+    case msg of
+        UpdateMonthlyRent monthlyRent ->
+            { appartment | monthlyRent = monthlyRent }
+
+        UpdateCollocs collocs ->
+            { appartment | collocs = collocs |> toPositiveInt }
+
+        UpdateWorks works ->
+            { appartment | works = works }
+
+        UpdateTitle title ->
+            { appartment | title = title }
+
+
 updateAppartmentHelper : Appartment -> UpdateAppartmentMsg -> Model -> Model
 updateAppartmentHelper appartment msg model =
     let
         newAppartment =
-            case msg of
-                UpdateMonthlyRent monthlyRent ->
-                    { appartment | monthlyRent = monthlyRent }
-
-                UpdateCollocs collocs ->
-                    { appartment | collocs = collocs |> toPositiveInt }
-
-                UpdateWorks works ->
-                    { appartment | works = works }
+            updateAppartmentBasedOnMsg msg appartment
 
         data =
             model.data
@@ -417,7 +492,75 @@ updateAppartment id customMsg model =
                 updateAppartmentHelper appartment customMsg model
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+updateDraftAppartment customMsg model =
+    let
+        newDraftAppartment =
+            updateAppartmentBasedOnMsg customMsg model.data.draftAppartment
+
+        data =
+            model.data
+
+        newData =
+            { data | draftAppartment = newDraftAppartment }
+    in
+        { model | data = newData }
+
+
+draftAppartmentToAppartment : { a | newId : Int, createdAt : Time } -> DraftAppartment -> Appartment
+draftAppartmentToAppartment { newId, createdAt } draftAppartment =
+    { id = newId
+    , createdAt = createdAt
+    , updatedAt = createdAt
+    , title = draftAppartment.title
+    , details = draftAppartment.details
+    , monthlyRent = draftAppartment.monthlyRent
+    , collocs = draftAppartment.collocs
+    , works = draftAppartment.works
+    , rate = draftAppartment.rate
+    }
+
+
+lastId : List { a | id : Int } -> Int
+lastId =
+    List.map .id >> List.maximum >> Maybe.withDefault 1
+
+
+saveDraftAppartment : Time.Time -> Model -> Model
+saveDraftAppartment currentTime ({ data } as model) =
+    let
+        newData =
+            { data
+                | appartments =
+                    (draftAppartmentToAppartment
+                        { newId = ((lastId data.appartments) + 1)
+                        , createdAt = currentTime
+                        }
+                        data.draftAppartment
+                    )
+                        :: data.appartments
+                , draftAppartment = initDraftAppartment
+            }
+    in
+        { model | data = newData }
+
+
+performSuccessfulTask : a -> Cmd a
+performSuccessfulTask msg =
+    Task.perform identity (Task.succeed msg)
+
+
+destroyAppartment id model =
+    let
+        data =
+            model.data
+
+        newData =
+            { data | appartments = data.appartments |> List.filter (\e -> e.id /= id) }
+    in
+        { model | data = newData }
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         HistoryMsgWrapper historyMsg ->
@@ -429,6 +572,18 @@ update msg model =
         UpdateAppartment id customMsg ->
             ( model |> updateAppartment id customMsg, Cmd.none )
 
+        UpdateDraftAppartment customMsg ->
+            ( model |> updateDraftAppartment customMsg, Cmd.none )
+
+        SaveDraftAppartment ->
+            ( model, Task.perform SaveDraftAppartmentHelper Time.now )
+
+        SaveDraftAppartmentHelper time ->
+            ( model |> saveDraftAppartment time, performSuccessfulTask (StandardHistoryWrapper Back) )
+
+        DestroyAppartment id ->
+            ( model |> destroyAppartment id, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -439,8 +594,8 @@ initAppartments : List Appartment
 initAppartments =
     [ { id = 1
       , title = "Immeuble rapport (Belfort)"
-      , createdAt = Date.fromCalendarDate 2017 Aug 10
-      , updatedAt = Date.fromCalendarDate 2017 Aug 10
+      , createdAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
+      , updatedAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
       , details = "details"
       , monthlyRent = defaultMonthlyRent
       , collocs = defaultCollocs
@@ -449,8 +604,8 @@ initAppartments =
       }
     , { id = 2
       , title = "Immeuble rapport 2 (Belfort)"
-      , createdAt = Date.fromCalendarDate 2017 Aug 10
-      , updatedAt = Date.fromCalendarDate 2017 Aug 10
+      , createdAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
+      , updatedAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
       , details = "details"
       , monthlyRent = defaultMonthlyRent
       , collocs = defaultCollocs
@@ -460,9 +615,21 @@ initAppartments =
     ]
 
 
+initDraftAppartment =
+    { title = "New"
+    , details = ""
+    , works = 0
+    , rate = 0.0175
+    , monthlyRent = defaultMonthlyRent
+    , collocs = defaultCollocs
+    }
+
+
 initData : Data
 initData =
-    { appartments = initAppartments }
+    { appartments = initAppartments
+    , draftAppartment = initDraftAppartment
+    }
 
 
 init : { data : Data, history : History Route }
