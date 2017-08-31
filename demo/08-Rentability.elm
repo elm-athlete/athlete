@@ -14,18 +14,36 @@ import Function exposing (compose)
 import Task
 
 
+type alias Persisted a =
+    { id : Int, createdAt : Time, updatedAt : Time, attributes : a }
+
+
+type alias Appartment =
+    Persisted AppartmentAttributes
+
+
+type alias AppartmentAttributes =
+    { title : String
+    , details : MarkdownString
+    , monthlyRent : Int
+    , collocs : Int
+    , works : Int
+    , rate : Float
+    }
+
+
+type alias Data =
+    { appartments : List Appartment
+    , draftAppartment : AppartmentAttributes
+    }
+
+
 type Route
     = AppartmentsIndex
     | AppartmentsShow Int
     | AppartmentsEdit Int
     | AppartmentsNew
     | AppartmentsIndexEdit
-
-
-type alias Data =
-    { appartments : List Appartment
-    , draftAppartment : DraftAppartment
-    }
 
 
 type alias Model =
@@ -52,32 +70,14 @@ type Msg
     = HistoryMsgWrapper HistoryMsg
     | StandardHistoryWrapper StandardHistoryMsg
     | UpdateAppartment Int UpdateAppartmentMsg
-    | UpdateDraftAppartment UpdateAppartmentMsg
+    | UpdateAppartmentAttributes UpdateAppartmentMsg
     | DestroyAppartment Int
-    | SaveDraftAppartment
-    | SaveDraftAppartmentHelper Time
+    | SaveAppartmentAttributes
+    | SaveAppartmentAttributesHelper Time
 
 
 type alias MarkdownString =
     String
-
-
-type alias Persisted a =
-    { id : Int, createdAt : Time, updatedAt : Time, attributes : a }
-
-
-type alias Appartment =
-    Persisted DraftAppartment
-
-
-type alias DraftAppartment =
-    { title : String
-    , details : MarkdownString
-    , monthlyRent : Int
-    , collocs : Int
-    , works : Int
-    , rate : Float
-    }
 
 
 handleHistory : HistoryMsg -> History Route -> History Route
@@ -133,6 +133,9 @@ titleView appartment =
         [ text appartment.attributes.title ]
 
 
+titleViewWithDelete :
+    Appartment
+    -> Node Interactive phrasingContent Spanning NotListElement Msg
 titleViewWithDelete appartment =
     button
         [ standardCellStyle
@@ -197,7 +200,7 @@ renta collocs =
         rentaSimple
 
 
-maxPrice : DraftAppartment -> Float
+maxPrice : AppartmentAttributes -> Float
 maxPrice appartment =
     (yearlyRent appartment |> toFloat) / ((renta appartment.collocs) / 100)
 
@@ -207,7 +210,7 @@ yearsOfDebt =
     25
 
 
-monthlyBankDebt : DraftAppartment -> Int
+monthlyBankDebt : AppartmentAttributes -> Int
 monthlyBankDebt model =
     let
         k =
@@ -222,7 +225,7 @@ monthlyBankDebt model =
         (k * (t / 12)) / (1 - ((1 + t / 12) ^ (-n))) |> round
 
 
-minSalary : DraftAppartment -> Int
+minSalary : AppartmentAttributes -> Int
 minSalary model =
     (model |> monthlyBankDebt) * 3
 
@@ -231,6 +234,7 @@ pad =
     style [ padding Elegant.medium ]
 
 
+result : String -> a -> Node interactiveContent Phrasing Spanning NotListElement msg
 result label value =
     div [ pad ]
         [ text <| label
@@ -239,6 +243,7 @@ result label value =
         ]
 
 
+yearlyRent : { a | collocs : number, monthlyRent : number } -> number
 yearlyRent model =
     (totalMonthlyRent model) * 12
 
@@ -403,12 +408,12 @@ appartmentsNew draftAppartment =
         (headerElement
             { left = headerButton (StandardHistoryWrapper Back) "cancel"
             , center = div [] [ text draftAppartment.title ]
-            , right = headerButton SaveDraftAppartment "save"
+            , right = headerButton SaveAppartmentAttributes "save"
             }
         )
         (div
             []
-            [ inputText [ value draftAppartment.title, onInput (UpdateDraftAppartment << UpdateTitle) ]
+            [ inputText [ value draftAppartment.title, onInput (UpdateAppartmentAttributes << UpdateTitle) ]
             ]
         )
 
@@ -501,21 +506,21 @@ updateAppartment id customMsg model =
                 updateAppartmentHelper appartment customMsg model
 
 
-updateDraftAppartment customMsg model =
+updateAppartmentAttributes customMsg model =
     let
-        newDraftAppartment =
+        newAppartmentAttributes =
             updateAppartmentAttributesBasedOnMsg customMsg model.data.draftAppartment
 
         data =
             model.data
 
         newData =
-            { data | draftAppartment = newDraftAppartment }
+            { data | draftAppartment = newAppartmentAttributes }
     in
         { model | data = newData }
 
 
-draftAppartmentToAppartment : { a | newId : Int, createdAt : Time } -> DraftAppartment -> Appartment
+draftAppartmentToAppartment : { a | newId : Int, createdAt : Time } -> AppartmentAttributes -> Appartment
 draftAppartmentToAppartment { newId, createdAt } draftAppartment =
     { id = newId
     , createdAt = createdAt
@@ -529,8 +534,8 @@ lastId =
     List.map .id >> List.maximum >> Maybe.withDefault 1
 
 
-saveDraftAppartment : Time.Time -> Model -> Model
-saveDraftAppartment currentTime ({ data } as model) =
+saveAppartmentAttributes : Time.Time -> Model -> Model
+saveAppartmentAttributes currentTime ({ data } as model) =
     let
         newData =
             { data
@@ -542,7 +547,7 @@ saveDraftAppartment currentTime ({ data } as model) =
                         data.draftAppartment
                     )
                         :: data.appartments
-                , draftAppartment = initDraftAppartment
+                , draftAppartment = initAppartmentAttributes
             }
     in
         { model | data = newData }
@@ -576,14 +581,14 @@ update msg model =
         UpdateAppartment id customMsg ->
             ( model |> updateAppartment id customMsg, Cmd.none )
 
-        UpdateDraftAppartment customMsg ->
-            ( model |> updateDraftAppartment customMsg, Cmd.none )
+        UpdateAppartmentAttributes customMsg ->
+            ( model |> updateAppartmentAttributes customMsg, Cmd.none )
 
-        SaveDraftAppartment ->
-            ( model, Task.perform SaveDraftAppartmentHelper Time.now )
+        SaveAppartmentAttributes ->
+            ( model, Task.perform SaveAppartmentAttributesHelper Time.now )
 
-        SaveDraftAppartmentHelper time ->
-            ( model |> saveDraftAppartment time, performSuccessfulTask (StandardHistoryWrapper Back) )
+        SaveAppartmentAttributesHelper time ->
+            ( model |> saveAppartmentAttributes time, performSuccessfulTask (StandardHistoryWrapper Back) )
 
         DestroyAppartment id ->
             ( model |> destroyAppartment id, Cmd.none )
@@ -623,7 +628,7 @@ initAppartments =
     ]
 
 
-initDraftAppartment =
+initAppartmentAttributes =
     { title = "New"
     , details = ""
     , works = 0
@@ -636,7 +641,7 @@ initDraftAppartment =
 initData : Data
 initData =
     { appartments = initAppartments
-    , draftAppartment = initDraftAppartment
+    , draftAppartment = initAppartmentAttributes
     }
 
 
