@@ -137,7 +137,11 @@ module Elegant
         , flexGrow
         , flexShrink
         , flexBasis
+        , flexDirectionColumn
+        , flexDirectionRow
         , flex
+        , flexWrapWrap
+        , flexWrapNoWrap
         , displayInline
         , displayNone
         , opacity
@@ -590,6 +594,42 @@ opposite unit =
             Rem -a
 
 
+type alias FlexContainerDetails =
+    { direction : Maybe FlexDirection
+    , wrap : Maybe FlexWrap
+    , align : Maybe Align
+    , justifyContent : Maybe JustifyContent
+    }
+
+
+defaultFlexContainerDetails =
+    FlexContainerDetails Nothing Nothing Nothing Nothing
+
+
+flexContainerDetailsDirection val el =
+    { el | direction = Just val }
+
+
+flexContainerDetailsWrap val el =
+    { el | wrap = Just val }
+
+
+flexContainerDetailsalign val el =
+    { el | align = Just val }
+
+
+flexContainerDetailsJustify val el =
+    { el | justifyContent = Just val }
+
+
+type alias FlexItemDetails =
+    { grow : Maybe Int
+    , shrink : Maybe Int
+    , basis : Maybe (Either SizeUnit Auto)
+    , alignSelf : Maybe Align
+    }
+
+
 type alias VerticalAlign =
     String
 
@@ -611,6 +651,22 @@ type ListStyleType
     | ListStyleTypeSquare
     | ListStyleTypeDecimal
     | ListStyleTypeGeorgian
+
+
+type Align
+    = AlignBaseline
+    | AlignCenter
+    | AlignFlexStart
+    | AlignFlexEnd
+    | AlignInherit
+    | AlignInitial
+    | AlignStretch
+
+
+type JustifyContent
+    = JustifyContentSpaceBetween
+    | JustifyContentSpaceAround
+    | JustifyContentCenter
 
 
 type TextCase
@@ -642,6 +698,16 @@ type Overflow
     | OverflowHidden
     | OverflowAuto
     | OverflowScroll
+
+
+type FlexWrap
+    = FlexWrapWrap
+    | FlexWrapNoWrap
+
+
+type FlexDirection
+    = FlexDirectionColumn
+    | FlexDirectionRow
 
 
 type Visibility
@@ -764,6 +830,29 @@ type alias Layout =
     , cursor : Maybe String
     , zIndex : Maybe Int
     }
+
+
+type InsideDisplay
+    = DisplayFlow
+    | DisplayFlowRoot VerticalAlign
+    | DisplayFlexContainer FlexContainerDetails
+
+
+type OutsideDisplay
+    = DisplayInline
+    | DisplayBlock (Maybe Size)
+    | DisplayFlexItem FlexItemDetails
+
+
+type alias DisplayContents =
+    { layout : ( OutsideDisplay, Maybe Layout )
+    , text : ( InsideDisplay, Maybe TextStyle )
+    }
+
+
+type Display
+    = DisplayNone
+    | DisplayContentsWrapper DisplayContents
 
 
 {-| Contains all style for an element used with Elegant.
@@ -988,6 +1077,34 @@ maybeColorToString =
     nothingOrJust colorToString
 
 
+alignItemsToString : Maybe Align -> Maybe String
+alignItemsToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                AlignBaseline ->
+                    "baseline"
+
+                AlignCenter ->
+                    "center"
+
+                AlignFlexStart ->
+                    "flex-start"
+
+                AlignFlexEnd ->
+                    "flex-end"
+
+                AlignInherit ->
+                    "inherit"
+
+                AlignInitial ->
+                    "initial"
+
+                AlignStretch ->
+                    "stretch"
+        )
+
+
 concatNumberWithString : number -> String -> String
 concatNumberWithString number str =
     (number |> toString) ++ str
@@ -1187,6 +1304,32 @@ normalOrSizeUnitToString =
 
                 Right _ ->
                     "normal"
+        )
+
+
+flexWrapToString : Maybe FlexWrap -> Maybe String
+flexWrapToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                FlexWrapWrap ->
+                    "wrap"
+
+                FlexWrapNoWrap ->
+                    "nowrap"
+        )
+
+
+flexDirectionToString : Maybe FlexDirection -> Maybe String
+flexDirectionToString =
+    nothingOrJust
+        (\val ->
+            case val of
+                FlexDirectionColumn ->
+                    "column"
+
+                FlexDirectionRow ->
+                    "row"
         )
 
 
@@ -2370,6 +2513,40 @@ flex val =
     , flexBasis (Px 0)
     ]
         |> compose
+
+
+flexWrap : FlexWrap -> Style -> Style
+flexWrap val (Style style) =
+    Style { style | flexWrap = Just val }
+
+
+{-| -}
+flexWrapWrap : Style -> Style
+flexWrapWrap =
+    flexWrap FlexWrapWrap
+
+
+{-| -}
+flexWrapNoWrap : Style -> Style
+flexWrapNoWrap =
+    flexWrap FlexWrapNoWrap
+
+
+flexDirection : FlexDirection -> Style -> Style
+flexDirection value (Style style) =
+    Style { style | flexDirection = Just value }
+
+
+{-| -}
+flexDirectionColumn : Style -> Style
+flexDirectionColumn =
+    flexDirection FlexDirectionColumn
+
+
+{-| -}
+flexDirectionRow : Style -> Style
+flexDirectionRow =
+    flexDirection FlexDirectionRow
 
 
 {-| -}
