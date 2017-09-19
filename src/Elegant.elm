@@ -130,18 +130,14 @@ module Elegant
         , boxShadowPlain
         , boxShadowBlurry
         , boxShadowCenteredBlurry
-        , displayInlineBlock
+          -- , displayInlineBlock
         , displayBlock
-        , displayFlex
-        , displayInlineFlex
+          -- , displayFlex
+          -- , displayInlineFlex
         , flexGrow
         , flexShrink
         , flexBasis
-        , flexDirectionColumn
-        , flexDirectionRow
         , flex
-        , flexWrapWrap
-        , flexWrapNoWrap
         , displayInline
         , displayNone
         , opacity
@@ -376,7 +372,6 @@ module Elegant
 @docs overflowYScroll
 @docs textOverflowEllipsis
 
-
 ## List Style Type
 @docs listStyleNone
 @docs listStyleDisc
@@ -595,21 +590,18 @@ opposite unit =
             Rem -a
 
 
-type Position
-    = PositionAbsolute
-    | PositionRelative
-    | PositionFixed
-    | PositionStatic
-    | PositionSticky
+type alias VerticalAlign =
+    String
 
 
-type Display
-    = DisplayBlock
-    | DisplayInline
-    | DisplayInlineBlock
-    | DisplayFlex
-    | DisplayInlineFlex
-    | DisplayNone
+type alias Size =
+    { minHeight : Maybe SizeUnit
+    , minWidth : Maybe SizeUnit
+    , width : Maybe SizeUnit
+    , height : Maybe SizeUnit
+    , maxWidth : Maybe SizeUnit
+    , maxHeight : Maybe SizeUnit
+    }
 
 
 type ListStyleType
@@ -621,26 +613,10 @@ type ListStyleType
     | ListStyleTypeGeorgian
 
 
-type AlignItems
-    = AlignItemsBaseline
-    | AlignItemsCenter
-    | AlignItemsFlexStart
-    | AlignItemsFlexEnd
-    | AlignItemsInherit
-    | AlignItemsInitial
-    | AlignItemsStretch
-
-
-type JustifyContent
-    = JustifyContentSpaceBetween
-    | JustifyContentSpaceAround
-    | JustifyContentCenter
-
-
-type TextTransform
-    = TextTransformUppercase
-    | TextTransformLowercase
-    | TextTransformCapitalize
+type TextCase
+    = TextCaseUppercase
+    | TextCaseLowercase
+    | TextCaseCapitalize
 
 
 type TextAlign
@@ -656,9 +632,9 @@ type TextDecoration
     | TextDecorationLineThrough
 
 
-type FontStyle
-    = FontStyleNormal
-    | FontStyleItalic
+type FontTilt
+    = FontTiltNormal
+    | FontTiltItalic
 
 
 type Overflow
@@ -666,20 +642,6 @@ type Overflow
     | OverflowHidden
     | OverflowAuto
     | OverflowScroll
-
-
-type FlexWrap
-    = FlexWrapWrap
-    | FlexWrapNoWrap
-
-
-type FlexDirection
-    = FlexDirectionColumn
-    | FlexDirectionRow
-
-
-type AlignSelf
-    = AlignSelfCenter
 
 
 type Visibility
@@ -704,83 +666,177 @@ type UserSelect
     | UserSelectAll
 
 
+type alias SideBorder =
+    { color : Maybe Color
+    , width : Maybe SizeUnit
+    , style : Maybe Border
+    }
+
+
+type alias Surrounded surroundType =
+    { top : Maybe surroundType
+    , right : Maybe surroundType
+    , bottom : Maybe surroundType
+    , left : Maybe surroundType
+    }
+
+
+type alias CompleteBorder =
+    Surrounded SideBorder
+
+
+type alias Margin =
+    Surrounded (Either SizeUnit Auto)
+
+
+type alias Padding =
+    Surrounded SizeUnit
+
+
+type alias TopRightBottomLeft =
+    Surrounded SizeUnit
+
+
+type DynamicPositionningType
+    = PositionAbsolute
+    | PositionRelative
+    | PositionFixed
+    | PositionSticky
+
+
+type Position
+    = PositionDynamic DynamicPositionningType TopRightBottomLeft
+    | PositionStatic
+
+
+type alias Font =
+    { fontWeight : Maybe Int
+    , fontTilt : Maybe FontTilt
+    , fontSize : Maybe SizeUnit
+    , fontFamily : Maybe FontFamily
+    }
+
+
+type alias Outline =
+    Border
+
+
+type alias TextStyle =
+    { font : Maybe Font
+    , align : Maybe TextAlign
+    , overflow : Maybe TextOverflow
+    , textCase : Maybe TextCase
+    , decoration : Maybe TextDecoration
+    , color : Maybe Color
+    , whiteSpace : Maybe WhiteSpace
+    , userSelect : Maybe UserSelect
+    , lineHeight : Maybe (Either SizeUnit Normal)
+    , listStyleType : Maybe ListStyleType
+    }
+
+
+type alias Background =
+    { backgroundColor : Maybe Color
+    , backgroundImages : List BackgroundImage
+    }
+
+
+type alias FullOverflow =
+    Vector (Maybe Overflow)
+
+
+
+-- style [layout [flex [shrink 3, flexBlah Nothing], padding [all (Px 20)]], text [color Color.Blue]]
+-- flexContainer [style [flex [shrink]]] []
+
+
+type alias Layout =
+    { position : Maybe Position
+    , visibility : Maybe Visibility
+    , padding : Maybe Padding
+    , border : Maybe CompleteBorder
+    , margin : Maybe Margin
+    , outline : Maybe Outline
+    , boxShadow : Maybe BoxShadow
+    , overflow : Maybe FullOverflow
+    , background : Maybe Background
+    , opacity : Maybe Float
+    , cursor : Maybe String
+    , zIndex : Maybe Int
+    }
+
+
 {-| Contains all style for an element used with Elegant.
 -}
 type Style
     = Style
-        { position : Maybe Position
-        , left : Maybe SizeUnit
-        , top : Maybe SizeUnit
-        , bottom : Maybe SizeUnit
-        , right : Maybe SizeUnit
-        , textColor : Maybe Color
-        , backgroundColor : Maybe Color
-        , backgroundImages : List BackgroundImage
-        , borderBottomColor : Maybe Color
-        , borderBottomWidth : Maybe SizeUnit
-        , borderBottomStyle : Maybe Border
-        , borderLeftColor : Maybe Color
-        , borderLeftWidth : Maybe SizeUnit
-        , borderLeftStyle : Maybe Border
-        , borderTopColor : Maybe Color
-        , borderTopWidth : Maybe SizeUnit
-        , borderTopStyle : Maybe Border
-        , borderRightColor : Maybe Color
-        , borderRightWidth : Maybe SizeUnit
-        , borderRightStyle : Maybe Border
-        , borderBottomLeftRadius : Maybe SizeUnit
-        , borderBottomRightRadius : Maybe SizeUnit
-        , borderTopLeftRadius : Maybe SizeUnit
-        , borderTopRightRadius : Maybe SizeUnit
-        , outlineColor : Maybe Color
-        , outlineStyle : Maybe Border
-        , outlineWidth : Maybe SizeUnit
-        , boxShadow : Maybe BoxShadow
-        , paddingRight : Maybe SizeUnit
-        , paddingLeft : Maybe SizeUnit
-        , paddingBottom : Maybe SizeUnit
-        , paddingTop : Maybe SizeUnit
-        , marginRight : Maybe (Either SizeUnit Auto)
-        , marginLeft : Maybe (Either SizeUnit Auto)
-        , marginBottom : Maybe (Either SizeUnit Auto)
-        , marginTop : Maybe (Either SizeUnit Auto)
-        , display : Maybe Display
-        , flexGrow : Maybe Int
-        , flexShrink : Maybe Int
-        , flexBasis : Maybe (Either SizeUnit Auto)
-        , flexWrap : Maybe FlexWrap
-        , flexDirection : Maybe FlexDirection
-        , opacity : Maybe Float
-        , overflowX : Maybe Overflow
-        , overflowY : Maybe Overflow
-        , textOverflow : Maybe TextOverflow
-        , listStyleType : Maybe ListStyleType
-        , verticalAlign : Maybe String
-        , textAlign : Maybe TextAlign
-        , textTransform : Maybe TextTransform
-        , textDecoration : Maybe TextDecoration
-        , whiteSpace : Maybe WhiteSpace
-        , lineHeight : Maybe (Either SizeUnit Normal)
-        , fontWeight : Maybe Int
-        , fontStyle : Maybe FontStyle
-        , fontSize : Maybe SizeUnit
-        , fontFamily : Maybe FontFamily
-        , alignItems : Maybe AlignItems
-        , alignSelf : Maybe AlignSelf
-        , justifyContent : Maybe JustifyContent
-        , width : Maybe SizeUnit
-        , maxWidth : Maybe SizeUnit
-        , minWidth : Maybe SizeUnit
-        , height : Maybe SizeUnit
-        , maxHeight : Maybe SizeUnit
-        , minHeight : Maybe SizeUnit
-        , zIndex : Maybe Int
-        , cursor : Maybe String
-        , visibility : Maybe Visibility
-        , boxSizing : Maybe String
+        { display : Display
         , screenWidths : List ScreenWidth
-        , userSelect : Maybe UserSelect
         }
+
+
+style display screenWidths =
+    Style
+        { display = display
+        , screenWidths = screenWidths
+        }
+
+
+inlineBlock verticalAlign layout text =
+    styleContents
+        { layout = ( DisplayInline, Just layout )
+        , text = ( DisplayFlowRoot verticalAlign, Just text )
+        }
+
+
+block sizes layout text =
+    styleContents
+        { layout = ( DisplayBlock (Just sizes), Just layout )
+        , text = ( DisplayFlow, Just text )
+        }
+
+
+inline layout text =
+    styleContents
+        { layout = ( DisplayInline, Just layout )
+        , text = ( DisplayFlow, Just text )
+        }
+
+
+inlineFlexContainer flexContainerDetails layout text =
+    styleContents
+        { layout = ( DisplayInline, Just layout )
+        , text = ( DisplayFlexContainer flexContainerDetails, Just text )
+        }
+
+
+blockFlexContainer sizes flexContainerDetails layout text =
+    styleContents
+        { layout = ( DisplayBlock sizes, Just layout )
+        , text = ( DisplayFlexContainer flexContainerDetails, Just text )
+        }
+
+
+flexChild flexItemDetails layout text =
+    styleContents
+        { layout = ( DisplayFlexItem flexItemDetails, Just layout )
+        , text = ( DisplayFlow, Just text )
+        }
+
+
+flexChildContainer flexContainerDetails flexItemDetails layout text =
+    styleContents
+        { layout = ( DisplayFlexItem flexItemDetails, Just layout )
+        , text = ( DisplayFlexContainer flexContainerDetails, Just text )
+        }
+
+
+styleContents displayContents =
+    style (DisplayContentsWrapper displayContents)
+
+
+styleDisplayNone =
+    style DisplayNone
 
 
 type alias ScreenWidth =
@@ -872,78 +928,8 @@ zero =
 defaultStyle : Style
 defaultStyle =
     Style
-        { position = Nothing
-        , left = Nothing
-        , top = Nothing
-        , bottom = Nothing
-        , right = Nothing
-        , textColor = Nothing
-        , backgroundColor = Nothing
-        , backgroundImages = []
-        , borderBottomColor = Nothing
-        , borderBottomWidth = Nothing
-        , borderBottomStyle = Nothing
-        , borderLeftColor = Nothing
-        , borderLeftWidth = Nothing
-        , borderLeftStyle = Nothing
-        , borderTopColor = Nothing
-        , borderTopWidth = Nothing
-        , borderTopStyle = Nothing
-        , borderRightColor = Nothing
-        , borderRightWidth = Nothing
-        , borderRightStyle = Nothing
-        , borderBottomLeftRadius = Nothing
-        , borderBottomRightRadius = Nothing
-        , borderTopLeftRadius = Nothing
-        , borderTopRightRadius = Nothing
-        , outlineColor = Nothing
-        , outlineWidth = Nothing
-        , outlineStyle = Nothing
-        , boxShadow = Nothing
-        , paddingRight = Nothing
-        , paddingLeft = Nothing
-        , paddingBottom = Nothing
-        , paddingTop = Nothing
-        , marginRight = Nothing
-        , marginLeft = Nothing
-        , marginBottom = Nothing
-        , marginTop = Nothing
-        , display = Nothing
-        , flexGrow = Nothing
-        , flexShrink = Nothing
-        , flexBasis = Nothing
-        , flexWrap = Nothing
-        , flexDirection = Nothing
-        , opacity = Nothing
-        , overflowX = Nothing
-        , overflowY = Nothing
-        , textOverflow = Nothing
-        , listStyleType = Nothing
-        , verticalAlign = Nothing
-        , textAlign = Nothing
-        , textTransform = Nothing
-        , textDecoration = Nothing
-        , whiteSpace = Nothing
-        , lineHeight = Nothing
-        , fontWeight = Nothing
-        , fontStyle = Nothing
-        , fontSize = Nothing
-        , fontFamily = Nothing
-        , alignItems = Nothing
-        , alignSelf = Nothing
-        , justifyContent = Nothing
-        , width = Nothing
-        , maxWidth = Nothing
-        , minWidth = Nothing
-        , height = Nothing
-        , maxHeight = Nothing
-        , minHeight = Nothing
-        , zIndex = Nothing
-        , cursor = Nothing
-        , visibility = Nothing
-        , boxSizing = Nothing
+        { display = Nothing
         , screenWidths = []
-        , userSelect = Nothing
         }
 
 
@@ -957,20 +943,11 @@ positionToString =
     nothingOrJust
         (\val ->
             case val of
-                PositionAbsolute ->
-                    "absolute"
-
-                PositionRelative ->
-                    "relative"
-
-                PositionFixed ->
-                    "fixed"
+                PositionDynamic positionningType coordinates ->
+                    "TODO"
 
                 PositionStatic ->
                     "static"
-
-                PositionSticky ->
-                    "sticky"
         )
 
 
@@ -979,23 +956,25 @@ displayToString =
     nothingOrJust
         (\val ->
             case val of
-                DisplayBlock ->
-                    "block"
-
-                DisplayInlineBlock ->
-                    "inline-block"
-
-                DisplayFlex ->
-                    "flex"
-
-                DisplayInlineFlex ->
-                    "inline-flex"
-
-                DisplayInline ->
-                    "inline"
-
-                DisplayNone ->
-                    "none"
+                ( outsideDisplay, insideDisplay ) ->
+                    "TODO"
+         -- DisplayBlock size ->
+         --     "block"
+         --
+         -- DisplayInline ->
+         --     "inline"
+         --
+         -- DisplayInlineBlock verticalAlign size ->
+         --     "inline-block"
+         --
+         -- DisplayFlex flexDetails size ->
+         --     "flex"
+         --
+         -- DisplayInlineFlex flexDetails size ->
+         --     "inline-flex"
+         --
+         -- DisplayNone ->
+         --     "none"
         )
 
 
@@ -1007,34 +986,6 @@ colorToString =
 maybeColorToString : Maybe Color -> Maybe String
 maybeColorToString =
     nothingOrJust colorToString
-
-
-alignItemsToString : Maybe AlignItems -> Maybe String
-alignItemsToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                AlignItemsBaseline ->
-                    "baseline"
-
-                AlignItemsCenter ->
-                    "center"
-
-                AlignItemsFlexStart ->
-                    "flex-start"
-
-                AlignItemsFlexEnd ->
-                    "flex-end"
-
-                AlignItemsInherit ->
-                    "inherit"
-
-                AlignItemsInitial ->
-                    "initial"
-
-                AlignItemsStretch ->
-                    "stretch"
-        )
 
 
 concatNumberWithString : number -> String -> String
@@ -1110,18 +1061,18 @@ justifyContentToString =
         )
 
 
-textTransformToString : Maybe TextTransform -> Maybe String
+textTransformToString : Maybe TextCase -> Maybe String
 textTransformToString =
     nothingOrJust
         (\val ->
             case val of
-                TextTransformLowercase ->
+                TextCaseLowercase ->
                     "lowercase"
 
-                TextTransformUppercase ->
+                TextCaseUppercase ->
                     "uppercase"
 
-                TextTransformCapitalize ->
+                TextCaseCapitalize ->
                     "capitalize"
         )
 
@@ -1152,15 +1103,15 @@ whiteSpaceToString =
         )
 
 
-fontStyleToString : Maybe FontStyle -> Maybe String
+fontStyleToString : Maybe FontTilt -> Maybe String
 fontStyleToString =
     nothingOrJust
         (\val ->
             case val of
-                FontStyleNormal ->
+                FontTiltNormal ->
                     "normal"
 
-                FontStyleItalic ->
+                FontTiltItalic ->
                     "italic"
         )
 
@@ -1239,40 +1190,15 @@ normalOrSizeUnitToString =
         )
 
 
-flexWrapToString : Maybe FlexWrap -> Maybe String
-flexWrapToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                FlexWrapWrap ->
-                    "wrap"
 
-                FlexWrapNoWrap ->
-                    "nowrap"
-        )
-
-
-flexDirectionToString : Maybe FlexDirection -> Maybe String
-flexDirectionToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                FlexDirectionColumn ->
-                    "column"
-
-                FlexDirectionRow ->
-                    "row"
-        )
-
-
-alignSelfToString : Maybe AlignSelf -> Maybe String
-alignSelfToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                AlignSelfCenter ->
-                    "center"
-        )
+-- alignSelfToString : Maybe AlignSelf -> Maybe String
+-- alignSelfToString =
+--     nothingOrJust
+--         (\val ->
+--             case val of
+--                 AlignSelfCenter ->
+--                     "center"
+--         )
 
 
 visibilityToString : Maybe Visibility -> Maybe String
@@ -1497,7 +1423,7 @@ getStyles (Style styleValues) =
     , ( "margin-bottom", autoOrSizeUnitToString << .marginBottom )
     , ( "list-style-type", listStyleTypeToString << .listStyleType )
     , ( "align-items", alignItemsToString << .alignItems )
-    , ( "align-self", alignSelfToString << .alignSelf )
+    , ( "align-self", alignItemsToString << .alignSelf )
     , ( "justify-content", justifyContentToString << .justifyContent )
     , ( "font-weight", maybeToString << .fontWeight )
     , ( "font-style", fontStyleToString << .fontStyle )
@@ -1513,7 +1439,6 @@ getStyles (Style styleValues) =
     , ( "cursor", .cursor )
     , ( "visibility", visibilityToString << .visibility )
     , ( "vertical-align", .verticalAlign )
-    , ( "box-sizing", .boxSizing )
     ]
         |> List.map
             (\( attrName, fun ) ->
@@ -1542,7 +1467,6 @@ compileStyle =
 toInlineStyles : (Style -> Style) -> List ( String, String )
 toInlineStyles styleTransformer =
     defaultStyle
-        |> boxSizing "border-box"
         |> styleTransformer
         |> compileStyle
 
@@ -1635,7 +1559,7 @@ verticalAlignMiddle (Style style) =
     Style { style | verticalAlign = Just "middle" }
 
 
-alignItems : AlignItems -> Style -> Style
+alignItems : Align -> Style -> Style
 alignItems value (Style style) =
     Style { style | alignItems = Just value }
 
@@ -1643,46 +1567,46 @@ alignItems value (Style style) =
 {-| -}
 alignItemsBaseline : Style -> Style
 alignItemsBaseline =
-    alignItems AlignItemsBaseline
+    alignItems AlignBaseline
 
 
 {-| -}
 alignItemsCenter : Style -> Style
 alignItemsCenter =
-    alignItems AlignItemsCenter
+    alignItems AlignCenter
 
 
 {-| -}
 alignItemsFlexStart : Style -> Style
 alignItemsFlexStart =
-    alignItems AlignItemsFlexStart
+    alignItems AlignFlexStart
 
 
 {-| -}
 alignItemsFlexEnd : Style -> Style
 alignItemsFlexEnd =
-    alignItems AlignItemsFlexEnd
+    alignItems AlignFlexEnd
 
 
 {-| -}
 alignItemsInherit : Style -> Style
 alignItemsInherit =
-    alignItems AlignItemsInherit
+    alignItems AlignInherit
 
 
 {-| -}
 alignItemsInitial : Style -> Style
 alignItemsInitial =
-    alignItems AlignItemsInitial
+    alignItems AlignInitial
 
 
 {-| -}
 alignItemsStretch : Style -> Style
 alignItemsStretch =
-    alignItems AlignItemsStretch
+    alignItems AlignStretch
 
 
-alignSelf : AlignSelf -> Style -> Style
+alignSelf : Align -> Style -> Style
 alignSelf value (Style style) =
     Style { style | alignSelf = Just value }
 
@@ -1690,7 +1614,7 @@ alignSelf value (Style style) =
 {-| -}
 alignSelfCenter : Style -> Style
 alignSelfCenter =
-    alignSelf AlignSelfCenter
+    alignSelf AlignCenter
 
 
 {-| -}
@@ -1798,7 +1722,7 @@ marginBottom size (Style style) =
     Style { style | marginBottom = Just <| Left size }
 
 
-textTransform : TextTransform -> Style -> Style
+textTransform : TextCase -> Style -> Style
 textTransform val (Style style) =
     Style { style | textTransform = Just val }
 
@@ -1806,19 +1730,19 @@ textTransform val (Style style) =
 {-| -}
 uppercase : Style -> Style
 uppercase =
-    textTransform TextTransformUppercase
+    textTransform TextCaseUppercase
 
 
 {-| -}
 lowercase : Style -> Style
 lowercase =
-    textTransform TextTransformLowercase
+    textTransform TextCaseLowercase
 
 
 {-| -}
 capitalize : Style -> Style
 capitalize =
-    textTransform TextTransformCapitalize
+    textTransform TextCaseCapitalize
 
 
 {-| -}
@@ -1891,7 +1815,7 @@ fontWeight val (Style style) =
     Style { style | fontWeight = Just val }
 
 
-fontStyle : FontStyle -> Style -> Style
+fontStyle : FontTilt -> Style -> Style
 fontStyle val (Style style) =
     Style { style | fontStyle = Just val }
 
@@ -1899,13 +1823,13 @@ fontStyle val (Style style) =
 {-| -}
 fontStyleNormal : Style -> Style
 fontStyleNormal =
-    fontStyle FontStyleNormal
+    fontStyle FontTiltNormal
 
 
 {-| -}
 fontStyleItalic : Style -> Style
 fontStyleItalic =
-    fontStyle FontStyleItalic
+    fontStyle FontTiltItalic
 
 
 {-| -}
@@ -2339,11 +2263,6 @@ outlineNone =
     outlineWidth 0
 
 
-boxSizing : String -> Style -> Style
-boxSizing val (Style style) =
-    Style { style | boxSizing = Just val }
-
-
 standardBoxShadow : Maybe SizeUnit -> Maybe Color -> Offset -> BoxShadow
 standardBoxShadow =
     BoxShadow False Nothing
@@ -2384,10 +2303,11 @@ display val (Style style) =
     Style { style | display = Just val }
 
 
-{-| -}
-displayInlineBlock : Style -> Style
-displayInlineBlock =
-    display DisplayInlineBlock
+
+-- {-| -}
+-- displayInlineBlock : Style -> Style
+-- displayInlineBlock =
+--     display DisplayInlineBlock
 
 
 {-| -}
@@ -2396,16 +2316,14 @@ displayBlock =
     display DisplayBlock
 
 
-{-| -}
-displayFlex : Style -> Style
-displayFlex =
-    display DisplayFlex
 
-
-{-| -}
-displayInlineFlex : Style -> Style
-displayInlineFlex =
-    display DisplayInlineFlex
+-- {-| -}
+-- displayFlex : Style -> Style
+-- displayFlex =
+--     display DisplayFlex
+-- displayInlineFlex : Style -> Style
+-- displayInlineFlex =
+--     display DisplayInlineFlex
 
 
 {-| -}
@@ -2452,40 +2370,6 @@ flex val =
     , flexBasis (Px 0)
     ]
         |> compose
-
-
-flexWrap : FlexWrap -> Style -> Style
-flexWrap val (Style style) =
-    Style { style | flexWrap = Just val }
-
-
-{-| -}
-flexWrapWrap : Style -> Style
-flexWrapWrap =
-    flexWrap FlexWrapWrap
-
-
-{-| -}
-flexWrapNoWrap : Style -> Style
-flexWrapNoWrap =
-    flexWrap FlexWrapNoWrap
-
-
-flexDirection : FlexDirection -> Style -> Style
-flexDirection value (Style style) =
-    Style { style | flexDirection = Just value }
-
-
-{-| -}
-flexDirectionColumn : Style -> Style
-flexDirectionColumn =
-    flexDirection FlexDirectionColumn
-
-
-{-| -}
-flexDirectionRow : Style -> Style
-flexDirectionRow =
-    flexDirection FlexDirectionRow
 
 
 {-| -}

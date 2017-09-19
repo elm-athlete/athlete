@@ -88,7 +88,7 @@ getStripeData stripePlan =
     case stripePlan of
         Mensual ->
             [ ( "image", "https://stripe.com/img/documentation/checkout/marketplace.png" )
-            , ( "key", "pk_test_1" )
+            , ( "key", "pk_test_6pRNASCoBOKtIshFeQd4XMUh" )
             , ( "name", "Sponsoring mensuel" )
             , ( "description", "450€ HT / mois" )
             , ( "panel-label", "Sponsoriser" )
@@ -100,7 +100,7 @@ getStripeData stripePlan =
 
         Semestrial ->
             [ ( "image", "https://stripe.com/img/documentation/checkout/marketplace.png" )
-            , ( "key", "pk_test_2" )
+            , ( "key", "pk_test_6pRNASCoBOKtIshFeQd4XMUh" )
             , ( "name", "Sponsoring 6 mois" )
             , ( "description", "425€ HT / mois" )
             , ( "panel-label", "Sponsoriser" )
@@ -112,7 +112,7 @@ getStripeData stripePlan =
 
         Annual ->
             [ ( "image", "https://stripe.com/img/documentation/checkout/marketplace.png" )
-            , ( "key", "pk_test_3" )
+            , ( "key", "pk_test_6pRNASCoBOKtIshFeQd4XMUh" )
             , ( "name", "Sponsoring annuel" )
             , ( "description", "405€ HT / mois" )
             , ( "panel-label", "Sponsoriser" )
@@ -123,11 +123,7 @@ getStripeData stripePlan =
             ]
 
 
-selectionButton :
-    StripePlan
-    -> String
-    -> Bool
-    -> Node Msg
+selectionButton : StripePlan -> String -> Bool -> Node Msg
 selectionButton msg label selected =
     div
         [ style
@@ -273,55 +269,6 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     maybeTransitionSubscription StandardHistoryWrapper model.history.transition
-
-
-initPlans : List Plan
-initPlans =
-    [ { name = "Bulbasaurdagger", id = 1, phoneNumber = "+33389399383" }
-    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
-    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
-    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
-    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
-    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
-    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
-    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
-    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
-    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
-    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
-    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
-    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
-    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
-    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
-    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
-    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
-    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
-    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
-    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
-    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
-    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
-    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
-    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
-    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
-    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
-    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
-    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
-    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
-    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
-    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
-    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
-    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
-    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
-    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
-    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
-    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
-    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
-    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
-    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
-    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
-    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
-    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
-    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
-    ]
 
 
 initData : Data

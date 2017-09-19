@@ -107,13 +107,13 @@ standardCellStyle :
 standardCellStyle =
     [ style
         [ Elegant.cursorPointer
-        , Elegant.borderNone
-        , borderBottom gray
-        , Elegant.outlineNone
         , Elegant.textLeft
         , Elegant.fontFamilyInherit
         , Elegant.fontSize Elegant.zeta
+        , Elegant.borderNone
+        , borderBottom gray
         , Elegant.padding Elegant.large
+        , Elegant.outlineNone
         , Elegant.backgroundColor Color.white
         , Elegant.fullWidth
         ]
