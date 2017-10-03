@@ -794,8 +794,12 @@ type alias CompleteBorder =
     Surrounded SideBorder
 
 
+type alias MarginValue =
+    Either SizeUnit Auto
+
+
 type alias Margin =
-    Surrounded (Either SizeUnit Auto)
+    Surrounded MarginValue
 
 
 type alias Padding =
@@ -1032,17 +1036,6 @@ defaultSurrounded =
     , right = Nothing
     , bottom = Nothing
     , top = Nothing
-    }
-
-
-padding : SizeUnit -> Layout -> Layout
-padding val layout =
-    { layout
-        | padding =
-            Just
-                (fullSurrounding val
-                    (layout.padding |> Maybe.withDefault defaultSurrounded)
-                )
     }
 
 
@@ -2075,6 +2068,98 @@ inlineStyle =
 --     alignSelf AlignCenter
 --
 --
+
+
+padding : SizeUnit -> Layout -> Layout
+padding val layout =
+    { layout
+        | padding =
+            Just
+                (fullSurrounding val
+                    (layout.padding |> Maybe.withDefault defaultSurrounded)
+                )
+    }
+
+
+paddingLeft : SizeUnit -> Layout -> Layout
+paddingLeft val layout =
+    layout
+        |> .padding
+        |> Maybe.withDefault defaultSurrounded
+        |> leftSurrounding val
+        |> Just
+        |> setPaddingIn layout
+
+
+paddingRight : SizeUnit -> Layout -> Layout
+paddingRight val ({ padding } as layout) =
+    padding
+        |> Maybe.withDefault defaultSurrounded
+        |> rightSurrounding val
+        |> Just
+        |> setPaddingIn layout
+
+
+setSurroundingValue :
+    (surroundingContainer -> Maybe (Surrounded a))
+    -> (surroundingContainer -> Maybe (Surrounded a) -> surroundingContainer)
+    -> (a -> Surrounded a -> Surrounded a)
+    -> a
+    -> surroundingContainer
+    -> surroundingContainer
+setSurroundingValue getter propertySetter valueSetter val surroundingContainer =
+    surroundingContainer
+        |> getter
+        |> Maybe.withDefault defaultSurrounded
+        |> valueSetter val
+        |> Just
+        |> propertySetter surroundingContainer
+
+
+setMarginValue :
+    (MarginValue -> Surrounded MarginValue -> Surrounded MarginValue)
+    -> MarginValue
+    -> Layout
+    -> Layout
+setMarginValue =
+    setSurroundingValue .margin setMarginIn
+
+
+marginRight : MarginValue -> Layout -> Layout
+marginRight =
+    setMarginValue rightSurrounding
+
+
+marginLeft : MarginValue -> Layout -> Layout
+marginLeft =
+    setMarginValue leftSurrounding
+
+
+
+-- padding : SizeUnit -> Layout -> Layout
+-- padding val ({ padding } as layout) =
+--     padding
+--         |> Maybe.withDefault defaultSurrounded
+--         |> fullSurrounding val
+--         |> Just
+--         |> setPaddingIn layout
+
+
+setPadding : c -> { b | padding : a } -> { b | padding : c }
+setPadding padding layout =
+    setPaddingIn layout padding
+
+
+setPaddingIn : { b | padding : a } -> c -> { b | padding : c }
+setPaddingIn o v =
+    { o | padding = v }
+
+
+setMarginIn o v =
+    { o | margin = v }
+
+
+
 -- {-| -}
 -- padding : SizeUnit -> Style -> Style
 -- padding size =
@@ -2093,10 +2178,6 @@ inlineStyle =
 --     paddingBottom size << paddingTop size
 --
 --
--- {-| -}
--- paddingLeft : SizeUnit -> Style -> Style
--- paddingLeft size (Style style) =
---     Style { style | paddingLeft = Just size }
 --
 --
 -- {-| -}
