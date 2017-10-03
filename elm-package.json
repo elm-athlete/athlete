@@ -7,11 +7,6 @@
         "src"
     ],
     "exposed-modules": [
-        "Elegant",
-        "Elegant.Elements",
-        "Elegant.Grid",
-        "BodyBuilder",
-        "BodyBuilderHtml"
     ],
     "dependencies": {
         "Fresheyeball/elm-tuple-extra": "3.0.0 <= v < 4.0.0",

@@ -1,204 +1,6 @@
 module Elegant
     exposing
-        ( Vector
-        , BoxShadow
-        , Offset
-        , Style
-        , SizeUnit(..)
-        , huge
-        , large
-        , medium
-        , small
-        , tiny
-        , zero
-        , opposite
-        , defaultStyle
-        , inlineStyle
-        , convertStyles
-        , screenWidthBetween
-        , screenWidthGE
-        , screenWidthLE
-          -- , positionAbsolute
-          -- , positionRelative
-          -- , positionFixed
-          -- , positionStatic
-          -- , positionSticky
-          -- , left
-          -- , right
-          -- , top
-          -- , bottom
-          -- , absolutelyPositionned
-          -- , verticalAlignMiddle
-          -- , alignItemsBaseline
-          -- , alignItemsCenter
-          -- , alignItemsFlexStart
-          -- , alignItemsFlexEnd
-          -- , alignItemsInherit
-          -- , alignItemsInitial
-          -- , alignItemsStretch
-          -- , alignSelfCenter
-          -- , padding
-          -- , paddingHorizontal
-          -- , paddingVertical
-          -- , paddingLeft
-          -- , paddingRight
-          -- , paddingTop
-          -- , paddingBottom
-          -- , margin
-          -- , marginAuto
-          -- , marginHorizontal
-          -- , marginVertical
-          -- , marginTop
-          -- , marginBottom
-          -- , marginLeft
-          -- , marginRight
-          -- , textColor
-          -- , uppercase
-          -- , lowercase
-          -- , capitalize
-          -- , textDecorationNone
-          -- , underline
-          -- , lineThrough
-          -- , bold
-          -- , strong
-          -- , lineHeight
-          -- , lineHeightNormal
-          -- , fontWeightNormal
-          -- , fontWeight
-          -- , fontStyleNormal
-          -- , fontStyleItalic
-          -- , fontSize
-        , typography
-        , color
-        , heading
-        , h1S
-        , h2S
-        , h3S
-        , h4S
-        , h5S
-        , h6S
-        , alpha
-        , beta
-        , gamma
-        , delta
-        , epsilon
-        , zeta
-        , eta
-        , theta
-        , iota
-        , kappa
-          -- , textCenter
-          -- , textRight
-          -- , textLeft
-          -- , textJustify
-          -- , whiteSpaceWrapNoWrap
-          -- , backgroundColor
-          -- , backgroundImage
-          -- , backgroundImages
-        , withUrl
-          -- , borderNone
-          -- , borderColor
-          -- , borderSolid
-          -- , borderDashed
-          -- , borderWidth
-          -- , borderBottomColor
-          -- , borderBottomWidth
-          -- , borderBottomSolid
-          -- , borderBottomDashed
-          -- , borderLeftColor
-          -- , borderLeftWidth
-          -- , borderLeftSolid
-          -- , borderLeftDashed
-          -- , borderTopColor
-          -- , borderTopWidth
-          -- , borderTopSolid
-          -- , borderTopDashed
-          -- , borderRightColor
-          -- , borderRightWidth
-          -- , borderRightSolid
-          -- , borderRightDashed
-          -- , borderBottomLeftRadius
-          -- , borderBottomRightRadius
-          -- , borderTopLeftRadius
-          -- , borderTopRightRadius
-          -- , borderRadius
-          -- , borderAndTextColor
-          -- , outlineWidth
-          -- , outlineColor
-          -- , outlineStyleSolid
-          -- , outlineStyleDashed
-          -- , outlineNone
-          -- , boxShadow
-          -- , boxShadowPlain
-          -- , boxShadowBlurry
-          -- , boxShadowCenteredBlurry
-        , displayBlock
-        , displayBlockFlexContainer
-        , displayInlineFlexContainer
-        , displayInline
-        , displayNone
-          -- , flexGrow
-          -- , flexShrink
-          -- , flexBasis
-          -- , flexDirectionColumn
-          -- , flexDirectionRow
-          -- , flex
-          -- , flexWrapWrap
-          -- , flexWrapNoWrap
-          -- , opacity
-          -- , overflowAuto
-          -- , overflowVisible
-          -- , overflowHidden
-          -- , overflowScroll
-          -- , overflowXAuto
-          -- , overflowXVisible
-          -- , overflowXHidden
-          -- , overflowXScroll
-          -- , overflowYAuto
-          -- , overflowYVisible
-          -- , overflowYHidden
-          -- , overflowYScroll
-          -- , textOverflowEllipsis
-          -- , listStyleNone
-          -- , listStyleDisc
-          -- , listStyleCircle
-          -- , listStyleSquare
-          -- , listStyleDecimal
-          -- , listStyleGeorgian
-          -- , round
-          -- , roundCorner
-          -- , justifyContentSpaceBetween
-          -- , justifyContentSpaceAround
-          -- , justifyContentCenter
-          -- , spaceBetween
-          -- , spaceAround
-          -- , fontFamilyInherit
-          -- , fontFamilySansSerif
-          -- , fontFamily
-        , FontFamily(..)
-        , CustomFontFamily(..)
-          -- , width
-          -- , fullWidth
-          -- , widthPercent
-          -- , maxWidth
-          -- , minWidth
-          -- , height
-          -- , fullHeight
-          -- , fullViewportHeight
-          -- , heightPercent
-          -- , maxHeight
-          -- , minHeight
-          -- , zIndex
-          -- , cursorPointer
-          -- , visibilityHidden
-          -- , transparent
-        , classes
-        , classesHover
-        , classesFocus
-        , stylesToCss
-          -- , userSelectNone
-          -- , userSelectAll
-        )
+        (..)
 
 {-|
 
@@ -207,6 +9,10 @@ module Elegant
 
 @docs color
 @docs typography
+@docs toInlineStyles
+@docs style
+@docs padding
+@docs styleContents
 
 
 # Types
@@ -860,6 +666,29 @@ type alias Character =
     }
 
 
+weight : Int -> Character -> Character
+weight =
+    setWeight << Just
+
+italic : Character -> Character
+italic =
+    setTilt <| Just FontTiltItalic
+
+
+oblique : Character -> Character
+oblique =
+    setTilt <| Just FontTiltOblique
+
+size : SizeUnit -> Character -> Character
+size =
+    setSize << Just
+
+
+defaultCharacter : Character
+defaultCharacter =
+    Character Nothing Nothing Nothing Nothing
+
+
 type alias Outline =
     Border
 
@@ -879,6 +708,15 @@ type alias Typography =
 color : a -> { b | color : Maybe a } -> { b | color : Maybe a }
 color =
     setColor << Just
+
+
+character : Modifiers Character -> Typography -> Typography
+character modifiers typo =
+    typo.character
+        |> Maybe.withDefault defaultCharacter
+        |> Function.compose modifiers
+        |> Just
+        |> setCharacterIn typo
 
 
 defaultTypography : Typography
@@ -972,6 +810,7 @@ type Style
         }
 
 
+{-| -}
 style : Maybe DisplayBox -> List ScreenWidth -> Style
 style display screenWidths =
     Style
@@ -980,6 +819,7 @@ style display screenWidths =
         }
 
 
+{-| -}
 styleContents : DisplayContents -> List ScreenWidth -> Style
 styleContents displayContents =
     style (Just (DisplayContentsWrapper displayContents))
@@ -1273,14 +1113,126 @@ toLegacyDisplayCss str =
             "block"
 
 
-layoutToString : a -> List b
-layoutToString layout =
-    []
+unwrapToCouple : (a -> ( String, String )) -> Maybe a -> ( String, String )
+unwrapToCouple function aMaybe =
+    aMaybe
+        |> Maybe.map function
+        |> Maybe.withDefault ( "", "" )
 
 
-textStyleToString : a -> List b
-textStyleToString textStyle =
-    []
+unwrapToCouples : (a -> List ( String, String )) -> Maybe a -> List ( String, String )
+unwrapToCouples function aMaybe =
+    aMaybe
+        |> Maybe.map function
+        |> Maybe.withDefault []
+
+
+layoutToCouples : Layout -> List ( String, String )
+layoutToCouples layout =
+    List.concat
+        [ layout.visibility |> unwrapToCouples visibilityToCouple
+        , layout.typography |> unwrapToCouples typographyToCouples
+        ]
+
+
+visibilityToCouple : Visibility -> List ( String, String )
+visibilityToCouple visibility =
+    [ ( "visibility", visibilityToString visibility ) ]
+
+
+typographyToCouples : Typography -> List ( String, String )
+typographyToCouples typography =
+    List.concat
+        [ typography.character |> unwrapToCouples characterToCouples
+        , typography.color |> unwrapToCouples colorToCouples
+        , typography.capitalization |> unwrapToCouples capitalizationToCouples
+        , typography.decoration |> unwrapToCouples decorationToCouples
+        , typography.whiteSpaceWrap |> unwrapToCouples whiteSpaceToCouples
+        , typography.userSelect |> unwrapToCouples userSelectToCouples
+        , typography.lineHeight |> unwrapToCouples lineHeightToCouples
+        ]
+
+
+capitalizationToCouples : Capitalization -> List ( String, String )
+capitalizationToCouples capitalization =
+    [ ( "text-transform", capitalizationToString capitalization ) ]
+
+
+capitalizationToString : Capitalization -> String
+capitalizationToString capitalization =
+    case capitalization of
+        CapitalizationUppercase ->
+            "uppercase"
+
+        CapitalizationLowercase ->
+            "lowercase"
+
+        CapitalizationCapitalize ->
+            "capitalize"
+
+
+decorationToCouples : TextDecoration -> List ( String, String )
+decorationToCouples decoration =
+    [ ( "text-decoration", textDecorationToString decoration ) ]
+
+
+whiteSpaceToCouples : WhiteSpaceWrap -> List ( String, String )
+whiteSpaceToCouples whiteSpace =
+    [ ( "white-space", whiteSpaceWrapToString whiteSpace ) ]
+
+
+userSelectToCouples : UserSelect -> List ( String, String )
+userSelectToCouples userSelect =
+    [ ( "user-select", userSelectToString userSelect ) ]
+
+
+lineHeightToCouples : Either SizeUnit Normal -> List ( String, String )
+lineHeightToCouples lineHeight =
+    [ ( "line-height", lineHeightToString lineHeight ) ]
+
+
+lineHeightToString : Either SizeUnit Normal -> String
+lineHeightToString normalSizeUnitEither =
+    case normalSizeUnitEither of
+        Left sizeUnit ->
+            sizeUnitToString sizeUnit
+
+        Right normal ->
+            "normal"
+
+
+colorToCouples : Color -> List ( String, String )
+colorToCouples color =
+    [ ( "color", Color.Convert.colorToCssRgba color ) ]
+
+
+characterToCouples : Character -> List ( String, String )
+characterToCouples character =
+    [ character.weight |> unwrapToCouple weightToCouple
+    , character.tilt |> unwrapToCouple tiltToCouple
+    , character.size |> unwrapToCouple sizeToCouple
+    , character.family |> unwrapToCouple familyToCouple
+    ]
+
+
+weightToCouple : Int -> ( String, String )
+weightToCouple int =
+    ( "font-weight", toString int )
+
+
+tiltToCouple : FontTilt -> ( String, String )
+tiltToCouple fontTilt =
+    ( "font-style", fontStyleToString fontTilt )
+
+
+sizeToCouple : SizeUnit -> ( String, String )
+sizeToCouple val =
+    ( "font-size", sizeUnitToString val )
+
+
+familyToCouple : FontFamily -> ( String, String )
+familyToCouple fontFamily =
+    ( "font-style", fontFamilyToString fontFamily )
 
 
 displayBoxToString : Maybe DisplayBox -> List ( String, String )
@@ -1292,7 +1244,7 @@ displayBoxToString =
                     [ ( "display", "none" ) ]
 
                 DisplayContentsWrapper ( display, layout ) ->
-                    outsideInsideDisplayToString display ++ layoutToString layout
+                    outsideInsideDisplayToString display ++ (layout |> Maybe.map layoutToCouples |> Maybe.withDefault [])
         )
 
 
@@ -1535,46 +1487,37 @@ textTransformToString =
         )
 
 
-textDecorationToString : Maybe TextDecoration -> Maybe String
-textDecorationToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                TextDecorationNone ->
-                    "none"
+textDecorationToString : TextDecoration -> String
+textDecorationToString val =
+    case val of
+        TextDecorationNone ->
+            "none"
 
-                TextDecorationUnderline ->
-                    "underline"
+        TextDecorationUnderline ->
+            "underline"
 
-                TextDecorationLineThrough ->
-                    "line-through"
-        )
+        TextDecorationLineThrough ->
+            "line-through"
 
 
-whiteSpaceWrapToString : Maybe WhiteSpaceWrap -> Maybe String
-whiteSpaceWrapToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                WhiteSpaceWrapNoWrap ->
-                    "nowrap"
-        )
+whiteSpaceWrapToString : WhiteSpaceWrap -> String
+whiteSpaceWrapToString val =
+    case val of
+        WhiteSpaceWrapNoWrap ->
+            "nowrap"
 
 
-fontStyleToString : Maybe FontTilt -> Maybe String
-fontStyleToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                FontTiltNormal ->
-                    "normal"
+fontStyleToString : FontTilt -> String
+fontStyleToString val =
+    case val of
+        FontTiltNormal ->
+            "normal"
 
-                FontTiltItalic ->
-                    "italic"
+        FontTiltItalic ->
+            "italic"
 
-                FontTiltOblique ->
-                    "oblique"
-        )
+        FontTiltOblique ->
+            "oblique"
 
 
 textAlignToString : Maybe Alignment -> Maybe String
@@ -1688,14 +1631,11 @@ flexDirectionToString =
 --         )
 
 
-visibilityToString : Maybe Visibility -> Maybe String
-visibilityToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                VisibilityHidden ->
-                    "hidden"
-        )
+visibilityToString : Visibility -> String
+visibilityToString val =
+    case val of
+        VisibilityHidden ->
+            "hidden"
 
 
 borderToString : Maybe Border -> Maybe String
@@ -1739,27 +1679,24 @@ type FontFamily
     | FontFamilyCustom (List CustomFontFamily)
 
 
-fontFamilyToString : Maybe FontFamily -> Maybe String
-fontFamilyToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                FontFamilyInherit ->
-                    "inherit"
+fontFamilyToString : FontFamily -> String
+fontFamilyToString val =
+    case val of
+        FontFamilyInherit ->
+            "inherit"
 
-                FontFamilyCustom fontList ->
-                    fontList
-                        |> List.map
-                            (\e ->
-                                case e of
-                                    CustomFont fontName ->
-                                        Helpers.surroundWithQuotes fontName
+        FontFamilyCustom fontList ->
+            fontList
+                |> List.map
+                    (\e ->
+                        case e of
+                            CustomFont fontName ->
+                                Helpers.surroundWithQuotes fontName
 
-                                    SystemFont fontName ->
-                                        fontName
-                            )
-                        |> String.join ", "
-        )
+                            SystemFont fontName ->
+                                fontName
+                    )
+                |> String.join ", "
 
 
 boxShadowToString : Maybe BoxShadow -> Maybe String
@@ -1783,16 +1720,14 @@ boxShadowToString =
         )
 
 
-userSelectToString : Maybe UserSelect -> Maybe String
-userSelectToString =
-    nothingOrJust <|
-        \val ->
-            case val of
-                False ->
-                    "none"
+userSelectToString : UserSelect -> String
+userSelectToString val =
+    case val of
+        False ->
+            "none"
 
-                True ->
-                    "all"
+        True ->
+            "all"
 
 
 applyCssFunction : String -> String -> String
@@ -1854,8 +1789,8 @@ backgroundImagesToString backgroundImages =
             )
 
 
-getStyles : Style -> List ( String, String )
-getStyles (Style style) =
+compileStyle : Style -> List ( String, String )
+compileStyle (Style style) =
     displayBoxToString style.display
 
 
@@ -1949,26 +1884,20 @@ removeEmptyStyles =
                     [ ( attr, val ) ]
 
 
-compileStyle : Style -> List ( String, String )
-compileStyle =
-    getStyles
-
-
-toInlineStyles : (Style -> Style) -> List ( String, String )
-toInlineStyles styleTransformer =
-    defaultStyle
-        |> styleTransformer
-        |> compileStyle
+{-| -}
+toInlineStyles : Style -> List ( String, String )
+toInlineStyles =
+    compileStyle
 
 
 {-| -}
-convertStyles : List (Style -> Style) -> List ( String, String )
+convertStyles : Style -> List ( String, String )
 convertStyles =
-    toInlineStyles << compose
+    toInlineStyles
 
 
 {-| -}
-inlineStyle : List (Style -> Style) -> Html.Attribute msg
+inlineStyle : Style -> Html.Attribute msg
 inlineStyle =
     Html.Attributes.style
         << convertStyles
@@ -2103,6 +2032,7 @@ inlineStyle =
 --
 
 
+{-| -}
 padding : SizeUnit -> Layout -> Layout
 padding val layout =
     { layout
