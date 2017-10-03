@@ -1,4 +1,44 @@
-module Router exposing (..)
+module Router
+    exposing
+        ( History
+        , StandardHistoryMsg(Back)
+        , Page
+        , Transition
+        , push
+        , slideUp
+        , pageWithDefaultTransition
+        , pageWithTransition
+        , pageWithoutTransition
+        , headerElement
+        , headerButton
+        , historyView
+        , handleStandardHistory
+        , maybeTransitionSubscription
+        , initHistoryAndData
+        )
+
+{-| Router based on BodyBuilder and Elegant implementing transitions between
+pages and history (backward and forward)
+
+@docs History
+@docs StandardHistoryMsg
+@docs Page
+@docs Transition
+
+@docs handleStandardHistory
+@docs maybeTransitionSubscription
+@docs initHistoryAndData
+@docs push
+@docs slideUp
+@docs pageWithDefaultTransition
+@docs pageWithTransition
+@docs pageWithoutTransition
+
+@docs headerElement
+@docs headerButton
+@docs historyView
+
+-}
 
 import BodyBuilder exposing (..)
 import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
@@ -6,12 +46,6 @@ import AnimationFrame
 import Color
 import Time exposing (Time)
 import Function exposing (compose)
-
-
-type alias Page customRoute =
-    { maybeTransition : Maybe Transition
-    , route : customRoute
-    }
 
 
 type Easing
@@ -24,6 +58,8 @@ type Kind
     | SlideUp
 
 
+{-| Transition between 2 pages
+-}
 type alias Transition =
     { timer : Float
     , length : Float
@@ -33,6 +69,17 @@ type alias Transition =
     }
 
 
+{-| Page type handling transition
+-}
+type alias Page customRoute =
+    { maybeTransition : Maybe Transition
+    , route : customRoute
+    }
+
+
+{-| Generic History type handling current page, before pages, after pages
+and current transition
+-}
 type alias History route =
     { before : List (Page route)
     , current : Page route
@@ -46,6 +93,10 @@ type Direction
     | Backward
 
 
+{-| Standard History Messages type :
+Tick to handle transitions with RequestAnimationFrame
+Back to handle back buttons
+-}
 type StandardHistoryMsg
     = Tick Time
     | Back
@@ -130,6 +181,8 @@ customTransition duration =
     Transition duration duration
 
 
+{-| push a page into history
+-}
 push : Page route -> History route -> History route
 push el ({ transition, before, current, after } as history) =
     if isRunning transition then
@@ -172,16 +225,22 @@ defaultTransition =
     Just <| customTransition basicDuration SlideRight Forward EaseInOut
 
 
+{-| function to create a page with the defaultTransition
+-}
 pageWithDefaultTransition : route -> Page route
 pageWithDefaultTransition =
     Page defaultTransition
 
 
+{-| function to create a page without any transition
+-}
 pageWithoutTransition : route -> Page route
 pageWithoutTransition =
     Page Nothing
 
 
+{-| function to create a page with a custom transition
+-}
 pageWithTransition : Transition -> route -> Page route
 pageWithTransition transition =
     Page (Just transition)
@@ -205,6 +264,8 @@ pull ({ transition, before, current, after } as history) =
                 }
 
 
+{-| slideUp transition
+-}
 slideUp : Transition
 slideUp =
     customTransition basicDuration SlideUp Forward EaseInOut
@@ -292,10 +353,13 @@ pageView insidePageView_ transition data page =
         [ insidePageView_ page data transition ]
 
 
+{-| display the current possible transition from one page to the other using
+the history and its own routing system
+-}
 historyView :
-    (Page route -> a -> Maybe Transition -> Node msg)
+    (Page route -> data -> Maybe Transition -> Node msg)
     -> History route
-    -> a
+    -> data
     -> Node msg
 historyView insidePageView_ history data =
     let
@@ -339,6 +403,8 @@ historyView insidePageView_ history data =
                             (List.map (pageView insidePageView_ history.transition data) visiblePages_)
 
 
+{-| maybe transition subscription
+-}
 maybeTransitionSubscription : (StandardHistoryMsg -> msg) -> Maybe a -> Sub msg
 maybeTransitionSubscription standardHistoryWrapper =
     Maybe.map (\transition -> AnimationFrame.diffs <| (standardHistoryWrapper << Tick))
@@ -376,11 +442,15 @@ standardHandleHistory historyMsg history =
                             { history | transition = Nothing }
 
 
+{-| handle model's history update using historyMsg
+-}
 handleStandardHistory : StandardHistoryMsg -> { a | history : History route } -> ( { a | history : History route }, Cmd msg )
 handleStandardHistory historyMsg model =
     ( { model | history = standardHandleHistory historyMsg model.history }, Cmd.none )
 
 
+{-| initialize history and data based on the routing system
+-}
 initHistoryAndData : route -> data -> { history : History route, data : data }
 initHistoryAndData route data =
     { history = initHistory route
@@ -388,6 +458,7 @@ initHistoryAndData route data =
     }
 
 
+headerButtonStyle : Elegant.Style -> Elegant.Style
 headerButtonStyle =
     [ Elegant.textColor Color.black
     , Elegant.padding Elegant.medium
@@ -399,6 +470,9 @@ headerButtonStyle =
         |> compose
 
 
+headerButtonStyleLeft :
+    { a | style : StyleAttribute }
+    -> { a | style : StyleAttribute }
 headerButtonStyleLeft =
     [ style
         [ headerButtonStyle
@@ -408,6 +482,9 @@ headerButtonStyleLeft =
         |> compose
 
 
+headerButtonStyleCenter :
+    { a | style : StyleAttribute }
+    -> { a | style : StyleAttribute }
 headerButtonStyleCenter =
     [ style
         [ headerButtonStyle
@@ -418,6 +495,9 @@ headerButtonStyleCenter =
         |> compose
 
 
+headerButtonStyleRight :
+    { a | style : StyleAttribute }
+    -> { a | style : StyleAttribute }
 headerButtonStyleRight =
     [ style
         [ headerButtonStyle
@@ -428,6 +508,11 @@ headerButtonStyleRight =
         |> compose
 
 
+{-| display header
+-}
+headerElement :
+    { a | center : Node msg, left : Node msg, right : Node msg }
+    -> Node msg
 headerElement { left, center, right } =
     div [ style [ Elegant.positionSticky, Elegant.fullWidth ] ]
         [ div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow, Elegant.fullWidth ] ]
@@ -438,6 +523,9 @@ headerElement { left, center, right } =
         ]
 
 
+{-| display button
+-}
+headerButton : msg -> String -> Node msg
 headerButton msg content =
     div
         [ onClick <| msg
