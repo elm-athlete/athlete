@@ -478,6 +478,7 @@ import Elegant.Helpers as Helpers exposing (emptyListOrApply)
 import Maybe.Extra as Maybe exposing ((?))
 import Color exposing (Color)
 import Color.Convert
+import Setters exposing (..)
 
 
 type Either a b
@@ -1008,29 +1009,35 @@ displayBlock blockDetailsModifiers layoutModifiers =
         )
 
 
-leftSurrounding val surrounded =
-    { surrounded | left = Just val }
+leftSurrounding : a -> Surrounded a -> Surrounded a
+leftSurrounding =
+    setLeft << Just
 
 
-rightSurrounding val surrounded =
-    { surrounded | right = Just val }
+rightSurrounding : a -> Surrounded a -> Surrounded a
+rightSurrounding =
+    setRight << Just
 
 
-topSurrounding val surrounded =
-    { surrounded | top = Just val }
+topSurrounding : a -> Surrounded a -> Surrounded a
+topSurrounding =
+    setTop << Just
 
 
-bottomSurrounding val surrounded =
-    { surrounded | bottom = Just val }
+bottomSurrounding : a -> Surrounded a -> Surrounded a
+bottomSurrounding =
+    setBottom << Just
 
 
+fullSurrounding : a -> Surrounded a -> Surrounded a
 fullSurrounding val =
     leftSurrounding val
         << rightSurrounding val
         << bottomSurrounding val
-        << leftSurrounding val
+        << topSurrounding val
 
 
+defaultSurrounded : Surrounded a
 defaultSurrounded =
     { left = Nothing
     , right = Nothing
@@ -2143,23 +2150,6 @@ marginLeft =
 --         |> fullSurrounding val
 --         |> Just
 --         |> setPaddingIn layout
-
-
-setPadding : c -> { b | padding : a } -> { b | padding : c }
-setPadding padding layout =
-    setPaddingIn layout padding
-
-
-setPaddingIn : { b | padding : a } -> c -> { b | padding : c }
-setPaddingIn o v =
-    { o | padding = v }
-
-
-setMarginIn o v =
-    { o | margin = v }
-
-
-
 -- {-| -}
 -- padding : SizeUnit -> Style -> Style
 -- padding size =
