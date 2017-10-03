@@ -68,13 +68,15 @@ module Elegant
           -- , fontStyleNormal
           -- , fontStyleItalic
           -- , fontSize
-          -- , heading
-          -- , h1S
-          -- , h2S
-          -- , h3S
-          -- , h4S
-          -- , h5S
-          -- , h6S
+        , typography
+        , color
+        , heading
+        , h1S
+        , h2S
+        , h3S
+        , h4S
+        , h5S
+        , h6S
         , alpha
         , beta
         , gamma
@@ -199,6 +201,12 @@ module Elegant
         )
 
 {-|
+
+
+# New
+
+@docs color
+@docs typography
 
 
 # Types
@@ -448,13 +456,13 @@ module Elegant
 
 ## -- ## Headings Helper functions
 
--- @docs h1S
--- @docs h2S
--- @docs h3S
--- @docs h4S
--- @docs h5S
--- @docs h6S
--- @docs heading
+@docs h1S
+@docs h2S
+@docs h3S
+@docs h4S
+@docs h5S
+@docs h6S
+@docs heading
 
 ## Font Sizes
 @docs alpha
@@ -479,6 +487,7 @@ import Maybe.Extra as Maybe exposing ((?))
 import Color exposing (Color)
 import Color.Convert
 import Setters exposing (..)
+import Function
 
 
 type Either a b
@@ -866,6 +875,12 @@ type alias Typography =
     }
 
 
+{-| -}
+color : a -> { b | color : Maybe a } -> { b | color : Maybe a }
+color =
+    setColor << Just
+
+
 defaultTypography : Typography
 defaultTypography =
     Typography Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -896,6 +911,17 @@ type alias Layout =
     , cursor : Maybe String
     , zIndex : Maybe Int
     }
+
+
+{-| -}
+typography : Modifiers Typography -> Layout -> Layout
+typography modifiers layout =
+    layout
+        |> .typography
+        |> Maybe.withDefault defaultTypography
+        |> Function.compose modifiers
+        |> Just
+        |> setTypographyIn layout
 
 
 type alias BlockDetails =
@@ -2367,56 +2393,64 @@ marginLeft =
 --     Style { style | fontSize = Just val }
 --
 --
--- {-| helper function to create a heading
--- -}
--- heading : SizeUnit -> Style -> Style
--- heading val =
---     [ margin zero
---     , marginBottom (Rem 0.5)
---     , fontWeight 600
---     , fontSize val
---     ]
---         |> compose
--- {-| helper function to create a h1 style
--- -}
--- h1S : Style -> Style
--- h1S =
---     heading alpha
---
---
--- {-| helper function to create a h2 style
--- -}
--- h2S : Style -> Style
--- h2S =
---     heading beta
---
---
--- {-| helper function to create a h3 style
--- -}
--- h3S : Style -> Style
--- h3S =
---     heading gamma
---
---
--- {-| helper function to create a h4 style
--- -}
--- h4S : Style -> Style
--- h4S =
---     heading delta
---
---
--- {-| helper function to create a h5 style
--- -}
--- h5S : Style -> Style
--- h5S =
---     heading epsilon
---
---
--- {-| helper function to create a h6 style
--- -}
--- h6S : Style -> Style
--- h6S =
---     heading zeta
+
+
+{-| helper function to create a heading
+-}
+heading : SizeUnit -> Style -> Style
+heading val =
+    identity
+
+
+
+-- [ margin zero
+-- , marginBottom (Rem 0.5)
+-- , fontWeight 600
+-- , fontSize val
+-- ]
+--     |> compose
+
+
+{-| helper function to create a h1 style
+-}
+h1S : Style -> Style
+h1S =
+    heading alpha
+
+
+{-| helper function to create a h2 style
+-}
+h2S : Style -> Style
+h2S =
+    heading beta
+
+
+{-| helper function to create a h3 style
+-}
+h3S : Style -> Style
+h3S =
+    heading gamma
+
+
+{-| helper function to create a h4 style
+-}
+h4S : Style -> Style
+h4S =
+    heading delta
+
+
+{-| helper function to create a h5 style
+-}
+h5S : Style -> Style
+h5S =
+    heading epsilon
+
+
+{-| helper function to create a h6 style
+-}
+h6S : Style -> Style
+h6S =
+    heading zeta
 
 
 {-| -}
