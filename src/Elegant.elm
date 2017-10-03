@@ -18,63 +18,63 @@ module Elegant
         , screenWidthBetween
         , screenWidthGE
         , screenWidthLE
-        , positionAbsolute
-        , positionRelative
-        , positionFixed
-        , positionStatic
-        , positionSticky
-        , left
-        , right
-        , top
-        , bottom
-        , absolutelyPositionned
-        , verticalAlignMiddle
-        , alignItemsBaseline
-        , alignItemsCenter
-        , alignItemsFlexStart
-        , alignItemsFlexEnd
-        , alignItemsInherit
-        , alignItemsInitial
-        , alignItemsStretch
-        , alignSelfCenter
-        , padding
-        , paddingHorizontal
-        , paddingVertical
-        , paddingLeft
-        , paddingRight
-        , paddingTop
-        , paddingBottom
-        , margin
-        , marginAuto
-        , marginHorizontal
-        , marginVertical
-        , marginTop
-        , marginBottom
-        , marginLeft
-        , marginRight
-        , textColor
-        , uppercase
-        , lowercase
-        , capitalize
-        , textDecorationNone
-        , underline
-        , lineThrough
-        , bold
-        , strong
-        , lineHeight
-        , lineHeightNormal
-        , fontWeightNormal
-        , fontWeight
-        , fontStyleNormal
-        , fontStyleItalic
-        , fontSize
-        , heading
-        , h1S
-        , h2S
-        , h3S
-        , h4S
-        , h5S
-        , h6S
+          -- , positionAbsolute
+          -- , positionRelative
+          -- , positionFixed
+          -- , positionStatic
+          -- , positionSticky
+          -- , left
+          -- , right
+          -- , top
+          -- , bottom
+          -- , absolutelyPositionned
+          -- , verticalAlignMiddle
+          -- , alignItemsBaseline
+          -- , alignItemsCenter
+          -- , alignItemsFlexStart
+          -- , alignItemsFlexEnd
+          -- , alignItemsInherit
+          -- , alignItemsInitial
+          -- , alignItemsStretch
+          -- , alignSelfCenter
+          -- , padding
+          -- , paddingHorizontal
+          -- , paddingVertical
+          -- , paddingLeft
+          -- , paddingRight
+          -- , paddingTop
+          -- , paddingBottom
+          -- , margin
+          -- , marginAuto
+          -- , marginHorizontal
+          -- , marginVertical
+          -- , marginTop
+          -- , marginBottom
+          -- , marginLeft
+          -- , marginRight
+          -- , textColor
+          -- , uppercase
+          -- , lowercase
+          -- , capitalize
+          -- , textDecorationNone
+          -- , underline
+          -- , lineThrough
+          -- , bold
+          -- , strong
+          -- , lineHeight
+          -- , lineHeightNormal
+          -- , fontWeightNormal
+          -- , fontWeight
+          -- , fontStyleNormal
+          -- , fontStyleItalic
+          -- , fontSize
+          -- , heading
+          -- , h1S
+          -- , h2S
+          -- , h3S
+          -- , h4S
+          -- , h5S
+          -- , h6S
         , alpha
         , beta
         , gamma
@@ -85,118 +85,117 @@ module Elegant
         , theta
         , iota
         , kappa
-        , textCenter
-        , textRight
-        , textLeft
-        , textJustify
-        , whiteSpaceNoWrap
-        , backgroundColor
-        , backgroundImage
-        , backgroundImages
+          -- , textCenter
+          -- , textRight
+          -- , textLeft
+          -- , textJustify
+          -- , whiteSpaceWrapNoWrap
+          -- , backgroundColor
+          -- , backgroundImage
+          -- , backgroundImages
         , withUrl
-        , borderNone
-        , borderColor
-        , borderSolid
-        , borderDashed
-        , borderWidth
-        , borderBottomColor
-        , borderBottomWidth
-        , borderBottomSolid
-        , borderBottomDashed
-        , borderLeftColor
-        , borderLeftWidth
-        , borderLeftSolid
-        , borderLeftDashed
-        , borderTopColor
-        , borderTopWidth
-        , borderTopSolid
-        , borderTopDashed
-        , borderRightColor
-        , borderRightWidth
-        , borderRightSolid
-        , borderRightDashed
-        , borderBottomLeftRadius
-        , borderBottomRightRadius
-        , borderTopLeftRadius
-        , borderTopRightRadius
-        , borderRadius
-        , borderAndTextColor
-        , outlineWidth
-        , outlineColor
-        , outlineStyleSolid
-        , outlineStyleDashed
-        , outlineNone
-        , boxShadow
-        , boxShadowPlain
-        , boxShadowBlurry
-        , boxShadowCenteredBlurry
-          -- , displayInlineBlock
+          -- , borderNone
+          -- , borderColor
+          -- , borderSolid
+          -- , borderDashed
+          -- , borderWidth
+          -- , borderBottomColor
+          -- , borderBottomWidth
+          -- , borderBottomSolid
+          -- , borderBottomDashed
+          -- , borderLeftColor
+          -- , borderLeftWidth
+          -- , borderLeftSolid
+          -- , borderLeftDashed
+          -- , borderTopColor
+          -- , borderTopWidth
+          -- , borderTopSolid
+          -- , borderTopDashed
+          -- , borderRightColor
+          -- , borderRightWidth
+          -- , borderRightSolid
+          -- , borderRightDashed
+          -- , borderBottomLeftRadius
+          -- , borderBottomRightRadius
+          -- , borderTopLeftRadius
+          -- , borderTopRightRadius
+          -- , borderRadius
+          -- , borderAndTextColor
+          -- , outlineWidth
+          -- , outlineColor
+          -- , outlineStyleSolid
+          -- , outlineStyleDashed
+          -- , outlineNone
+          -- , boxShadow
+          -- , boxShadowPlain
+          -- , boxShadowBlurry
+          -- , boxShadowCenteredBlurry
         , displayBlock
-          -- , displayFlex
-          -- , displayInlineFlex
-        , flexGrow
-        , flexShrink
-        , flexBasis
-        , flexDirectionColumn
-        , flexDirectionRow
-        , flex
-        , flexWrapWrap
-        , flexWrapNoWrap
+        , displayBlockFlexContainer
+        , displayInlineFlexContainer
         , displayInline
         , displayNone
-        , opacity
-        , overflowAuto
-        , overflowVisible
-        , overflowHidden
-        , overflowScroll
-        , overflowXAuto
-        , overflowXVisible
-        , overflowXHidden
-        , overflowXScroll
-        , overflowYAuto
-        , overflowYVisible
-        , overflowYHidden
-        , overflowYScroll
-        , textOverflowEllipsis
-        , listStyleNone
-        , listStyleDisc
-        , listStyleCircle
-        , listStyleSquare
-        , listStyleDecimal
-        , listStyleGeorgian
-        , round
-        , roundCorner
-        , justifyContentSpaceBetween
-        , justifyContentSpaceAround
-        , justifyContentCenter
-        , spaceBetween
-        , spaceAround
-        , fontFamilyInherit
-        , fontFamilySansSerif
-        , fontFamily
+          -- , flexGrow
+          -- , flexShrink
+          -- , flexBasis
+          -- , flexDirectionColumn
+          -- , flexDirectionRow
+          -- , flex
+          -- , flexWrapWrap
+          -- , flexWrapNoWrap
+          -- , opacity
+          -- , overflowAuto
+          -- , overflowVisible
+          -- , overflowHidden
+          -- , overflowScroll
+          -- , overflowXAuto
+          -- , overflowXVisible
+          -- , overflowXHidden
+          -- , overflowXScroll
+          -- , overflowYAuto
+          -- , overflowYVisible
+          -- , overflowYHidden
+          -- , overflowYScroll
+          -- , textOverflowEllipsis
+          -- , listStyleNone
+          -- , listStyleDisc
+          -- , listStyleCircle
+          -- , listStyleSquare
+          -- , listStyleDecimal
+          -- , listStyleGeorgian
+          -- , round
+          -- , roundCorner
+          -- , justifyContentSpaceBetween
+          -- , justifyContentSpaceAround
+          -- , justifyContentCenter
+          -- , spaceBetween
+          -- , spaceAround
+          -- , fontFamilyInherit
+          -- , fontFamilySansSerif
+          -- , fontFamily
         , FontFamily(..)
         , CustomFontFamily(..)
-        , width
-        , fullWidth
-        , widthPercent
-        , maxWidth
-        , minWidth
-        , height
-        , fullHeight
-        , fullViewportHeight
-        , heightPercent
-        , maxHeight
-        , minHeight
-        , zIndex
-        , cursorPointer
-        , visibilityHidden
-        , transparent
+          -- , width
+          -- , fullWidth
+          -- , widthPercent
+          -- , maxWidth
+          -- , minWidth
+          -- , height
+          -- , fullHeight
+          -- , fullViewportHeight
+          -- , heightPercent
+          -- , maxHeight
+          -- , minHeight
+          -- , zIndex
+          -- , cursorPointer
+          -- , visibilityHidden
+          -- , transparent
         , classes
         , classesHover
         , classesFocus
         , stylesToCss
-        , userSelectNone
-        , userSelectAll
+          -- , userSelectNone
+          -- , userSelectAll
         )
 
 {-|
@@ -221,32 +220,32 @@ module Elegant
 @docs screenWidthBetween
 @docs screenWidthGE
 @docs screenWidthLE
-@docs userSelectNone
-@docs userSelectAll
+-- @docs userSelectNone
+-- @docs userSelectAll
 
 # Styles
 ## Positions
-@docs positionStatic
-@docs positionAbsolute
-@docs positionRelative
-@docs positionFixed
-@docs positionSticky
-@docs left
-@docs right
-@docs top
-@docs bottom
-@docs absolutelyPositionned
-@docs verticalAlignMiddle
+-- @docs positionStatic
+-- @docs positionAbsolute
+-- @docs positionRelative
+-- @docs positionFixed
+-- @docs positionSticky
+-- @docs left
+-- @docs right
+-- @docs top
+-- @docs bottom
+-- @docs absolutelyPositionned
+-- @docs verticalAlignMiddle
 
 ## Align Items
-@docs alignItemsBaseline
-@docs alignItemsCenter
-@docs alignItemsFlexStart
-@docs alignItemsFlexEnd
-@docs alignItemsInherit
-@docs alignItemsInitial
-@docs alignItemsStretch
-@docs alignSelfCenter
+-- @docs alignItemsBaseline
+-- @docs alignItemsCenter
+-- @docs alignItemsFlexStart
+-- @docs alignItemsFlexEnd
+-- @docs alignItemsInherit
+-- @docs alignItemsInitial
+-- @docs alignItemsStretch
+-- @docs alignSelfCenter
 
 
 ## SizeUnit operations
@@ -254,174 +253,179 @@ module Elegant
 @docs opposite
 
 ## Paddings
-@docs padding
-@docs paddingHorizontal
-@docs paddingVertical
-@docs paddingLeft
-@docs paddingRight
-@docs paddingTop
-@docs paddingBottom
+-- @docs padding
+-- @docs paddingHorizontal
+-- @docs paddingVertical
+-- @docs paddingLeft
+-- @docs paddingRight
+-- @docs paddingTop
+-- @docs paddingBottom
 
 ## Margins
-@docs margin
-@docs marginAuto
-@docs marginHorizontal
-@docs marginVertical
-@docs marginTop
-@docs marginBottom
-@docs marginLeft
-@docs marginRight
+-- @docs margin
+-- @docs marginAuto
+-- @docs marginHorizontal
+-- @docs marginVertical
+-- @docs marginTop
+-- @docs marginBottom
+-- @docs marginLeft
+-- @docs marginRight
 
 ## Text Attributes
-@docs textColor
-@docs uppercase
-@docs lowercase
-@docs capitalize
-@docs textDecorationNone
-@docs underline
-@docs lineThrough
-@docs bold
-@docs strong
-@docs lineHeight
-@docs fontWeight
-@docs fontWeightNormal
-@docs fontStyleNormal
-@docs fontStyleItalic
-@docs fontSize
-@docs cursorPointer
-@docs lineHeightNormal
-@docs whiteSpaceNoWrap
+-- @docs textColor
+-- @docs uppercase
+-- @docs lowercase
+-- @docs capitalize
+-- @docs textDecorationNone
+-- @docs underline
+-- @docs lineThrough
+-- @docs bold
+-- @docs strong
+-- @docs lineHeight
+-- @docs fontWeight
+-- @docs fontWeightNormal
+-- @docs fontStyleNormal
+-- @docs fontStyleItalic
+-- @docs fontSize
+-- @docs cursorPointer
+-- @docs lineHeightNormal
+-- @docs whiteSpaceWrapNoWrap
 
 ## Text Alignements
-@docs textCenter
-@docs textLeft
-@docs textRight
-@docs textJustify
-@docs backgroundColor
-@docs backgroundImage
+-- @docs textCenter
+-- @docs textLeft
+-- @docs textRight
+-- @docs textJustify
+-- @docs backgroundColor
+-- @docs backgroundImage
 @docs withUrl
-@docs backgroundImages
+-- @docs backgroundImages
 
 ## Border
-@docs borderNone
-@docs borderColor
-@docs borderSolid
-@docs borderDashed
-@docs borderWidth
-@docs borderBottomColor
-@docs borderBottomWidth
-@docs borderBottomSolid
-@docs borderBottomDashed
-@docs borderLeftColor
-@docs borderLeftWidth
-@docs borderLeftSolid
-@docs borderLeftDashed
-@docs borderTopColor
-@docs borderTopWidth
-@docs borderTopSolid
-@docs borderTopDashed
-@docs borderRightColor
-@docs borderRightWidth
-@docs borderRightSolid
-@docs borderRightDashed
-@docs borderBottomLeftRadius
-@docs borderBottomRightRadius
-@docs borderTopLeftRadius
-@docs borderTopRightRadius
-@docs borderRadius
-@docs borderAndTextColor
-@docs outlineWidth
-@docs outlineStyleSolid
-@docs outlineStyleDashed
-@docs outlineColor
-@docs outlineNone
-@docs boxShadow
-@docs boxShadowPlain
-@docs boxShadowBlurry
-@docs boxShadowCenteredBlurry
+-- @docs borderNone
+-- @docs borderColor
+-- @docs borderSolid
+-- @docs borderDashed
+-- @docs borderWidth
+-- @docs borderBottomColor
+-- @docs borderBottomWidth
+-- @docs borderBottomSolid
+-- @docs borderBottomDashed
+-- @docs borderLeftColor
+-- @docs borderLeftWidth
+-- @docs borderLeftSolid
+-- @docs borderLeftDashed
+-- @docs borderTopColor
+-- @docs borderTopWidth
+-- @docs borderTopSolid
+-- @docs borderTopDashed
+-- @docs borderRightColor
+-- @docs borderRightWidth
+-- @docs borderRightSolid
+-- @docs borderRightDashed
+-- @docs borderBottomLeftRadius
+-- @docs borderBottomRightRadius
+-- @docs borderTopLeftRadius
+-- @docs borderTopRightRadius
+-- @docs borderRadius
+-- @docs borderAndTextColor
+-- @docs outlineWidth
+-- @docs outlineStyleSolid
+-- @docs outlineStyleDashed
+-- @docs outlineColor
+-- @docs outlineNone
+-- @docs boxShadow
+-- @docs boxShadowPlain
+-- @docs boxShadowBlurry
+-- @docs boxShadowCenteredBlurry
 
 ## Display
 @docs displayBlock
-@docs displayInlineBlock
-@docs displayFlex
-@docs displayInlineFlex
+@docs displayBlockFlexContainer
+@docs displayInlineFlexContainer
 @docs displayInline
 @docs displayNone
 
 ## Flex Attributes
-@docs flex
-@docs flexWrapWrap
-@docs flexWrapNoWrap
-@docs flexBasis
-@docs flexGrow
-@docs flexShrink
-@docs flexDirectionColumn
-@docs flexDirectionRow
+-- @docs flex
+-- @docs flexWrapWrap
+-- @docs flexWrapNoWrap
+-- @docs flexBasis
+-- @docs flexGrow
+-- @docs flexShrink
+-- @docs flexDirectionColumn
+-- @docs flexDirectionRow
 
 ## Opacity
-@docs opacity
+-- @docs opacity
 
 ## Overflow
-@docs overflowAuto
-@docs overflowHidden
-@docs overflowScroll
-@docs overflowVisible
-@docs overflowXAuto
-@docs overflowXVisible
-@docs overflowXHidden
-@docs overflowXScroll
-@docs overflowYAuto
-@docs overflowYVisible
-@docs overflowYHidden
-@docs overflowYScroll
-@docs textOverflowEllipsis
+-- @docs overflowAuto
+-- @docs overflowHidden
+-- @docs overflowScroll
+-- @docs overflowVisible
+-- @docs overflowXAuto
+-- @docs overflowXVisible
+-- @docs overflowXHidden
+-- @docs overflowXScroll
+-- @docs overflowYAuto
+-- @docs overflowYVisible
+-- @docs overflowYHidden
+-- @docs overflowYScroll
+-- @docs textOverflowEllipsis
 
 ## List Style Type
-@docs listStyleNone
-@docs listStyleDisc
-@docs listStyleCircle
-@docs listStyleSquare
-@docs listStyleDecimal
-@docs listStyleGeorgian
+-- @docs listStyleNone
+-- @docs listStyleDisc
+-- @docs listStyleCircle
+-- @docs listStyleSquare
+-- @docs listStyleDecimal
+-- @docs listStyleGeorgian
 
 ## Round
-@docs roundCorner
-@docs round
+-- @docs roundCorner
+-- @docs round
 
 
 ## Justify Content
 
-@docs justifyContentSpaceBetween
-@docs justifyContentSpaceAround
-@docs justifyContentCenter
+-- @docs justifyContentSpaceBetween
+-- @docs justifyContentSpaceAround
 
-## Spacings
-@docs spaceBetween
-@docs spaceAround
-@docs fontFamilyInherit
-@docs fontFamilySansSerif
-@docs fontFamily
+
+## -- @docs justifyContentCenter
+
+-- ## Spacings
+-- @docs spaceBetween
+-- @docs spaceAround
+-- @docs fontFamilyInherit
+-- @docs fontFamilySansSerif
+-- @docs fontFamily
 @docs FontFamily
 @docs CustomFontFamily
 
 ## Width and Height
-@docs width
-@docs widthPercent
-@docs maxWidth
-@docs minWidth
-@docs height
-@docs heightPercent
-@docs maxHeight
-@docs minHeight
-@docs fullWidth
-@docs fullHeight
-@docs fullViewportHeight
+-- @docs width
+-- @docs widthPercent
+-- @docs maxWidth
+-- @docs minWidth
+-- @docs height
+-- @docs heightPercent
+-- @docs maxHeight
+-- @docs minHeight
+-- @docs fullWidth
+-- @docs fullHeight
 
-## Z-Index
-@docs zIndex
 
-## Visibility
-@docs visibilityHidden
+## -- @docs fullViewportHeight
+
+-- ## Z-Index
+
+
+## -- @docs zIndex
+
+-- ## Visibility
+-- @docs visibilityHidden
 
 
 # Constants
@@ -435,18 +439,22 @@ module Elegant
 @docs zero
 
 ## Color
-@docs transparent
 
 
-## Headings Helper functions
+## -- @docs transparent
 
-@docs h1S
-@docs h2S
-@docs h3S
-@docs h4S
-@docs h5S
-@docs h6S
-@docs heading
+--
+
+
+## -- ## Headings Helper functions
+
+-- @docs h1S
+-- @docs h2S
+-- @docs h3S
+-- @docs h4S
+-- @docs h5S
+-- @docs h6S
+-- @docs heading
 
 ## Font Sizes
 @docs alpha
@@ -467,7 +475,7 @@ import Html.Attributes
 import Function exposing (compose)
 import List.Extra
 import Elegant.Helpers as Helpers exposing (emptyListOrApply)
-import Maybe.Extra exposing ((?))
+import Maybe.Extra as Maybe exposing ((?))
 import Color exposing (Color)
 import Color.Convert
 
@@ -602,22 +610,27 @@ type alias FlexContainerDetails =
     }
 
 
+defaultFlexContainerDetails : FlexContainerDetails
 defaultFlexContainerDetails =
     FlexContainerDetails Nothing Nothing Nothing Nothing
 
 
+flexContainerDetailsDirection : FlexDirection -> FlexContainerDetails -> FlexContainerDetails
 flexContainerDetailsDirection val el =
     { el | direction = Just val }
 
 
+flexContainerDetailsWrap : FlexWrap -> FlexContainerDetails -> FlexContainerDetails
 flexContainerDetailsWrap val el =
     { el | wrap = Just val }
 
 
+flexContainerDetailsalign : Align -> FlexContainerDetails -> FlexContainerDetails
 flexContainerDetailsalign val el =
     { el | align = Just val }
 
 
+flexContainerDetailsJustify : JustifyContent -> { a | justifyContent : Maybe JustifyContent } -> { a | justifyContent : Maybe JustifyContent }
 flexContainerDetailsJustify val el =
     { el | justifyContent = Just val }
 
@@ -630,18 +643,48 @@ type alias FlexItemDetails =
     }
 
 
-type alias VerticalAlign =
-    String
+defaultFlexItemDetails : FlexItemDetails
+defaultFlexItemDetails =
+    FlexItemDetails Nothing Nothing Nothing Nothing
 
 
-type alias Size =
-    { minHeight : Maybe SizeUnit
-    , minWidth : Maybe SizeUnit
-    , width : Maybe SizeUnit
-    , height : Maybe SizeUnit
-    , maxWidth : Maybe SizeUnit
-    , maxHeight : Maybe SizeUnit
+
+-- type VerticalAlign
+--     = VerticalAlignMiddle
+
+
+type alias DimensionAxis =
+    { min : Maybe SizeUnit
+    , dimension : Maybe SizeUnit
+    , max : Maybe SizeUnit
     }
+
+
+type alias Dimensions =
+    ( DimensionAxis, DimensionAxis )
+
+
+defaultDimensionAxis : DimensionAxis
+defaultDimensionAxis =
+    DimensionAxis Nothing Nothing Nothing
+
+
+defaultDimensions : ( DimensionAxis, DimensionAxis )
+defaultDimensions =
+    ( defaultDimensionAxis, defaultDimensionAxis )
+
+
+
+-- dimensions [ width (Px 30) ]
+
+
+blah : DisplayBox
+blah =
+    displayBlock
+        [ textOverflow TextOverflowEllipsis
+        , dimensions [ width (Px 10) ]
+        ]
+        [ padding (Px 20) ]
 
 
 type ListStyleType
@@ -669,17 +712,17 @@ type JustifyContent
     | JustifyContentCenter
 
 
-type TextCase
-    = TextCaseUppercase
-    | TextCaseLowercase
-    | TextCaseCapitalize
+type Capitalization
+    = CapitalizationUppercase
+    | CapitalizationLowercase
+    | CapitalizationCapitalize
 
 
-type TextAlign
-    = TextAlignCenter
-    | TextAlignRight
-    | TextAlignLeft
-    | TextAlignJustify
+type Alignment
+    = AlignmentCenter
+    | AlignmentRight
+    | AlignmentLeft
+    | AlignmentJustify
 
 
 type TextDecoration
@@ -691,6 +734,7 @@ type TextDecoration
 type FontTilt
     = FontTiltNormal
     | FontTiltItalic
+    | FontTiltOblique
 
 
 type Overflow
@@ -719,17 +763,16 @@ type Border
     | BorderDashed
 
 
-type WhiteSpace
-    = WhiteSpaceNoWrap
+type WhiteSpaceWrap
+    = WhiteSpaceWrapNoWrap
 
 
 type TextOverflow
     = TextOverflowEllipsis
 
 
-type UserSelect
-    = UserSelectNone
-    | UserSelectAll
+type alias UserSelect =
+    Bool
 
 
 type alias SideBorder =
@@ -759,8 +802,28 @@ type alias Padding =
     Surrounded SizeUnit
 
 
-type alias TopRightBottomLeft =
-    Surrounded SizeUnit
+type alias BorderRadius =
+    { topLeft : Maybe SizeUnit
+    , topRight : Maybe SizeUnit
+    , bottomRight : Maybe SizeUnit
+    , bottomLeft : Maybe SizeUnit
+    }
+
+
+type Horizontal a
+    = PositionLeft a
+    | PositionRight a
+
+
+type Vertical a
+    = PositionTop a
+    | PositionBottom a
+
+
+type alias PositionCoordinates a =
+    { horizontal : Horizontal a
+    , vertical : Vertical a
+    }
 
 
 type DynamicPositionningType
@@ -771,15 +834,15 @@ type DynamicPositionningType
 
 
 type Position
-    = PositionDynamic DynamicPositionningType TopRightBottomLeft
+    = PositionDynamic DynamicPositionningType (PositionCoordinates SizeUnit)
     | PositionStatic
 
 
-type alias Font =
-    { fontWeight : Maybe Int
-    , fontTilt : Maybe FontTilt
-    , fontSize : Maybe SizeUnit
-    , fontFamily : Maybe FontFamily
+type alias Character =
+    { weight : Maybe Int
+    , tilt : Maybe FontTilt
+    , size : Maybe SizeUnit
+    , family : Maybe FontFamily
     }
 
 
@@ -787,23 +850,25 @@ type alias Outline =
     Border
 
 
-type alias TextStyle =
-    { font : Maybe Font
-    , align : Maybe TextAlign
-    , overflow : Maybe TextOverflow
-    , textCase : Maybe TextCase
+type alias Typography =
+    { character : Maybe Character
+    , capitalization : Maybe Capitalization
     , decoration : Maybe TextDecoration
     , color : Maybe Color
-    , whiteSpace : Maybe WhiteSpace
+    , whiteSpaceWrap : Maybe WhiteSpaceWrap
     , userSelect : Maybe UserSelect
     , lineHeight : Maybe (Either SizeUnit Normal)
-    , listStyleType : Maybe ListStyleType
     }
 
 
+defaultTypography : Typography
+defaultTypography =
+    Typography Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+
 type alias Background =
-    { backgroundColor : Maybe Color
-    , backgroundImages : List BackgroundImage
+    { color : Maybe Color
+    , images : List BackgroundImage
     }
 
 
@@ -811,20 +876,16 @@ type alias FullOverflow =
     Vector (Maybe Overflow)
 
 
-
--- style [layout [flex [shrink 3, flexBlah Nothing], padding [all (Px 20)]], text [color Color.Blue]]
--- flexContainer [style [flex [shrink]]] []
-
-
 type alias Layout =
     { position : Maybe Position
     , visibility : Maybe Visibility
+    , typography : Maybe Typography
     , padding : Maybe Padding
     , border : Maybe CompleteBorder
+    , radius : Maybe BorderRadius
     , margin : Maybe Margin
     , outline : Maybe Outline
     , boxShadow : Maybe BoxShadow
-    , overflow : Maybe FullOverflow
     , background : Maybe Background
     , opacity : Maybe Float
     , cursor : Maybe String
@@ -832,25 +893,41 @@ type alias Layout =
     }
 
 
+type alias BlockDetails =
+    { listStyleType : Maybe ListStyleType
+    , alignment : Maybe Alignment
+    , overflow : Maybe FullOverflow
+    , textOverflow : Maybe TextOverflow
+    , dimensions : Maybe Dimensions
+    }
+
+
+defaultBlockDetails : BlockDetails
+defaultBlockDetails =
+    BlockDetails Nothing Nothing Nothing Nothing Nothing
+
+
+defaultLayout : Layout
+defaultLayout =
+    Layout Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+
 type InsideDisplay
     = DisplayFlow
-    | DisplayFlowRoot VerticalAlign
-    | DisplayFlexContainer FlexContainerDetails
+    | DisplayFlexContainer (Maybe FlexContainerDetails)
 
 
 type OutsideDisplay
     = DisplayInline
-    | DisplayBlock (Maybe Size)
-    | DisplayFlexItem FlexItemDetails
+    | DisplayBlock (Maybe BlockDetails)
+    | DisplayFlexItem (Maybe FlexItemDetails)
 
 
 type alias DisplayContents =
-    { layout : ( OutsideDisplay, Maybe Layout )
-    , text : ( InsideDisplay, Maybe TextStyle )
-    }
+    ( ( OutsideDisplay, InsideDisplay ), Maybe Layout )
 
 
-type Display
+type DisplayBox
     = DisplayNone
     | DisplayContentsWrapper DisplayContents
 
@@ -859,11 +936,12 @@ type Display
 -}
 type Style
     = Style
-        { display : Display
+        { display : Maybe DisplayBox
         , screenWidths : List ScreenWidth
         }
 
 
+style : Maybe DisplayBox -> List ScreenWidth -> Style
 style display screenWidths =
     Style
         { display = display
@@ -871,61 +949,325 @@ style display screenWidths =
         }
 
 
-inlineBlock verticalAlign layout text =
-    styleContents
-        { layout = ( DisplayInline, Just layout )
-        , text = ( DisplayFlowRoot verticalAlign, Just text )
-        }
-
-
-block sizes layout text =
-    styleContents
-        { layout = ( DisplayBlock (Just sizes), Just layout )
-        , text = ( DisplayFlow, Just text )
-        }
-
-
-inline layout text =
-    styleContents
-        { layout = ( DisplayInline, Just layout )
-        , text = ( DisplayFlow, Just text )
-        }
-
-
-inlineFlexContainer flexContainerDetails layout text =
-    styleContents
-        { layout = ( DisplayInline, Just layout )
-        , text = ( DisplayFlexContainer flexContainerDetails, Just text )
-        }
-
-
-blockFlexContainer sizes flexContainerDetails layout text =
-    styleContents
-        { layout = ( DisplayBlock sizes, Just layout )
-        , text = ( DisplayFlexContainer flexContainerDetails, Just text )
-        }
-
-
-flexChild flexItemDetails layout text =
-    styleContents
-        { layout = ( DisplayFlexItem flexItemDetails, Just layout )
-        , text = ( DisplayFlow, Just text )
-        }
-
-
-flexChildContainer flexContainerDetails flexItemDetails layout text =
-    styleContents
-        { layout = ( DisplayFlexItem flexItemDetails, Just layout )
-        , text = ( DisplayFlexContainer flexContainerDetails, Just text )
-        }
-
-
+styleContents : DisplayContents -> List ScreenWidth -> Style
 styleContents displayContents =
-    style (DisplayContentsWrapper displayContents)
+    style (Just (DisplayContentsWrapper displayContents))
 
 
-styleDisplayNone =
-    style DisplayNone
+{-| displayNone
+The "display none" <display box> is useful to simply don't show
+the element in the browser, it is on top of the hierarchy, because
+applying any text or
+layout style to a "display none" element doesn't mean anything.
+ex : displayNone
+-}
+displayNone : DisplayBox
+displayNone =
+    DisplayNone
+
+
+displayStyle : OutsideDisplay -> InsideDisplay -> Maybe Layout -> DisplayContents
+displayStyle outsideDisplay insideDisplay layoutStyle =
+    ( ( outsideDisplay, insideDisplay ), layoutStyle )
+
+
+type alias Modifier a =
+    a -> a
+
+
+type alias Modifiers a =
+    List (Modifier a)
+
+
+modifiedElementOrNothing : a -> Modifiers a -> Maybe a
+modifiedElementOrNothing default modifiers =
+    if List.isEmpty modifiers then
+        Nothing
+    else
+        Just ((modifiers |> compose) default)
+
+
+{-| The display Block
+node behaving like a block element
+children behaving like inside a flow element => considered block from children
+
+    displayBlock [dimensions [width (Px 30)]] [padding (Px 30)]
+
+-}
+displayBlock : Modifiers BlockDetails -> Modifiers Layout -> DisplayBox
+displayBlock blockDetailsModifiers layoutModifiers =
+    DisplayContentsWrapper
+        (displayStyle
+            (DisplayBlock (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
+            DisplayFlow
+            (modifiedElementOrNothing defaultLayout layoutModifiers)
+        )
+
+
+leftSurrounding val surrounded =
+    { surrounded | left = Just val }
+
+
+rightSurrounding val surrounded =
+    { surrounded | right = Just val }
+
+
+topSurrounding val surrounded =
+    { surrounded | top = Just val }
+
+
+bottomSurrounding val surrounded =
+    { surrounded | bottom = Just val }
+
+
+fullSurrounding val =
+    leftSurrounding val
+        << rightSurrounding val
+        << bottomSurrounding val
+        << leftSurrounding val
+
+
+defaultSurrounded =
+    { left = Nothing
+    , right = Nothing
+    , bottom = Nothing
+    , top = Nothing
+    }
+
+
+padding : SizeUnit -> Layout -> Layout
+padding val layout =
+    { layout
+        | padding =
+            Just
+                (fullSurrounding val
+                    (layout.padding |> Maybe.withDefault defaultSurrounded)
+                )
+    }
+
+
+{-| The display inline
+node behaving like an inline element
+
+    displayInline [background [color Color.blue]] [textCenter]
+
+-}
+displayInline : Modifiers Layout -> DisplayBox
+displayInline layoutModifiers =
+    DisplayContentsWrapper
+        (displayStyle
+            DisplayInline
+            DisplayFlow
+            (modifiedElementOrNothing defaultLayout layoutModifiers)
+        )
+
+
+{-| The display inline-flex container :
+node behaving like an inline element, contained nodes will behave like flex children
+
+    displayInlineFlexContainer [] []
+
+-}
+displayInlineFlexContainer : Modifiers FlexContainerDetails -> Modifiers Layout -> DisplayBox
+displayInlineFlexContainer flexContainerDetailsModifiers layoutModifiers =
+    DisplayContentsWrapper
+        (displayStyle
+            DisplayInline
+            (DisplayFlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
+            (modifiedElementOrNothing defaultLayout layoutModifiers)
+        )
+
+
+{-| The display blockflex container :
+node behaving like an block element, contained nodes will behave like flex children
+
+    displayFlexContainer [] [] []
+
+-}
+displayBlockFlexContainer : Modifiers FlexContainerDetails -> Modifiers BlockDetails -> Modifiers Layout -> DisplayBox
+displayBlockFlexContainer flexContainerDetailsModifiers blockDetailsModifiers layoutModifiers =
+    DisplayContentsWrapper
+        (displayStyle
+            (DisplayBlock (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
+            (DisplayFlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
+            (modifiedElementOrNothing defaultLayout layoutModifiers)
+        )
+
+
+{-| The display flexitemdetails container :
+node behaving like an flex child (not being a flex father himself)
+
+    displayFlexChild [] []
+
+-}
+displayFlexChild : Modifiers FlexItemDetails -> Modifiers Layout -> DisplayBox
+displayFlexChild flexItemDetailsModifiers layoutModifiers =
+    DisplayContentsWrapper
+        (displayStyle
+            (DisplayFlexItem (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers))
+            DisplayFlow
+            (modifiedElementOrNothing defaultLayout layoutModifiers)
+        )
+
+
+{-| The display flexchildcontainer container :
+node behaving like an flex child being a flex father himself.
+
+    displayFlexChildContainer [] [] []
+
+-}
+displayFlexChildContainer : Modifiers FlexContainerDetails -> Modifiers FlexItemDetails -> Modifiers Layout -> DisplayBox
+displayFlexChildContainer flexContainerDetailsModifiers flexItemDetailsModifiers layoutModifiers =
+    DisplayContentsWrapper
+        (displayStyle
+            (DisplayFlexItem (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers))
+            (DisplayFlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
+            (modifiedElementOrNothing defaultLayout layoutModifiers)
+        )
+
+
+valueToPair : (a -> b) -> c -> List ( d, c -> Maybe a ) -> List ( d, b )
+valueToPair fun value =
+    List.foldr
+        (\( key, valueFun ) acu ->
+            acu
+                |> List.append ((unwrapEmptyList (\e -> [ ( key, e |> fun ) ]) (valueFun value)))
+        )
+        []
+
+
+dimensionsToString : Dimensions -> List ( String, String )
+dimensionsToString size =
+    [ ( "width", Tuple.first >> .dimension )
+    , ( "min-width", Tuple.first >> .min )
+    , ( "max-width", Tuple.first >> .max )
+    , ( "height", Tuple.second >> .dimension )
+    , ( "max-height", Tuple.second >> .max )
+    , ( "min-height", Tuple.second >> .min )
+    ]
+        |> valueToPair sizeUnitToString size
+
+
+maybeDimensionsToString : Maybe Dimensions -> List ( String, String )
+maybeDimensionsToString =
+    unwrapEmptyList dimensionsToString
+
+
+blockDetailsToString : BlockDetails -> List ( String, String )
+blockDetailsToString blockDetails =
+    []
+
+
+maybeBlockDetailsToString : Maybe BlockDetails -> List ( String, String )
+maybeBlockDetailsToString =
+    unwrapEmptyList blockDetailsToString
+
+
+unwrapEmptyList : (a -> List b) -> Maybe a -> List b
+unwrapEmptyList =
+    Maybe.unwrap []
+
+
+
+-- verticalAlignToString : VerticalAlign -> String
+-- verticalAlignToString verticalAlign =
+--     case verticalAlign of
+--         VerticalAlignMiddle ->
+--             "middle"
+--
+-- maybeVerticalAlignToString : VerticalAlign -> List ( String, String )
+-- maybeVerticalAlignToString =
+--     (\val ->
+--         [ ( "vertical-align", verticalAlignToString val ) ]
+--     )
+
+
+flexContainerDetailsToString : a -> List b
+flexContainerDetailsToString flexContainerDetails =
+    []
+
+
+flexItemDetailsToString : a -> List b
+flexItemDetailsToString flexContainerDetails =
+    []
+
+
+layoutStyleToString : a -> List b
+layoutStyleToString a =
+    []
+
+
+outsideInsideDisplayToString : ( OutsideDisplay, InsideDisplay ) -> List ( String, String )
+outsideInsideDisplayToString outsideAndInsideDisplay =
+    let
+        joiner ( a, b ) ( c, d ) =
+            ( a ++ " " ++ c, b ++ d )
+
+        ( dis, rest ) =
+            case outsideAndInsideDisplay of
+                ( outer, inner ) ->
+                    (case outer of
+                        DisplayInline ->
+                            ( "inline", [] )
+
+                        DisplayBlock blockDetails ->
+                            ( "block", maybeBlockDetailsToString blockDetails )
+
+                        DisplayFlexItem flexItemDetails ->
+                            ( "block", flexItemDetailsToString flexItemDetails )
+                    )
+                        |> joiner
+                            (case inner of
+                                DisplayFlow ->
+                                    ( "flow", [] )
+
+                                DisplayFlexContainer flexContainerDetails ->
+                                    ( "flex", flexContainerDetailsToString flexContainerDetails )
+                            )
+    in
+        [ ( "display", dis |> toLegacyDisplayCss ) ] ++ rest
+
+
+toLegacyDisplayCss : String -> String
+toLegacyDisplayCss str =
+    case str of
+        "inline flow" ->
+            "inline"
+
+        "inline flex" ->
+            "inline-flex"
+
+        "block flow" ->
+            "block"
+
+        "block flex" ->
+            "flex"
+
+        _ ->
+            "block"
+
+
+layoutToString : a -> List b
+layoutToString layout =
+    []
+
+
+textStyleToString : a -> List b
+textStyleToString textStyle =
+    []
+
+
+displayBoxToString : Maybe DisplayBox -> List ( String, String )
+displayBoxToString =
+    unwrapEmptyList
+        (\val ->
+            case val of
+                DisplayNone ->
+                    [ ( "display", "none" ) ]
+
+                DisplayContentsWrapper ( display, layout ) ->
+                    outsideInsideDisplayToString display ++ layoutToString layout
+        )
 
 
 type alias ScreenWidth =
@@ -1040,33 +1382,6 @@ positionToString =
         )
 
 
-displayToString : Maybe Display -> Maybe String
-displayToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                ( outsideDisplay, insideDisplay ) ->
-                    "TODO"
-         -- DisplayBlock size ->
-         --     "block"
-         --
-         -- DisplayInline ->
-         --     "inline"
-         --
-         -- DisplayInlineBlock verticalAlign size ->
-         --     "inline-block"
-         --
-         -- DisplayFlex flexDetails size ->
-         --     "flex"
-         --
-         -- DisplayInlineFlex flexDetails size ->
-         --     "inline-flex"
-         --
-         -- DisplayNone ->
-         --     "none"
-        )
-
-
 colorToString : Color -> String
 colorToString =
     Color.Convert.colorToCssRgba
@@ -1178,18 +1493,18 @@ justifyContentToString =
         )
 
 
-textTransformToString : Maybe TextCase -> Maybe String
+textTransformToString : Maybe Capitalization -> Maybe String
 textTransformToString =
     nothingOrJust
         (\val ->
             case val of
-                TextCaseLowercase ->
+                CapitalizationLowercase ->
                     "lowercase"
 
-                TextCaseUppercase ->
+                CapitalizationUppercase ->
                     "uppercase"
 
-                TextCaseCapitalize ->
+                CapitalizationCapitalize ->
                     "capitalize"
         )
 
@@ -1210,12 +1525,12 @@ textDecorationToString =
         )
 
 
-whiteSpaceToString : Maybe WhiteSpace -> Maybe String
-whiteSpaceToString =
+whiteSpaceWrapToString : Maybe WhiteSpaceWrap -> Maybe String
+whiteSpaceWrapToString =
     nothingOrJust
         (\val ->
             case val of
-                WhiteSpaceNoWrap ->
+                WhiteSpaceWrapNoWrap ->
                     "nowrap"
         )
 
@@ -1230,24 +1545,27 @@ fontStyleToString =
 
                 FontTiltItalic ->
                     "italic"
+
+                FontTiltOblique ->
+                    "oblique"
         )
 
 
-textAlignToString : Maybe TextAlign -> Maybe String
+textAlignToString : Maybe Alignment -> Maybe String
 textAlignToString =
     nothingOrJust
         (\val ->
             case val of
-                TextAlignCenter ->
+                AlignmentCenter ->
                     "center"
 
-                TextAlignLeft ->
+                AlignmentLeft ->
                     "left"
 
-                TextAlignRight ->
+                AlignmentRight ->
                     "right"
 
-                TextAlignJustify ->
+                AlignmentJustify ->
                     "justify"
         )
 
@@ -1444,10 +1762,10 @@ userSelectToString =
     nothingOrJust <|
         \val ->
             case val of
-                UserSelectNone ->
+                False ->
                     "none"
 
-                UserSelectAll ->
+                True ->
                     "all"
 
 
@@ -1470,7 +1788,7 @@ colorStopToString : ColorStop -> String
 colorStopToString colorStop =
     case colorStop of
         { color, offset } ->
-            [ Just (colorToString color), maybeSizeUnitToString offset ] |> Maybe.Extra.values |> String.join " "
+            [ Just (colorToString color), maybeSizeUnitToString offset ] |> Maybe.values |> String.join " "
 
 
 colorStopsToString : List ColorStop -> String
@@ -1510,83 +1828,87 @@ backgroundImagesToString backgroundImages =
             )
 
 
-getStyles : Style -> List ( String, Maybe String )
-getStyles (Style styleValues) =
-    [ ( "position", positionToString << .position )
-    , ( "left", maybeSizeUnitToString << .left )
-    , ( "top", maybeSizeUnitToString << .top )
-    , ( "bottom", maybeSizeUnitToString << .bottom )
-    , ( "right", maybeSizeUnitToString << .right )
-    , ( "color", maybeColorToString << .textColor )
-    , ( "display", displayToString << .display )
-    , ( "user-select", userSelectToString << .userSelect )
-    , ( "flex-grow", maybeToString << .flexGrow )
-    , ( "flex-shrink", maybeToString << .flexShrink )
-    , ( "flex-basis", autoOrSizeUnitToString << .flexBasis )
-    , ( "flex-wrap", flexWrapToString << .flexWrap )
-    , ( "flex-direction", flexDirectionToString << .flexDirection )
-    , ( "opacity", maybeToString << .opacity )
-    , ( "overflow-x", overflowToString << .overflowX )
-    , ( "overflow-y", overflowToString << .overflowY )
-    , ( "text-overflow", textOverflowToString << .textOverflow )
-    , ( "text-align", textAlignToString << .textAlign )
-    , ( "text-transform", textTransformToString << .textTransform )
-    , ( "text-decoration", textDecorationToString << .textDecoration )
-    , ( "white-space", whiteSpaceToString << .whiteSpace )
-    , ( "lineHeight", normalOrSizeUnitToString << .lineHeight )
-    , ( "background-color", maybeColorToString << .backgroundColor )
-    , ( "background-image", backgroundImagesToString << .backgroundImages )
-    , ( "border-bottom-color", maybeColorToString << .borderBottomColor )
-    , ( "border-bottom-width", maybeSizeUnitToString << .borderBottomWidth )
-    , ( "border-bottom-style", borderToString << .borderBottomStyle )
-    , ( "border-left-color", maybeColorToString << .borderLeftColor )
-    , ( "border-left-width", maybeSizeUnitToString << .borderLeftWidth )
-    , ( "border-left-style", borderToString << .borderLeftStyle )
-    , ( "border-top-color", maybeColorToString << .borderTopColor )
-    , ( "border-top-width", maybeSizeUnitToString << .borderTopWidth )
-    , ( "border-top-style", borderToString << .borderTopStyle )
-    , ( "border-right-color", maybeColorToString << .borderRightColor )
-    , ( "border-right-width", maybeSizeUnitToString << .borderRightWidth )
-    , ( "border-right-style", borderToString << .borderRightStyle )
-    , ( "border-bottom-left-radius", maybeSizeUnitToString << .borderBottomLeftRadius )
-    , ( "border-bottom-right-radius", maybeSizeUnitToString << .borderBottomRightRadius )
-    , ( "border-top-left-radius", maybeSizeUnitToString << .borderTopLeftRadius )
-    , ( "border-top-right-radius", maybeSizeUnitToString << .borderTopRightRadius )
-    , ( "outline-color", maybeColorToString << .outlineColor )
-    , ( "outline-width", maybeSizeUnitToString << .outlineWidth )
-    , ( "outline-style", borderToString << .outlineStyle )
-    , ( "box-shadow", boxShadowToString << .boxShadow )
-    , ( "padding-left", maybeSizeUnitToString << .paddingLeft )
-    , ( "padding-right", maybeSizeUnitToString << .paddingRight )
-    , ( "padding-top", maybeSizeUnitToString << .paddingTop )
-    , ( "padding-bottom", maybeSizeUnitToString << .paddingBottom )
-    , ( "margin-left", autoOrSizeUnitToString << .marginLeft )
-    , ( "margin-right", autoOrSizeUnitToString << .marginRight )
-    , ( "margin-top", autoOrSizeUnitToString << .marginTop )
-    , ( "margin-bottom", autoOrSizeUnitToString << .marginBottom )
-    , ( "list-style-type", listStyleTypeToString << .listStyleType )
-    , ( "align-items", alignItemsToString << .alignItems )
-    , ( "align-self", alignItemsToString << .alignSelf )
-    , ( "justify-content", justifyContentToString << .justifyContent )
-    , ( "font-weight", maybeToString << .fontWeight )
-    , ( "font-style", fontStyleToString << .fontStyle )
-    , ( "font-size", maybeSizeUnitToString << .fontSize )
-    , ( "font-family", fontFamilyToString << .fontFamily )
-    , ( "width", maybeSizeUnitToString << .width )
-    , ( "max-width", maybeSizeUnitToString << .maxWidth )
-    , ( "min-width", maybeSizeUnitToString << .minWidth )
-    , ( "height", maybeSizeUnitToString << .height )
-    , ( "max-height", maybeSizeUnitToString << .maxHeight )
-    , ( "min-height", maybeSizeUnitToString << .minHeight )
-    , ( "z-index", maybeToString << .zIndex )
-    , ( "cursor", .cursor )
-    , ( "visibility", visibilityToString << .visibility )
-    , ( "vertical-align", .verticalAlign )
-    ]
-        |> List.map
-            (\( attrName, fun ) ->
-                ( attrName, fun styleValues )
-            )
+getStyles : Style -> List ( String, String )
+getStyles (Style style) =
+    displayBoxToString style.display
+
+
+
+-- [ ( "position", positionToString << .position )
+-- , ( "left", maybeSizeUnitToString << .left )
+-- , ( "top", maybeSizeUnitToString << .top )
+-- , ( "bottom", maybeSizeUnitToString << .bottom )
+-- , ( "right", maybeSizeUnitToString << .right )
+-- , ( "color", maybeColorToString << .textColor )
+-- , ( "display", displayToString << .display )
+-- , ( "user-select", userSelectToString << .userSelect )
+-- , ( "flex-grow", maybeToString << .flexGrow )
+-- , ( "flex-shrink", maybeToString << .flexShrink )
+-- , ( "flex-basis", autoOrSizeUnitToString << .flexBasis )
+-- , ( "flex-wrap", flexWrapToString << .flexWrap )
+-- , ( "flex-direction", flexDirectionToString << .flexDirection )
+-- , ( "opacity", maybeToString << .opacity )
+-- , ( "overflow-x", overflowToString << .overflowX )
+-- , ( "overflow-y", overflowToString << .overflowY )
+-- , ( "text-overflow", textOverflowToString << .textOverflow )
+-- , ( "text-align", textAlignToString << .textAlign )
+-- , ( "text-transform", textTransformToString << .textTransform )
+-- , ( "text-decoration", textDecorationToString << .textDecoration )
+-- , ( "white-space", whiteSpaceWrapToString << .whiteSpaceWrap )
+-- , ( "lineHeight", normalOrSizeUnitToString << .lineHeight )
+-- , ( "background-color", maybeColorToString << .backgroundColor )
+-- , ( "background-image", backgroundImagesToString << .backgroundImages )
+-- , ( "border-bottom-color", maybeColorToString << .borderBottomColor )
+-- , ( "border-bottom-width", maybeSizeUnitToString << .borderBottomWidth )
+-- , ( "border-bottom-style", borderToString << .borderBottomStyle )
+-- , ( "border-left-color", maybeColorToString << .borderLeftColor )
+-- , ( "border-left-width", maybeSizeUnitToString << .borderLeftWidth )
+-- , ( "border-left-style", borderToString << .borderLeftStyle )
+-- , ( "border-top-color", maybeColorToString << .borderTopColor )
+-- , ( "border-top-width", maybeSizeUnitToString << .borderTopWidth )
+-- , ( "border-top-style", borderToString << .borderTopStyle )
+-- , ( "border-right-color", maybeColorToString << .borderRightColor )
+-- , ( "border-right-width", maybeSizeUnitToString << .borderRightWidth )
+-- , ( "border-right-style", borderToString << .borderRightStyle )
+-- , ( "border-bottom-left-radius", maybeSizeUnitToString << .borderBottomLeftRadius )
+-- , ( "border-bottom-right-radius", maybeSizeUnitToString << .borderBottomRightRadius )
+-- , ( "border-top-left-radius", maybeSizeUnitToString << .borderTopLeftRadius )
+-- , ( "border-top-right-radius", maybeSizeUnitToString << .borderTopRightRadius )
+-- , ( "outline-color", maybeColorToString << .outlineColor )
+-- , ( "outline-width", maybeSizeUnitToString << .outlineWidth )
+-- , ( "outline-style", borderToString << .outlineStyle )
+-- , ( "box-shadow", boxShadowToString << .boxShadow )
+-- , ( "padding-left", maybeSizeUnitToString << .paddingLeft )
+-- , ( "padding-right", maybeSizeUnitToString << .paddingRight )
+-- , ( "padding-top", maybeSizeUnitToString << .paddingTop )
+-- , ( "padding-bottom", maybeSizeUnitToString << .paddingBottom )
+-- , ( "margin-left", autoOrSizeUnitToString << .marginLeft )
+-- , ( "margin-right", autoOrSizeUnitToString << .marginRight )
+-- , ( "margin-top", autoOrSizeUnitToString << .marginTop )
+-- , ( "margin-bottom", autoOrSizeUnitToString << .marginBottom )
+-- , ( "list-style-type", listStyleTypeToString << .listStyleType )
+-- , ( "align-items", alignItemsToString << .alignItems )
+-- , ( "align-self", alignItemsToString << .alignSelf )
+-- , ( "justify-content", justifyContentToString << .justifyContent )
+-- , ( "font-weight", maybeToString << .fontWeight )
+-- , ( "font-style", fontStyleToString << .fontStyle )
+-- , ( "font-size", maybeSizeUnitToString << .fontSize )
+-- , ( "font-family", fontFamilyToString << .fontFamily )
+-- , ( "width", maybeSizeUnitToString << .width )
+-- , ( "max-width", maybeSizeUnitToString << .maxWidth )
+-- , ( "min-width", maybeSizeUnitToString << .minWidth )
+-- , ( "height", maybeSizeUnitToString << .height )
+-- , ( "max-height", maybeSizeUnitToString << .maxHeight )
+-- , ( "min-height", maybeSizeUnitToString << .minHeight )
+-- , ( "z-index", maybeToString << .zIndex )
+-- , ( "cursor", .cursor )
+-- , ( "visibility", visibilityToString << .visibility )
+-- , ( "vertical-align", .verticalAlign )
+-- ]
+--     |> List.map
+--         (\( attrName, fun ) ->
+--             ( attrName, fun styleValues )
+--         )
 
 
 removeEmptyStyles : List ( String, Maybe String ) -> List ( String, String )
@@ -1604,7 +1926,6 @@ removeEmptyStyles =
 compileStyle : Style -> List ( String, String )
 compileStyle =
     getStyles
-        >> removeEmptyStyles
 
 
 toInlineStyles : (Style -> Style) -> List ( String, String )
@@ -1627,418 +1948,410 @@ inlineStyle =
         << convertStyles
 
 
-position : Position -> Style -> Style
-position value (Style style) =
-    Style { style | position = Just value }
 
-
-{-| -}
-positionAbsolute : Style -> Style
-positionAbsolute =
-    position PositionAbsolute
-
-
-{-| -}
-positionSticky : Style -> Style
-positionSticky =
-    position PositionSticky
-
-
-{-| -}
-positionRelative : Style -> Style
-positionRelative =
-    position PositionRelative
-
-
-{-| -}
-positionFixed : Style -> Style
-positionFixed =
-    position PositionFixed
-
-
-{-| -}
-positionStatic : Style -> Style
-positionStatic =
-    position PositionStatic
-
-
-{-| -}
-left : SizeUnit -> Style -> Style
-left value (Style style) =
-    Style { style | left = Just value }
-
-
-{-| -}
-right : SizeUnit -> Style -> Style
-right value (Style style) =
-    Style { style | right = Just value }
-
-
-{-| -}
-top : SizeUnit -> Style -> Style
-top value (Style style) =
-    Style { style | top = Just value }
-
-
-{-| -}
-bottom : SizeUnit -> Style -> Style
-bottom value (Style style) =
-    Style { style | bottom = Just value }
-
-
-{-| -}
-absolutelyPositionned : Vector Float -> Style -> Style
-absolutelyPositionned ( x, y ) =
-    [ position PositionAbsolute
-    , left <| Px <| Basics.round <| x
-    , right <| Px <| Basics.round <| x
-    ]
-        |> compose
-
-
-{-| -}
-verticalAlignMiddle : Style -> Style
-verticalAlignMiddle (Style style) =
-    Style { style | verticalAlign = Just "middle" }
-
-
-alignItems : Align -> Style -> Style
-alignItems value (Style style) =
-    Style { style | alignItems = Just value }
-
-
-{-| -}
-alignItemsBaseline : Style -> Style
-alignItemsBaseline =
-    alignItems AlignBaseline
-
-
-{-| -}
-alignItemsCenter : Style -> Style
-alignItemsCenter =
-    alignItems AlignCenter
-
-
-{-| -}
-alignItemsFlexStart : Style -> Style
-alignItemsFlexStart =
-    alignItems AlignFlexStart
-
-
-{-| -}
-alignItemsFlexEnd : Style -> Style
-alignItemsFlexEnd =
-    alignItems AlignFlexEnd
-
-
-{-| -}
-alignItemsInherit : Style -> Style
-alignItemsInherit =
-    alignItems AlignInherit
-
-
-{-| -}
-alignItemsInitial : Style -> Style
-alignItemsInitial =
-    alignItems AlignInitial
-
-
-{-| -}
-alignItemsStretch : Style -> Style
-alignItemsStretch =
-    alignItems AlignStretch
-
-
-alignSelf : Align -> Style -> Style
-alignSelf value (Style style) =
-    Style { style | alignSelf = Just value }
-
-
-{-| -}
-alignSelfCenter : Style -> Style
-alignSelfCenter =
-    alignSelf AlignCenter
-
-
-{-| -}
-padding : SizeUnit -> Style -> Style
-padding size =
-    paddingHorizontal size << paddingVertical size
-
-
-{-| -}
-paddingHorizontal : SizeUnit -> Style -> Style
-paddingHorizontal size =
-    paddingLeft size << paddingRight size
-
-
-{-| -}
-paddingVertical : SizeUnit -> Style -> Style
-paddingVertical size =
-    paddingBottom size << paddingTop size
-
-
-{-| -}
-paddingLeft : SizeUnit -> Style -> Style
-paddingLeft size (Style style) =
-    Style { style | paddingLeft = Just size }
-
-
-{-| -}
-paddingTop : SizeUnit -> Style -> Style
-paddingTop size (Style style) =
-    Style { style | paddingTop = Just size }
-
-
-{-| -}
-paddingRight : SizeUnit -> Style -> Style
-paddingRight size (Style style) =
-    Style { style | paddingRight = Just size }
-
-
-{-| -}
-paddingBottom : SizeUnit -> Style -> Style
-paddingBottom size (Style style) =
-    Style { style | paddingBottom = Just size }
-
-
-{-| -}
-margin : SizeUnit -> Style -> Style
-margin size =
-    marginHorizontal size << marginVertical size
-
-
-{-| -}
-marginAuto : Style -> Style
-marginAuto =
-    marginHorizontalAuto
-
-
-{-| -}
-marginHorizontal : SizeUnit -> Style -> Style
-marginHorizontal size =
-    marginLeft size << marginRight size
-
-
-marginHorizontalAuto : Style -> Style
-marginHorizontalAuto =
-    marginLeftAuto << marginRightAuto
-
-
-{-| -}
-marginVertical : SizeUnit -> Style -> Style
-marginVertical size =
-    marginBottom size << marginTop size
-
-
-{-| -}
-marginLeft : SizeUnit -> Style -> Style
-marginLeft size (Style style) =
-    Style { style | marginLeft = Just <| Left size }
-
-
-marginLeftAuto : Style -> Style
-marginLeftAuto (Style style) =
-    Style { style | marginLeft = Just <| Right Auto }
-
-
-{-| -}
-marginTop : SizeUnit -> Style -> Style
-marginTop size (Style style) =
-    Style { style | marginTop = Just <| Left size }
-
-
-{-| -}
-marginRight : SizeUnit -> Style -> Style
-marginRight size (Style style) =
-    Style { style | marginRight = Just <| Left size }
-
-
-marginRightAuto : Style -> Style
-marginRightAuto (Style style) =
-    Style { style | marginRight = Just <| Right Auto }
-
-
-{-| -}
-marginBottom : SizeUnit -> Style -> Style
-marginBottom size (Style style) =
-    Style { style | marginBottom = Just <| Left size }
-
-
-textTransform : TextCase -> Style -> Style
-textTransform val (Style style) =
-    Style { style | textTransform = Just val }
-
-
-{-| -}
-uppercase : Style -> Style
-uppercase =
-    textTransform TextCaseUppercase
-
-
-{-| -}
-lowercase : Style -> Style
-lowercase =
-    textTransform TextCaseLowercase
-
-
-{-| -}
-capitalize : Style -> Style
-capitalize =
-    textTransform TextCaseCapitalize
-
-
-{-| -}
-textColor : Color -> Style -> Style
-textColor value (Style style) =
-    Style { style | textColor = Just value }
-
-
-textDecoration : TextDecoration -> Style -> Style
-textDecoration val (Style style) =
-    Style { style | textDecoration = Just val }
-
-
-{-| -}
-textDecorationNone : Style -> Style
-textDecorationNone =
-    textDecoration TextDecorationNone
-
-
-{-| -}
-underline : Style -> Style
-underline =
-    textDecoration TextDecorationUnderline
-
-
-{-| -}
-lineThrough : Style -> Style
-lineThrough =
-    textDecoration TextDecorationLineThrough
-
-
-{-| -}
-bold : Style -> Style
-bold =
-    fontWeight 700
-
-
-{-| -}
-strong : Style -> Style
-strong =
-    bold
-
-
-lineHeightGeneric : Either SizeUnit Normal -> Style -> Style
-lineHeightGeneric val (Style style) =
-    Style { style | lineHeight = Just val }
-
-
-{-| -}
-lineHeight : SizeUnit -> Style -> Style
-lineHeight =
-    lineHeightGeneric << Left
-
-
-{-| -}
-lineHeightNormal : Style -> Style
-lineHeightNormal =
-    lineHeightGeneric <| Right Normal
-
-
-{-| -}
-fontWeightNormal : Style -> Style
-fontWeightNormal =
-    fontWeight 400
-
-
-{-| -}
-fontWeight : Int -> Style -> Style
-fontWeight val (Style style) =
-    Style { style | fontWeight = Just val }
-
-
-fontStyle : FontTilt -> Style -> Style
-fontStyle val (Style style) =
-    Style { style | fontStyle = Just val }
-
-
-{-| -}
-fontStyleNormal : Style -> Style
-fontStyleNormal =
-    fontStyle FontTiltNormal
-
-
-{-| -}
-fontStyleItalic : Style -> Style
-fontStyleItalic =
-    fontStyle FontTiltItalic
-
-
-{-| -}
-fontSize : SizeUnit -> Style -> Style
-fontSize val (Style style) =
-    Style { style | fontSize = Just val }
+-- position : Position -> Style -> Style
+-- position value (Style style) =
+--     Style { style | position = Just value }
+-- {-| -}
+-- positionAbsolute : Style -> Style
+-- positionAbsolute =
+--     position PositionAbsolute
+--
+--
+-- {-| -}
+-- positionSticky : Style -> Style
+-- positionSticky =
+--     position PositionSticky
+--
+--
+-- {-| -}
+-- positionRelative : Style -> Style
+-- positionRelative =
+--     position PositionRelative
+--
+--
+-- {-| -}
+-- positionFixed : Style -> Style
+-- positionFixed =
+--     position PositionFixed
+--
+--
+-- {-| -}
+-- positionStatic : Style -> Style
+-- positionStatic =
+--     position PositionStatic
+--
+-- {-| -}
+-- left : SizeUnit -> Style -> Style
+-- left value (Style style) =
+--     Style { style | left = Just value }
+--
+--
+-- {-| -}
+-- right : SizeUnit -> Style -> Style
+-- right value (Style style) =
+--     Style { style | right = Just value }
+--
+--
+-- {-| -}
+-- top : SizeUnit -> Style -> Style
+-- top value (Style style) =
+--     Style { style | top = Just value }
+--
+--
+-- {-| -}
+-- bottom : SizeUnit -> Style -> Style
+-- bottom value (Style style) =
+--     Style { style | bottom = Just value }
+-- {-| -}
+-- absolutelyPositionned : Vector Float -> Style -> Style
+-- absolutelyPositionned ( x, y ) =
+--     [ position PositionAbsolute
+--     , left <| Px <| Basics.round <| x
+--     , right <| Px <| Basics.round <| x
+--     ]
+--         |> compose
+-- {-| -}
+-- verticalAlignMiddle : Style -> Style
+-- verticalAlignMiddle (Style style) =
+--     Style { style | verticalAlign = Just "middle" }
+--
+--
+-- alignItems : Align -> Style -> Style
+-- alignItems value (Style style) =
+--     Style { style | alignItems = Just value }
+--
+--
+-- {-| -}
+-- alignItemsBaseline : Style -> Style
+-- alignItemsBaseline =
+--     alignItems AlignBaseline
+--
+--
+-- {-| -}
+-- alignItemsCenter : Style -> Style
+-- alignItemsCenter =
+--     alignItems AlignCenter
+--
+--
+-- {-| -}
+-- alignItemsFlexStart : Style -> Style
+-- alignItemsFlexStart =
+--     alignItems AlignFlexStart
+--
+--
+-- {-| -}
+-- alignItemsFlexEnd : Style -> Style
+-- alignItemsFlexEnd =
+--     alignItems AlignFlexEnd
+--
+--
+-- {-| -}
+-- alignItemsInherit : Style -> Style
+-- alignItemsInherit =
+--     alignItems AlignInherit
+--
+--
+-- {-| -}
+-- alignItemsInitial : Style -> Style
+-- alignItemsInitial =
+--     alignItems AlignInitial
+--
+--
+-- {-| -}
+-- alignItemsStretch : Style -> Style
+-- alignItemsStretch =
+--     alignItems AlignStretch
+--
+--
+-- alignSelf : Align -> Style -> Style
+-- alignSelf value (Style style) =
+--     Style { style | alignSelf = Just value }
+--
+--
+-- {-| -}
+-- alignSelfCenter : Style -> Style
+-- alignSelfCenter =
+--     alignSelf AlignCenter
+--
+--
+-- {-| -}
+-- padding : SizeUnit -> Style -> Style
+-- padding size =
+--     paddingHorizontal size << paddingVertical size
+--
+--
+-- {-| -}
+-- paddingHorizontal : SizeUnit -> Style -> Style
+-- paddingHorizontal size =
+--     paddingLeft size << paddingRight size
+--
+--
+-- {-| -}
+-- paddingVertical : SizeUnit -> Style -> Style
+-- paddingVertical size =
+--     paddingBottom size << paddingTop size
+--
+--
+-- {-| -}
+-- paddingLeft : SizeUnit -> Style -> Style
+-- paddingLeft size (Style style) =
+--     Style { style | paddingLeft = Just size }
+--
+--
+-- {-| -}
+-- paddingTop : SizeUnit -> Style -> Style
+-- paddingTop size (Style style) =
+--     Style { style | paddingTop = Just size }
+--
+--
+-- {-| -}
+-- paddingRight : SizeUnit -> Style -> Style
+-- paddingRight size (Style style) =
+--     Style { style | paddingRight = Just size }
+--
+--
+-- {-| -}
+-- paddingBottom : SizeUnit -> Style -> Style
+-- paddingBottom size (Style style) =
+--     Style { style | paddingBottom = Just size }
+--
+--
+-- {-| -}
+-- margin : SizeUnit -> Style -> Style
+-- margin size =
+--     marginHorizontal size << marginVertical size
+--
+--
+-- {-| -}
+-- marginAuto : Style -> Style
+-- marginAuto =
+--     marginHorizontalAuto
+--
+--
+-- {-| -}
+-- marginHorizontal : SizeUnit -> Style -> Style
+-- marginHorizontal size =
+--     marginLeft size << marginRight size
+--
+--
+-- marginHorizontalAuto : Style -> Style
+-- marginHorizontalAuto =
+--     marginLeftAuto << marginRightAuto
+--
+--
+-- {-| -}
+-- marginVertical : SizeUnit -> Style -> Style
+-- marginVertical size =
+--     marginBottom size << marginTop size
+--
+--
+-- {-| -}
+-- marginLeft : SizeUnit -> Style -> Style
+-- marginLeft size (Style style) =
+--     Style { style | marginLeft = Just <| Left size }
+--
+--
+-- marginLeftAuto : Style -> Style
+-- marginLeftAuto (Style style) =
+--     Style { style | marginLeft = Just <| Right Auto }
+--
+--
+-- {-| -}
+-- marginTop : SizeUnit -> Style -> Style
+-- marginTop size (Style style) =
+--     Style { style | marginTop = Just <| Left size }
+--
+--
+-- {-| -}
+-- marginRight : SizeUnit -> Style -> Style
+-- marginRight size (Style style) =
+--     Style { style | marginRight = Just <| Left size }
+--
+--
+-- marginRightAuto : Style -> Style
+-- marginRightAuto (Style style) =
+--     Style { style | marginRight = Just <| Right Auto }
+--
+--
+-- {-| -}
+-- marginBottom : SizeUnit -> Style -> Style
+-- marginBottom size (Style style) =
+--     Style { style | marginBottom = Just <| Left size }
+--
+--
+-- textTransform : Capitalization -> Style -> Style
+-- textTransform val (Style style) =
+--     Style { style | textTransform = Just val }
+--
+--
+-- {-| -}
+-- uppercase : Style -> Style
+-- uppercase =
+--     textTransform CapitalizationUppercase
+--
+--
+-- {-| -}
+-- lowercase : Style -> Style
+-- lowercase =
+--     textTransform CapitalizationLowercase
+--
+--
+-- {-| -}
+-- capitalize : Style -> Style
+-- capitalize =
+--     textTransform CapitalizationCapitalize
+--
+--
+-- {-| -}
+-- textColor : Color -> Style -> Style
+-- textColor value (Style style) =
+--     Style { style | textColor = Just value }
+--
+--
+-- textDecoration : TextDecoration -> Style -> Style
+-- textDecoration val (Style style) =
+--     Style { style | textDecoration = Just val }
+--
+--
+-- {-| -}
+-- textDecorationNone : Style -> Style
+-- textDecorationNone =
+--     textDecoration TextDecorationNone
+--
+--
+-- {-| -}
+-- underline : Style -> Style
+-- underline =
+--     textDecoration TextDecorationUnderline
+--
+--
+-- {-| -}
+-- lineThrough : Style -> Style
+-- lineThrough =
+--     textDecoration TextDecorationLineThrough
+--
+--
+-- {-| -}
+-- bold : Style -> Style
+-- bold =
+--     fontWeight 700
+--
+--
+-- {-| -}
+-- strong : Style -> Style
+-- strong =
+--     bold
+--
+--
+-- lineHeightGeneric : Either SizeUnit Normal -> Style -> Style
+-- lineHeightGeneric val (Style style) =
+--     Style { style | lineHeight = Just val }
+--
+--
+-- {-| -}
+-- lineHeight : SizeUnit -> Style -> Style
+-- lineHeight =
+--     lineHeightGeneric << Left
+--
+--
+-- {-| -}
+-- lineHeightNormal : Style -> Style
+-- lineHeightNormal =
+--     lineHeightGeneric <| Right Normal
+--
+--
+-- {-| -}
+-- fontWeightNormal : Style -> Style
+-- fontWeightNormal =
+--     fontWeight 400
+--
+--
+-- {-| -}
+-- fontWeight : Int -> Style -> Style
+-- fontWeight val (Style style) =
+--     Style { style | fontWeight = Just val }
+--
+--
+-- fontStyle : FontTilt -> Style -> Style
+-- fontStyle val (Style style) =
+--     Style { style | fontStyle = Just val }
+--
+--
+-- {-| -}
+-- fontStyleNormal : Style -> Style
+-- fontStyleNormal =
+--     fontStyle FontTiltNormal
+--
+--
+-- {-| -}
+-- fontStyleItalic : Style -> Style
+-- fontStyleItalic =
+--     fontStyle FontTiltItalic
+--
+--
+-- {-| -}
+-- fontSize : SizeUnit -> Style -> Style
+-- fontSize val (Style style) =
+--     Style { style | fontSize = Just val }
+--
+--
+-- {-| helper function to create a heading
+-- -}
+-- heading : SizeUnit -> Style -> Style
+-- heading val =
+--     [ margin zero
+--     , marginBottom (Rem 0.5)
+--     , fontWeight 600
+--     , fontSize val
+--     ]
+--         |> compose
+-- {-| helper function to create a h1 style
+-- -}
+-- h1S : Style -> Style
+-- h1S =
+--     heading alpha
+--
+--
+-- {-| helper function to create a h2 style
+-- -}
+-- h2S : Style -> Style
+-- h2S =
+--     heading beta
+--
+--
+-- {-| helper function to create a h3 style
+-- -}
+-- h3S : Style -> Style
+-- h3S =
+--     heading gamma
+--
+--
+-- {-| helper function to create a h4 style
+-- -}
+-- h4S : Style -> Style
+-- h4S =
+--     heading delta
+--
+--
+-- {-| helper function to create a h5 style
+-- -}
+-- h5S : Style -> Style
+-- h5S =
+--     heading epsilon
+--
+--
+-- {-| helper function to create a h6 style
+-- -}
+-- h6S : Style -> Style
+-- h6S =
+--     heading zeta
 
 
 {-| -}
 alpha : SizeUnit
 alpha =
     Rem 2.5
-
-
-{-| helper function to create a heading
--}
-heading : SizeUnit -> Style -> Style
-heading val =
-    [ margin zero
-    , marginBottom (Rem 0.5)
-    , fontWeight 600
-    , fontSize val
-    ]
-        |> compose
-
-
-{-| helper function to create a h1 style
--}
-h1S : Style -> Style
-h1S =
-    heading alpha
-
-
-{-| helper function to create a h2 style
--}
-h2S : Style -> Style
-h2S =
-    heading beta
-
-
-{-| helper function to create a h3 style
--}
-h3S : Style -> Style
-h3S =
-    heading gamma
-
-
-{-| helper function to create a h4 style
--}
-h4S : Style -> Style
-h4S =
-    heading delta
-
-
-{-| helper function to create a h5 style
--}
-h5S : Style -> Style
-h5S =
-    heading epsilon
-
-
-{-| helper function to create a h6 style
--}
-h6S : Style -> Style
-h6S =
-    heading zeta
 
 
 {-| -}
@@ -2095,371 +2408,370 @@ kappa =
     Em 0.125
 
 
-textAlign : TextAlign -> Style -> Style
-textAlign val (Style style) =
-    Style { style | textAlign = Just val }
 
-
-{-| -}
-textCenter : Style -> Style
-textCenter =
-    textAlign TextAlignCenter
-
-
-{-| -}
-textRight : Style -> Style
-textRight =
-    textAlign TextAlignRight
-
-
-{-| -}
-textLeft : Style -> Style
-textLeft =
-    textAlign TextAlignLeft
-
-
-{-| -}
-textJustify : Style -> Style
-textJustify =
-    textAlign TextAlignJustify
-
-
-whiteSpace : WhiteSpace -> Style -> Style
-whiteSpace value (Style style) =
-    Style { style | whiteSpace = Just value }
-
-
-{-| -}
-whiteSpaceNoWrap : Style -> Style
-whiteSpaceNoWrap =
-    whiteSpace WhiteSpaceNoWrap
-
-
-textOverflow : TextOverflow -> Style -> Style
-textOverflow value (Style style) =
-    Style { style | textOverflow = Just value }
-
-
-{-| -}
-textOverflowEllipsis : Style -> Style
-textOverflowEllipsis =
-    textOverflow TextOverflowEllipsis
-
-
-{-| -}
-backgroundColor : Color -> Style -> Style
-backgroundColor color (Style style) =
-    Style { style | backgroundColor = Just color }
-
-
-{-| Add multiple background images to the styles
--}
-backgroundImages : List BackgroundImage -> Style -> Style
-backgroundImages backgroundImages (Style style) =
-    Style { style | backgroundImages = backgroundImages }
-
-
-{-| Add a background image to the styles
--}
-backgroundImage : BackgroundImage -> Style -> Style
-backgroundImage backgroundImage (Style style) =
-    Style { style | backgroundImages = [ backgroundImage ] }
-
-
-{-| Remove the border
--}
-borderNone : Style -> Style
-borderNone =
-    borderWidth 0
-
-
-{-| -}
-borderColor : Color -> Style -> Style
-borderColor color =
-    borderBottomColor color
-        << borderLeftColor color
-        << borderTopColor color
-        << borderRightColor color
-
-
-{-| -}
-borderSolid : Style -> Style
-borderSolid =
-    borderBottomSolid
-        << borderLeftSolid
-        << borderTopSolid
-        << borderRightSolid
-
-
-{-| -}
-borderDashed : Style -> Style
-borderDashed =
-    borderBottomDashed
-        << borderLeftDashed
-        << borderTopDashed
-        << borderRightDashed
-
-
-{-| -}
-borderWidth : Int -> Style -> Style
-borderWidth size =
-    borderBottomWidth size
-        << borderLeftWidth size
-        << borderTopWidth size
-        << borderRightWidth size
-
-
-{-| -}
-borderBottomColor : Color -> Style -> Style
-borderBottomColor color (Style style) =
-    Style { style | borderBottomColor = Just color }
-
-
-{-| -}
-borderBottomStyle : Border -> Style -> Style
-borderBottomStyle style_ (Style style) =
-    Style { style | borderBottomStyle = Just style_ }
-
-
-{-| -}
-borderBottomSolid : Style -> Style
-borderBottomSolid =
-    borderBottomStyle BorderSolid
-
-
-{-| -}
-borderBottomDashed : Style -> Style
-borderBottomDashed =
-    borderBottomStyle BorderDashed
-
-
-{-| -}
-borderBottomWidth : Int -> Style -> Style
-borderBottomWidth size_ (Style style) =
-    Style { style | borderBottomWidth = Just (Px size_) }
-
-
-{-| -}
-borderLeftColor : Color -> Style -> Style
-borderLeftColor color (Style style) =
-    Style { style | borderLeftColor = Just color }
-
-
-{-| -}
-borderLeftStyle : Border -> Style -> Style
-borderLeftStyle style_ (Style style) =
-    Style { style | borderLeftStyle = Just style_ }
-
-
-{-| -}
-borderLeftSolid : Style -> Style
-borderLeftSolid =
-    borderLeftStyle BorderSolid
-
-
-{-| -}
-borderLeftDashed : Style -> Style
-borderLeftDashed =
-    borderLeftStyle BorderDashed
-
-
-{-| -}
-borderLeftWidth : Int -> Style -> Style
-borderLeftWidth size_ (Style style) =
-    Style { style | borderLeftWidth = Just (Px size_) }
-
-
-{-| -}
-borderTopColor : Color -> Style -> Style
-borderTopColor color (Style style) =
-    Style { style | borderTopColor = Just color }
-
-
-{-| -}
-borderTopStyle : Border -> Style -> Style
-borderTopStyle style_ (Style style) =
-    Style { style | borderTopStyle = Just style_ }
-
-
-{-| -}
-borderTopSolid : Style -> Style
-borderTopSolid =
-    borderTopStyle BorderSolid
-
-
-{-| -}
-borderTopDashed : Style -> Style
-borderTopDashed =
-    borderTopStyle BorderDashed
-
-
-{-| -}
-borderTopWidth : Int -> Style -> Style
-borderTopWidth size_ (Style style) =
-    Style { style | borderTopWidth = Just (Px size_) }
-
-
-{-| -}
-borderRightColor : Color -> Style -> Style
-borderRightColor color (Style style) =
-    Style { style | borderRightColor = Just color }
-
-
-{-| -}
-borderRightStyle : Border -> Style -> Style
-borderRightStyle style_ (Style style) =
-    Style { style | borderRightStyle = Just style_ }
-
-
-{-| -}
-borderRightSolid : Style -> Style
-borderRightSolid =
-    borderRightStyle BorderSolid
-
-
-{-| -}
-borderRightDashed : Style -> Style
-borderRightDashed =
-    borderRightStyle BorderDashed
-
-
-{-| -}
-borderRightWidth : Int -> Style -> Style
-borderRightWidth size_ (Style style) =
-    Style { style | borderRightWidth = Just (Px size_) }
-
-
-{-| -}
-borderBottomLeftRadius : Int -> Style -> Style
-borderBottomLeftRadius size_ (Style style) =
-    Style { style | borderBottomLeftRadius = Just (Px size_) }
-
-
-{-| -}
-borderBottomRightRadius : Int -> Style -> Style
-borderBottomRightRadius size_ (Style style) =
-    Style { style | borderBottomRightRadius = Just (Px size_) }
-
-
-{-| -}
-borderTopLeftRadius : Int -> Style -> Style
-borderTopLeftRadius size_ (Style style) =
-    Style { style | borderTopLeftRadius = Just (Px size_) }
-
-
-{-| -}
-borderTopRightRadius : Int -> Style -> Style
-borderTopRightRadius size_ (Style style) =
-    Style { style | borderTopRightRadius = Just (Px size_) }
-
-
-{-| -}
-borderRadius : Int -> Style -> Style
-borderRadius size_ =
-    [ borderTopRightRadius size_
-    , borderTopLeftRadius size_
-    , borderBottomLeftRadius size_
-    , borderBottomRightRadius size_
-    ]
-        |> compose
-
-
-{-| Set both text and border in same color.
--}
-borderAndTextColor : Color -> Style -> Style
-borderAndTextColor val =
-    borderColor val << textColor val
-
-
-{-| -}
-outlineColor : Color -> Style -> Style
-outlineColor val (Style style) =
-    Style { style | outlineColor = Just val }
-
-
-outlineStyle : Border -> Style -> Style
-outlineStyle val (Style style) =
-    Style { style | outlineStyle = Just val }
-
-
-{-| -}
-outlineStyleSolid : Style -> Style
-outlineStyleSolid =
-    outlineStyle BorderSolid
-
-
-{-| -}
-outlineStyleDashed : Style -> Style
-outlineStyleDashed =
-    outlineStyle BorderDashed
-
-
-{-| -}
-outlineWidth : Int -> Style -> Style
-outlineWidth val (Style style) =
-    Style { style | outlineWidth = Just (Px val) }
-
-
-{-| -}
-outlineNone : Style -> Style
-outlineNone =
-    outlineWidth 0
-
-
-standardBoxShadow : Maybe SizeUnit -> Maybe Color -> Offset -> BoxShadow
-standardBoxShadow =
-    BoxShadow False Nothing
-
-
-{-| Set the box shadow
--}
-boxShadow : BoxShadow -> Style -> Style
-boxShadow val (Style style) =
-    Style { style | boxShadow = Just val }
-
-
-{-| Create a plain box shadow
--}
-boxShadowPlain : Offset -> Color -> Style -> Style
-boxShadowPlain offset color =
-    boxShadow
-        (standardBoxShadow Nothing (Just color) offset)
-
-
-{-| Create a blurry box shadow
--}
-boxShadowBlurry : Offset -> SizeUnit -> Color -> Style -> Style
-boxShadowBlurry offset blurRadius color =
-    boxShadow
-        (standardBoxShadow (Just blurRadius) (Just color) offset)
-
-
-{-| Create a centered blurry box shadow
--}
-boxShadowCenteredBlurry : SizeUnit -> Color -> Style -> Style
-boxShadowCenteredBlurry =
-    boxShadowBlurry ( Px 0, Px 0 )
-
-
-display : Display -> Style -> Style
-display val (Style style) =
-    Style { style | display = Just val }
-
-
-
+-- textAlign : Alignment -> Style -> Style
+-- textAlign val (Style style) =
+--     Style { style | textAlign = Just val }
+--
+--
+-- {-| -}
+-- textCenter : Style -> Style
+-- textCenter =
+--     textAlign AlignmentCenter
+--
+--
+-- {-| -}
+-- textRight : Style -> Style
+-- textRight =
+--     textAlign AlignmentRight
+--
+--
+-- {-| -}
+-- textLeft : Style -> Style
+-- textLeft =
+--     textAlign AlignmentLeft
+--
+--
+-- {-| -}
+-- textJustify : Style -> Style
+-- textJustify =
+--     textAlign AlignmentJustify
+--
+--
+-- whiteSpace : WhiteSpace -> Style -> Style
+-- whiteSpace value (Style style) =
+--     Style { style | whiteSpace = Just value }
+--
+--
+-- {-| -}
+-- whiteSpaceNoWrap : Style -> Style
+-- whiteSpaceNoWrap =
+--     whiteSpace WhiteSpaceNoWrap
+--
+--
+
+
+textOverflow : TextOverflow -> BlockDetails -> BlockDetails
+textOverflow value blockAttributes =
+    { blockAttributes | textOverflow = Just value }
+
+
+dimensions : Modifiers Dimensions -> BlockDetails -> BlockDetails
+dimensions dimensionsModifiers blockAttributes =
+    { blockAttributes | dimensions = Just (defaultDimensions |> (dimensionsModifiers |> compose)) }
+
+
+
+--
+--
+-- {-| -}
+-- textOverflowEllipsis : Style -> Style
+-- textOverflowEllipsis =
+--     textOverflow TextOverflowEllipsis
+--
+--
+-- {-| -}
+-- backgroundColor : Color -> Style -> Style
+-- backgroundColor color (Style style) =
+--     Style { style | backgroundColor = Just color }
+--
+--
+-- {-| Add multiple background images to the styles
+-- -}
+-- backgroundImages : List BackgroundImage -> Style -> Style
+-- backgroundImages backgroundImages (Style style) =
+--     Style { style | backgroundImages = backgroundImages }
+--
+--
+-- {-| Add a background image to the styles
+-- -}
+-- backgroundImage : BackgroundImage -> Style -> Style
+-- backgroundImage backgroundImage (Style style) =
+--     Style { style | backgroundImages = [ backgroundImage ] }
+--
+--
+-- {-| Remove the border
+-- -}
+-- borderNone : Style -> Style
+-- borderNone =
+--     borderWidth 0
+--
+--
+-- {-| -}
+-- borderColor : Color -> Style -> Style
+-- borderColor color =
+--     borderBottomColor color
+--         << borderLeftColor color
+--         << borderTopColor color
+--         << borderRightColor color
+--
+--
+-- {-| -}
+-- borderSolid : Style -> Style
+-- borderSolid =
+--     borderBottomSolid
+--         << borderLeftSolid
+--         << borderTopSolid
+--         << borderRightSolid
+--
+--
+-- {-| -}
+-- borderDashed : Style -> Style
+-- borderDashed =
+--     borderBottomDashed
+--         << borderLeftDashed
+--         << borderTopDashed
+--         << borderRightDashed
+--
+--
+-- {-| -}
+-- borderWidth : Int -> Style -> Style
+-- borderWidth size =
+--     borderBottomWidth size
+--         << borderLeftWidth size
+--         << borderTopWidth size
+--         << borderRightWidth size
+--
+--
+-- {-| -}
+-- borderBottomColor : Color -> Style -> Style
+-- borderBottomColor color (Style style) =
+--     Style { style | borderBottomColor = Just color }
+--
+--
+-- {-| -}
+-- borderBottomStyle : Border -> Style -> Style
+-- borderBottomStyle style_ (Style style) =
+--     Style { style | borderBottomStyle = Just style_ }
+--
+--
+-- {-| -}
+-- borderBottomSolid : Style -> Style
+-- borderBottomSolid =
+--     borderBottomStyle BorderSolid
+--
+--
+-- {-| -}
+-- borderBottomDashed : Style -> Style
+-- borderBottomDashed =
+--     borderBottomStyle BorderDashed
+--
+--
+-- {-| -}
+-- borderBottomWidth : Int -> Style -> Style
+-- borderBottomWidth size_ (Style style) =
+--     Style { style | borderBottomWidth = Just (Px size_) }
+--
+--
+-- {-| -}
+-- borderLeftColor : Color -> Style -> Style
+-- borderLeftColor color (Style style) =
+--     Style { style | borderLeftColor = Just color }
+--
+--
+-- {-| -}
+-- borderLeftStyle : Border -> Style -> Style
+-- borderLeftStyle style_ (Style style) =
+--     Style { style | borderLeftStyle = Just style_ }
+--
+--
+-- {-| -}
+-- borderLeftSolid : Style -> Style
+-- borderLeftSolid =
+--     borderLeftStyle BorderSolid
+--
+--
+-- {-| -}
+-- borderLeftDashed : Style -> Style
+-- borderLeftDashed =
+--     borderLeftStyle BorderDashed
+--
+--
+-- {-| -}
+-- borderLeftWidth : Int -> Style -> Style
+-- borderLeftWidth size_ (Style style) =
+--     Style { style | borderLeftWidth = Just (Px size_) }
+--
+--
+-- {-| -}
+-- borderTopColor : Color -> Style -> Style
+-- borderTopColor color (Style style) =
+--     Style { style | borderTopColor = Just color }
+--
+--
+-- {-| -}
+-- borderTopStyle : Border -> Style -> Style
+-- borderTopStyle style_ (Style style) =
+--     Style { style | borderTopStyle = Just style_ }
+--
+--
+-- {-| -}
+-- borderTopSolid : Style -> Style
+-- borderTopSolid =
+--     borderTopStyle BorderSolid
+--
+--
+-- {-| -}
+-- borderTopDashed : Style -> Style
+-- borderTopDashed =
+--     borderTopStyle BorderDashed
+--
+--
+-- {-| -}
+-- borderTopWidth : Int -> Style -> Style
+-- borderTopWidth size_ (Style style) =
+--     Style { style | borderTopWidth = Just (Px size_) }
+--
+--
+-- {-| -}
+-- borderRightColor : Color -> Style -> Style
+-- borderRightColor color (Style style) =
+--     Style { style | borderRightColor = Just color }
+--
+--
+-- {-| -}
+-- borderRightStyle : Border -> Style -> Style
+-- borderRightStyle style_ (Style style) =
+--     Style { style | borderRightStyle = Just style_ }
+--
+--
+-- {-| -}
+-- borderRightSolid : Style -> Style
+-- borderRightSolid =
+--     borderRightStyle BorderSolid
+--
+--
+-- {-| -}
+-- borderRightDashed : Style -> Style
+-- borderRightDashed =
+--     borderRightStyle BorderDashed
+--
+--
+-- {-| -}
+-- borderRightWidth : Int -> Style -> Style
+-- borderRightWidth size_ (Style style) =
+--     Style { style | borderRightWidth = Just (Px size_) }
+--
+--
+-- {-| -}
+-- borderBottomLeftRadius : Int -> Style -> Style
+-- borderBottomLeftRadius size_ (Style style) =
+--     Style { style | borderBottomLeftRadius = Just (Px size_) }
+--
+--
+-- {-| -}
+-- borderBottomRightRadius : Int -> Style -> Style
+-- borderBottomRightRadius size_ (Style style) =
+--     Style { style | borderBottomRightRadius = Just (Px size_) }
+--
+--
+-- {-| -}
+-- borderTopLeftRadius : Int -> Style -> Style
+-- borderTopLeftRadius size_ (Style style) =
+--     Style { style | borderTopLeftRadius = Just (Px size_) }
+--
+--
+-- {-| -}
+-- borderTopRightRadius : Int -> Style -> Style
+-- borderTopRightRadius size_ (Style style) =
+--     Style { style | borderTopRightRadius = Just (Px size_) }
+--
+--
+-- {-| -}
+-- borderRadius : Int -> Style -> Style
+-- borderRadius size_ =
+--     [ borderTopRightRadius size_
+--     , borderTopLeftRadius size_
+--     , borderBottomLeftRadius size_
+--     , borderBottomRightRadius size_
+--     ]
+--         |> compose
+-- {-| Set both text and border in same color.
+-- -}
+-- borderAndTextColor : Color -> Style -> Style
+-- borderAndTextColor val =
+--     borderColor val << textColor val
+-- {-| -}
+-- outlineColor : Color -> Style -> Style
+-- outlineColor val (Style style) =
+--     Style { style | outlineColor = Just val }
+--
+--
+-- outlineStyle : Border -> Style -> Style
+-- outlineStyle val (Style style) =
+--     Style { style | outlineStyle = Just val }
+--
+--
+-- {-| -}
+-- outlineStyleSolid : Style -> Style
+-- outlineStyleSolid =
+--     outlineStyle BorderSolid
+--
+--
+-- {-| -}
+-- outlineStyleDashed : Style -> Style
+-- outlineStyleDashed =
+--     outlineStyle BorderDashed
+--
+--
+-- {-| -}
+-- outlineWidth : Int -> Style -> Style
+-- outlineWidth val (Style style) =
+--     Style { style | outlineWidth = Just (Px val) }
+--
+--
+-- {-| -}
+-- outlineNone : Style -> Style
+-- outlineNone =
+--     outlineWidth 0
+--
+--
+-- standardBoxShadow : Maybe SizeUnit -> Maybe Color -> Offset -> BoxShadow
+-- standardBoxShadow =
+--     BoxShadow False Nothing
+--
+--
+-- {-| Set the box shadow
+-- -}
+-- boxShadow : BoxShadow -> Style -> Style
+-- boxShadow val (Style style) =
+--     Style { style | boxShadow = Just val }
+--
+--
+-- {-| Create a plain box shadow
+-- -}
+-- boxShadowPlain : Offset -> Color -> Style -> Style
+-- boxShadowPlain offset color =
+--     boxShadow
+--         (standardBoxShadow Nothing (Just color) offset)
+--
+--
+-- {-| Create a blurry box shadow
+-- -}
+-- boxShadowBlurry : Offset -> SizeUnit -> Color -> Style -> Style
+-- boxShadowBlurry offset blurRadius color =
+--     boxShadow
+--         (standardBoxShadow (Just blurRadius) (Just color) offset)
+--
+--
+-- {-| Create a centered blurry box shadow
+-- -}
+-- boxShadowCenteredBlurry : SizeUnit -> Color -> Style -> Style
+-- boxShadowCenteredBlurry =
+--     boxShadowBlurry ( Px 0, Px 0 )
+--
+-- display : DisplayBox -> Style -> Style
+-- display val (Style style) =
+--     Style { style | display = Just val }
+--
 -- {-| -}
 -- displayInlineBlock : Style -> Style
 -- displayInlineBlock =
 --     display DisplayInlineBlock
-
-
-{-| -}
-displayBlock : Style -> Style
-displayBlock =
-    display DisplayBlock
-
-
-
+-- {-| -}
+-- displayBlock : Style -> Style
+-- displayBlock =
+--     display DisplayBlock
 -- {-| -}
 -- displayFlex : Style -> Style
 -- displayFlex =
@@ -2467,423 +2779,428 @@ displayBlock =
 -- displayInlineFlex : Style -> Style
 -- displayInlineFlex =
 --     display DisplayInlineFlex
+-- {-| -}
+-- displayInline : Style -> Style
+-- displayInline =
+--     display DisplayInline
+--
+--
+--
+--
+-- {-| -}
+-- flexGrow : Int -> Style -> Style
+-- flexGrow val (Style style) =
+--     Style { style | flexGrow = Just val }
+--
+--
+-- {-| -}
+-- flexShrink : Int -> Style -> Style
+-- flexShrink val (Style style) =
+--     Style { style | flexShrink = Just val }
+--
+--
+-- {-| -}
+-- flexBasisGeneric : Either SizeUnit Auto -> Style -> Style
+-- flexBasisGeneric val (Style style) =
+--     Style { style | flexBasis = Just val }
+--
+--
+-- {-| -}
+-- flexBasis : SizeUnit -> Style -> Style
+-- flexBasis =
+--     flexBasisGeneric << Left
+--
+--
+-- {-| -}
+-- flex : Int -> Style -> Style
+-- flex val =
+--     [ flexGrow val
+--     , flexShrink 1
+--     , flexBasis (Px 0)
+--     ]
+--         |> compose
+--
+--
+-- flexWrap : FlexWrap -> Style -> Style
+-- flexWrap val (Style style) =
+--     Style { style | flexWrap = Just val }
+--
+--
+-- {-| -}
+-- flexWrapWrap : Style -> Style
+-- flexWrapWrap =
+--     flexWrap FlexWrapWrap
+--
+--
+-- {-| -}
+-- flexWrapNoWrap : Style -> Style
+-- flexWrapNoWrap =
+--     flexWrap FlexWrapNoWrap
+--
+--
+-- flexDirection : FlexDirection -> Style -> Style
+-- flexDirection value (Style style) =
+--     Style { style | flexDirection = Just value }
+--
+--
+-- {-| -}
+-- flexDirectionColumn : Style -> Style
+-- flexDirectionColumn =
+--     flexDirection FlexDirectionColumn
+--
+--
+-- {-| -}
+-- flexDirectionRow : Style -> Style
+-- flexDirectionRow =
+--     flexDirection FlexDirectionRow
+--
+--
+-- {-| -}
+-- opacity : Float -> Style -> Style
+-- opacity val (Style style) =
+--     Style { style | opacity = Just val }
+--
+--
+-- {-| -}
+-- overflowX : Overflow -> Style -> Style
+-- overflowX val (Style style) =
+--     Style { style | overflowX = Just val }
+--
+--
+-- {-| -}
+-- overflowY : Overflow -> Style -> Style
+-- overflowY val (Style style) =
+--     Style { style | overflowY = Just val }
+--
+--
+-- overflow : Overflow -> Style -> Style
+-- overflow val =
+--     overflowX val << overflowY val
+--
+--
+-- {-| -}
+-- overflowAuto : Style -> Style
+-- overflowAuto =
+--     overflow OverflowAuto
+--
+--
+-- {-| -}
+-- overflowVisible : Style -> Style
+-- overflowVisible =
+--     overflow OverflowVisible
+--
+--
+-- {-| -}
+-- overflowHidden : Style -> Style
+-- overflowHidden =
+--     overflow OverflowHidden
+--
+--
+-- {-| -}
+-- overflowScroll : Style -> Style
+-- overflowScroll =
+--     overflow OverflowScroll
+--
+--
+-- {-| -}
+-- overflowXAuto : Style -> Style
+-- overflowXAuto =
+--     overflowX OverflowAuto
+--
+--
+-- {-| -}
+-- overflowXVisible : Style -> Style
+-- overflowXVisible =
+--     overflowX OverflowVisible
+--
+--
+-- {-| -}
+-- overflowXHidden : Style -> Style
+-- overflowXHidden =
+--     overflowX OverflowHidden
+--
+--
+-- {-| -}
+-- overflowXScroll : Style -> Style
+-- overflowXScroll =
+--     overflowX OverflowScroll
+--
+--
+-- {-| -}
+-- overflowYAuto : Style -> Style
+-- overflowYAuto =
+--     overflowY OverflowAuto
+--
+--
+-- {-| -}
+-- overflowYVisible : Style -> Style
+-- overflowYVisible =
+--     overflowY OverflowVisible
+--
+--
+-- {-| -}
+-- overflowYHidden : Style -> Style
+-- overflowYHidden =
+--     overflowY OverflowHidden
+--
+--
+-- {-| -}
+-- overflowYScroll : Style -> Style
+-- overflowYScroll =
+--     overflowY OverflowScroll
+--
+--
+-- listStyleType : ListStyleType -> Style -> Style
+-- listStyleType value (Style style) =
+--     Style { style | listStyleType = Just value }
+--
+--
+-- {-| -}
+-- listStyleNone : Style -> Style
+-- listStyleNone =
+--     listStyleType ListStyleTypeNone
+--
+--
+-- {-| -}
+-- listStyleDisc : Style -> Style
+-- listStyleDisc =
+--     listStyleType ListStyleTypeDisc
+--
+--
+-- {-| -}
+-- listStyleCircle : Style -> Style
+-- listStyleCircle =
+--     listStyleType ListStyleTypeCircle
+--
+--
+-- {-| -}
+-- listStyleSquare : Style -> Style
+-- listStyleSquare =
+--     listStyleType ListStyleTypeSquare
+--
+--
+-- {-| -}
+-- listStyleDecimal : Style -> Style
+-- listStyleDecimal =
+--     listStyleType ListStyleTypeDecimal
+--
+--
+-- {-| -}
+-- listStyleGeorgian : Style -> Style
+-- listStyleGeorgian =
+--     listStyleType ListStyleTypeGeorgian
+--
+--
+-- {-| -}
+-- round : Style -> Style
+-- round =
+--     roundCorner 300
+--
+--
+-- {-| -}
+-- roundCorner : Int -> Style -> Style
+-- roundCorner value =
+--     borderBottomLeftRadius value
+--         << borderBottomRightRadius value
+--         << borderTopLeftRadius value
+--         << borderTopRightRadius value
+--
+--
+-- justifyContent : JustifyContent -> Style -> Style
+-- justifyContent value (Style style) =
+--     Style { style | justifyContent = Just value }
+--
+--
+-- {-| -}
+-- justifyContentSpaceBetween : Style -> Style
+-- justifyContentSpaceBetween =
+--     justifyContent JustifyContentSpaceBetween
+--
+--
+-- {-| -}
+-- spaceBetween : Style -> Style
+-- spaceBetween =
+--     justifyContentSpaceBetween
+--
+--
+-- {-| -}
+-- justifyContentSpaceAround : Style -> Style
+-- justifyContentSpaceAround =
+--     justifyContent JustifyContentSpaceAround
+--
+--
+-- {-| -}
+-- spaceAround : Style -> Style
+-- spaceAround =
+--     justifyContentSpaceAround
+--
+--
+-- {-| -}
+-- justifyContentCenter : Style -> Style
+-- justifyContentCenter =
+--     justifyContent JustifyContentCenter
+--
+--
+-- {-| -}
+-- fontFamily : FontFamily -> Style -> Style
+-- fontFamily fontFamily (Style style) =
+--     Style { style | fontFamily = Just fontFamily }
+--
+--
+-- {-| -}
+-- fontFamilyInherit : Style -> Style
+-- fontFamilyInherit =
+--     fontFamily FontFamilyInherit
+--
+--
+-- {-| Standard Sans Serif font family.
+-- Inspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>
+-- -}
+-- fontFamilySansSerif : Style -> Style
+-- fontFamilySansSerif =
+--     fontFamily
+--         (FontFamilyCustom
+--             [ SystemFont "-apple-system"
+--             , SystemFont "system-ui"
+--             , SystemFont "BlinkMacSystemFont"
+--             , CustomFont "Segoe UI"
+--             , CustomFont "Roboto"
+--             , CustomFont "Helvetica Neue"
+--             , CustomFont "Arial"
+--             , SystemFont "sans-serif"
+--             ]
+--         )
+--
+--
 
 
 {-| -}
-displayInline : Style -> Style
-displayInline =
-    display DisplayInline
+width : SizeUnit -> Dimensions -> Dimensions
+width value ( x, y ) =
+    ( x |> setDimension value, y )
 
 
 {-| -}
-displayNone : Style -> Style
-displayNone =
-    display DisplayNone
-
-
-{-| -}
-flexGrow : Int -> Style -> Style
-flexGrow val (Style style) =
-    Style { style | flexGrow = Just val }
-
-
-{-| -}
-flexShrink : Int -> Style -> Style
-flexShrink val (Style style) =
-    Style { style | flexShrink = Just val }
-
-
-{-| -}
-flexBasisGeneric : Either SizeUnit Auto -> Style -> Style
-flexBasisGeneric val (Style style) =
-    Style { style | flexBasis = Just val }
-
-
-{-| -}
-flexBasis : SizeUnit -> Style -> Style
-flexBasis =
-    flexBasisGeneric << Left
-
-
-{-| -}
-flex : Int -> Style -> Style
-flex val =
-    [ flexGrow val
-    , flexShrink 1
-    , flexBasis (Px 0)
-    ]
-        |> compose
-
-
-flexWrap : FlexWrap -> Style -> Style
-flexWrap val (Style style) =
-    Style { style | flexWrap = Just val }
-
-
-{-| -}
-flexWrapWrap : Style -> Style
-flexWrapWrap =
-    flexWrap FlexWrapWrap
-
-
-{-| -}
-flexWrapNoWrap : Style -> Style
-flexWrapNoWrap =
-    flexWrap FlexWrapNoWrap
-
-
-flexDirection : FlexDirection -> Style -> Style
-flexDirection value (Style style) =
-    Style { style | flexDirection = Just value }
-
-
-{-| -}
-flexDirectionColumn : Style -> Style
-flexDirectionColumn =
-    flexDirection FlexDirectionColumn
-
-
-{-| -}
-flexDirectionRow : Style -> Style
-flexDirectionRow =
-    flexDirection FlexDirectionRow
-
-
-{-| -}
-opacity : Float -> Style -> Style
-opacity val (Style style) =
-    Style { style | opacity = Just val }
-
-
-{-| -}
-overflowX : Overflow -> Style -> Style
-overflowX val (Style style) =
-    Style { style | overflowX = Just val }
-
-
-{-| -}
-overflowY : Overflow -> Style -> Style
-overflowY val (Style style) =
-    Style { style | overflowY = Just val }
-
-
-overflow : Overflow -> Style -> Style
-overflow val =
-    overflowX val << overflowY val
-
-
-{-| -}
-overflowAuto : Style -> Style
-overflowAuto =
-    overflow OverflowAuto
-
-
-{-| -}
-overflowVisible : Style -> Style
-overflowVisible =
-    overflow OverflowVisible
-
-
-{-| -}
-overflowHidden : Style -> Style
-overflowHidden =
-    overflow OverflowHidden
-
-
-{-| -}
-overflowScroll : Style -> Style
-overflowScroll =
-    overflow OverflowScroll
-
-
-{-| -}
-overflowXAuto : Style -> Style
-overflowXAuto =
-    overflowX OverflowAuto
-
-
-{-| -}
-overflowXVisible : Style -> Style
-overflowXVisible =
-    overflowX OverflowVisible
-
-
-{-| -}
-overflowXHidden : Style -> Style
-overflowXHidden =
-    overflowX OverflowHidden
-
-
-{-| -}
-overflowXScroll : Style -> Style
-overflowXScroll =
-    overflowX OverflowScroll
-
-
-{-| -}
-overflowYAuto : Style -> Style
-overflowYAuto =
-    overflowY OverflowAuto
-
-
-{-| -}
-overflowYVisible : Style -> Style
-overflowYVisible =
-    overflowY OverflowVisible
-
-
-{-| -}
-overflowYHidden : Style -> Style
-overflowYHidden =
-    overflowY OverflowHidden
-
-
-{-| -}
-overflowYScroll : Style -> Style
-overflowYScroll =
-    overflowY OverflowScroll
-
-
-listStyleType : ListStyleType -> Style -> Style
-listStyleType value (Style style) =
-    Style { style | listStyleType = Just value }
-
-
-{-| -}
-listStyleNone : Style -> Style
-listStyleNone =
-    listStyleType ListStyleTypeNone
-
-
-{-| -}
-listStyleDisc : Style -> Style
-listStyleDisc =
-    listStyleType ListStyleTypeDisc
-
-
-{-| -}
-listStyleCircle : Style -> Style
-listStyleCircle =
-    listStyleType ListStyleTypeCircle
-
-
-{-| -}
-listStyleSquare : Style -> Style
-listStyleSquare =
-    listStyleType ListStyleTypeSquare
-
-
-{-| -}
-listStyleDecimal : Style -> Style
-listStyleDecimal =
-    listStyleType ListStyleTypeDecimal
-
-
-{-| -}
-listStyleGeorgian : Style -> Style
-listStyleGeorgian =
-    listStyleType ListStyleTypeGeorgian
-
-
-{-| -}
-round : Style -> Style
-round =
-    roundCorner 300
-
-
-{-| -}
-roundCorner : Int -> Style -> Style
-roundCorner value =
-    borderBottomLeftRadius value
-        << borderBottomRightRadius value
-        << borderTopLeftRadius value
-        << borderTopRightRadius value
-
-
-justifyContent : JustifyContent -> Style -> Style
-justifyContent value (Style style) =
-    Style { style | justifyContent = Just value }
-
-
-{-| -}
-justifyContentSpaceBetween : Style -> Style
-justifyContentSpaceBetween =
-    justifyContent JustifyContentSpaceBetween
-
-
-{-| -}
-spaceBetween : Style -> Style
-spaceBetween =
-    justifyContentSpaceBetween
-
-
-{-| -}
-justifyContentSpaceAround : Style -> Style
-justifyContentSpaceAround =
-    justifyContent JustifyContentSpaceAround
-
-
-{-| -}
-spaceAround : Style -> Style
-spaceAround =
-    justifyContentSpaceAround
-
-
-{-| -}
-justifyContentCenter : Style -> Style
-justifyContentCenter =
-    justifyContent JustifyContentCenter
-
-
-{-| -}
-fontFamily : FontFamily -> Style -> Style
-fontFamily fontFamily (Style style) =
-    Style { style | fontFamily = Just fontFamily }
-
-
-{-| -}
-fontFamilyInherit : Style -> Style
-fontFamilyInherit =
-    fontFamily FontFamilyInherit
-
-
-{-| Standard Sans Serif font family.
-Inspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>
--}
-fontFamilySansSerif : Style -> Style
-fontFamilySansSerif =
-    fontFamily
-        (FontFamilyCustom
-            [ SystemFont "-apple-system"
-            , SystemFont "system-ui"
-            , SystemFont "BlinkMacSystemFont"
-            , CustomFont "Segoe UI"
-            , CustomFont "Roboto"
-            , CustomFont "Helvetica Neue"
-            , CustomFont "Arial"
-            , SystemFont "sans-serif"
-            ]
-        )
-
-
-{-| -}
-width : SizeUnit -> Style -> Style
-width value (Style style) =
-    Style { style | width = Just value }
-
-
-{-| -}
-widthPercent : Float -> Style -> Style
-widthPercent =
-    width << Percent
-
-
-{-| -}
-fullWidth : Style -> Style
-fullWidth =
-    widthPercent 100
-
-
-{-| -}
-maxWidth : SizeUnit -> Style -> Style
-maxWidth value (Style style) =
-    Style { style | maxWidth = Just value }
-
-
-{-| -}
-minWidth : SizeUnit -> Style -> Style
-minWidth value (Style style) =
-    Style { style | minWidth = Just value }
-
-
-{-| -}
-height : SizeUnit -> Style -> Style
-height value (Style style) =
-    Style { style | height = Just value }
-
-
-{-| -}
-maxHeight : SizeUnit -> Style -> Style
-maxHeight value (Style style) =
-    Style { style | maxHeight = Just value }
-
-
-{-| -}
-minHeight : SizeUnit -> Style -> Style
-minHeight value (Style style) =
-    Style { style | minHeight = Just value }
-
-
-{-| -}
-heightPercent : Float -> Style -> Style
-heightPercent =
-    height << Percent
-
-
-{-| -}
-fullHeight : Style -> Style
-fullHeight =
-    heightPercent 100
-
-
-{-| -}
-fullViewportHeight : Style -> Style
-fullViewportHeight =
-    height (Vh 100)
-
-
-{-| -}
-zIndex : Int -> Style -> Style
-zIndex value (Style style) =
-    Style { style | zIndex = Just value }
-
-
-cursor : String -> Style -> Style
-cursor value (Style style) =
-    Style { style | cursor = Just value }
-
-
-{-| -}
-cursorPointer : Style -> Style
-cursorPointer =
-    cursor "pointer"
-
-
-visibility : Visibility -> Style -> Style
-visibility value (Style style) =
-    Style { style | visibility = Just value }
-
-
-{-| -}
-visibilityHidden : Style -> Style
-visibilityHidden =
-    visibility VisibilityHidden
-
-
-{-| -}
-transparent : Color
-transparent =
-    Color.rgba 0 0 0 0.0
-
-
-userSelect : UserSelect -> Style -> Style
-userSelect val (Style style) =
-    Style { style | userSelect = Just val }
-
-
-{-| -}
-userSelectNone : Style -> Style
-userSelectNone =
-    userSelect UserSelectNone
-
-
-{-| -}
-userSelectAll : Style -> Style
-userSelectAll =
-    userSelect UserSelectAll
-
-
-
+height : SizeUnit -> Dimensions -> Dimensions
+height value ( x, y ) =
+    ( x, y |> setDimension value )
+
+
+setDimension : SizeUnit -> DimensionAxis -> DimensionAxis
+setDimension value dimensionAxis =
+    { dimensionAxis | dimension = Just value }
+
+
+
+--
+--
+-- {-| -}
+-- widthPercent : Float -> Style -> Style
+-- widthPercent =
+--     width << Percent
+--
+--
+-- {-| -}
+-- fullWidth : Style -> Style
+-- fullWidth =
+--     widthPercent 100
+--
+--
+-- {-| -}
+-- maxWidth : SizeUnit -> Style -> Style
+-- maxWidth value (Style style) =
+--     Style { style | maxWidth = Just value }
+--
+--
+-- {-| -}
+-- minWidth : SizeUnit -> Style -> Style
+-- minWidth value (Style style) =
+--     Style { style | minWidth = Just value }
+--
+--
+-- {-| -}
+-- height : SizeUnit -> Style -> Style
+-- height value (Style style) =
+--     Style { style | height = Just value }
+--
+--
+-- {-| -}
+-- maxHeight : SizeUnit -> Style -> Style
+-- maxHeight value (Style style) =
+--     Style { style | maxHeight = Just value }
+--
+--
+-- {-| -}
+-- minHeight : SizeUnit -> Style -> Style
+-- minHeight value (Style style) =
+--     Style { style | minHeight = Just value }
+--
+--
+-- {-| -}
+-- heightPercent : Float -> Style -> Style
+-- heightPercent =
+--     height << Percent
+--
+--
+-- {-| -}
+-- fullHeight : Style -> Style
+-- fullHeight =
+--     heightPercent 100
+--
+--
+-- {-| -}
+-- fullViewportHeight : Style -> Style
+-- fullViewportHeight =
+--     height (Vh 100)
+--
+--
+-- {-| -}
+-- zIndex : Int -> Style -> Style
+-- zIndex value (Style style) =
+--     Style { style | zIndex = Just value }
+--
+--
+-- cursor : String -> Style -> Style
+-- cursor value (Style style) =
+--     Style { style | cursor = Just value }
+-- {-| -}
+-- cursorPointer : Style -> Style
+-- cursorPointer =
+--     cursor "pointer"
+--
+--
+-- visibility : Visibility -> Style -> Style
+-- visibility value (Style style) =
+--     Style { style | visibility = Just value }
+--
+--
+-- {-| -}
+-- visibilityHidden : Style -> Style
+-- visibilityHidden =
+--     visibility VisibilityHidden
+--
+--
+-- {-| -}
+-- transparent : Color
+-- transparent =
+--     Color.rgba 0 0 0 0.0
+--
+--
+-- userSelect : UserSelect -> Style -> Style
+-- userSelect val (Style style) =
+--     Style { style | userSelect = Just val }
+--
+--
+-- {-| -}
+-- userSelectNone : Style -> Style
+-- userSelectNone =
+--     userSelect UserSelectNone
+--
+--
+-- {-| -}
+-- userSelectAll : Style -> Style
+-- userSelectAll =
+--     userSelect UserSelectAll
 {-
     ███████    ███████    ███████
    ████████   ████████   ████████
