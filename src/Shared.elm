@@ -2,6 +2,8 @@ module Shared exposing (..)
 
 {-| -}
 
+import Function
+
 
 type SizeUnit
     = Px Int
@@ -62,3 +64,13 @@ unwrapToCouples getter function aMaybe =
         |> getter
         |> Maybe.map function
         |> Maybe.withDefault []
+
+
+getModifyAndSet : (b -> Maybe a) -> (b -> Maybe a -> c) -> a -> List (a -> a) -> b -> c
+getModifyAndSet getter setterIn default modifiers record =
+    record
+        |> getter
+        |> Maybe.withDefault default
+        |> Function.compose modifiers
+        |> Just
+        |> setterIn record

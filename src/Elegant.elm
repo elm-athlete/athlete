@@ -291,6 +291,8 @@ import Shared exposing (..)
 import Typography
 import BoxShadow
 import Either exposing (Either(..))
+import Surrounded exposing (Surrounded)
+import Border
 
 
 type alias SizeUnit =
@@ -551,32 +553,8 @@ type Visibility
     = VisibilityHidden
 
 
-type Border
-    = BorderSolid
-    | BorderDashed
-
-
 type TextOverflow
     = TextOverflowEllipsis
-
-
-type alias SideBorder =
-    { color : Maybe Color
-    , width : Maybe SizeUnit
-    , style : Maybe Border
-    }
-
-
-type alias Surrounded surroundType =
-    { top : Maybe surroundType
-    , right : Maybe surroundType
-    , bottom : Maybe surroundType
-    , left : Maybe surroundType
-    }
-
-
-type alias CompleteBorder =
-    Surrounded SideBorder
 
 
 type alias MarginValue =
@@ -628,7 +606,7 @@ type Position
 
 
 type alias Outline =
-    Border
+    Border.Border
 
 
 {-| -}
@@ -652,7 +630,7 @@ type alias Layout =
     , visibility : Maybe Visibility
     , typography : Maybe Typography.Typography
     , padding : Maybe Padding
-    , border : Maybe CompleteBorder
+    , border : Maybe (Surrounded Border.Border)
     , radius : Maybe BorderRadius
     , margin : Maybe Margin
     , outline : Maybe Outline
@@ -662,6 +640,11 @@ type alias Layout =
     , cursor : Maybe String
     , zIndex : Maybe Int
     }
+
+
+border : Modifiers (Surrounded Border.Border) -> Modifier Layout
+border =
+    getModifyAndSet .border setBorderIn Surrounded.default
 
 
 {-| -}
@@ -1354,19 +1337,6 @@ visibilityToString val =
     case val of
         VisibilityHidden ->
             "hidden"
-
-
-borderToString : Maybe Border -> Maybe String
-borderToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                BorderSolid ->
-                    "solid"
-
-                BorderDashed ->
-                    "dashed"
-        )
 
 
 maybeToString : Maybe a -> Maybe String
