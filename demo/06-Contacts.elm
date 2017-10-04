@@ -12,7 +12,19 @@ import BodyBuilder.Elements exposing (..)
 import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
 import Elegant.Elements exposing (borderBottom, pageCenter)
 import Color
-import Router exposing (..)
+import Router
+    exposing
+        ( History
+        , StandardHistoryMsg(Back)
+        , handleStandardHistory
+        , push
+        , pageWithDefaultTransition
+        , Page
+        , Transition
+        , historyView
+        , maybeTransitionSubscription
+        , initHistoryAndData
+        )
 import Finders exposing (..)
 import Dict exposing (Dict)
 import Dict.Extra as Dict

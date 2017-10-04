@@ -14,7 +14,19 @@ import Color
 import Date
 import Date exposing (Month(..))
 import Date.Extra as Date
-import Router exposing (..)
+import Router
+    exposing
+        ( History
+        , StandardHistoryMsg(Back)
+        , push
+        , pageWithDefaultTransition
+        , Page
+        , Transition
+        , historyView
+        , handleStandardHistory
+        , maybeTransitionSubscription
+        , initHistoryAndData
+        )
 import Finders exposing (..)
 
 
