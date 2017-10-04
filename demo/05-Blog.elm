@@ -1,10 +1,10 @@
 module Blog exposing (..)
 
 {-| This code is something I always dreamt of being able to code with only html
-    and styles. I thought it would have taken more time to create, but, in the
-    end I did it. Elm was the way to go after all.
-    It is heavily inspired by the way iOS works, but the code is original :)
-    I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
+and styles. I thought it would have taken more time to create, but, in the
+end I did it. Elm was the way to go after all.
+It is heavily inspired by the way iOS works, but the code is original :)
+I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 -}
 
 import BodyBuilder exposing (..)
@@ -14,7 +14,19 @@ import Color
 import Date
 import Date exposing (Month(..))
 import Date.Extra as Date
-import Router exposing (..)
+import Router
+    exposing
+        ( History
+        , StandardHistoryMsg(Back)
+        , push
+        , pageWithDefaultTransition
+        , Page
+        , Transition
+        , historyView
+        , handleStandardHistory
+        , maybeTransitionSubscription
+        , initHistoryAndData
+        )
 import Finders exposing (..)
 
 
