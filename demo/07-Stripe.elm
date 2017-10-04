@@ -5,7 +5,17 @@ import BodyBuilder.Elements
 import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
 import Elegant.Elements exposing (..)
 import Color
-import Router exposing (..)
+import Router
+    exposing
+        ( History
+        , StandardHistoryMsg
+        , Page
+        , Transition
+        , historyView
+        , handleStandardHistory
+        , maybeTransitionSubscription
+        , initHistoryAndData
+        )
 import Function exposing (compose)
 
 

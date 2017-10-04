@@ -8,7 +8,23 @@ import Date
 import Date exposing (Month(..))
 import Time exposing (Time)
 import Date.Extra as Date
-import Router exposing (..)
+import Router
+    exposing
+        ( History
+        , StandardHistoryMsg
+        , slideUp
+        , pageWithDefaultTransition
+        , pageWithTransition
+        , pageWithoutTransition
+        , headerElement
+        , headerButton
+        , Page
+        , Transition
+        , historyView
+        , handleStandardHistory
+        , maybeTransitionSubscription
+        , initHistoryAndData
+        )
 import Finders exposing (..)
 import Function exposing (compose)
 import Task
@@ -84,16 +100,16 @@ handleHistory : HistoryMsg -> History Route -> History Route
 handleHistory route history =
     case route of
         AppartmentShowMsg id ->
-            history |> push (pageWithDefaultTransition (AppartmentsShow id))
+            history |> Router.push (Router.pageWithDefaultTransition (AppartmentsShow id))
 
         AppartmentEditMsg id ->
-            history |> push (pageWithTransition (slideUp) (AppartmentsEdit id))
+            history |> Router.push (Router.pageWithTransition (Router.slideUp) (AppartmentsEdit id))
 
         AppartmentNewMsg ->
-            history |> push (pageWithTransition (slideUp) AppartmentsNew)
+            history |> Router.push (Router.pageWithTransition (Router.slideUp) AppartmentsNew)
 
         AppartmentsIndexEditMsg ->
-            history |> push (pageWithoutTransition AppartmentsIndexEdit)
+            history |> Router.push (Router.pageWithoutTransition AppartmentsIndexEdit)
 
 
 gray : Color.Color
@@ -155,14 +171,14 @@ showView data =
 
         Just appartment ->
             pageWithHeader
-                (headerElement
-                    { left = headerButton (StandardHistoryWrapper Back) "← BACK"
+                (Router.headerElement
+                    { left = Router.headerButton (StandardHistoryWrapper Router.Back) "← BACK"
                     , center =
                         div
                             []
                             [ text appartment.attributes.title
                             ]
-                    , right = headerButton (HistoryMsgWrapper (AppartmentEditMsg appartment.id)) "Edit"
+                    , right = Router.headerButton (HistoryMsgWrapper (AppartmentEditMsg appartment.id)) "Edit"
                     }
                 )
                 (appartmentBodyView appartment)
@@ -345,8 +361,8 @@ editView data =
 
         Just appartment ->
             pageWithHeader
-                (headerElement
-                    { left = headerButton (StandardHistoryWrapper Back) "x"
+                (Router.headerElement
+                    { left = Router.headerButton (StandardHistoryWrapper Router.Back) "x"
                     , center = div [] [ text appartment.attributes.title ]
                     , right = div [] []
                     }
@@ -372,10 +388,10 @@ appartmentBodyView appartment =
 appartmentsIndex : List Appartment -> Node Msg
 appartmentsIndex appartments =
     pageWithHeader
-        (headerElement
-            { left = headerButton (HistoryMsgWrapper AppartmentsIndexEditMsg) "edit"
+        (Router.headerElement
+            { left = Router.headerButton (HistoryMsgWrapper AppartmentsIndexEditMsg) "edit"
             , center = div [] [ text "Rentabilize" ]
-            , right = headerButton (HistoryMsgWrapper AppartmentNewMsg) "new"
+            , right = Router.headerButton (HistoryMsgWrapper AppartmentNewMsg) "new"
             }
         )
         (div [ style [ Elegant.backgroundColor gray ] ]
@@ -386,8 +402,8 @@ appartmentsIndex appartments =
 appartmentsIndexEdit : List Appartment -> Node Msg
 appartmentsIndexEdit appartments =
     pageWithHeader
-        (headerElement
-            { left = headerButton (StandardHistoryWrapper Back) "done"
+        (Router.headerElement
+            { left = Router.headerButton (StandardHistoryWrapper Router.Back) "done"
             , center = div [] [ text "Rentabilize" ]
             , right = text ""
             }
@@ -413,10 +429,10 @@ appartmentsEdit id appartments =
 appartmentsNew : AppartmentAttributes -> Node Msg
 appartmentsNew draftAppartment =
     pageWithHeader
-        (headerElement
-            { left = headerButton (StandardHistoryWrapper Back) "cancel"
+        (Router.headerElement
+            { left = Router.headerButton (StandardHistoryWrapper Router.Back) "cancel"
             , center = div [] [ text draftAppartment.title ]
-            , right = headerButton SaveAppartmentAttributes "save"
+            , right = Router.headerButton SaveAppartmentAttributes "save"
             }
         )
         (div
@@ -426,7 +442,7 @@ appartmentsNew draftAppartment =
         )
 
 
-insidePageView : Page Route -> Data -> Maybe Transition -> Node Msg
+insidePageView : Router.Page Route -> Data -> Maybe Router.Transition -> Node Msg
 insidePageView page data transition =
     let
         appartments =
@@ -452,7 +468,7 @@ insidePageView page data transition =
 view : Model -> Node Msg
 view { history, data } =
     div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
-        [ historyView insidePageView history data ]
+        [ Router.historyView insidePageView history data ]
 
 
 updateAppartmentAttributesBasedOnMsg : UpdateAppartmentMsg -> AppartmentAttributes -> AppartmentAttributes
@@ -589,7 +605,7 @@ update msg model =
             ( { model | history = handleHistory historyMsg model.history }, Cmd.none )
 
         StandardHistoryWrapper historyMsg ->
-            model |> handleStandardHistory historyMsg
+            model |> Router.handleStandardHistory historyMsg
 
         UpdateAppartment id customMsg ->
             ( model |> updateAppartment id customMsg, Cmd.none )
@@ -601,7 +617,7 @@ update msg model =
             ( model, Task.perform SaveAppartmentAttributesHelper Time.now )
 
         SaveAppartmentAttributesHelper time ->
-            ( model |> saveAppartmentAttributes time, performSuccessfulTask (StandardHistoryWrapper Back) )
+            ( model |> saveAppartmentAttributes time, performSuccessfulTask (StandardHistoryWrapper Router.Back) )
 
         DestroyAppartment id ->
             ( model |> destroyAppartment id, Cmd.none )
@@ -609,7 +625,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    maybeTransitionSubscription StandardHistoryWrapper model.history.transition
+    Router.maybeTransitionSubscription StandardHistoryWrapper model.history.transition
 
 
 initAppartments : List Appartment
@@ -661,7 +677,7 @@ initData =
 
 init : Model
 init =
-    initHistoryAndData AppartmentsIndex initData
+    Router.initHistoryAndData AppartmentsIndex initData
 
 
 main : Program Basics.Never Model Msg
