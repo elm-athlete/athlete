@@ -2,7 +2,9 @@ module Main exposing (..)
 
 import Html exposing (Html)
 import Html.Attributes
-import Elegant exposing (SizeUnit(..))
+import Elegant exposing (px)
+import Typography
+import Typography.Character
 import Color exposing (Color)
 
 main : Html msg
@@ -15,13 +17,13 @@ main =
       <| Elegant.displayBlock []
         [ Elegant.typography
           [ Elegant.color Color.blue
-          , Elegant.character
-            [ Elegant.weight 900
-            , Elegant.size (Px 200)
-            , Elegant.italic
+          , Typography.character
+            [ Typography.Character.weight 900
+            , Typography.Character.size (px 200)
+            , Typography.Character.italic
             ]
           ]
-        , Elegant.padding (Px 30)
+        , Elegant.padding (px 30)
         ]
     ]
     [ Html.text "Just a text." ]
