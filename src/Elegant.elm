@@ -1,6 +1,4 @@
-module Elegant
-    exposing
-        (..)
+module Elegant exposing (..)
 
 {-|
 
@@ -670,6 +668,7 @@ weight : Int -> Character -> Character
 weight =
     setWeight << Just
 
+
 italic : Character -> Character
 italic =
     setTilt <| Just FontTiltItalic
@@ -678,6 +677,7 @@ italic =
 oblique : Character -> Character
 oblique =
     setTilt <| Just FontTiltOblique
+
 
 size : SizeUnit -> Character -> Character
 size =

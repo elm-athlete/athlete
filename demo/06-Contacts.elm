@@ -1,10 +1,10 @@
 module Blog exposing (..)
 
 {-| This code is something I always dreamt of being able to code with only html
-    and styles. I thought it would have taken more time to create, but, in the
-    end I did it. Elm was the way to go after all.
-    It is heavily inspired by the way iOS works, but the code is original :)
-    I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
+and styles. I thought it would have taken more time to create, but, in the
+end I did it. Elm was the way to go after all.
+It is heavily inspired by the way iOS works, but the code is original :)
+I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 -}
 
 import BodyBuilder exposing (..)
@@ -12,7 +12,19 @@ import BodyBuilder.Elements exposing (..)
 import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
 import Elegant.Elements exposing (borderBottom, pageCenter)
 import Color
-import Router exposing (..)
+import Router
+    exposing
+        ( History
+        , StandardHistoryMsg(Back)
+        , handleStandardHistory
+        , push
+        , pageWithDefaultTransition
+        , Page
+        , Transition
+        , historyView
+        , maybeTransitionSubscription
+        , initHistoryAndData
+        )
 import Finders exposing (..)
 import Dict exposing (Dict)
 import Dict.Extra as Dict
