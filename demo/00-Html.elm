@@ -5,6 +5,7 @@ import Html.Attributes
 import Elegant exposing (px)
 import Typography
 import Typography.Character
+import BoxShadow
 import Color exposing (Color)
 
 main : Html msg
@@ -24,6 +25,8 @@ main =
             ]
           ]
         , Elegant.padding (px 30)
+        , Elegant.boxShadow
+          [ BoxShadow.standard (px 30) Color.black (px 3, px 3) ]
         ]
     ]
     [ Html.text "Just a text." ]

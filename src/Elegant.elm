@@ -289,6 +289,7 @@ import Setters exposing (..)
 import Function
 import Shared exposing (..)
 import Typography
+import BoxShadow
 import Either exposing (Either(..))
 
 
@@ -333,23 +334,6 @@ type Auto
 {-| -}
 type alias Vector a =
     ( a, a )
-
-
-{-| Offset type
--}
-type alias Offset =
-    ( SizeUnit, SizeUnit )
-
-
-{-| BoxShadow type
--}
-type alias BoxShadow =
-    { inset : Bool
-    , spreadRadius : Maybe SizeUnit
-    , blurRadius : Maybe SizeUnit
-    , maybeColor : Maybe Color
-    , offset : Offset
-    }
 
 
 type alias Radiant =
@@ -672,7 +656,7 @@ type alias Layout =
     , radius : Maybe BorderRadius
     , margin : Maybe Margin
     , outline : Maybe Outline
-    , boxShadow : Maybe BoxShadow
+    , boxShadow : Maybe BoxShadow.BoxShadow
     , background : Maybe Background
     , opacity : Maybe Float
     , cursor : Maybe String
@@ -689,6 +673,16 @@ typography modifiers layout =
         |> Function.compose modifiers
         |> Just
         |> setTypographyIn layout
+
+
+boxShadow : Modifiers BoxShadow.BoxShadow -> Layout -> Layout
+boxShadow modifiers layout =
+    layout
+        |> .boxShadow
+        |> Maybe.withDefault BoxShadow.default
+        |> Function.compose modifiers
+        |> Just
+        |> setBoxShadowIn layout
 
 
 type alias BlockDetails =
@@ -1038,6 +1032,7 @@ layoutToCouples : Layout -> List ( String, String )
 layoutToCouples layout =
     [ unwrapToCouples .visibility visibilityToCouple
     , unwrapToCouples .typography Typography.typographyToCouples
+    , unwrapToCouple .boxShadow BoxShadow.boxShadowToCouple
     ]
         |> List.concatMap (\fun -> fun layout)
 
@@ -1379,33 +1374,6 @@ maybeToString =
     nothingOrJust
         (\val ->
             toString val
-        )
-
-
-offsetToStringList : ( SizeUnit, SizeUnit ) -> List String
-offsetToStringList ( x, y ) =
-    [ x, y ]
-        |> List.map sizeUnitToString
-
-
-boxShadowToString : Maybe BoxShadow -> Maybe String
-boxShadowToString =
-    nothingOrJust
-        (\{ offset, blurRadius, spreadRadius, maybeColor, inset } ->
-            List.concat
-                [ offsetToStringList offset
-                , [ blurRadius, spreadRadius ]
-                    |> List.map (emptyListOrApply sizeUnitToString)
-                    |> List.concat
-                , maybeColorToString maybeColor
-                    |> Maybe.map (\a -> [ a ])
-                    |> Maybe.withDefault []
-                , if inset then
-                    [ "inset" ]
-                  else
-                    []
-                ]
-                |> String.join " "
         )
 
 
@@ -2440,39 +2408,6 @@ dimensions dimensionsModifiers blockAttributes =
 --     outlineWidth 0
 --
 --
--- standardBoxShadow : Maybe SizeUnit -> Maybe Color -> Offset -> BoxShadow
--- standardBoxShadow =
---     BoxShadow False Nothing
---
---
--- {-| Set the box shadow
--- -}
--- boxShadow : BoxShadow -> Style -> Style
--- boxShadow val (Style style) =
---     Style { style | boxShadow = Just val }
---
---
--- {-| Create a plain box shadow
--- -}
--- boxShadowPlain : Offset -> Color -> Style -> Style
--- boxShadowPlain offset color =
---     boxShadow
---         (standardBoxShadow Nothing (Just color) offset)
---
---
--- {-| Create a blurry box shadow
--- -}
--- boxShadowBlurry : Offset -> SizeUnit -> Color -> Style -> Style
--- boxShadowBlurry offset blurRadius color =
---     boxShadow
---         (standardBoxShadow (Just blurRadius) (Just color) offset)
---
---
--- {-| Create a centered blurry box shadow
--- -}
--- boxShadowCenteredBlurry : SizeUnit -> Color -> Style -> Style
--- boxShadowCenteredBlurry =
---     boxShadowBlurry ( Px 0, Px 0 )
 --
 -- display : DisplayBox -> Style -> Style
 -- display val (Style style) =
