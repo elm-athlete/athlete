@@ -225,21 +225,21 @@ defaultTransition =
     Just <| customTransition basicDuration SlideRight Forward EaseInOut
 
 
-{-| function to create a page with the defaultTransition
+{-| creates a page with the defaultTransition
 -}
 pageWithDefaultTransition : route -> Page route
 pageWithDefaultTransition =
     Page defaultTransition
 
 
-{-| function to create a page without any transition
+{-| creates a page without any transition
 -}
 pageWithoutTransition : route -> Page route
 pageWithoutTransition =
     Page Nothing
 
 
-{-| function to create a page with a custom transition
+{-| creates a page with a custom transition
 -}
 pageWithTransition : Transition -> route -> Page route
 pageWithTransition transition =

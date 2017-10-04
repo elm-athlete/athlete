@@ -376,7 +376,6 @@ module Elegant
 @docs overflowYScroll
 @docs textOverflowEllipsis
 
-
 ## List Style Type
 @docs listStyleNone
 @docs listStyleDisc
@@ -1920,7 +1919,7 @@ alpha =
     Rem 2.5
 
 
-{-| helper function to create a heading
+{-| creates a heading
 -}
 heading : SizeUnit -> Style -> Style
 heading val =
@@ -1932,42 +1931,42 @@ heading val =
         |> compose
 
 
-{-| helper function to create a h1 style
+{-| creates a h1 style
 -}
 h1S : Style -> Style
 h1S =
     heading alpha
 
 
-{-| helper function to create a h2 style
+{-| creates a h2 style
 -}
 h2S : Style -> Style
 h2S =
     heading beta
 
 
-{-| helper function to create a h3 style
+{-| creates a h3 style
 -}
 h3S : Style -> Style
 h3S =
     heading gamma
 
 
-{-| helper function to create a h4 style
+{-| creates a h4 style
 -}
 h4S : Style -> Style
 h4S =
     heading delta
 
 
-{-| helper function to create a h5 style
+{-| creates a h5 style
 -}
 h5S : Style -> Style
 h5S =
     heading epsilon
 
 
-{-| helper function to create a h6 style
+{-| creates a h6 style
 -}
 h6S : Style -> Style
 h6S =
