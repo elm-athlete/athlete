@@ -60,6 +60,7 @@ module BodyBuilder
         , CanvasAttributes
         , Node
         , Position(..)
+        , html
         , h1
         , h2
         , h3
@@ -210,6 +211,7 @@ module BodyBuilder
 @docs CanvasAttributes
 @docs Node
 @docs Position
+@docs html
 @docs h1
 @docs h2
 @docs h3
@@ -836,6 +838,7 @@ type Node msg
     | InputUrl (InputUrlAttributes msg)
     | Select (SelectAttributes msg)
     | Text String
+    | Html (Html.Html msg)
 
 
 defaultsComposedToAttrs : a -> List (a -> a) -> a
@@ -891,6 +894,12 @@ flowDefaultsComposedToAttrs =
    ██   ██    ██    ██  ██  ██ ██          ██      ██    ██ ██  ██ ██      ██    ██    ██   ██ ██    ██ ██         ██
    ██   ██    ██    ██      ██ ███████      ██████  ██████  ██   ████ ███████    ██    ██   ██  ██████   ██████    ██
 -}
+
+
+{-| -}
+html : Html.Html msg -> Node msg
+html =
+    Html
 
 
 {-| -}
@@ -2348,6 +2357,9 @@ toTree :
     -> BodyBuilderHtml.HtmlAttributes msg
 toTree node =
     case node of
+        Html content ->
+            BodyBuilderHtml.html content
+
         A attributes children ->
             parentToHtml children
                 attributes

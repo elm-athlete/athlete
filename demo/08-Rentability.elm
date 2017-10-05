@@ -677,7 +677,7 @@ initData =
 
 init : Model
 init =
-    Router.initHistoryAndData AppartmentsIndex initData
+    initHistoryAndData AppartmentsIndex initData
 
 
 main : Program Basics.Never Model Msg

@@ -9,6 +9,7 @@ module BodyBuilderHtml
         , div
         , tag
         , text
+        , html
         , node
         , leaf
         , container
@@ -68,6 +69,7 @@ module BodyBuilderHtml
 @docs div
 @docs tag
 @docs text
+@docs html
 @docs node
 @docs leaf
 @docs container
@@ -111,6 +113,7 @@ module BodyBuilderHtml
 @docs onFocus
 @docs on
 @docs data
+
 -}
 
 import Html
@@ -172,6 +175,7 @@ type alias Tree msg =
     -- Children
     , text : String
     , content : List (HtmlAttributes msg)
+    , html : Maybe (Html.Html msg)
     }
 
 
@@ -239,6 +243,7 @@ base =
         -- Children
         , text = ""
         , content = []
+        , html = Nothing
         }
 
 
@@ -345,6 +350,9 @@ htmlAttributesToHtml (HtmlAttributes val) =
             case val.tag of
                 Nothing ->
                     Html.text val.text
+
+                Just "html" ->
+                    val.html |> Maybe.withDefault (Html.text "")
 
                 Just tag_ ->
                     Html.node tag_
@@ -684,6 +692,16 @@ onBlur value (HtmlAttributes attrs) =
 on : String -> Decoder msg -> HtmlAttributes msg -> HtmlAttributes msg
 on event decoder (HtmlAttributes attrs) =
     HtmlAttributes { attrs | on = Just ( event, decoder ) }
+
+
+{-| -}
+html : Html.Html msg -> HtmlAttributes msg
+html content =
+    let
+        (HtmlAttributes attrs) =
+            base
+    in
+        tag "html" <| HtmlAttributes { attrs | html = Just content }
 
 
 {-| -}
