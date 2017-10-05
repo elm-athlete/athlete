@@ -44,12 +44,12 @@ left default =
 
 horizontal : a -> Modifiers a -> Modifier (Surrounded a)
 horizontal default modifiers =
-    left default modifiers >> right default modifiers
+    top default modifiers >> bottom default modifiers
 
 
 vertical : a -> Modifiers a -> Modifier (Surrounded a)
 vertical default modifiers =
-    top default modifiers >> bottom default modifiers
+    left default modifiers >> right default modifiers
 
 
 all : a -> Modifiers a -> Modifier (Surrounded a)
@@ -81,4 +81,13 @@ surroundedToCouples prefix toCouple border =
 
 addPrefix : String -> String -> ( String, String ) -> ( String, String )
 addPrefix qualifier orientation ( selector, value ) =
-    ( [ qualifier, orientation, selector ] |> String.join "-", value )
+    let
+        name =
+            case selector of
+                "" ->
+                    [ qualifier, orientation ]
+
+                name ->
+                    [ qualifier, orientation, name ]
+    in
+        ( name |> String.join "-", value )

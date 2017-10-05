@@ -291,8 +291,10 @@ import Shared exposing (..)
 import Typography
 import BoxShadow
 import Either exposing (Either(..))
+import Corner
 import Surrounded exposing (Surrounded)
 import Border
+import Margin
 
 
 type alias SizeUnit =
@@ -327,10 +329,6 @@ em =
 rem : Float -> SizeUnit
 rem =
     Rem
-
-
-type Auto
-    = Auto
 
 
 {-| -}
@@ -557,24 +555,8 @@ type TextOverflow
     = TextOverflowEllipsis
 
 
-type alias MarginValue =
-    Either SizeUnit Auto
-
-
-type alias Margin =
-    Surrounded MarginValue
-
-
 type alias Padding =
     Surrounded SizeUnit
-
-
-type alias BorderRadius =
-    { topLeft : Maybe SizeUnit
-    , topRight : Maybe SizeUnit
-    , bottomRight : Maybe SizeUnit
-    , bottomLeft : Maybe SizeUnit
-    }
 
 
 type Horizontal a
@@ -631,8 +613,8 @@ type alias Layout =
     , typography : Maybe Typography.Typography
     , padding : Maybe Padding
     , border : Maybe (Surrounded Border.Border)
-    , radius : Maybe BorderRadius
-    , margin : Maybe Margin
+    , corner : Maybe Corner.Corner
+    , margin : Maybe (Surrounded Margin.Margin)
     , outline : Maybe Outline
     , boxShadow : Maybe BoxShadow.BoxShadow
     , background : Maybe Background
@@ -645,6 +627,16 @@ type alias Layout =
 border : Modifiers (Surrounded Border.Border) -> Modifier Layout
 border =
     getModifyAndSet .border setBorderIn Surrounded.default
+
+
+corner : Modifiers Corner.Corner -> Modifier Layout
+corner =
+    getModifyAndSet .corner setCornerIn Corner.default
+
+
+margin : Modifiers (Surrounded Margin.Margin) -> Modifier Layout
+margin =
+    getModifyAndSet .margin setMarginIn Surrounded.default
 
 
 typography : Modifiers Typography.Typography -> Modifier Layout
@@ -997,6 +989,8 @@ layoutToCouples layout =
     , unwrapToCouples .typography Typography.typographyToCouples
     , unwrapToCouple .boxShadow BoxShadow.boxShadowToCouple
     , unwrapToCouples .border Border.borderToCouples
+    , unwrapToCouples .corner Corner.cornerToCouples
+    , unwrapToCouples .margin Margin.marginToCouples
     ]
         |> List.concatMap (callOn layout)
 
@@ -1677,26 +1671,24 @@ setSurroundingValue getter propertySetter valueSetter val surroundingContainer =
         |> propertySetter surroundingContainer
 
 
-setMarginValue :
-    (MarginValue -> Surrounded MarginValue -> Surrounded MarginValue)
-    -> MarginValue
-    -> Layout
-    -> Layout
-setMarginValue =
-    setSurroundingValue .margin setMarginIn
 
-
-marginRight : MarginValue -> Layout -> Layout
-marginRight =
-    setMarginValue rightSurrounding
-
-
-marginLeft : MarginValue -> Layout -> Layout
-marginLeft =
-    setMarginValue leftSurrounding
-
-
-
+-- setMarginValue :
+--     (MarginValue -> Surrounded MarginValue -> Surrounded MarginValue)
+--     -> MarginValue
+--     -> Layout
+--     -> Layout
+-- setMarginValue =
+--     setSurroundingValue .margin setMarginIn
+--
+--
+-- marginRight : MarginValue -> Layout -> Layout
+-- marginRight =
+--     setMarginValue rightSurrounding
+--
+--
+-- marginLeft : MarginValue -> Layout -> Layout
+-- marginLeft =
+--     setMarginValue leftSurrounding
 -- padding : SizeUnit -> Layout -> Layout
 -- padding val ({ padding } as layout) =
 --     padding

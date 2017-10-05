@@ -63,7 +63,7 @@ import Setters exposing (..)
 import Surrounded exposing (Surrounded)
 
 
-{-| The Border record contains everything about one border side.
+{-| The `Border` record contains everything about one border side.
 You probably won't use it as is, but instead using `Elegant.border`
 which automatically generate an empty `Border` record. You
 can then use modifiers. I.E.

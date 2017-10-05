@@ -32,6 +32,10 @@ module BoxShadow
 @docs offset
 @docs standard
 @docs plain
+
+
+# Compilation
+
 @docs boxShadowToCouple
 
 -}

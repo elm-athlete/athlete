@@ -16,6 +16,10 @@ type SizeUnit
     | Rem Float
 
 
+type Auto
+    = Auto
+
+
 concatNumberWithString : number -> String -> String
 concatNumberWithString number str =
     (number |> toString) ++ str
@@ -54,9 +58,11 @@ type alias Modifiers a =
 
 -- TODO move in Function
 
+
 call : (a -> b) -> a -> b
 call fun =
-  fun
+    fun
+
 
 callOn : a -> (a -> b) -> b
 callOn var fun =

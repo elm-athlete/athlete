@@ -431,14 +431,14 @@ setPositionIn =
     flip setPosition
 
 
-setRadius : c -> { b | radius : a } -> { b | radius : c }
-setRadius v o =
-    { o | radius = v }
+setCorner : c -> { b | corner : a } -> { b | corner : c }
+setCorner v o =
+    { o | corner = v }
 
 
-setRadiusIn : { b | radius : a } -> c -> { b | radius : c }
-setRadiusIn =
-    flip setRadius
+setCornerIn : { b | corner : a } -> c -> { b | corner : c }
+setCornerIn =
+    flip setCorner
 
 
 setRight : c -> { b | right : a } -> { b | right : c }
@@ -649,3 +649,13 @@ setThickness v o =
 setThicknessIn : { c | thickness : b } -> a -> { c | thickness : a }
 setThicknessIn =
     flip setThickness
+
+
+setValue : a -> { c | value : b } -> { c | value : a }
+setValue v o =
+    { o | value = v }
+
+
+setValueIn : { c | value : b } -> a -> { c | value : a }
+setValueIn =
+    flip setValue

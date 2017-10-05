@@ -9,6 +9,8 @@
     "exposed-modules": [
         "Border",
         "BoxShadow",
+        "Corner",
+        "Margin",
         "Typography",
         "Typography.Character"
     ],
