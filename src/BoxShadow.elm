@@ -58,12 +58,14 @@ type alias BoxShadow =
     { inset : Bool
     , spreadRadius : Maybe SizeUnit
     , blurRadius : Maybe SizeUnit
-    , color : Maybe Color -- The color is a required parameter.
+    , color : Maybe Color
     , offset : ( SizeUnit, SizeUnit )
     }
 
 
-{-| -}
+{-| Generate an empty `BoxShadow` record, with every field equal to Nothing except inset (to `False`) and offset (to `( 0, 0 )`).
+You are free to use it as you wish, but it is instanciated automatically by `Elegant.boxShadow`.
+-}
 default : BoxShadow
 default =
     BoxShadow False Nothing Nothing Nothing ( Px 0, Px 0 )

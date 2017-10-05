@@ -1,4 +1,61 @@
-module Border exposing (..)
+module Border
+    exposing
+        ( Border
+        , default
+        , BorderStyle
+        , solid
+        , dashed
+        , thickness
+        , top
+        , bottom
+        , right
+        , left
+        , horizontal
+        , vertical
+        , all
+        , borderToCouples
+        )
+
+{-| Border contains everything about borders rendering.
+
+
+# Types
+
+@docs Border
+@docs BorderStyle
+
+
+# Default border
+
+@docs default
+
+
+# Border modifiers
+
+
+## Appearance
+
+@docs thickness
+@docs solid
+@docs dashed
+
+
+## Sides
+
+@docs top
+@docs bottom
+@docs left
+@docs right
+@docs horizontal
+@docs vertical
+@docs all
+
+
+# Compilation
+
+@docs borderToCouples
+
+-}
 
 import Color exposing (Color)
 import Shared exposing (..)
@@ -6,6 +63,17 @@ import Setters exposing (..)
 import Surrounded exposing (Surrounded)
 
 
+{-| The Border record contains everything about one border side.
+You probably won't use it as is, but instead using `Elegant.border`
+which automatically generate an empty `Border` record. You
+can then use modifiers. I.E.
+
+    Elegant.border
+        [ Border.solid
+        , Border.color Color.blue
+        ]
+
+-}
 type alias Border =
     { color : Maybe Color
     , thickness : Maybe SizeUnit
@@ -13,66 +81,95 @@ type alias Border =
     }
 
 
+{-| Generate an empty `Border` record, with every field equal to Nothing.
+You are free to use it as you wish, but it is instanciated automatically by `Elegant.border`.
+-}
 default : Border
 default =
     Border Nothing Nothing Nothing
 
 
+{-| Represents the possible styles of the border.
+It can be Solid or Dashed. They are created by `solid` and `dashed`.
+-}
 type BorderStyle
     = BorderStyleSolid
     | BorderStyleDashed
 
 
+{-| Set the border as solid.
+-}
 solid : Modifier Border
 solid =
     setStyle <| Just BorderStyleSolid
 
 
+{-| Set the border as dashed.
+-}
 dashed : Modifier Border
 dashed =
     setStyle <| Just BorderStyleDashed
 
 
+{-| Set the thickness of the border.
+-}
 thickness : SizeUnit -> Modifier Border
 thickness =
     setThickness << Just
 
 
+{-| Accepts a list of border modifiers, and modify the top side of the border.
+-}
 top : Modifiers Border -> Modifier (Surrounded Border)
 top =
     Surrounded.top default
 
 
+{-| Accepts a list of border modifiers, and modify the bottom side of the border.
+-}
 bottom : Modifiers Border -> Modifier (Surrounded Border)
 bottom =
     Surrounded.bottom default
 
 
+{-| Accepts a list of border modifiers, and modify the left side of the border.
+-}
 left : Modifiers Border -> Modifier (Surrounded Border)
 left =
     Surrounded.left default
 
 
+{-| Accepts a list of border modifiers, and modify the right side of the border.
+-}
 right : Modifiers Border -> Modifier (Surrounded Border)
 right =
     Surrounded.right default
 
 
+{-| Accepts a list of border modifiers, and modify both the top and the bottom side of the border.
+-}
 horizontal : Modifiers Border -> Modifier (Surrounded Border)
 horizontal =
     Surrounded.horizontal default
 
 
+{-| Accepts a list of border modifiers, and modify both the right and left side of the border.
+-}
 vertical : Modifiers Border -> Modifier (Surrounded Border)
 vertical =
     Surrounded.vertical default
 
 
+{-| Accepts a list of border modifiers, and modify the four sides of the border.
+-}
 all : Modifiers Border -> Modifier (Surrounded Border)
 all =
     Surrounded.all default
 
 
+{-| Compiles a `Surrounded Border` record to the corresponding CSS list of tuples.
+Compiles only styles which are defined, ignoring `Nothing` fields.
+-}
 borderToCouples : Surrounded Border -> List ( String, String )
 borderToCouples =
     Surrounded.surroundedToCouples "border" borderSideToCouples
