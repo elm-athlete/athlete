@@ -210,11 +210,6 @@ module Elegant exposing (..)
 -- ## Spacings
 -- @docs spaceBetween
 -- @docs spaceAround
--- @docs fontFamilyInherit
--- @docs fontFamilySansSerif
--- @docs fontFamily
-@docs FontFamily
-@docs CustomFontFamily
 
 ## Width and Height
 -- @docs width
@@ -292,51 +287,55 @@ import Color exposing (Color)
 import Color.Convert
 import Setters exposing (..)
 import Function
+import Shared exposing (..)
+import Typography
+import BoxShadow
+import Either exposing (Either(..))
+import Surrounded exposing (Surrounded)
+import Border
 
 
-type Either a b
-    = Left a
-    | Right b
+type alias SizeUnit =
+    Shared.SizeUnit
+
+
+px : Int -> SizeUnit
+px =
+    Px
+
+
+pt : Int -> SizeUnit
+pt =
+    Pt
+
+
+percent : Float -> SizeUnit
+percent =
+    Percent
+
+
+vh : Float -> SizeUnit
+vh =
+    Vh
+
+
+em : Float -> SizeUnit
+em =
+    Em
+
+
+rem : Float -> SizeUnit
+rem =
+    Rem
 
 
 type Auto
     = Auto
 
 
-type Normal
-    = Normal
-
-
 {-| -}
 type alias Vector a =
     ( a, a )
-
-
-{-| -}
-type SizeUnit
-    = Px Int
-    | Pt Int
-    | Percent Float
-    | Vh Float
-    | Em Float
-    | Rem Float
-
-
-{-| Offset type
--}
-type alias Offset =
-    ( SizeUnit, SizeUnit )
-
-
-{-| BoxShadow type
--}
-type alias BoxShadow =
-    { inset : Bool
-    , spreadRadius : Maybe SizeUnit
-    , blurRadius : Maybe SizeUnit
-    , maybeColor : Maybe Color
-    , offset : Offset
-    }
 
 
 type alias Radiant =
@@ -526,29 +525,11 @@ type JustifyContent
     | JustifyContentCenter
 
 
-type Capitalization
-    = CapitalizationUppercase
-    | CapitalizationLowercase
-    | CapitalizationCapitalize
-
-
 type Alignment
     = AlignmentCenter
     | AlignmentRight
     | AlignmentLeft
     | AlignmentJustify
-
-
-type TextDecoration
-    = TextDecorationNone
-    | TextDecorationUnderline
-    | TextDecorationLineThrough
-
-
-type FontTilt
-    = FontTiltNormal
-    | FontTiltItalic
-    | FontTiltOblique
 
 
 type Overflow
@@ -572,40 +553,8 @@ type Visibility
     = VisibilityHidden
 
 
-type Border
-    = BorderSolid
-    | BorderDashed
-
-
-type WhiteSpaceWrap
-    = WhiteSpaceWrapNoWrap
-
-
 type TextOverflow
     = TextOverflowEllipsis
-
-
-type alias UserSelect =
-    Bool
-
-
-type alias SideBorder =
-    { color : Maybe Color
-    , width : Maybe SizeUnit
-    , style : Maybe Border
-    }
-
-
-type alias Surrounded surroundType =
-    { top : Maybe surroundType
-    , right : Maybe surroundType
-    , bottom : Maybe surroundType
-    , left : Maybe surroundType
-    }
-
-
-type alias CompleteBorder =
-    Surrounded SideBorder
 
 
 type alias MarginValue =
@@ -656,72 +605,14 @@ type Position
     | PositionStatic
 
 
-type alias Character =
-    { weight : Maybe Int
-    , tilt : Maybe FontTilt
-    , size : Maybe SizeUnit
-    , family : Maybe FontFamily
-    }
-
-
-weight : Int -> Character -> Character
-weight =
-    setWeight << Just
-
-
-italic : Character -> Character
-italic =
-    setTilt <| Just FontTiltItalic
-
-
-oblique : Character -> Character
-oblique =
-    setTilt <| Just FontTiltOblique
-
-
-size : SizeUnit -> Character -> Character
-size =
-    setSize << Just
-
-
-defaultCharacter : Character
-defaultCharacter =
-    Character Nothing Nothing Nothing Nothing
-
-
 type alias Outline =
-    Border
-
-
-type alias Typography =
-    { character : Maybe Character
-    , capitalization : Maybe Capitalization
-    , decoration : Maybe TextDecoration
-    , color : Maybe Color
-    , whiteSpaceWrap : Maybe WhiteSpaceWrap
-    , userSelect : Maybe UserSelect
-    , lineHeight : Maybe (Either SizeUnit Normal)
-    }
+    Border.Border
 
 
 {-| -}
 color : a -> { b | color : Maybe a } -> { b | color : Maybe a }
 color =
     setColor << Just
-
-
-character : Modifiers Character -> Typography -> Typography
-character modifiers typo =
-    typo.character
-        |> Maybe.withDefault defaultCharacter
-        |> Function.compose modifiers
-        |> Just
-        |> setCharacterIn typo
-
-
-defaultTypography : Typography
-defaultTypography =
-    Typography Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 
 type alias Background =
@@ -737,13 +628,13 @@ type alias FullOverflow =
 type alias Layout =
     { position : Maybe Position
     , visibility : Maybe Visibility
-    , typography : Maybe Typography
+    , typography : Maybe Typography.Typography
     , padding : Maybe Padding
-    , border : Maybe CompleteBorder
+    , border : Maybe (Surrounded Border.Border)
     , radius : Maybe BorderRadius
     , margin : Maybe Margin
     , outline : Maybe Outline
-    , boxShadow : Maybe BoxShadow
+    , boxShadow : Maybe BoxShadow.BoxShadow
     , background : Maybe Background
     , opacity : Maybe Float
     , cursor : Maybe String
@@ -751,15 +642,30 @@ type alias Layout =
     }
 
 
+border : Modifiers (Surrounded Border.Border) -> Modifier Layout
+border =
+    getModifyAndSet .border setBorderIn Surrounded.default
+
+
 {-| -}
-typography : Modifiers Typography -> Layout -> Layout
+typography : Modifiers Typography.Typography -> Layout -> Layout
 typography modifiers layout =
     layout
         |> .typography
-        |> Maybe.withDefault defaultTypography
+        |> Maybe.withDefault Typography.default
         |> Function.compose modifiers
         |> Just
         |> setTypographyIn layout
+
+
+boxShadow : Modifiers BoxShadow.BoxShadow -> Layout -> Layout
+boxShadow modifiers layout =
+    layout
+        |> .boxShadow
+        |> Maybe.withDefault BoxShadow.default
+        |> Function.compose modifiers
+        |> Just
+        |> setBoxShadowIn layout
 
 
 type alias BlockDetails =
@@ -840,14 +746,6 @@ displayNone =
 displayStyle : OutsideDisplay -> InsideDisplay -> Maybe Layout -> DisplayContents
 displayStyle outsideDisplay insideDisplay layoutStyle =
     ( ( outsideDisplay, insideDisplay ), layoutStyle )
-
-
-type alias Modifier a =
-    a -> a
-
-
-type alias Modifiers a =
-    List (Modifier a)
 
 
 modifiedElementOrNothing : a -> Modifiers a -> Maybe a
@@ -1113,126 +1011,18 @@ toLegacyDisplayCss str =
             "block"
 
 
-unwrapToCouple : (a -> ( String, String )) -> Maybe a -> ( String, String )
-unwrapToCouple function aMaybe =
-    aMaybe
-        |> Maybe.map function
-        |> Maybe.withDefault ( "", "" )
-
-
-unwrapToCouples : (a -> List ( String, String )) -> Maybe a -> List ( String, String )
-unwrapToCouples function aMaybe =
-    aMaybe
-        |> Maybe.map function
-        |> Maybe.withDefault []
-
-
 layoutToCouples : Layout -> List ( String, String )
 layoutToCouples layout =
-    List.concat
-        [ layout.visibility |> unwrapToCouples visibilityToCouple
-        , layout.typography |> unwrapToCouples typographyToCouples
-        ]
+    [ unwrapToCouples .visibility visibilityToCouple
+    , unwrapToCouples .typography Typography.typographyToCouples
+    , unwrapToCouple .boxShadow BoxShadow.boxShadowToCouple
+    ]
+        |> List.concatMap (\fun -> fun layout)
 
 
 visibilityToCouple : Visibility -> List ( String, String )
 visibilityToCouple visibility =
     [ ( "visibility", visibilityToString visibility ) ]
-
-
-typographyToCouples : Typography -> List ( String, String )
-typographyToCouples typography =
-    List.concat
-        [ typography.character |> unwrapToCouples characterToCouples
-        , typography.color |> unwrapToCouples colorToCouples
-        , typography.capitalization |> unwrapToCouples capitalizationToCouples
-        , typography.decoration |> unwrapToCouples decorationToCouples
-        , typography.whiteSpaceWrap |> unwrapToCouples whiteSpaceToCouples
-        , typography.userSelect |> unwrapToCouples userSelectToCouples
-        , typography.lineHeight |> unwrapToCouples lineHeightToCouples
-        ]
-
-
-capitalizationToCouples : Capitalization -> List ( String, String )
-capitalizationToCouples capitalization =
-    [ ( "text-transform", capitalizationToString capitalization ) ]
-
-
-capitalizationToString : Capitalization -> String
-capitalizationToString capitalization =
-    case capitalization of
-        CapitalizationUppercase ->
-            "uppercase"
-
-        CapitalizationLowercase ->
-            "lowercase"
-
-        CapitalizationCapitalize ->
-            "capitalize"
-
-
-decorationToCouples : TextDecoration -> List ( String, String )
-decorationToCouples decoration =
-    [ ( "text-decoration", textDecorationToString decoration ) ]
-
-
-whiteSpaceToCouples : WhiteSpaceWrap -> List ( String, String )
-whiteSpaceToCouples whiteSpace =
-    [ ( "white-space", whiteSpaceWrapToString whiteSpace ) ]
-
-
-userSelectToCouples : UserSelect -> List ( String, String )
-userSelectToCouples userSelect =
-    [ ( "user-select", userSelectToString userSelect ) ]
-
-
-lineHeightToCouples : Either SizeUnit Normal -> List ( String, String )
-lineHeightToCouples lineHeight =
-    [ ( "line-height", lineHeightToString lineHeight ) ]
-
-
-lineHeightToString : Either SizeUnit Normal -> String
-lineHeightToString normalSizeUnitEither =
-    case normalSizeUnitEither of
-        Left sizeUnit ->
-            sizeUnitToString sizeUnit
-
-        Right normal ->
-            "normal"
-
-
-colorToCouples : Color -> List ( String, String )
-colorToCouples color =
-    [ ( "color", Color.Convert.colorToCssRgba color ) ]
-
-
-characterToCouples : Character -> List ( String, String )
-characterToCouples character =
-    [ character.weight |> unwrapToCouple weightToCouple
-    , character.tilt |> unwrapToCouple tiltToCouple
-    , character.size |> unwrapToCouple sizeToCouple
-    , character.family |> unwrapToCouple familyToCouple
-    ]
-
-
-weightToCouple : Int -> ( String, String )
-weightToCouple int =
-    ( "font-weight", toString int )
-
-
-tiltToCouple : FontTilt -> ( String, String )
-tiltToCouple fontTilt =
-    ( "font-style", fontStyleToString fontTilt )
-
-
-sizeToCouple : SizeUnit -> ( String, String )
-sizeToCouple val =
-    ( "font-size", sizeUnitToString val )
-
-
-familyToCouple : FontFamily -> ( String, String )
-familyToCouple fontFamily =
-    ( "font-style", fontFamilyToString fontFamily )
 
 
 displayBoxToString : Maybe DisplayBox -> List ( String, String )
@@ -1398,33 +1188,6 @@ alignItemsToString =
         )
 
 
-concatNumberWithString : number -> String -> String
-concatNumberWithString number str =
-    (number |> toString) ++ str
-
-
-sizeUnitToString : SizeUnit -> String
-sizeUnitToString val =
-    case val of
-        Px x ->
-            concatNumberWithString x "px"
-
-        Pt x ->
-            concatNumberWithString x "pt"
-
-        Percent x ->
-            concatNumberWithString x "%"
-
-        Vh x ->
-            concatNumberWithString x "vh"
-
-        Em x ->
-            concatNumberWithString x "em"
-
-        Rem x ->
-            concatNumberWithString x "rem"
-
-
 maybeSizeUnitToString : Maybe SizeUnit -> Maybe String
 maybeSizeUnitToString =
     nothingOrJust sizeUnitToString
@@ -1469,55 +1232,6 @@ justifyContentToString =
                 JustifyContentCenter ->
                     "center"
         )
-
-
-textTransformToString : Maybe Capitalization -> Maybe String
-textTransformToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                CapitalizationLowercase ->
-                    "lowercase"
-
-                CapitalizationUppercase ->
-                    "uppercase"
-
-                CapitalizationCapitalize ->
-                    "capitalize"
-        )
-
-
-textDecorationToString : TextDecoration -> String
-textDecorationToString val =
-    case val of
-        TextDecorationNone ->
-            "none"
-
-        TextDecorationUnderline ->
-            "underline"
-
-        TextDecorationLineThrough ->
-            "line-through"
-
-
-whiteSpaceWrapToString : WhiteSpaceWrap -> String
-whiteSpaceWrapToString val =
-    case val of
-        WhiteSpaceWrapNoWrap ->
-            "nowrap"
-
-
-fontStyleToString : FontTilt -> String
-fontStyleToString val =
-    case val of
-        FontTiltNormal ->
-            "normal"
-
-        FontTiltItalic ->
-            "italic"
-
-        FontTiltOblique ->
-            "oblique"
 
 
 textAlignToString : Maybe Alignment -> Maybe String
@@ -1581,19 +1295,6 @@ autoOrSizeUnitToString =
         )
 
 
-normalOrSizeUnitToString : Maybe (Either SizeUnit Normal) -> Maybe String
-normalOrSizeUnitToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                Left su ->
-                    sizeUnitToString su
-
-                Right _ ->
-                    "normal"
-        )
-
-
 flexWrapToString : Maybe FlexWrap -> Maybe String
 flexWrapToString =
     nothingOrJust
@@ -1638,96 +1339,12 @@ visibilityToString val =
             "hidden"
 
 
-borderToString : Maybe Border -> Maybe String
-borderToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                BorderSolid ->
-                    "solid"
-
-                BorderDashed ->
-                    "dashed"
-        )
-
-
 maybeToString : Maybe a -> Maybe String
 maybeToString =
     nothingOrJust
         (\val ->
             toString val
         )
-
-
-offsetToStringList : ( SizeUnit, SizeUnit ) -> List String
-offsetToStringList ( x, y ) =
-    [ x, y ]
-        |> List.map sizeUnitToString
-
-
-{-| Custom font family
--}
-type CustomFontFamily
-    = SystemFont String
-    | CustomFont String
-
-
-{-| FontFamily Type
--}
-type FontFamily
-    = FontFamilyInherit
-    | FontFamilyCustom (List CustomFontFamily)
-
-
-fontFamilyToString : FontFamily -> String
-fontFamilyToString val =
-    case val of
-        FontFamilyInherit ->
-            "inherit"
-
-        FontFamilyCustom fontList ->
-            fontList
-                |> List.map
-                    (\e ->
-                        case e of
-                            CustomFont fontName ->
-                                Helpers.surroundWithQuotes fontName
-
-                            SystemFont fontName ->
-                                fontName
-                    )
-                |> String.join ", "
-
-
-boxShadowToString : Maybe BoxShadow -> Maybe String
-boxShadowToString =
-    nothingOrJust
-        (\{ offset, blurRadius, spreadRadius, maybeColor, inset } ->
-            List.concat
-                [ offsetToStringList offset
-                , [ blurRadius, spreadRadius ]
-                    |> List.map (emptyListOrApply sizeUnitToString)
-                    |> List.concat
-                , maybeColorToString maybeColor
-                    |> Maybe.map (\a -> [ a ])
-                    |> Maybe.withDefault []
-                , if inset then
-                    [ "inset" ]
-                  else
-                    []
-                ]
-                |> String.join " "
-        )
-
-
-userSelectToString : UserSelect -> String
-userSelectToString val =
-    case val of
-        False ->
-            "none"
-
-        True ->
-            "all"
 
 
 applyCssFunction : String -> String -> String
@@ -2761,39 +2378,6 @@ dimensions dimensionsModifiers blockAttributes =
 --     outlineWidth 0
 --
 --
--- standardBoxShadow : Maybe SizeUnit -> Maybe Color -> Offset -> BoxShadow
--- standardBoxShadow =
---     BoxShadow False Nothing
---
---
--- {-| Set the box shadow
--- -}
--- boxShadow : BoxShadow -> Style -> Style
--- boxShadow val (Style style) =
---     Style { style | boxShadow = Just val }
---
---
--- {-| Create a plain box shadow
--- -}
--- boxShadowPlain : Offset -> Color -> Style -> Style
--- boxShadowPlain offset color =
---     boxShadow
---         (standardBoxShadow Nothing (Just color) offset)
---
---
--- {-| Create a blurry box shadow
--- -}
--- boxShadowBlurry : Offset -> SizeUnit -> Color -> Style -> Style
--- boxShadowBlurry offset blurRadius color =
---     boxShadow
---         (standardBoxShadow (Just blurRadius) (Just color) offset)
---
---
--- {-| Create a centered blurry box shadow
--- -}
--- boxShadowCenteredBlurry : SizeUnit -> Color -> Style -> Style
--- boxShadowCenteredBlurry =
---     boxShadowBlurry ( Px 0, Px 0 )
 --
 -- display : DisplayBox -> Style -> Style
 -- display val (Style style) =
@@ -3076,35 +2660,6 @@ dimensions dimensionsModifiers blockAttributes =
 --     justifyContent JustifyContentCenter
 --
 --
--- {-| -}
--- fontFamily : FontFamily -> Style -> Style
--- fontFamily fontFamily (Style style) =
---     Style { style | fontFamily = Just fontFamily }
---
---
--- {-| -}
--- fontFamilyInherit : Style -> Style
--- fontFamilyInherit =
---     fontFamily FontFamilyInherit
---
---
--- {-| Standard Sans Serif font family.
--- Inspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>
--- -}
--- fontFamilySansSerif : Style -> Style
--- fontFamilySansSerif =
---     fontFamily
---         (FontFamilyCustom
---             [ SystemFont "-apple-system"
---             , SystemFont "system-ui"
---             , SystemFont "BlinkMacSystemFont"
---             , CustomFont "Segoe UI"
---             , CustomFont "Roboto"
---             , CustomFont "Helvetica Neue"
---             , CustomFont "Arial"
---             , SystemFont "sans-serif"
---             ]
---         )
 --
 --
 
