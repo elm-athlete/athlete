@@ -647,25 +647,14 @@ border =
     getModifyAndSet .border setBorderIn Surrounded.default
 
 
-{-| -}
-typography : Modifiers Typography.Typography -> Layout -> Layout
-typography modifiers layout =
-    layout
-        |> .typography
-        |> Maybe.withDefault Typography.default
-        |> Function.compose modifiers
-        |> Just
-        |> setTypographyIn layout
+typography : Modifiers Typography.Typography -> Modifier Layout
+typography =
+    getModifyAndSet .typography setTypographyIn Typography.default
 
 
-boxShadow : Modifiers BoxShadow.BoxShadow -> Layout -> Layout
-boxShadow modifiers layout =
-    layout
-        |> .boxShadow
-        |> Maybe.withDefault BoxShadow.default
-        |> Function.compose modifiers
-        |> Just
-        |> setBoxShadowIn layout
+boxShadow : Modifiers BoxShadow.BoxShadow -> Modifier Layout
+boxShadow =
+    getModifyAndSet .boxShadow setBoxShadowIn BoxShadow.default
 
 
 type alias BlockDetails =
@@ -799,15 +788,6 @@ fullSurrounding val =
         << rightSurrounding val
         << bottomSurrounding val
         << topSurrounding val
-
-
-defaultSurrounded : Surrounded a
-defaultSurrounded =
-    { left = Nothing
-    , right = Nothing
-    , bottom = Nothing
-    , top = Nothing
-    }
 
 
 {-| The display inline
@@ -1013,16 +993,17 @@ toLegacyDisplayCss str =
 
 layoutToCouples : Layout -> List ( String, String )
 layoutToCouples layout =
-    [ unwrapToCouples .visibility visibilityToCouple
+    [ unwrapToCouple .visibility visibilityToCouple
     , unwrapToCouples .typography Typography.typographyToCouples
     , unwrapToCouple .boxShadow BoxShadow.boxShadowToCouple
+    , unwrapToCouples .border Border.borderToCouples
     ]
-        |> List.concatMap (\fun -> fun layout)
+        |> List.concatMap (callOn layout)
 
 
-visibilityToCouple : Visibility -> List ( String, String )
+visibilityToCouple : Visibility -> ( String, String )
 visibilityToCouple visibility =
-    [ ( "visibility", visibilityToString visibility ) ]
+    ( "visibility", visibilityToString visibility )
 
 
 displayBoxToString : Maybe DisplayBox -> List ( String, String )
@@ -1656,7 +1637,7 @@ padding val layout =
         | padding =
             Just
                 (fullSurrounding val
-                    (layout.padding |> Maybe.withDefault defaultSurrounded)
+                    (layout.padding |> Maybe.withDefault Surrounded.default)
                 )
     }
 
@@ -1665,7 +1646,7 @@ paddingLeft : SizeUnit -> Layout -> Layout
 paddingLeft val layout =
     layout
         |> .padding
-        |> Maybe.withDefault defaultSurrounded
+        |> Maybe.withDefault Surrounded.default
         |> leftSurrounding val
         |> Just
         |> setPaddingIn layout
@@ -1674,7 +1655,7 @@ paddingLeft val layout =
 paddingRight : SizeUnit -> Layout -> Layout
 paddingRight val ({ padding } as layout) =
     padding
-        |> Maybe.withDefault defaultSurrounded
+        |> Maybe.withDefault Surrounded.default
         |> rightSurrounding val
         |> Just
         |> setPaddingIn layout
@@ -1690,7 +1671,7 @@ setSurroundingValue :
 setSurroundingValue getter propertySetter valueSetter val surroundingContainer =
     surroundingContainer
         |> getter
-        |> Maybe.withDefault defaultSurrounded
+        |> Maybe.withDefault Surrounded.default
         |> valueSetter val
         |> Just
         |> propertySetter surroundingContainer
@@ -1719,7 +1700,7 @@ marginLeft =
 -- padding : SizeUnit -> Layout -> Layout
 -- padding val ({ padding } as layout) =
 --     padding
---         |> Maybe.withDefault defaultSurrounded
+--         |> Maybe.withDefault Surrounded.default
 --         |> fullSurrounding val
 --         |> Just
 --         |> setPaddingIn layout
@@ -1822,124 +1803,6 @@ marginLeft =
 -- marginBottom : SizeUnit -> Style -> Style
 -- marginBottom size (Style style) =
 --     Style { style | marginBottom = Just <| Left size }
---
---
--- textTransform : Capitalization -> Style -> Style
--- textTransform val (Style style) =
---     Style { style | textTransform = Just val }
---
---
--- {-| -}
--- uppercase : Style -> Style
--- uppercase =
---     textTransform CapitalizationUppercase
---
---
--- {-| -}
--- lowercase : Style -> Style
--- lowercase =
---     textTransform CapitalizationLowercase
---
---
--- {-| -}
--- capitalize : Style -> Style
--- capitalize =
---     textTransform CapitalizationCapitalize
---
---
--- {-| -}
--- textColor : Color -> Style -> Style
--- textColor value (Style style) =
---     Style { style | textColor = Just value }
---
---
--- textDecoration : TextDecoration -> Style -> Style
--- textDecoration val (Style style) =
---     Style { style | textDecoration = Just val }
---
---
--- {-| -}
--- textDecorationNone : Style -> Style
--- textDecorationNone =
---     textDecoration TextDecorationNone
---
---
--- {-| -}
--- underline : Style -> Style
--- underline =
---     textDecoration TextDecorationUnderline
---
---
--- {-| -}
--- lineThrough : Style -> Style
--- lineThrough =
---     textDecoration TextDecorationLineThrough
---
---
--- {-| -}
--- bold : Style -> Style
--- bold =
---     fontWeight 700
---
---
--- {-| -}
--- strong : Style -> Style
--- strong =
---     bold
---
---
--- lineHeightGeneric : Either SizeUnit Normal -> Style -> Style
--- lineHeightGeneric val (Style style) =
---     Style { style | lineHeight = Just val }
---
---
--- {-| -}
--- lineHeight : SizeUnit -> Style -> Style
--- lineHeight =
---     lineHeightGeneric << Left
---
---
--- {-| -}
--- lineHeightNormal : Style -> Style
--- lineHeightNormal =
---     lineHeightGeneric <| Right Normal
---
---
--- {-| -}
--- fontWeightNormal : Style -> Style
--- fontWeightNormal =
---     fontWeight 400
---
---
--- {-| -}
--- fontWeight : Int -> Style -> Style
--- fontWeight val (Style style) =
---     Style { style | fontWeight = Just val }
---
---
--- fontStyle : FontTilt -> Style -> Style
--- fontStyle val (Style style) =
---     Style { style | fontStyle = Just val }
---
---
--- {-| -}
--- fontStyleNormal : Style -> Style
--- fontStyleNormal =
---     fontStyle FontTiltNormal
---
---
--- {-| -}
--- fontStyleItalic : Style -> Style
--- fontStyleItalic =
---     fontStyle FontTiltItalic
---
---
--- {-| -}
--- fontSize : SizeUnit -> Style -> Style
--- fontSize val (Style style) =
---     Style { style | fontSize = Just val }
---
---
 
 
 {-| helper function to create a heading
@@ -2089,18 +1952,6 @@ kappa =
 -- textJustify =
 --     textAlign AlignmentJustify
 --
---
--- whiteSpace : WhiteSpace -> Style -> Style
--- whiteSpace value (Style style) =
---     Style { style | whiteSpace = Just value }
---
---
--- {-| -}
--- whiteSpaceNoWrap : Style -> Style
--- whiteSpaceNoWrap =
---     whiteSpace WhiteSpaceNoWrap
---
---
 
 
 textOverflow : TextOverflow -> BlockDetails -> BlockDetails
@@ -2140,169 +1991,6 @@ dimensions dimensionsModifiers blockAttributes =
 -- backgroundImage : BackgroundImage -> Style -> Style
 -- backgroundImage backgroundImage (Style style) =
 --     Style { style | backgroundImages = [ backgroundImage ] }
---
---
--- {-| Remove the border
--- -}
--- borderNone : Style -> Style
--- borderNone =
---     borderWidth 0
---
---
--- {-| -}
--- borderColor : Color -> Style -> Style
--- borderColor color =
---     borderBottomColor color
---         << borderLeftColor color
---         << borderTopColor color
---         << borderRightColor color
---
---
--- {-| -}
--- borderSolid : Style -> Style
--- borderSolid =
---     borderBottomSolid
---         << borderLeftSolid
---         << borderTopSolid
---         << borderRightSolid
---
---
--- {-| -}
--- borderDashed : Style -> Style
--- borderDashed =
---     borderBottomDashed
---         << borderLeftDashed
---         << borderTopDashed
---         << borderRightDashed
---
---
--- {-| -}
--- borderWidth : Int -> Style -> Style
--- borderWidth size =
---     borderBottomWidth size
---         << borderLeftWidth size
---         << borderTopWidth size
---         << borderRightWidth size
---
---
--- {-| -}
--- borderBottomColor : Color -> Style -> Style
--- borderBottomColor color (Style style) =
---     Style { style | borderBottomColor = Just color }
---
---
--- {-| -}
--- borderBottomStyle : Border -> Style -> Style
--- borderBottomStyle style_ (Style style) =
---     Style { style | borderBottomStyle = Just style_ }
---
---
--- {-| -}
--- borderBottomSolid : Style -> Style
--- borderBottomSolid =
---     borderBottomStyle BorderSolid
---
---
--- {-| -}
--- borderBottomDashed : Style -> Style
--- borderBottomDashed =
---     borderBottomStyle BorderDashed
---
---
--- {-| -}
--- borderBottomWidth : Int -> Style -> Style
--- borderBottomWidth size_ (Style style) =
---     Style { style | borderBottomWidth = Just (Px size_) }
---
---
--- {-| -}
--- borderLeftColor : Color -> Style -> Style
--- borderLeftColor color (Style style) =
---     Style { style | borderLeftColor = Just color }
---
---
--- {-| -}
--- borderLeftStyle : Border -> Style -> Style
--- borderLeftStyle style_ (Style style) =
---     Style { style | borderLeftStyle = Just style_ }
---
---
--- {-| -}
--- borderLeftSolid : Style -> Style
--- borderLeftSolid =
---     borderLeftStyle BorderSolid
---
---
--- {-| -}
--- borderLeftDashed : Style -> Style
--- borderLeftDashed =
---     borderLeftStyle BorderDashed
---
---
--- {-| -}
--- borderLeftWidth : Int -> Style -> Style
--- borderLeftWidth size_ (Style style) =
---     Style { style | borderLeftWidth = Just (Px size_) }
---
---
--- {-| -}
--- borderTopColor : Color -> Style -> Style
--- borderTopColor color (Style style) =
---     Style { style | borderTopColor = Just color }
---
---
--- {-| -}
--- borderTopStyle : Border -> Style -> Style
--- borderTopStyle style_ (Style style) =
---     Style { style | borderTopStyle = Just style_ }
---
---
--- {-| -}
--- borderTopSolid : Style -> Style
--- borderTopSolid =
---     borderTopStyle BorderSolid
---
---
--- {-| -}
--- borderTopDashed : Style -> Style
--- borderTopDashed =
---     borderTopStyle BorderDashed
---
---
--- {-| -}
--- borderTopWidth : Int -> Style -> Style
--- borderTopWidth size_ (Style style) =
---     Style { style | borderTopWidth = Just (Px size_) }
---
---
--- {-| -}
--- borderRightColor : Color -> Style -> Style
--- borderRightColor color (Style style) =
---     Style { style | borderRightColor = Just color }
---
---
--- {-| -}
--- borderRightStyle : Border -> Style -> Style
--- borderRightStyle style_ (Style style) =
---     Style { style | borderRightStyle = Just style_ }
---
---
--- {-| -}
--- borderRightSolid : Style -> Style
--- borderRightSolid =
---     borderRightStyle BorderSolid
---
---
--- {-| -}
--- borderRightDashed : Style -> Style
--- borderRightDashed =
---     borderRightStyle BorderDashed
---
---
--- {-| -}
--- borderRightWidth : Int -> Style -> Style
--- borderRightWidth size_ (Style style) =
---     Style { style | borderRightWidth = Just (Px size_) }
 --
 --
 -- {-| -}
@@ -2376,34 +2064,6 @@ dimensions dimensionsModifiers blockAttributes =
 -- outlineNone : Style -> Style
 -- outlineNone =
 --     outlineWidth 0
---
---
---
--- display : DisplayBox -> Style -> Style
--- display val (Style style) =
---     Style { style | display = Just val }
---
--- {-| -}
--- displayInlineBlock : Style -> Style
--- displayInlineBlock =
---     display DisplayInlineBlock
--- {-| -}
--- displayBlock : Style -> Style
--- displayBlock =
---     display DisplayBlock
--- {-| -}
--- displayFlex : Style -> Style
--- displayFlex =
---     display DisplayFlex
--- displayInlineFlex : Style -> Style
--- displayInlineFlex =
---     display DisplayInlineFlex
--- {-| -}
--- displayInline : Style -> Style
--- displayInline =
---     display DisplayInline
---
---
 --
 --
 -- {-| -}

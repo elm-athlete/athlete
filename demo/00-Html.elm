@@ -22,7 +22,7 @@ main =
                                 [ Elegant.color Color.blue
                                 , Typography.character
                                     [ Typography.Character.weight 900
-                                    , Typography.Character.size (px 200)
+                                    , Typography.Character.size (px 100)
                                     , Typography.Character.italic
                                     ]
                                 ]
@@ -32,12 +32,15 @@ main =
                                 , BoxShadow.inset True
                                 ]
                             , Elegant.border
-                                [ Border.top
+                                [ Border.all
                                     [ Elegant.color Color.blue
                                     , Border.solid
+                                    , Border.thickness (px 200)
                                     ]
                                 , Border.horizontal
                                     [ Elegant.color Color.black ]
+                                , Border.right
+                                    [ Elegant.color Color.lightOrange ]
                                 ]
 
                             -- , Elegant.margin

@@ -1,5 +1,6 @@
 module Surrounded exposing (..)
 
+import List.Extra
 import Shared exposing (..)
 import Setters exposing (..)
 
@@ -55,3 +56,29 @@ all : a -> Modifiers a -> Modifier (Surrounded a)
 all default modifiers =
     vertical default modifiers
         >> horizontal default modifiers
+
+
+surroundedToCouples :
+    String
+    -> (a -> List ( String, String ))
+    -> Surrounded a
+    -> List ( String, String )
+surroundedToCouples prefix toCouple border =
+    [ unwrapToCouples .top toCouple
+    , unwrapToCouples .bottom toCouple
+    , unwrapToCouples .right toCouple
+    , unwrapToCouples .left toCouple
+    ]
+        |> List.map (callOn border)
+        |> flip List.Extra.andMap
+            [ List.map (addPrefix prefix "top")
+            , List.map (addPrefix prefix "bottom")
+            , List.map (addPrefix prefix "right")
+            , List.map (addPrefix prefix "left")
+            ]
+        |> List.concat
+
+
+addPrefix : String -> String -> ( String, String ) -> ( String, String )
+addPrefix qualifier orientation ( selector, value ) =
+    ( [ qualifier, orientation, selector ] |> String.join "-", value )

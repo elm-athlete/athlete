@@ -8,7 +8,7 @@ import Surrounded exposing (Surrounded)
 
 type alias Border =
     { color : Maybe Color
-    , width : Maybe SizeUnit
+    , thickness : Maybe SizeUnit
     , style : Maybe BorderStyle
     }
 
@@ -31,6 +31,11 @@ solid =
 dashed : Modifier Border
 dashed =
     setStyle <| Just BorderStyleDashed
+
+
+thickness : SizeUnit -> Modifier Border
+thickness =
+    setThickness << Just
 
 
 top : Modifiers Border -> Modifier (Surrounded Border)
@@ -62,17 +67,42 @@ vertical : Modifiers Border -> Modifier (Surrounded Border)
 vertical =
     Surrounded.vertical default
 
+
 all : Modifiers Border -> Modifier (Surrounded Border)
 all =
-  Surrounded.all default
+    Surrounded.all default
+
+
+borderToCouples : Surrounded Border -> List ( String, String )
+borderToCouples =
+    Surrounded.surroundedToCouples "border" borderSideToCouples
 
 
 
 -- Internals
 
 
-borderStyleToString : BorderStyle -> String
-borderStyleToString val =
+borderSideToCouples : Border -> List ( String, String )
+borderSideToCouples border =
+    [ unwrapToCouple .thickness thicknessToCouple
+    , unwrapToCouple .style styleToCouple
+    , unwrapToCouple .color colorToCouple
+    ]
+        |> List.concatMap (callOn border)
+
+
+thicknessToCouple : SizeUnit -> ( String, String )
+thicknessToCouple value =
+    ( "width", sizeUnitToString value )
+
+
+styleToCouple : BorderStyle -> ( String, String )
+styleToCouple style =
+    ( "style", styleToString style )
+
+
+styleToString : BorderStyle -> String
+styleToString val =
     case val of
         BorderStyleSolid ->
             "solid"

@@ -3,6 +3,8 @@ module Shared exposing (..)
 {-| -}
 
 import Function
+import Color.Convert
+import Color exposing (Color)
 
 
 type SizeUnit
@@ -49,21 +51,36 @@ type alias Modifiers a =
     List (Modifier a)
 
 
+
+-- TODO move in Function
+
+call : (a -> b) -> a -> b
+call fun =
+  fun
+
+callOn : a -> (a -> b) -> b
+callOn var fun =
+    fun var
+
+
+colorToCouple : Color -> ( String, String )
+colorToCouple color =
+    ( "color", Color.Convert.colorToCssRgba color )
+
+
 unwrapToCouple : (a -> Maybe b) -> (b -> ( String, String )) -> a -> List ( String, String )
-unwrapToCouple getter function aMaybe =
-    aMaybe
-        |> getter
-        |> Maybe.map function
-        |> Maybe.map List.singleton
-        |> Maybe.withDefault []
+unwrapToCouple getter function =
+    getter
+        >> Maybe.map function
+        >> Maybe.map List.singleton
+        >> Maybe.withDefault []
 
 
 unwrapToCouples : (a -> Maybe b) -> (b -> List ( String, String )) -> a -> List ( String, String )
-unwrapToCouples getter function aMaybe =
-    aMaybe
-        |> getter
-        |> Maybe.map function
-        |> Maybe.withDefault []
+unwrapToCouples getter function =
+    getter
+        >> Maybe.map function
+        >> Maybe.withDefault []
 
 
 getModifyAndSet : (b -> Maybe a) -> (b -> Maybe a -> c) -> a -> List (a -> a) -> b -> c

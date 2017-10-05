@@ -89,7 +89,6 @@ import Typography.Character as Character exposing (Character)
 import Shared exposing (..)
 import Function
 import Setters exposing (..)
-import Color.Convert
 
 
 {-| The Typography record contains everything about fonts rendering,
@@ -262,14 +261,14 @@ Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
 typographyToCouples : Typography -> List ( String, String )
 typographyToCouples typography =
-    [ unwrapToCouple .color colorToCouples
+    [ unwrapToCouple .color colorToCouple
     , unwrapToCouple .capitalization capitalizationToCouples
     , unwrapToCouple .decoration decorationToCouples
     , unwrapToCouple .whiteSpaceWrap whiteSpaceToCouples
     , unwrapToCouple .userSelect userSelectToCouples
     , unwrapToCouple .lineHeight lineHeightToCouples
     ]
-        |> List.concatMap (\fun -> fun typography)
+        |> List.concatMap (callOn typography)
         |> List.append
             (typography
                 |> unwrapToCouples
@@ -358,8 +357,3 @@ lineHeightToString normalSizeUnitEither =
 
         Right _ ->
             "normal"
-
-
-colorToCouples : Color -> ( String, String )
-colorToCouples color =
-    ( "color", Color.Convert.colorToCssRgba color )

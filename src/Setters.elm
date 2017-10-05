@@ -639,3 +639,13 @@ setZIndex v o =
 setZIndexIn : { b | zIndex : a } -> c -> { b | zIndex : c }
 setZIndexIn =
     flip setZIndex
+
+
+setThickness : a -> { c | thickness : b } -> { c | thickness : a }
+setThickness v o =
+    { o | thickness = v }
+
+
+setThicknessIn : { c | thickness : b } -> a -> { c | thickness : a }
+setThicknessIn =
+    flip setThickness
