@@ -295,6 +295,7 @@ import Corner
 import Surrounded exposing (Surrounded)
 import Border
 import Margin
+import Padding
 
 
 type alias SizeUnit =
@@ -489,15 +490,6 @@ defaultDimensions =
 -- dimensions [ width (Px 30) ]
 
 
-blah : DisplayBox
-blah =
-    displayBlock
-        [ textOverflow TextOverflowEllipsis
-        , dimensions [ width (Px 10) ]
-        ]
-        [ padding (Px 20) ]
-
-
 type ListStyleType
     = ListStyleTypeNone
     | ListStyleTypeDisc
@@ -556,10 +548,6 @@ type TextOverflow
     = TextOverflowEllipsis
 
 
-type alias Padding =
-    Surrounded SizeUnit
-
-
 type Horizontal a
     = PositionLeft a
     | PositionRight a
@@ -612,7 +600,7 @@ type alias Layout =
     { position : Maybe Position
     , visibility : Maybe Visibility
     , typography : Maybe Typography.Typography
-    , padding : Maybe Padding
+    , padding : Maybe (Surrounded Padding.Padding)
     , border : Maybe (Surrounded Border.Border)
     , corner : Maybe Corner.Corner
     , margin : Maybe (Surrounded Margin.Margin)
@@ -630,6 +618,11 @@ border =
     getModifyAndSet .border setBorderIn Surrounded.default
 
 
+boxShadow : Modifiers BoxShadow.BoxShadow -> Modifier Layout
+boxShadow =
+    getModifyAndSet .boxShadow setBoxShadowIn BoxShadow.default
+
+
 corner : Modifiers Corner.Corner -> Modifier Layout
 corner =
     getModifyAndSet .corner setCornerIn Corner.default
@@ -640,14 +633,14 @@ margin =
     getModifyAndSet .margin setMarginIn Surrounded.default
 
 
+padding : Modifiers (Surrounded Padding.Padding) -> Modifier Layout
+padding =
+    getModifyAndSet .padding setPaddingIn Surrounded.default
+
+
 typography : Modifiers Typography.Typography -> Modifier Layout
 typography =
     getModifyAndSet .typography setTypographyIn Typography.default
-
-
-boxShadow : Modifiers BoxShadow.BoxShadow -> Modifier Layout
-boxShadow =
-    getModifyAndSet .boxShadow setBoxShadowIn BoxShadow.default
 
 
 visibility : Visibility -> Modifier Layout
@@ -768,34 +761,6 @@ displayBlock blockDetailsModifiers layoutModifiers =
             DisplayFlow
             (modifiedElementOrNothing defaultLayout layoutModifiers)
         )
-
-
-leftSurrounding : a -> Surrounded a -> Surrounded a
-leftSurrounding =
-    setLeft << Just
-
-
-rightSurrounding : a -> Surrounded a -> Surrounded a
-rightSurrounding =
-    setRight << Just
-
-
-topSurrounding : a -> Surrounded a -> Surrounded a
-topSurrounding =
-    setTop << Just
-
-
-bottomSurrounding : a -> Surrounded a -> Surrounded a
-bottomSurrounding =
-    setBottom << Just
-
-
-fullSurrounding : a -> Surrounded a -> Surrounded a
-fullSurrounding val =
-    leftSurrounding val
-        << rightSurrounding val
-        << bottomSurrounding val
-        << topSurrounding val
 
 
 {-| The display inline
@@ -1007,6 +972,7 @@ layoutToCouples layout =
     , unwrapToCouples .border Border.borderToCouples
     , unwrapToCouples .corner Corner.cornerToCouples
     , unwrapToCouples .margin Margin.marginToCouples
+    , unwrapToCouples .padding Padding.paddingToCouples
     ]
         |> List.concatMap (callOn layout)
 
@@ -1643,67 +1609,11 @@ inlineStyle =
 --
 
 
-{-| -}
-padding : SizeUnit -> Layout -> Layout
-padding val layout =
-    { layout
-        | padding =
-            Just
-                (fullSurrounding val
-                    (layout.padding |> Maybe.withDefault Surrounded.default)
-                )
-    }
-
-
-paddingLeft : SizeUnit -> Layout -> Layout
-paddingLeft val layout =
-    layout
-        |> .padding
-        |> Maybe.withDefault Surrounded.default
-        |> leftSurrounding val
-        |> Just
-        |> setPaddingIn layout
-
-
-paddingRight : SizeUnit -> Layout -> Layout
-paddingRight val ({ padding } as layout) =
-    padding
-        |> Maybe.withDefault Surrounded.default
-        |> rightSurrounding val
-        |> Just
-        |> setPaddingIn layout
-
-
-setSurroundingValue :
-    (surroundingContainer -> Maybe (Surrounded a))
-    -> (surroundingContainer -> Maybe (Surrounded a) -> surroundingContainer)
-    -> (a -> Surrounded a -> Surrounded a)
-    -> a
-    -> surroundingContainer
-    -> surroundingContainer
-setSurroundingValue getter propertySetter valueSetter val surroundingContainer =
-    surroundingContainer
-        |> getter
-        |> Maybe.withDefault Surrounded.default
-        |> valueSetter val
-        |> Just
-        |> propertySetter surroundingContainer
-
-
 {-| helper function to create a heading
 -}
 heading : SizeUnit -> Style -> Style
 heading val =
     identity
-
-
-
--- [ margin zero
--- , marginBottom (Rem 0.5)
--- , fontWeight 600
--- , fontSize val
--- ]
---     |> compose
 
 
 {-| helper function to create a h1 style

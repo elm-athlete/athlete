@@ -70,7 +70,7 @@ type alias Margin =
     Either SizeUnit Auto
 
 
-{-| Generate an empty `Margin` record, equal to Nothing.
+{-| Generate an empty `Margin` record, equal to auto.
 You are free to use it as you wish, but it is instanciated automatically by `Elegant.margin`.
 -}
 default : Margin

@@ -11,6 +11,7 @@
         "BoxShadow",
         "Corner",
         "Margin",
+        "Padding",
         "Typography",
         "Typography.Character"
     ],
