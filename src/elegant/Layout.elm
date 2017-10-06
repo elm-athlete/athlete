@@ -1,12 +1,7 @@
 module Layout exposing (..)
 
-import Color exposing (Color)
-import Color.Convert
-import Maybe.Extra as Maybe
 import Helpers.Shared exposing (..)
 import Helpers.Setters exposing (..)
-import Helpers.Vector exposing (Vector)
-import Elegant.Helpers as Helpers
 import Typography
 import Padding
 import Border
@@ -16,14 +11,7 @@ import Outline
 import BoxShadow
 import Cursor
 import Surrounded exposing (Surrounded)
-
-
-type alias Radiant =
-    Float
-
-
-type alias Degree =
-    Float
+import Background
 
 
 type Visibility
@@ -39,12 +27,6 @@ hidden =
 visible : Visibility
 visible =
     VisibilityVisible
-
-
-type alias Background =
-    { color : Maybe Color
-    , images : List BackgroundImage
-    }
 
 
 type Horizontal a
@@ -75,50 +57,6 @@ type Position
     | PositionStatic
 
 
-type Angle
-    = Rad Radiant
-    | Deg Degree
-
-
-type alias ColorStop =
-    { offset : Maybe SizeUnit
-    , color : Color
-    }
-
-
-type alias LinearGradient =
-    { angle : Angle
-    , colorStops : List ColorStop
-    }
-
-
-type alias RadialGradient =
-    { colorStops : List ColorStop }
-
-
-type Gradient
-    = Linear LinearGradient
-    | Radial RadialGradient
-
-
-type Image
-    = Gradient Gradient
-    | Source String
-
-
-type alias BackgroundImage =
-    { image : Image
-    , backgroundPosition : Maybe (Vector SizeUnit)
-    }
-
-
-{-| Simple background image with only an url as source
--}
-withUrl : String -> BackgroundImage
-withUrl url =
-    BackgroundImage (Source url) Nothing
-
-
 type alias Layout =
     { position : Maybe Position
     , visibility : Maybe Visibility
@@ -129,7 +67,7 @@ type alias Layout =
     , margin : Maybe (Surrounded Margin.Margin)
     , outline : Maybe Outline.Outline
     , boxShadow : Maybe BoxShadow.BoxShadow
-    , background : Maybe Background
+    , background : Maybe Background.Background
     , opacity : Maybe Float
     , cursor : Maybe Cursor.Cursor
     , zIndex : Maybe Int
@@ -152,6 +90,11 @@ defaultLayout =
         Nothing
         Nothing
         Nothing
+
+
+background : Modifiers Background.Background -> Modifier Layout
+background =
+    getModifyAndSet .background setBackgroundIn Background.default
 
 
 border : Modifiers (Surrounded Border.Border) -> Modifier Layout
@@ -215,8 +158,9 @@ layoutToCouples layout =
     , unwrapToCouple .opacity opacityToCouple
     , unwrapToCouple .zIndex zIndexToCouple
     , unwrapToCouple .cursor Cursor.cursorToCouple
-    , unwrapToCouples .typography Typography.typographyToCouples
     , unwrapToCouple .boxShadow BoxShadow.boxShadowToCouple
+    , unwrapToCouples .background Background.backgroundToCouples
+    , unwrapToCouples .typography Typography.typographyToCouples
     , unwrapToCouples .border Border.borderToCouples
     , unwrapToCouples .outline Outline.outlineToCouples
     , unwrapToCouples .corner Corner.cornerToCouples
@@ -267,77 +211,3 @@ positionToString =
                 PositionStatic ->
                     "static"
         )
-
-
-angleToString : Angle -> String
-angleToString angle =
-    case angle of
-        Rad a ->
-            (a |> toString) ++ "rad"
-
-        Deg a ->
-            (a |> toString) ++ "deg"
-
-
-colorToString : Color -> String
-colorToString =
-    Color.Convert.colorToCssRgba
-
-
-maybeColorToString : Maybe Color -> Maybe String
-maybeColorToString =
-    nothingOrJust colorToString
-
-
-colorStopToString : ColorStop -> String
-colorStopToString colorStop =
-    case colorStop of
-        { color, offset } ->
-            [ Just (colorToString color), maybeSizeUnitToString offset ] |> Maybe.values |> String.join " "
-
-
-maybeSizeUnitToString : Maybe SizeUnit -> Maybe String
-maybeSizeUnitToString =
-    nothingOrJust sizeUnitToString
-
-
-colorStopsToString : List ColorStop -> String
-colorStopsToString colorStops =
-    colorStops |> List.map colorStopToString |> String.join ", "
-
-
-applyCssFunction : String -> String -> String
-applyCssFunction funName content =
-    funName ++ (Helpers.surroundWithParentheses content)
-
-
-gradientToString : Gradient -> String
-gradientToString gradient =
-    case gradient of
-        Linear { angle, colorStops } ->
-            applyCssFunction "linear-gradient" ([ angleToString angle, colorStopsToString colorStops ] |> String.join ", ")
-
-        Radial { colorStops } ->
-            applyCssFunction "radial-gradient" (colorStopsToString colorStops)
-
-
-imageToString : Image -> String
-imageToString image =
-    case image of
-        Gradient gradient ->
-            gradientToString gradient
-
-        Source src ->
-            applyCssFunction "url" src
-
-
-backgroundImagesToString : List BackgroundImage -> Maybe String
-backgroundImagesToString backgroundImages =
-    if backgroundImages == [] then
-        Nothing
-    else
-        Just
-            (backgroundImages
-                |> List.map (\{ image } -> imageToString image)
-                |> String.join (" ")
-            )

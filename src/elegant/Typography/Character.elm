@@ -71,7 +71,7 @@ module Typography.Character
 
 import Helpers.Shared exposing (..)
 import Helpers.Setters exposing (..)
-import Elegant.Helpers as Helpers
+import Helpers.Css
 
 
 {-| The Character record contains everything about characters rendering.
@@ -275,7 +275,7 @@ extractFontName : CustomFontFamily -> String
 extractFontName customFont =
     case customFont of
         CustomFont fontName ->
-            Helpers.surroundWithQuotes fontName
+            Helpers.Css.surroundWithQuotes fontName
 
         SystemFont fontName ->
             fontName

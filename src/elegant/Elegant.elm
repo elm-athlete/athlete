@@ -189,13 +189,13 @@ import Html exposing (Html)
 import Html.Attributes
 import Function exposing (compose)
 import List.Extra
-import Elegant.Helpers as Helpers exposing (emptyListOrApply)
 import Maybe.Extra as Maybe exposing ((?))
 import Function
 import Helpers.Setters exposing (..)
 import Helpers.Shared exposing (..)
 import Helpers.Vector exposing (Vector)
 import Either exposing (Either(..))
+import Helpers.Css
 import Layout
 
 
@@ -1795,12 +1795,12 @@ screenWidthToClassNames suffix { min, max, style } =
 
 addMediaQueryId : Maybe Int -> Maybe Int -> String -> String
 addMediaQueryId min max =
-    flip (++) (String.filter Helpers.isValidInCssName (toString min ++ toString max))
+    flip (++) (String.filter Helpers.Css.isValidInCssName (toString min ++ toString max))
 
 
 generateClassName : Maybe String -> ( String, String ) -> String
 generateClassName maybeSuffix ( attribute, value ) =
-    attribute ++ "-" ++ (String.filter Helpers.isValidInCssName (value ++ generateSuffix maybeSuffix))
+    attribute ++ "-" ++ (String.filter Helpers.Css.isValidInCssName (value ++ generateSuffix maybeSuffix))
 
 
 generateSuffix : Maybe String -> String
@@ -1837,7 +1837,7 @@ type alias AtomicClass =
 
 generateMediaQueryId : ( Maybe Int, Maybe Int ) -> String
 generateMediaQueryId ( min, max ) =
-    String.filter Helpers.isValidInCssName (toString min ++ toString max)
+    String.filter Helpers.Css.isValidInCssName (toString min ++ toString max)
 
 
 coupleToAtomicClass : Maybe String -> Maybe ( Maybe Int, Maybe Int ) -> ( String, String ) -> AtomicClass
@@ -1907,7 +1907,7 @@ inMediaQuery mediaQuery content =
             content
 
         Just queries ->
-            queries ++ Helpers.surroundWithBraces content
+            queries ++ Helpers.Css.surroundWithBraces content
 
 
 mediaQuerySelector : Maybe Int -> Maybe Int -> String
@@ -1941,4 +1941,4 @@ compileStyleToCss className mediaQueryId selector property =
         ++ className
         ++ (mediaQueryId ? "")
         ++ (selector ? "")
-        ++ Helpers.surroundWithBraces property
+        ++ Helpers.Css.surroundWithBraces property

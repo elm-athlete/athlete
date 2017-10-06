@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (Html)
 import Html.Attributes
 import Elegant exposing (px)
+import Layout
 import Typography
 import Typography.Character
 import BoxShadow
@@ -13,6 +14,7 @@ import Margin
 import Padding
 import Cursor
 import Outline
+import Background
 
 
 main : Html msg
@@ -25,7 +27,7 @@ main =
 mainStyle : Elegant.DisplayBox
 mainStyle =
     Elegant.displayBlock []
-        [ Elegant.typography
+        [ Layout.typography
             [ Elegant.color Color.blue
             , Typography.character
                 [ Typography.Character.weight 900
@@ -33,13 +35,13 @@ mainStyle =
                 , Typography.Character.italic
                 ]
             ]
-        , Elegant.padding
+        , Layout.padding
             [ Padding.all (px 30) ]
-        , Elegant.boxShadow
+        , Layout.boxShadow
             [ BoxShadow.standard (px 30) Color.black ( px 3, px 3 )
             , BoxShadow.inset True
             ]
-        , Elegant.border
+        , Layout.border
             [ Border.all
                 [ Elegant.color Color.blue
                 , Border.solid
@@ -50,19 +52,36 @@ mainStyle =
             , Border.right
                 [ Elegant.color Color.lightOrange ]
             ]
-        , Elegant.corner
+        , Layout.corner
             [ Corner.circular Corner.all (px 200) ]
-        , Elegant.margin
+        , Layout.margin
             [ Margin.top <| Margin.width (px 40)
             , Margin.vertical <| Margin.width (px 30)
             , Margin.bottom Margin.auto
             ]
-        , Elegant.visibility Elegant.visible
-        , Elegant.opacity 0.9
-        , Elegant.zIndex 1000
-        , Elegant.cursor Cursor.default
-        , Elegant.outline
+        , Layout.visibility Layout.visible
+        , Layout.opacity 0.9
+        , Layout.zIndex 1000
+        , Layout.cursor Cursor.default
+        , Layout.outline
             [ Outline.none ]
+        , Layout.background
+            [ Elegant.color Color.blue
+            , Background.images
+                [ Background.image "https://hackage.haskell.org/package/elm-reactor-0.3.1/src/assets/favicon.ico"
+                    |> Background.at ( px 5, px 5 )
+                , Background.linear (Background.degree 90)
+                    (Background.colorStop Color.blue |> Background.at (px 4))
+                    (Background.colorStop Color.black)
+                    |> Background.intermediateColors
+                        [ Background.colorStop Color.red ]
+                    |> Background.gradient
+                , Background.radial
+                    (Background.colorStop Color.black |> Background.at (px 200))
+                    (Background.colorStop Color.blue)
+                    |> Background.gradient
+                ]
+            ]
         ]
 
 
