@@ -4,7 +4,8 @@
     "repository": "https://github.com/elm-bodybuilder/elegant.git",
     "license": "MIT",
     "source-directories": [
-        "src"
+        "src/elegant",
+        "src/bodybuilder"
     ],
     "exposed-modules": [
         "Border",

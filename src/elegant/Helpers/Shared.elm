@@ -1,4 +1,4 @@
-module Shared exposing (..)
+module Helpers.Shared exposing (..)
 
 {-| -}
 

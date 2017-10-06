@@ -51,7 +51,7 @@ module Margin
 -}
 
 import Either exposing (Either(..))
-import Shared exposing (..)
+import Helpers.Shared exposing (..)
 import Surrounded exposing (Surrounded)
 
 

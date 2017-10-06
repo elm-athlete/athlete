@@ -193,9 +193,9 @@ import Elegant.Helpers as Helpers exposing (emptyListOrApply)
 import Maybe.Extra as Maybe exposing ((?))
 import Color exposing (Color)
 import Color.Convert
-import Setters exposing (..)
+import Helpers.Setters exposing (..)
 import Function
-import Shared exposing (..)
+import Helpers.Shared exposing (..)
 import Typography
 import BoxShadow
 import Either exposing (Either(..))
@@ -209,7 +209,7 @@ import Padding
 
 
 type alias SizeUnit =
-    Shared.SizeUnit
+    Helpers.Shared.SizeUnit
 
 
 px : Int -> SizeUnit

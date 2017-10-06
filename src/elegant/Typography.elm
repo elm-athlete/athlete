@@ -83,12 +83,12 @@ module Typography
 
 -}
 
+import Function
 import Color exposing (Color)
 import Either exposing (Either(..))
 import Typography.Character as Character exposing (Character)
-import Shared exposing (..)
-import Function
-import Setters exposing (..)
+import Helpers.Shared exposing (..)
+import Helpers.Setters exposing (..)
 
 
 {-| The Typography record contains everything about fonts rendering,

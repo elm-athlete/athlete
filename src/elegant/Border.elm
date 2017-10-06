@@ -60,8 +60,8 @@ module Border
 -}
 
 import Color exposing (Color)
-import Shared exposing (..)
-import Setters exposing (..)
+import Helpers.Shared exposing (..)
+import Helpers.Setters exposing (..)
 import Surrounded exposing (Surrounded)
 
 

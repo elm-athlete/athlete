@@ -42,8 +42,8 @@ module Outline
 -}
 
 import Color exposing (Color)
-import Setters exposing (..)
-import Shared exposing (..)
+import Helpers.Setters exposing (..)
+import Helpers.Shared exposing (..)
 
 
 {-| The `Outline` record contains everything about one outline side.
