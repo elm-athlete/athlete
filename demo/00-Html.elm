@@ -10,6 +10,7 @@ import Border
 import Color exposing (Color)
 import Corner
 import Margin
+import Padding
 
 
 main : Html msg
@@ -24,7 +25,8 @@ main =
                     , Typography.Character.italic
                     ]
                 ]
-            , Elegant.padding (px 30)
+            , Elegant.padding
+                [ Padding.all (px 30) ]
             , Elegant.boxShadow
                 [ BoxShadow.standard (px 30) Color.black ( px 3, px 3 )
                 , BoxShadow.inset True
@@ -47,7 +49,7 @@ main =
                 , Margin.vertical <| Margin.width (px 30)
                 , Margin.bottom Margin.auto
                 ]
-            , Elegant.visibility Elegant.hidden
+            , Elegant.visibility Elegant.visible
             ]
             |> Just
             |> flip Elegant.style []

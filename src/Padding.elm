@@ -2,7 +2,6 @@ module Padding
     exposing
         ( Padding
         , default
-        , width
         , top
         , bottom
         , left
@@ -24,11 +23,6 @@ module Padding
 # Default padding
 
 @docs default
-
-
-# Padding setters
-
-@docs width
 
 
 # Padding selectors
@@ -75,60 +69,53 @@ default =
     Px 0
 
 
-{-| Set the padding width to the desired value.
--}
-width : SizeUnit -> Modifier Padding
-width value padding =
-    value
-
-
 {-| Accepts a padding modifier, and modify the top side of the padding.
 -}
-top : Modifier Padding -> Modifier (Surrounded Padding)
+top : SizeUnit -> Modifier (Surrounded Padding)
 top =
-    Surrounded.top default << List.singleton
+    Surrounded.top default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify the bottom side of the padding.
 -}
-bottom : Modifier Padding -> Modifier (Surrounded Padding)
+bottom : SizeUnit -> Modifier (Surrounded Padding)
 bottom =
-    Surrounded.bottom default << List.singleton
+    Surrounded.bottom default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify the left side of the padding.
 -}
-left : Modifier Padding -> Modifier (Surrounded Padding)
+left : SizeUnit -> Modifier (Surrounded Padding)
 left =
-    Surrounded.left default << List.singleton
+    Surrounded.left default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify the right side of the padding.
 -}
-right : Modifier Padding -> Modifier (Surrounded Padding)
+right : SizeUnit -> Modifier (Surrounded Padding)
 right =
-    Surrounded.right default << List.singleton
+    Surrounded.right default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify both the top and the bottom side of the padding.
 -}
-horizontal : Modifier Padding -> Modifier (Surrounded Padding)
+horizontal : SizeUnit -> Modifier (Surrounded Padding)
 horizontal =
-    Surrounded.horizontal default << List.singleton
+    Surrounded.horizontal default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify both the right and left side of the padding.
 -}
-vertical : Modifier Padding -> Modifier (Surrounded Padding)
+vertical : SizeUnit -> Modifier (Surrounded Padding)
 vertical =
-    Surrounded.vertical default << List.singleton
+    Surrounded.vertical default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify the four sides of the padding.
 -}
-all : Modifier Padding -> Modifier (Surrounded Padding)
+all : SizeUnit -> Modifier (Surrounded Padding)
 all =
-    Surrounded.all default << List.singleton
+    Surrounded.all default << modifiersFrom
 
 
 {-| Compiles a `Surrounded Padding` record to the corresponding CSS list of tuples.

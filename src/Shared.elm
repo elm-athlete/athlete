@@ -99,6 +99,11 @@ getModifyAndSet getter setterIn default modifiers record =
         |> setterIn record
 
 
+modifiersFrom : a -> List (b -> a)
+modifiersFrom val =
+    [ \value -> val ]
+
+
 setMaybeValue : (Maybe a -> b) -> a -> b
 setMaybeValue setter =
     Just >> setter
