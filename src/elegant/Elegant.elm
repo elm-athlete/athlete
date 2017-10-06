@@ -191,21 +191,12 @@ import Function exposing (compose)
 import List.Extra
 import Elegant.Helpers as Helpers exposing (emptyListOrApply)
 import Maybe.Extra as Maybe exposing ((?))
-import Color exposing (Color)
-import Color.Convert
-import Helpers.Setters exposing (..)
 import Function
+import Helpers.Setters exposing (..)
 import Helpers.Shared exposing (..)
-import Typography
-import BoxShadow
+import Helpers.Vector exposing (Vector)
 import Either exposing (Either(..))
-import Outline
-import Cursor
-import Corner
-import Surrounded exposing (Surrounded)
-import Border
-import Margin
-import Padding
+import Layout
 
 
 type alias SizeUnit =
@@ -240,63 +231,6 @@ em =
 rem : Float -> SizeUnit
 rem =
     Rem
-
-
-{-| -}
-type alias Vector a =
-    ( a, a )
-
-
-type alias Radiant =
-    Float
-
-
-type alias Degree =
-    Float
-
-
-type Angle
-    = Rad Radiant
-    | Deg Degree
-
-
-type alias ColorStop =
-    { offset : Maybe SizeUnit
-    , color : Color
-    }
-
-
-type alias LinearGradient =
-    { angle : Angle
-    , colorStops : List ColorStop
-    }
-
-
-type alias RadialGradient =
-    { colorStops : List ColorStop }
-
-
-type Gradient
-    = Linear LinearGradient
-    | Radial RadialGradient
-
-
-type Image
-    = Gradient Gradient
-    | Source String
-
-
-type alias BackgroundImage =
-    { image : Image
-    , backgroundPosition : Maybe (Vector SizeUnit)
-    }
-
-
-{-| Simple background image with only an url as source
--}
-withUrl : String -> BackgroundImage
-withUrl url =
-    BackgroundImage (Source url) Nothing
 
 
 {-| Calculate the opposite of a size unit value.
@@ -449,41 +383,8 @@ type FlexDirection
     | FlexDirectionRow
 
 
-type Visibility
-    = VisibilityHidden
-    | VisibilityVisible
-
-
 type TextOverflow
     = TextOverflowEllipsis
-
-
-type Horizontal a
-    = PositionLeft a
-    | PositionRight a
-
-
-type Vertical a
-    = PositionTop a
-    | PositionBottom a
-
-
-type alias PositionCoordinates a =
-    { horizontal : Horizontal a
-    , vertical : Vertical a
-    }
-
-
-type DynamicPositionningType
-    = PositionAbsolute
-    | PositionRelative
-    | PositionFixed
-    | PositionSticky
-
-
-type Position
-    = PositionDynamic DynamicPositionningType (PositionCoordinates SizeUnit)
-    | PositionStatic
 
 
 {-| -}
@@ -492,96 +393,8 @@ color =
     setColor << Just
 
 
-type alias Background =
-    { color : Maybe Color
-    , images : List BackgroundImage
-    }
-
-
 type alias FullOverflow =
     Vector (Maybe Overflow)
-
-
-type alias Layout =
-    { position : Maybe Position
-    , visibility : Maybe Visibility
-    , typography : Maybe Typography.Typography
-    , padding : Maybe (Surrounded Padding.Padding)
-    , border : Maybe (Surrounded Border.Border)
-    , corner : Maybe Corner.Corner
-    , margin : Maybe (Surrounded Margin.Margin)
-    , outline : Maybe Outline.Outline
-    , boxShadow : Maybe BoxShadow.BoxShadow
-    , background : Maybe Background
-    , opacity : Maybe Float
-    , cursor : Maybe Cursor.Cursor
-    , zIndex : Maybe Int
-    }
-
-
-border : Modifiers (Surrounded Border.Border) -> Modifier Layout
-border =
-    getModifyAndSet .border setBorderIn Surrounded.default
-
-
-boxShadow : Modifiers BoxShadow.BoxShadow -> Modifier Layout
-boxShadow =
-    getModifyAndSet .boxShadow setBoxShadowIn BoxShadow.default
-
-
-corner : Modifiers Corner.Corner -> Modifier Layout
-corner =
-    getModifyAndSet .corner setCornerIn Corner.default
-
-
-cursor : Cursor.Cursor -> Modifier Layout
-cursor =
-    setMaybeValue setCursor
-
-
-margin : Modifiers (Surrounded Margin.Margin) -> Modifier Layout
-margin =
-    getModifyAndSet .margin setMarginIn Surrounded.default
-
-
-opacity : Float -> Modifier Layout
-opacity =
-    setMaybeValue setOpacity
-
-
-outline : Modifiers Outline.Outline -> Modifier Layout
-outline =
-    getModifyAndSet .outline setOutlineIn Outline.default
-
-
-padding : Modifiers (Surrounded Padding.Padding) -> Modifier Layout
-padding =
-    getModifyAndSet .padding setPaddingIn Surrounded.default
-
-
-typography : Modifiers Typography.Typography -> Modifier Layout
-typography =
-    getModifyAndSet .typography setTypographyIn Typography.default
-
-
-visibility : Visibility -> Modifier Layout
-visibility =
-    setMaybeValue setVisibility
-
-
-zIndex : Int -> Modifier Layout
-zIndex =
-    setMaybeValue setZIndex
-
-
-hidden : Visibility
-hidden =
-    VisibilityHidden
-
-
-visible : Visibility
-visible =
-    VisibilityVisible
 
 
 type alias BlockDetails =
@@ -598,11 +411,6 @@ defaultBlockDetails =
     BlockDetails Nothing Nothing Nothing Nothing Nothing
 
 
-defaultLayout : Layout
-defaultLayout =
-    Layout Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
-
-
 type InsideDisplay
     = DisplayFlow
     | DisplayFlexContainer (Maybe FlexContainerDetails)
@@ -615,7 +423,7 @@ type OutsideDisplay
 
 
 type alias DisplayContents =
-    ( ( OutsideDisplay, InsideDisplay ), Maybe Layout )
+    ( ( OutsideDisplay, InsideDisplay ), Maybe Layout.Layout )
 
 
 type DisplayBox
@@ -659,7 +467,7 @@ displayNone =
     DisplayNone
 
 
-displayStyle : OutsideDisplay -> InsideDisplay -> Maybe Layout -> DisplayContents
+displayStyle : OutsideDisplay -> InsideDisplay -> Maybe Layout.Layout -> DisplayContents
 displayStyle outsideDisplay insideDisplay layoutStyle =
     ( ( outsideDisplay, insideDisplay ), layoutStyle )
 
@@ -679,13 +487,13 @@ children behaving like inside a flow element => considered block from children
     displayBlock [dimensions [width (Px 30)]] [padding (Px 30)]
 
 -}
-displayBlock : Modifiers BlockDetails -> Modifiers Layout -> DisplayBox
+displayBlock : Modifiers BlockDetails -> Modifiers Layout.Layout -> DisplayBox
 displayBlock blockDetailsModifiers layoutModifiers =
     DisplayContentsWrapper
         (displayStyle
             (DisplayBlock (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
             DisplayFlow
-            (modifiedElementOrNothing defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
         )
 
 
@@ -695,13 +503,13 @@ node behaving like an inline element
     displayInline [background [color Color.blue]] [textCenter]
 
 -}
-displayInline : Modifiers Layout -> DisplayBox
+displayInline : Modifiers Layout.Layout -> DisplayBox
 displayInline layoutModifiers =
     DisplayContentsWrapper
         (displayStyle
             DisplayInline
             DisplayFlow
-            (modifiedElementOrNothing defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
         )
 
 
@@ -711,13 +519,13 @@ node behaving like an inline element, contained nodes will behave like flex chil
     displayInlineFlexContainer [] []
 
 -}
-displayInlineFlexContainer : Modifiers FlexContainerDetails -> Modifiers Layout -> DisplayBox
+displayInlineFlexContainer : Modifiers FlexContainerDetails -> Modifiers Layout.Layout -> DisplayBox
 displayInlineFlexContainer flexContainerDetailsModifiers layoutModifiers =
     DisplayContentsWrapper
         (displayStyle
             DisplayInline
             (DisplayFlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
-            (modifiedElementOrNothing defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
         )
 
 
@@ -727,13 +535,13 @@ node behaving like an block element, contained nodes will behave like flex child
     displayFlexContainer [] [] []
 
 -}
-displayBlockFlexContainer : Modifiers FlexContainerDetails -> Modifiers BlockDetails -> Modifiers Layout -> DisplayBox
+displayBlockFlexContainer : Modifiers FlexContainerDetails -> Modifiers BlockDetails -> Modifiers Layout.Layout -> DisplayBox
 displayBlockFlexContainer flexContainerDetailsModifiers blockDetailsModifiers layoutModifiers =
     DisplayContentsWrapper
         (displayStyle
             (DisplayBlock (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
             (DisplayFlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
-            (modifiedElementOrNothing defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
         )
 
 
@@ -743,13 +551,13 @@ node behaving like an flex child (not being a flex father himself)
     displayFlexChild [] []
 
 -}
-displayFlexChild : Modifiers FlexItemDetails -> Modifiers Layout -> DisplayBox
+displayFlexChild : Modifiers FlexItemDetails -> Modifiers Layout.Layout -> DisplayBox
 displayFlexChild flexItemDetailsModifiers layoutModifiers =
     DisplayContentsWrapper
         (displayStyle
             (DisplayFlexItem (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers))
             DisplayFlow
-            (modifiedElementOrNothing defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
         )
 
 
@@ -759,13 +567,13 @@ node behaving like an flex child being a flex father himself.
     displayFlexChildContainer [] [] []
 
 -}
-displayFlexChildContainer : Modifiers FlexContainerDetails -> Modifiers FlexItemDetails -> Modifiers Layout -> DisplayBox
+displayFlexChildContainer : Modifiers FlexContainerDetails -> Modifiers FlexItemDetails -> Modifiers Layout.Layout -> DisplayBox
 displayFlexChildContainer flexContainerDetailsModifiers flexItemDetailsModifiers layoutModifiers =
     DisplayContentsWrapper
         (displayStyle
             (DisplayFlexItem (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers))
             (DisplayFlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
-            (modifiedElementOrNothing defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
         )
 
 
@@ -890,38 +698,6 @@ toLegacyDisplayCss str =
             "block"
 
 
-layoutToCouples : Layout -> List ( String, String )
-layoutToCouples layout =
-    [ unwrapToCouple .visibility visibilityToCouple
-    , unwrapToCouple .opacity opacityToCouple
-    , unwrapToCouple .zIndex zIndexToCouple
-    , unwrapToCouple .cursor Cursor.cursorToCouple
-    , unwrapToCouples .typography Typography.typographyToCouples
-    , unwrapToCouple .boxShadow BoxShadow.boxShadowToCouple
-    , unwrapToCouples .border Border.borderToCouples
-    , unwrapToCouples .outline Outline.outlineToCouples
-    , unwrapToCouples .corner Corner.cornerToCouples
-    , unwrapToCouples .margin Margin.marginToCouples
-    , unwrapToCouples .padding Padding.paddingToCouples
-    ]
-        |> List.concatMap (callOn layout)
-
-
-opacityToCouple : Float -> ( String, String )
-opacityToCouple opacity =
-    ( "opacity", toString opacity )
-
-
-visibilityToCouple : Visibility -> ( String, String )
-visibilityToCouple visibility =
-    ( "visibility", visibilityToString visibility )
-
-
-zIndexToCouple : Int -> ( String, String )
-zIndexToCouple zIndex =
-    ( "z-index", toString zIndex )
-
-
 displayBoxToString : Maybe DisplayBox -> List ( String, String )
 displayBoxToString =
     unwrapEmptyList
@@ -931,7 +707,7 @@ displayBoxToString =
                     [ ( "display", "none" ) ]
 
                 DisplayContentsWrapper ( display, layout ) ->
-                    outsideInsideDisplayToString display ++ (layout |> Maybe.map layoutToCouples |> Maybe.withDefault [])
+                    outsideInsideDisplayToString display ++ (layout |> Maybe.map Layout.layoutToCouples |> Maybe.withDefault [])
         )
 
 
@@ -1034,29 +810,6 @@ nothingOrJust fun =
     Maybe.andThen (Just << fun)
 
 
-positionToString : Maybe Position -> Maybe String
-positionToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                PositionDynamic positionningType coordinates ->
-                    "TODO"
-
-                PositionStatic ->
-                    "static"
-        )
-
-
-colorToString : Color -> String
-colorToString =
-    Color.Convert.colorToCssRgba
-
-
-maybeColorToString : Maybe Color -> Maybe String
-maybeColorToString =
-    nothingOrJust colorToString
-
-
 alignItemsToString : Maybe Align -> Maybe String
 alignItemsToString =
     nothingOrJust
@@ -1083,11 +836,6 @@ alignItemsToString =
                 AlignStretch ->
                     "stretch"
         )
-
-
-maybeSizeUnitToString : Maybe SizeUnit -> Maybe String
-maybeSizeUnitToString =
-    nothingOrJust sizeUnitToString
 
 
 listStyleTypeToString : Maybe ListStyleType -> Maybe String
@@ -1229,81 +977,12 @@ flexDirectionToString =
 --         )
 
 
-visibilityToString : Visibility -> String
-visibilityToString val =
-    case val of
-        VisibilityHidden ->
-            "hidden"
-
-        VisibilityVisible ->
-            "visible"
-
-
 maybeToString : Maybe a -> Maybe String
 maybeToString =
     nothingOrJust
         (\val ->
             toString val
         )
-
-
-applyCssFunction : String -> String -> String
-applyCssFunction funName content =
-    funName ++ (Helpers.surroundWithParentheses content)
-
-
-angleToString : Angle -> String
-angleToString angle =
-    case angle of
-        Rad a ->
-            (a |> toString) ++ "rad"
-
-        Deg a ->
-            (a |> toString) ++ "deg"
-
-
-colorStopToString : ColorStop -> String
-colorStopToString colorStop =
-    case colorStop of
-        { color, offset } ->
-            [ Just (colorToString color), maybeSizeUnitToString offset ] |> Maybe.values |> String.join " "
-
-
-colorStopsToString : List ColorStop -> String
-colorStopsToString colorStops =
-    colorStops |> List.map colorStopToString |> String.join ", "
-
-
-gradientToString : Gradient -> String
-gradientToString gradient =
-    case gradient of
-        Linear { angle, colorStops } ->
-            applyCssFunction "linear-gradient" ([ angleToString angle, colorStopsToString colorStops ] |> String.join ", ")
-
-        Radial { colorStops } ->
-            applyCssFunction "radial-gradient" (colorStopsToString colorStops)
-
-
-imageToString : Image -> String
-imageToString image =
-    case image of
-        Gradient gradient ->
-            gradientToString gradient
-
-        Source src ->
-            applyCssFunction "url" src
-
-
-backgroundImagesToString : List BackgroundImage -> Maybe String
-backgroundImagesToString backgroundImages =
-    if backgroundImages == [] then
-        Nothing
-    else
-        Just
-            (backgroundImages
-                |> List.map (\{ image } -> imageToString image)
-                |> String.join (" ")
-            )
 
 
 compileStyle : Style -> List ( String, String )
