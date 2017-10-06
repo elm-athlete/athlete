@@ -3,6 +3,7 @@ module Border
         ( Border
         , default
         , BorderStyle
+        , none
         , solid
         , dashed
         , thickness
@@ -36,6 +37,7 @@ module Border
 ## Appearance
 
 @docs thickness
+@docs none
 @docs solid
 @docs dashed
 
@@ -93,22 +95,30 @@ default =
 It can be Solid or Dashed. They are created by `solid` and `dashed`.
 -}
 type BorderStyle
-    = BorderStyleSolid
-    | BorderStyleDashed
+    = Solid
+    | Dashed
+    | None
+
+
+{-| Set the border to none.
+-}
+none : Modifier Border
+none =
+    setStyle <| Just None
 
 
 {-| Set the border as solid.
 -}
 solid : Modifier Border
 solid =
-    setStyle <| Just BorderStyleSolid
+    setStyle <| Just Solid
 
 
 {-| Set the border as dashed.
 -}
 dashed : Modifier Border
 dashed =
-    setStyle <| Just BorderStyleDashed
+    setStyle <| Just Dashed
 
 
 {-| Set the thickness of the border.
@@ -201,8 +211,11 @@ styleToCouple style =
 styleToString : BorderStyle -> String
 styleToString val =
     case val of
-        BorderStyleSolid ->
+        Solid ->
             "solid"
 
-        BorderStyleDashed ->
+        Dashed ->
             "dashed"
+
+        None ->
+            "none"

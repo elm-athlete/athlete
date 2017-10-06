@@ -142,10 +142,7 @@ all =
 
 
 {-| Compiles a `Surrounded Margin` record to the corresponding CSS list of tuples.
-
-
-## Compiles only styles which are defined, ignoring `Nothing` fields.
-
+Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
 marginToCouples : Surrounded Margin -> List ( String, String )
 marginToCouples =

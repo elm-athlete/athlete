@@ -10,7 +10,9 @@
         "Border",
         "BoxShadow",
         "Corner",
+        "Cursor",
         "Margin",
+        "Outline",
         "Padding",
         "Typography",
         "Typography.Character"

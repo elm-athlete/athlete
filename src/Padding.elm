@@ -119,10 +119,7 @@ all =
 
 
 {-| Compiles a `Surrounded Padding` record to the corresponding CSS list of tuples.
-
-
-## Compiles only styles which are defined, ignoring `Nothing` fields.
-
+Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
 paddingToCouples : Surrounded Padding -> List ( String, String )
 paddingToCouples =

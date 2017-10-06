@@ -64,45 +64,6 @@ module Elegant exposing (..)
 
 @docs opposite
 
-## Paddings
--- @docs padding
--- @docs paddingHorizontal
--- @docs paddingVertical
--- @docs paddingLeft
--- @docs paddingRight
--- @docs paddingTop
--- @docs paddingBottom
-
-## Margins
--- @docs margin
--- @docs marginAuto
--- @docs marginHorizontal
--- @docs marginVertical
--- @docs marginTop
--- @docs marginBottom
--- @docs marginLeft
--- @docs marginRight
-
-## Text Attributes
--- @docs textColor
--- @docs uppercase
--- @docs lowercase
--- @docs capitalize
--- @docs textDecorationNone
--- @docs underline
--- @docs lineThrough
--- @docs bold
--- @docs strong
--- @docs lineHeight
--- @docs fontWeight
--- @docs fontWeightNormal
--- @docs fontStyleNormal
--- @docs fontStyleItalic
--- @docs fontSize
--- @docs cursorPointer
--- @docs lineHeightNormal
--- @docs whiteSpaceWrapNoWrap
-
 ## Text Alignements
 -- @docs textCenter
 -- @docs textLeft
@@ -112,44 +73,6 @@ module Elegant exposing (..)
 -- @docs backgroundImage
 @docs withUrl
 -- @docs backgroundImages
-
-## Border
--- @docs borderNone
--- @docs borderColor
--- @docs borderSolid
--- @docs borderDashed
--- @docs borderWidth
--- @docs borderBottomColor
--- @docs borderBottomWidth
--- @docs borderBottomSolid
--- @docs borderBottomDashed
--- @docs borderLeftColor
--- @docs borderLeftWidth
--- @docs borderLeftSolid
--- @docs borderLeftDashed
--- @docs borderTopColor
--- @docs borderTopWidth
--- @docs borderTopSolid
--- @docs borderTopDashed
--- @docs borderRightColor
--- @docs borderRightWidth
--- @docs borderRightSolid
--- @docs borderRightDashed
--- @docs borderBottomLeftRadius
--- @docs borderBottomRightRadius
--- @docs borderTopLeftRadius
--- @docs borderTopRightRadius
--- @docs borderRadius
--- @docs borderAndTextColor
--- @docs outlineWidth
--- @docs outlineStyleSolid
--- @docs outlineStyleDashed
--- @docs outlineColor
--- @docs outlineNone
--- @docs boxShadow
--- @docs boxShadowPlain
--- @docs boxShadowBlurry
--- @docs boxShadowCenteredBlurry
 
 ## Display
 @docs displayBlock
@@ -167,9 +90,6 @@ module Elegant exposing (..)
 -- @docs flexShrink
 -- @docs flexDirectionColumn
 -- @docs flexDirectionRow
-
-## Opacity
--- @docs opacity
 
 ## Overflow
 -- @docs overflowAuto
@@ -193,10 +113,6 @@ module Elegant exposing (..)
 -- @docs listStyleSquare
 -- @docs listStyleDecimal
 -- @docs listStyleGeorgian
-
-## Round
--- @docs roundCorner
--- @docs round
 
 
 ## Justify Content
@@ -225,14 +141,6 @@ module Elegant exposing (..)
 
 
 ## -- @docs fullViewportHeight
-
--- ## Z-Index
-
-
-## -- @docs zIndex
-
--- ## Visibility
--- @docs visibilityHidden
 
 
 # Constants
@@ -291,6 +199,8 @@ import Shared exposing (..)
 import Typography
 import BoxShadow
 import Either exposing (Either(..))
+import Outline
+import Cursor
 import Corner
 import Surrounded exposing (Surrounded)
 import Border
@@ -576,10 +486,6 @@ type Position
     | PositionStatic
 
 
-type alias Outline =
-    Border.Border
-
-
 {-| -}
 color : a -> { b | color : Maybe a } -> { b | color : Maybe a }
 color =
@@ -604,11 +510,11 @@ type alias Layout =
     , border : Maybe (Surrounded Border.Border)
     , corner : Maybe Corner.Corner
     , margin : Maybe (Surrounded Margin.Margin)
-    , outline : Maybe Outline
+    , outline : Maybe Outline.Outline
     , boxShadow : Maybe BoxShadow.BoxShadow
     , background : Maybe Background
     , opacity : Maybe Float
-    , cursor : Maybe String
+    , cursor : Maybe Cursor.Cursor
     , zIndex : Maybe Int
     }
 
@@ -628,9 +534,24 @@ corner =
     getModifyAndSet .corner setCornerIn Corner.default
 
 
+cursor : Cursor.Cursor -> Modifier Layout
+cursor =
+    setMaybeValue setCursor
+
+
 margin : Modifiers (Surrounded Margin.Margin) -> Modifier Layout
 margin =
     getModifyAndSet .margin setMarginIn Surrounded.default
+
+
+opacity : Float -> Modifier Layout
+opacity =
+    setMaybeValue setOpacity
+
+
+outline : Modifiers Outline.Outline -> Modifier Layout
+outline =
+    getModifyAndSet .outline setOutlineIn Outline.default
 
 
 padding : Modifiers (Surrounded Padding.Padding) -> Modifier Layout
@@ -646,6 +567,11 @@ typography =
 visibility : Visibility -> Modifier Layout
 visibility =
     setMaybeValue setVisibility
+
+
+zIndex : Int -> Modifier Layout
+zIndex =
+    setMaybeValue setZIndex
 
 
 hidden : Visibility
@@ -967,9 +893,13 @@ toLegacyDisplayCss str =
 layoutToCouples : Layout -> List ( String, String )
 layoutToCouples layout =
     [ unwrapToCouple .visibility visibilityToCouple
+    , unwrapToCouple .opacity opacityToCouple
+    , unwrapToCouple .zIndex zIndexToCouple
+    , unwrapToCouple .cursor Cursor.cursorToCouple
     , unwrapToCouples .typography Typography.typographyToCouples
     , unwrapToCouple .boxShadow BoxShadow.boxShadowToCouple
     , unwrapToCouples .border Border.borderToCouples
+    , unwrapToCouples .outline Outline.outlineToCouples
     , unwrapToCouples .corner Corner.cornerToCouples
     , unwrapToCouples .margin Margin.marginToCouples
     , unwrapToCouples .padding Padding.paddingToCouples
@@ -977,9 +907,19 @@ layoutToCouples layout =
         |> List.concatMap (callOn layout)
 
 
+opacityToCouple : Float -> ( String, String )
+opacityToCouple opacity =
+    ( "opacity", toString opacity )
+
+
 visibilityToCouple : Visibility -> ( String, String )
 visibilityToCouple visibility =
     ( "visibility", visibilityToString visibility )
+
+
+zIndexToCouple : Int -> ( String, String )
+zIndexToCouple zIndex =
+    ( "z-index", toString zIndex )
 
 
 displayBoxToString : Maybe DisplayBox -> List ( String, String )
@@ -1377,7 +1317,6 @@ compileStyle (Style style) =
 -- , ( "top", maybeSizeUnitToString << .top )
 -- , ( "bottom", maybeSizeUnitToString << .bottom )
 -- , ( "right", maybeSizeUnitToString << .right )
--- , ( "color", maybeColorToString << .textColor )
 -- , ( "display", displayToString << .display )
 -- , ( "user-select", userSelectToString << .userSelect )
 -- , ( "flex-grow", maybeToString << .flexGrow )
@@ -1385,62 +1324,22 @@ compileStyle (Style style) =
 -- , ( "flex-basis", autoOrSizeUnitToString << .flexBasis )
 -- , ( "flex-wrap", flexWrapToString << .flexWrap )
 -- , ( "flex-direction", flexDirectionToString << .flexDirection )
--- , ( "opacity", maybeToString << .opacity )
 -- , ( "overflow-x", overflowToString << .overflowX )
 -- , ( "overflow-y", overflowToString << .overflowY )
 -- , ( "text-overflow", textOverflowToString << .textOverflow )
 -- , ( "text-align", textAlignToString << .textAlign )
--- , ( "text-transform", textTransformToString << .textTransform )
--- , ( "text-decoration", textDecorationToString << .textDecoration )
--- , ( "white-space", whiteSpaceWrapToString << .whiteSpaceWrap )
--- , ( "lineHeight", normalOrSizeUnitToString << .lineHeight )
 -- , ( "background-color", maybeColorToString << .backgroundColor )
 -- , ( "background-image", backgroundImagesToString << .backgroundImages )
--- , ( "border-bottom-color", maybeColorToString << .borderBottomColor )
--- , ( "border-bottom-width", maybeSizeUnitToString << .borderBottomWidth )
--- , ( "border-bottom-style", borderToString << .borderBottomStyle )
--- , ( "border-left-color", maybeColorToString << .borderLeftColor )
--- , ( "border-left-width", maybeSizeUnitToString << .borderLeftWidth )
--- , ( "border-left-style", borderToString << .borderLeftStyle )
--- , ( "border-top-color", maybeColorToString << .borderTopColor )
--- , ( "border-top-width", maybeSizeUnitToString << .borderTopWidth )
--- , ( "border-top-style", borderToString << .borderTopStyle )
--- , ( "border-right-color", maybeColorToString << .borderRightColor )
--- , ( "border-right-width", maybeSizeUnitToString << .borderRightWidth )
--- , ( "border-right-style", borderToString << .borderRightStyle )
--- , ( "border-bottom-left-radius", maybeSizeUnitToString << .borderBottomLeftRadius )
--- , ( "border-bottom-right-radius", maybeSizeUnitToString << .borderBottomRightRadius )
--- , ( "border-top-left-radius", maybeSizeUnitToString << .borderTopLeftRadius )
--- , ( "border-top-right-radius", maybeSizeUnitToString << .borderTopRightRadius )
--- , ( "outline-color", maybeColorToString << .outlineColor )
--- , ( "outline-width", maybeSizeUnitToString << .outlineWidth )
--- , ( "outline-style", borderToString << .outlineStyle )
--- , ( "box-shadow", boxShadowToString << .boxShadow )
--- , ( "padding-left", maybeSizeUnitToString << .paddingLeft )
--- , ( "padding-right", maybeSizeUnitToString << .paddingRight )
--- , ( "padding-top", maybeSizeUnitToString << .paddingTop )
--- , ( "padding-bottom", maybeSizeUnitToString << .paddingBottom )
--- , ( "margin-left", autoOrSizeUnitToString << .marginLeft )
--- , ( "margin-right", autoOrSizeUnitToString << .marginRight )
--- , ( "margin-top", autoOrSizeUnitToString << .marginTop )
--- , ( "margin-bottom", autoOrSizeUnitToString << .marginBottom )
 -- , ( "list-style-type", listStyleTypeToString << .listStyleType )
 -- , ( "align-items", alignItemsToString << .alignItems )
 -- , ( "align-self", alignItemsToString << .alignSelf )
 -- , ( "justify-content", justifyContentToString << .justifyContent )
--- , ( "font-weight", maybeToString << .fontWeight )
--- , ( "font-style", fontStyleToString << .fontStyle )
--- , ( "font-size", maybeSizeUnitToString << .fontSize )
--- , ( "font-family", fontFamilyToString << .fontFamily )
 -- , ( "width", maybeSizeUnitToString << .width )
 -- , ( "max-width", maybeSizeUnitToString << .maxWidth )
 -- , ( "min-width", maybeSizeUnitToString << .minWidth )
 -- , ( "height", maybeSizeUnitToString << .height )
 -- , ( "max-height", maybeSizeUnitToString << .maxHeight )
 -- , ( "min-height", maybeSizeUnitToString << .minHeight )
--- , ( "z-index", maybeToString << .zIndex )
--- , ( "cursor", .cursor )
--- , ( "visibility", visibilityToString << .visibility )
 -- , ( "vertical-align", .verticalAlign )
 -- ]
 --     |> List.map
@@ -1789,79 +1688,6 @@ dimensions dimensionsModifiers blockAttributes =
 --
 --
 -- {-| -}
--- borderBottomLeftRadius : Int -> Style -> Style
--- borderBottomLeftRadius size_ (Style style) =
---     Style { style | borderBottomLeftRadius = Just (Px size_) }
---
---
--- {-| -}
--- borderBottomRightRadius : Int -> Style -> Style
--- borderBottomRightRadius size_ (Style style) =
---     Style { style | borderBottomRightRadius = Just (Px size_) }
---
---
--- {-| -}
--- borderTopLeftRadius : Int -> Style -> Style
--- borderTopLeftRadius size_ (Style style) =
---     Style { style | borderTopLeftRadius = Just (Px size_) }
---
---
--- {-| -}
--- borderTopRightRadius : Int -> Style -> Style
--- borderTopRightRadius size_ (Style style) =
---     Style { style | borderTopRightRadius = Just (Px size_) }
---
---
--- {-| -}
--- borderRadius : Int -> Style -> Style
--- borderRadius size_ =
---     [ borderTopRightRadius size_
---     , borderTopLeftRadius size_
---     , borderBottomLeftRadius size_
---     , borderBottomRightRadius size_
---     ]
---         |> compose
--- {-| Set both text and border in same color.
--- -}
--- borderAndTextColor : Color -> Style -> Style
--- borderAndTextColor val =
---     borderColor val << textColor val
--- {-| -}
--- outlineColor : Color -> Style -> Style
--- outlineColor val (Style style) =
---     Style { style | outlineColor = Just val }
---
---
--- outlineStyle : Border -> Style -> Style
--- outlineStyle val (Style style) =
---     Style { style | outlineStyle = Just val }
---
---
--- {-| -}
--- outlineStyleSolid : Style -> Style
--- outlineStyleSolid =
---     outlineStyle BorderSolid
---
---
--- {-| -}
--- outlineStyleDashed : Style -> Style
--- outlineStyleDashed =
---     outlineStyle BorderDashed
---
---
--- {-| -}
--- outlineWidth : Int -> Style -> Style
--- outlineWidth val (Style style) =
---     Style { style | outlineWidth = Just (Px val) }
---
---
--- {-| -}
--- outlineNone : Style -> Style
--- outlineNone =
---     outlineWidth 0
---
---
--- {-| -}
 -- flexGrow : Int -> Style -> Style
 -- flexGrow val (Style style) =
 --     Style { style | flexGrow = Just val }
@@ -2197,32 +2023,6 @@ setDimension value dimensionAxis =
 -- fullViewportHeight : Style -> Style
 -- fullViewportHeight =
 --     height (Vh 100)
---
---
--- {-| -}
--- zIndex : Int -> Style -> Style
--- zIndex value (Style style) =
---     Style { style | zIndex = Just value }
---
---
--- cursor : String -> Style -> Style
--- cursor value (Style style) =
---     Style { style | cursor = Just value }
--- {-| -}
--- cursorPointer : Style -> Style
--- cursorPointer =
---     cursor "pointer"
---
---
--- visibility : Visibility -> Style -> Style
--- visibility value (Style style) =
---     Style { style | visibility = Just value }
---
---
--- {-| -}
--- visibilityHidden : Style -> Style
--- visibilityHidden =
---     visibility VisibilityHidden
 --
 --
 -- {-| -}
