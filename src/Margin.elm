@@ -52,7 +52,6 @@ module Margin
 
 import Either exposing (Either(..))
 import Shared exposing (..)
-import Setters exposing (..)
 import Surrounded exposing (Surrounded)
 
 
@@ -68,7 +67,7 @@ can then use modifiers. I.E.
 
 -}
 type alias Margin =
-    { value : Maybe (Either SizeUnit Auto) }
+    Either SizeUnit Auto
 
 
 {-| Generate an empty `Margin` record, equal to Nothing.
@@ -76,21 +75,21 @@ You are free to use it as you wish, but it is instanciated automatically by `Ele
 -}
 default : Margin
 default =
-    Margin Nothing
+    Right Auto
 
 
 {-| Set the margin value to auto.
 -}
 auto : Modifier Margin
-auto =
-    setValue <| Just <| Right Auto
+auto margin =
+    Right Auto
 
 
 {-| Set the margin value to the desired value.
 -}
 width : SizeUnit -> Modifier Margin
-width =
-    setValue << Just << Left
+width value margin =
+    Left value
 
 
 {-| Accepts a margin modifier, and modify the top side of the margin.
@@ -159,8 +158,9 @@ marginToCouples =
 
 marginSideToCouples : Margin -> List ( String, String )
 marginSideToCouples margin =
-    [ unwrapToCouple .value valueToCouple ]
-        |> List.concatMap (callOn margin)
+    margin
+        |> valueToCouple
+        |> List.singleton
 
 
 valueToCouple : Either SizeUnit Auto -> ( String, String )

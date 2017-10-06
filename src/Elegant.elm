@@ -549,6 +549,7 @@ type FlexDirection
 
 type Visibility
     = VisibilityHidden
+    | VisibilityVisible
 
 
 type TextOverflow
@@ -647,6 +648,21 @@ typography =
 boxShadow : Modifiers BoxShadow.BoxShadow -> Modifier Layout
 boxShadow =
     getModifyAndSet .boxShadow setBoxShadowIn BoxShadow.default
+
+
+visibility : Visibility -> Modifier Layout
+visibility =
+    setMaybeValue setVisibility
+
+
+hidden : Visibility
+hidden =
+    VisibilityHidden
+
+
+visible : Visibility
+visible =
+    VisibilityVisible
 
 
 type alias BlockDetails =
@@ -1312,6 +1328,9 @@ visibilityToString val =
     case val of
         VisibilityHidden ->
             "hidden"
+
+        VisibilityVisible ->
+            "visible"
 
 
 maybeToString : Maybe a -> Maybe String

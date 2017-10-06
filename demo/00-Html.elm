@@ -45,7 +45,9 @@ main =
             , Elegant.margin
                 [ Margin.top <| Margin.width (px 40)
                 , Margin.vertical <| Margin.width (px 30)
+                , Margin.bottom Margin.auto
                 ]
+            , Elegant.visibility Elegant.hidden
             ]
             |> Just
             |> flip Elegant.style []

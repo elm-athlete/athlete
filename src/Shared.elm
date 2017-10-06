@@ -97,3 +97,8 @@ getModifyAndSet getter setterIn default modifiers record =
         |> Function.compose modifiers
         |> Just
         |> setterIn record
+
+
+setMaybeValue : (Maybe a -> b) -> a -> b
+setMaybeValue setter =
+    Just >> setter
