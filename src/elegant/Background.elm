@@ -1,6 +1,7 @@
 module Background
     exposing
         ( Background
+        , default
         , images
         , Image
         , BackgroundImage
@@ -39,6 +40,7 @@ and positionning them on the page.
 
 # Background creation
 
+@docs default
 @docs images
 @docs image
 @docs gradient
@@ -86,6 +88,13 @@ type alias Background =
     { color : Maybe Color
     , images : List BackgroundImage
     }
+
+
+{-| Generates an empty `Background`.
+-}
+default : Background
+default =
+    Background Nothing []
 
 
 {-| Modify the background rendering to add photos and gradients.
