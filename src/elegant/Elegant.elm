@@ -493,7 +493,7 @@ displayBlock blockDetailsModifiers layoutModifiers =
         (displayStyle
             (DisplayBlock (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
             DisplayFlow
-            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.default layoutModifiers)
         )
 
 
@@ -509,7 +509,7 @@ displayInline layoutModifiers =
         (displayStyle
             DisplayInline
             DisplayFlow
-            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.default layoutModifiers)
         )
 
 
@@ -525,7 +525,7 @@ displayInlineFlexContainer flexContainerDetailsModifiers layoutModifiers =
         (displayStyle
             DisplayInline
             (DisplayFlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
-            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.default layoutModifiers)
         )
 
 
@@ -541,7 +541,7 @@ displayBlockFlexContainer flexContainerDetailsModifiers blockDetailsModifiers la
         (displayStyle
             (DisplayBlock (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
             (DisplayFlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
-            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.default layoutModifiers)
         )
 
 
@@ -557,7 +557,7 @@ displayFlexChild flexItemDetailsModifiers layoutModifiers =
         (displayStyle
             (DisplayFlexItem (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers))
             DisplayFlow
-            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.default layoutModifiers)
         )
 
 
@@ -573,7 +573,7 @@ displayFlexChildContainer flexContainerDetailsModifiers flexItemDetailsModifiers
         (displayStyle
             (DisplayFlexItem (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers))
             (DisplayFlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
-            (modifiedElementOrNothing Layout.defaultLayout layoutModifiers)
+            (modifiedElementOrNothing Layout.default layoutModifiers)
         )
 
 
