@@ -463,13 +463,15 @@ extractDisplayBoxCouples val =
 
 
 outsideInsideDisplayToCouples : OutsideDisplay -> InsideDisplay -> List ( String, String )
-outsideInsideDisplayToCouples outsideDisplay insideDisplay =
-    let
-        ( dis, rest ) =
-            outsideDisplayToCouples outsideDisplay
-                |> Helpers.Css.joiner (insideDisplayToCouples insideDisplay)
-    in
-        [ ( "display", dis |> toLegacyDisplayCss ) ] ++ rest
+outsideInsideDisplayToCouples outsideDisplay =
+    insideDisplayToCouples
+        >> Helpers.Css.joiner (outsideDisplayToCouples outsideDisplay)
+        >> convertDisplayToLegacyCss
+
+
+convertDisplayToLegacyCss : ( String, List ( String, String ) ) -> List ( String, String )
+convertDisplayToLegacyCss ( dis, rest ) =
+    ( "display", dis |> toLegacyDisplayCss ) :: rest
 
 
 outsideDisplayToCouples : OutsideDisplay -> ( String, List ( String, String ) )
@@ -479,10 +481,10 @@ outsideDisplayToCouples outsideDisplay =
             ( "inline", [] )
 
         Block blockDetails ->
-            ( "block", maybeBlockDetailsToString blockDetails )
+            ( "block", unwrapEmptyList blockDetailsToCouples blockDetails )
 
         FlexItem flexItemDetails ->
-            ( "block", flexItemDetailsToString flexItemDetails )
+            ( "block", unwrapEmptyList flexItemDetailsToCouples flexItemDetails )
 
 
 insideDisplayToCouples : InsideDisplay -> ( String, List ( String, String ) )
@@ -492,11 +494,36 @@ insideDisplayToCouples insideDisplay =
             ( "flow", [] )
 
         FlexContainer flexContainerDetails ->
-            ( "flex", flexContainerDetailsToString flexContainerDetails )
+            ( "flex", unwrapEmptyList flexContainerDetailsToCouples flexContainerDetails )
 
 
-dimensionsToString : Dimensions -> List ( String, String )
-dimensionsToString size =
+blockDetailsToCouples : BlockDetails -> List ( String, String )
+blockDetailsToCouples blockDetails =
+    [ unwrapToCouple .listStyleType listStyleTypeToCouple
+    , unwrapToCouple .alignment textAlignToCouple
+    , unwrapToCouples .overflow overflowToCouples
+    , unwrapToCouple .textOverflow textOverflowToCouple
+    , unwrapToCouples .dimensions dimensionsToCouples
+    ]
+        |> List.concatMap (callOn blockDetails)
+
+
+flexItemDetailsToCouples : FlexItemDetails -> List ( String, String )
+flexItemDetailsToCouples flexContainerDetails =
+    []
+
+
+flexContainerDetailsToCouples : FlexContainerDetails -> List ( String, String )
+flexContainerDetailsToCouples flexContainerDetails =
+    []
+
+
+
+-- Noise
+
+
+dimensionsToCouples : Dimensions -> List ( String, String )
+dimensionsToCouples size =
     [ ( "width", Tuple.first >> .dimension )
     , ( "min-width", Tuple.first >> .min )
     , ( "max-width", Tuple.first >> .max )
@@ -519,36 +546,6 @@ keepJustValues ( property, value ) =
             [ ( property, val ) ]
 
 
-maybeDimensionsToString : Maybe Dimensions -> List ( String, String )
-maybeDimensionsToString =
-    unwrapEmptyList dimensionsToString
-
-
-blockDetailsToString : BlockDetails -> List ( String, String )
-blockDetailsToString blockDetails =
-    []
-
-
-maybeBlockDetailsToString : Maybe BlockDetails -> List ( String, String )
-maybeBlockDetailsToString =
-    unwrapEmptyList blockDetailsToString
-
-
-flexContainerDetailsToString : a -> List b
-flexContainerDetailsToString flexContainerDetails =
-    []
-
-
-flexItemDetailsToString : a -> List b
-flexItemDetailsToString flexContainerDetails =
-    []
-
-
-layoutStyleToString : a -> List b
-layoutStyleToString a =
-    []
-
-
 toLegacyDisplayCss : String -> String
 toLegacyDisplayCss str =
     case str of
@@ -568,152 +565,155 @@ toLegacyDisplayCss str =
             str
 
 
-alignItemsToString : Maybe Align -> Maybe String
-alignItemsToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                AlignBaseline ->
-                    "baseline"
-
-                AlignCenter ->
-                    "center"
-
-                AlignFlexStart ->
-                    "flex-start"
-
-                AlignFlexEnd ->
-                    "flex-end"
-
-                AlignInherit ->
-                    "inherit"
-
-                AlignInitial ->
-                    "initial"
-
-                AlignStretch ->
-                    "stretch"
-        )
+alignItemsToCouple : Align -> ( String, String )
+alignItemsToCouple =
+    (,) "align-items" << alignItemsToString
 
 
-listStyleTypeToString : Maybe ListStyleType -> Maybe String
-listStyleTypeToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                ListStyleTypeNone ->
-                    "none"
+alignItemsToString : Align -> String
+alignItemsToString val =
+    case val of
+        AlignBaseline ->
+            "baseline"
 
-                ListStyleTypeDisc ->
-                    "disc"
+        AlignCenter ->
+            "center"
 
-                ListStyleTypeCircle ->
-                    "circle"
+        AlignFlexStart ->
+            "flex-start"
 
-                ListStyleTypeSquare ->
-                    "square"
+        AlignFlexEnd ->
+            "flex-end"
 
-                ListStyleTypeDecimal ->
-                    "decimal"
+        AlignInherit ->
+            "inherit"
 
-                ListStyleTypeGeorgian ->
-                    "georgian"
-        )
+        AlignInitial ->
+            "initial"
 
-
-justifyContentToString : Maybe JustifyContent -> Maybe String
-justifyContentToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                JustifyContentSpaceBetween ->
-                    "space-between"
-
-                JustifyContentSpaceAround ->
-                    "space-around"
-
-                JustifyContentCenter ->
-                    "center"
-        )
+        AlignStretch ->
+            "stretch"
 
 
-textAlignToString : Maybe Alignment -> Maybe String
-textAlignToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                AlignmentCenter ->
-                    "center"
-
-                AlignmentLeft ->
-                    "left"
-
-                AlignmentRight ->
-                    "right"
-
-                AlignmentJustify ->
-                    "justify"
-        )
+listStyleTypeToCouple : ListStyleType -> ( String, String )
+listStyleTypeToCouple =
+    (,) "list-style" << listStyleTypeToString
 
 
-textOverflowToString : Maybe TextOverflow -> Maybe String
-textOverflowToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                TextOverflowEllipsis ->
-                    "ellipsis"
-        )
+listStyleTypeToString : ListStyleType -> String
+listStyleTypeToString val =
+    case val of
+        ListStyleTypeNone ->
+            "none"
+
+        ListStyleTypeDisc ->
+            "disc"
+
+        ListStyleTypeCircle ->
+            "circle"
+
+        ListStyleTypeSquare ->
+            "square"
+
+        ListStyleTypeDecimal ->
+            "decimal"
+
+        ListStyleTypeGeorgian ->
+            "georgian"
 
 
-overflowToString : Maybe Overflow.Overflow -> Maybe String
-overflowToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                Overflow.OverflowAuto ->
-                    "auto"
-
-                Overflow.OverflowScroll ->
-                    "scroll"
-
-                Overflow.OverflowHidden ->
-                    "hidden"
-
-                Overflow.OverflowVisible ->
-                    "visible"
-        )
+justifyContentToCouple : JustifyContent -> ( String, String )
+justifyContentToCouple =
+    (,) "justify-content" << justifyContentToString
 
 
-flexWrapToString : Maybe FlexWrap -> Maybe String
-flexWrapToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                FlexWrapWrap ->
-                    "wrap"
+justifyContentToString : JustifyContent -> String
+justifyContentToString val =
+    case val of
+        JustifyContentSpaceBetween ->
+            "space-between"
 
-                FlexWrapNoWrap ->
-                    "nowrap"
-        )
+        JustifyContentSpaceAround ->
+            "space-around"
 
-
-flexDirectionToString : Maybe FlexDirection -> Maybe String
-flexDirectionToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                FlexDirectionColumn ->
-                    "column"
-
-                FlexDirectionRow ->
-                    "row"
-        )
+        JustifyContentCenter ->
+            "center"
 
 
-nothingOrJust : (a -> b) -> Maybe a -> Maybe b
-nothingOrJust fun =
-    Maybe.andThen (Just << fun)
+textAlignToCouple : Alignment -> ( String, String )
+textAlignToCouple =
+    (,) "text-align" << textAlignToString
+
+
+textAlignToString : Alignment -> String
+textAlignToString val =
+    case val of
+        AlignmentCenter ->
+            "center"
+
+        AlignmentLeft ->
+            "left"
+
+        AlignmentRight ->
+            "right"
+
+        AlignmentJustify ->
+            "justify"
+
+
+textOverflowToCouple : TextOverflow -> ( String, String )
+textOverflowToCouple =
+    (,) "text-overflow" << textOverflowToString
+
+
+textOverflowToString : TextOverflow -> String
+textOverflowToString val =
+    case val of
+        TextOverflowEllipsis ->
+            "ellipsis"
+
+
+overflowToCouples : Overflow.FullOverflow -> List ( String, String )
+overflowToCouples ( x, y ) =
+    [ ( "overflow-x", x ), ( "overflow-y", y ) ]
+        |> List.map (Tuple.mapSecond (Maybe.map overflowToString))
+        |> List.concatMap keepJustValues
+
+
+overflowToString : Overflow.Overflow -> String
+overflowToString val =
+    case val of
+        Overflow.OverflowAuto ->
+            "auto"
+
+        Overflow.OverflowScroll ->
+            "scroll"
+
+        Overflow.OverflowHidden ->
+            "hidden"
+
+        Overflow.OverflowVisible ->
+            "visible"
+
+
+flexWrapToString : FlexWrap -> String
+flexWrapToString val =
+    case val of
+        FlexWrapWrap ->
+            "wrap"
+
+        FlexWrapNoWrap ->
+            "nowrap"
+
+
+flexDirectionToString : FlexDirection -> String
+flexDirectionToString val =
+    case val of
+        FlexDirectionColumn ->
+            "column"
+
+        FlexDirectionRow ->
+            "row"
 
 
 unwrapEmptyList : (a -> List b) -> Maybe a -> List b

@@ -407,7 +407,7 @@ maybeToString =
 
 compileStyle : Style -> List ( String, String )
 compileStyle (Style style) =
-    Display.displayBoxToString style.display
+    Display.displayBoxToCouples style.display
 
 
 removeEmptyStyles : List ( String, Maybe String ) -> List ( String, String )
