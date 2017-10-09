@@ -8,6 +8,7 @@
         "src/bodybuilder"
     ],
     "exposed-modules": [
+        "Background",
         "Border",
         "BoxShadow",
         "Corner",

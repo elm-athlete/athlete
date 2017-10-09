@@ -694,8 +694,8 @@ toLegacyDisplayCss str =
         "block flex" ->
             "flex"
 
-        _ ->
-            "block"
+        str ->
+            str
 
 
 displayBoxToString : Maybe DisplayBox -> List ( String, String )

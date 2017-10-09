@@ -73,9 +73,9 @@ mainStyle =
                 , Background.linear (Background.degree 90)
                     (Background.colorStop Color.blue |> Background.at (px 4))
                     (Background.colorStop Color.black)
-                    |> Background.intermediateColors
-                        [ Background.colorStop Color.red ]
+                    |> Background.intermediateColors [ Background.colorStop Color.red ]
                     |> Background.gradient
+                    |> Background.at ( px 30, px 30 )
                 , Background.radial
                     (Background.colorStop Color.black |> Background.at (px 200))
                     (Background.colorStop Color.blue)

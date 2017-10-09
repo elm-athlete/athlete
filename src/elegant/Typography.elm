@@ -91,12 +91,12 @@ import Helpers.Shared exposing (..)
 import Helpers.Setters exposing (..)
 
 
-{-| The Typography record contains everything about fonts rendering,
+{-| The `Typography` record contains everything about fonts rendering,
 including character rendering. You probably won't use it as is, but instead using
-`Elegant.typography` which automatically generate an empty `Typography` record. You
+`Layout.typography` which automatically generate an empty `Typography` record. You
 can then use modifiers. I.E.
 
-    Elegant.typography
+    Layout.typography
         [ Typography.color Color.white
         , Typography.italic
         ]
@@ -114,7 +114,7 @@ type alias Typography =
 
 
 {-| Generate an empty `Typography` record, with every field equal to Nothing.
-You are free to use it as you wish, but it is instanciated automatically by `Elegant.typography`.
+You are free to use it as you wish, but it is instanciated automatically by `Layout.typography`.
 -}
 default : Typography
 default =
