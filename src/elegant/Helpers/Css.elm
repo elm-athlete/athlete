@@ -6,6 +6,7 @@ module Helpers.Css
         , surroundWithParentheses
         , surroundWithQuotes
         , surroundWithSingleQuotes
+        , joiner
         )
 
 import Char
@@ -44,6 +45,11 @@ surroundWithQuotes =
 surroundWithSingleQuotes : String -> String
 surroundWithSingleQuotes =
     surroundWith "'" "'"
+
+
+joiner : ( String, List a ) -> ( String, List a ) -> ( String, List a )
+joiner ( a, b ) ( c, d ) =
+    ( a ++ " " ++ c, b ++ d )
 
 
 

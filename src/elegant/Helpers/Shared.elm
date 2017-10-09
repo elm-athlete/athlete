@@ -55,6 +55,16 @@ type alias Modifiers a =
     List (Modifier a)
 
 
+modifiedElementOrNothing : a -> Modifiers a -> Maybe a
+modifiedElementOrNothing default modifiers =
+    if List.isEmpty modifiers then
+        Nothing
+    else
+        default
+            |> Function.compose modifiers
+            |> Just
+
+
 
 -- TODO move in Function
 

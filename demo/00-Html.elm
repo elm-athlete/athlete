@@ -16,7 +16,8 @@ import Cursor
 import Outline
 import Background
 import Position
-
+import Display
+import Display.Overflow
 
 main : Html msg
 main =
@@ -25,9 +26,21 @@ main =
         [ Html.text "Just a text." ]
 
 
-mainStyle : Elegant.DisplayBox
+mainStyle : Display.DisplayBox
 mainStyle =
-    Elegant.displayBlock []
+    Display.block
+        [ Display.overflow
+            [ Display.Overflow.overflowX Display.Overflow.hidden
+            , Display.Overflow.overflowY Display.Overflow.visible
+            ]
+        , Display.dimensions
+            [ Display.width (px 30)
+            , Display.height (px 40)
+            ]
+        , Display.textOverflowEllipsis
+        , Display.alignment Display.left
+        , Display.listStyleCircle
+        ]
         [ Layout.typography
             [ Elegant.color Color.blue
             , Typography.character
@@ -92,10 +105,9 @@ mainStyle =
         ]
 
 
-toStyle : Elegant.DisplayBox -> Html.Attribute msg
+toStyle : Display.DisplayBox -> Html.Attribute msg
 toStyle =
-    Just
-        >> flip Elegant.style []
+    Elegant.style
         >> Elegant.toInlineStyles
         >> Debug.log "after compiling"
         >> Html.Attributes.style
