@@ -123,7 +123,7 @@ Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
 paddingToCouples : Surrounded Padding -> List ( String, String )
 paddingToCouples =
-    Surrounded.surroundedToCouples "padding" paddingSideToCouples
+    Surrounded.surroundedToCouples (Just "padding") paddingSideToCouples
 
 
 

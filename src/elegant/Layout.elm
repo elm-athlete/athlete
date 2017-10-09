@@ -12,53 +12,11 @@ import BoxShadow
 import Cursor
 import Surrounded exposing (Surrounded)
 import Background
-
-
-type Visibility
-    = VisibilityHidden
-    | VisibilityVisible
-
-
-hidden : Visibility
-hidden =
-    VisibilityHidden
-
-
-visible : Visibility
-visible =
-    VisibilityVisible
-
-
-type Horizontal a
-    = PositionLeft a
-    | PositionRight a
-
-
-type Vertical a
-    = PositionTop a
-    | PositionBottom a
-
-
-type alias PositionCoordinates a =
-    { horizontal : Horizontal a
-    , vertical : Vertical a
-    }
-
-
-type DynamicPositionningType
-    = PositionAbsolute
-    | PositionRelative
-    | PositionFixed
-    | PositionSticky
-
-
-type Position
-    = PositionDynamic DynamicPositionningType (PositionCoordinates SizeUnit)
-    | PositionStatic
+import Position
 
 
 type alias Layout =
-    { position : Maybe Position
+    { position : Maybe Position.Position
     , visibility : Maybe Visibility
     , typography : Maybe Typography.Typography
     , padding : Maybe (Surrounded Padding.Padding)
@@ -90,6 +48,11 @@ defaultLayout =
         Nothing
         Nothing
         Nothing
+
+
+position : Position.Position -> Modifier Layout
+position =
+    setMaybeValue setPosition
 
 
 background : Modifiers Background.Background -> Modifier Layout
@@ -166,8 +129,28 @@ layoutToCouples layout =
     , unwrapToCouples .corner Corner.cornerToCouples
     , unwrapToCouples .margin Margin.marginToCouples
     , unwrapToCouples .padding Padding.paddingToCouples
+    , unwrapToCouples .position Position.positionToCouples
     ]
         |> List.concatMap (callOn layout)
+
+
+type Visibility
+    = VisibilityHidden
+    | VisibilityVisible
+
+
+hidden : Visibility
+hidden =
+    VisibilityHidden
+
+
+visible : Visibility
+visible =
+    VisibilityVisible
+
+
+
+-- Internals
 
 
 opacityToCouple : Float -> ( String, String )
@@ -193,21 +176,3 @@ visibilityToString val =
 zIndexToCouple : Int -> ( String, String )
 zIndexToCouple zIndex =
     ( "z-index", toString zIndex )
-
-
-nothingOrJust : (a -> b) -> Maybe a -> Maybe b
-nothingOrJust fun =
-    Maybe.andThen (Just << fun)
-
-
-positionToString : Maybe Position -> Maybe String
-positionToString =
-    nothingOrJust
-        (\val ->
-            case val of
-                PositionDynamic positionningType coordinates ->
-                    "TODO"
-
-                PositionStatic ->
-                    "static"
-        )

@@ -1,5 +1,6 @@
 module Surrounded exposing (..)
 
+import Function
 import List.Extra
 import Helpers.Shared exposing (..)
 import Helpers.Setters exposing (..)
@@ -58,8 +59,14 @@ all default modifiers =
         >> horizontal default modifiers
 
 
+applyModifiersOnDefault : Modifiers (Surrounded a) -> Surrounded a
+applyModifiersOnDefault modifiers =
+    default
+        |> Function.compose modifiers
+
+
 surroundedToCouples :
-    String
+    Maybe String
     -> (a -> List ( String, String ))
     -> Surrounded a
     -> List ( String, String )
@@ -79,15 +86,25 @@ surroundedToCouples prefix toCouple border =
         |> List.concat
 
 
-addPrefix : String -> String -> ( String, String ) -> ( String, String )
+addPrefix : Maybe String -> String -> ( String, String ) -> ( String, String )
 addPrefix qualifier orientation ( selector, value ) =
     let
         name =
             case selector of
                 "" ->
-                    [ qualifier, orientation ]
+                    case qualifier of
+                        Nothing ->
+                            [ orientation ]
+
+                        Just qual ->
+                            [ qual, orientation ]
 
                 name ->
-                    [ qualifier, orientation, name ]
+                    case qualifier of
+                        Nothing ->
+                            [ orientation, name ]
+
+                        Just qual ->
+                            [ qual, orientation, name ]
     in
         ( name |> String.join "-", value )

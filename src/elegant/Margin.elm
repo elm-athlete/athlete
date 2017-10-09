@@ -146,7 +146,7 @@ Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
 marginToCouples : Surrounded Margin -> List ( String, String )
 marginToCouples =
-    Surrounded.surroundedToCouples "margin" marginSideToCouples
+    Surrounded.surroundedToCouples (Just "margin") marginSideToCouples
 
 
 

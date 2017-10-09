@@ -182,7 +182,7 @@ Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
 borderToCouples : Surrounded Border -> List ( String, String )
 borderToCouples =
-    Surrounded.surroundedToCouples "border" borderSideToCouples
+    Surrounded.surroundedToCouples (Just "border") borderSideToCouples
 
 
 

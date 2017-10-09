@@ -15,6 +15,7 @@ import Padding
 import Cursor
 import Outline
 import Background
+import Position
 
 
 main : Html msg
@@ -82,6 +83,12 @@ mainStyle =
                     |> Background.gradient
                 ]
             ]
+        , Layout.position Position.static
+        , Layout.position <|
+            Position.fixed
+                [ Position.top (px 30)
+                , Position.bottom (px 20)
+                ]
         ]
 
 
