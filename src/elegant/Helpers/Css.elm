@@ -2,6 +2,8 @@ module Helpers.Css
     exposing
         ( applyCssFunction
         , isValidInCssName
+        , prependUnderscore
+        , cssValidName
         , surroundWithBraces
         , surroundWithParentheses
         , surroundWithQuotes
@@ -20,6 +22,16 @@ applyCssFunction funName content =
 isValidInCssName : Char -> Bool
 isValidInCssName char =
     isAlphaNum char || char == '-' || char == '_'
+
+
+prependUnderscore : String -> String
+prependUnderscore =
+    (++) "_"
+
+
+cssValidName : String -> String
+cssValidName =
+    String.filter isValidInCssName
 
 
 surroundWith : String -> String -> String -> String

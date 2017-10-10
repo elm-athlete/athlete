@@ -177,7 +177,6 @@ every style, for every element. Each element can be block, inline, flow or flex.
 
 import Either exposing (Either(..))
 import Helpers.Css
-import Maybe.Extra
 import Layout
 import Helpers.Shared exposing (..)
 import Helpers.Setters exposing (..)
@@ -867,18 +866,8 @@ dimensionsToCouples size =
     , ( "min-height", Tuple.second >> .min )
     ]
         |> List.map (Tuple.mapSecond (callOn size))
-        |> List.concatMap keepJustValues
+        |> keepJustValues
         |> List.map (Tuple.mapSecond sizeUnitToString)
-
-
-keepJustValues : ( String, Maybe a ) -> List ( String, a )
-keepJustValues ( property, value ) =
-    case value of
-        Nothing ->
-            []
-
-        Just val ->
-            [ ( property, val ) ]
 
 
 toLegacyDisplayCss : String -> String
@@ -1017,7 +1006,7 @@ overflowToCouples : Overflow.FullOverflow -> List ( String, String )
 overflowToCouples ( x, y ) =
     [ ( "overflow-x", x ), ( "overflow-y", y ) ]
         |> List.map (Tuple.mapSecond (Maybe.map overflowToString))
-        |> List.concatMap keepJustValues
+        |> keepJustValues
 
 
 overflowToString : Overflow.Overflow -> String
@@ -1064,8 +1053,3 @@ flexDirectionToString val =
 
         FlexDirectionRow ->
             "row"
-
-
-unwrapEmptyList : (a -> List b) -> Maybe a -> List b
-unwrapEmptyList =
-    Maybe.Extra.unwrap []

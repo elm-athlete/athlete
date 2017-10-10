@@ -5,6 +5,11 @@ module Helpers.Shared exposing (..)
 import Function
 import Color.Convert
 import Color exposing (Color)
+import Maybe.Extra
+
+unwrapEmptyList : (a -> List b) -> Maybe a -> List b
+unwrapEmptyList =
+    Maybe.Extra.unwrap []
 
 
 type SizeUnit
@@ -63,6 +68,21 @@ modifiedElementOrNothing default modifiers =
         default
             |> Function.compose modifiers
             |> Just
+
+
+keepJustValues : List ( String, Maybe a ) -> List ( String, a )
+keepJustValues =
+    List.concatMap keepJustValue
+
+
+keepJustValue : ( String, Maybe a ) -> List ( String, a )
+keepJustValue ( property, value ) =
+    case value of
+        Nothing ->
+            []
+
+        Just val ->
+            [ ( property, val ) ]
 
 
 

@@ -451,6 +451,11 @@ setRightIn =
     flip setRight
 
 
+addScreenWidth : b -> { a | screenWidths : List b } -> { a | screenWidths : List b }
+addScreenWidth screenWidth record =
+    { record | screenWidths = screenWidth :: record.screenWidths }
+
+
 setScreenWidths : c -> { b | screenWidths : a } -> { b | screenWidths : c }
 setScreenWidths v o =
     { o | screenWidths = v }
