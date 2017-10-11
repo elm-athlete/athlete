@@ -213,7 +213,7 @@ Can be inline, block, or flex-item.
 type OutsideDisplay
     = Inline
     | Block (Maybe BlockDetails)
-    | FlexItem (Maybe FlexItemDetails)
+    | FlexItem (Maybe FlexItemDetails) (Maybe BlockDetails)
 
 
 {-| Represents the style from inside a display.
@@ -307,10 +307,13 @@ node behaving like an flex child (not being a flex father himself)
     Display.flexChild [] []
 
 -}
-flexChild : Modifiers FlexItemDetails -> Modifiers Layout.Layout -> DisplayBox
-flexChild flexItemDetailsModifiers =
+flexChild : Modifiers FlexItemDetails -> Modifiers BlockDetails -> Modifiers Layout.Layout -> DisplayBox
+flexChild flexItemDetailsModifiers blockDetailsModifiers =
     displayBox
-        (FlexItem (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers))
+        (FlexItem
+            (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers)
+            (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers)
+        )
         Flow
 
 
@@ -320,10 +323,13 @@ node behaving like an flex child being a flex father himself.
     Display.flexChildContainer [] [] []
 
 -}
-flexChildContainer : Modifiers FlexContainerDetails -> Modifiers FlexItemDetails -> Modifiers Layout.Layout -> DisplayBox
-flexChildContainer flexContainerDetailsModifiers flexItemDetailsModifiers =
+flexChildContainer : Modifiers FlexContainerDetails -> Modifiers FlexItemDetails -> Modifiers BlockDetails -> Modifiers Layout.Layout -> DisplayBox
+flexChildContainer flexContainerDetailsModifiers flexItemDetailsModifiers blockDetailsModifiers =
     displayBox
-        (FlexItem (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers))
+        (FlexItem
+            (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers)
+            (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers)
+        )
         (FlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
 
 
@@ -771,8 +777,8 @@ outsideDisplayToCouples outsideDisplay =
         Block blockDetails ->
             ( "block", unwrapEmptyList blockDetailsToCouples blockDetails )
 
-        FlexItem flexItemDetails ->
-            ( "block", unwrapEmptyList flexItemDetailsToCouples flexItemDetails )
+        FlexItem flexItemDetails blockDetails ->
+            ( "block", List.append (unwrapEmptyList flexItemDetailsToCouples flexItemDetails) (unwrapEmptyList blockDetailsToCouples blockDetails) )
 
 
 insideDisplayToCouples : InsideDisplay -> ( String, List ( String, String ) )

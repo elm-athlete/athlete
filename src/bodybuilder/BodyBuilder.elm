@@ -500,17 +500,17 @@ defaultUniversalAttributes =
 
 {-| -}
 type alias StyleAttribute =
-    { standard : List (Style -> Style)
-    , hover : List (Style -> Style)
-    , focus : List (Style -> Style)
+    { standard : Maybe Style
+    , hover : Maybe Style
+    , focus : Maybe Style
     }
 
 
 defaultStyleAttribute : StyleAttribute
 defaultStyleAttribute =
-    { standard = []
-    , hover = []
-    , focus = []
+    { standard = Nothing
+    , hover = Nothing
+    , focus = Nothing
     }
 
 
@@ -844,25 +844,25 @@ defaultsComposedToAttrs defaults attrs =
 
 
 styleAttribute :
-    List (Style -> Style)
+    Style
     -> StyleAttribute
 styleAttribute style =
-    styleAttributeWithHover style []
+    StyleAttribute (Just style) Nothing Nothing
 
 
 styleAttributeWithHover :
-    List (Style -> Style)
-    -> List (Style -> Style)
+    Style
+    -> Style
     -> StyleAttribute
 styleAttributeWithHover style hover =
-    { standard = style
-    , hover = hover
-    , focus = []
+    { standard = Just style
+    , hover = Just hover
+    , focus = Nothing
     }
 
 
 flowDefaultsComposedToAttrsWithStyle :
-    List (Style -> Style)
+    Style
     -> List (FlowAttributes msg -> FlowAttributes msg)
     -> FlowAttributes msg
 flowDefaultsComposedToAttrsWithStyle style =
@@ -880,7 +880,14 @@ flowDefaultsComposedToAttrs :
     List (FlowAttributes msg -> FlowAttributes msg)
     -> FlowAttributes msg
 flowDefaultsComposedToAttrs =
-    flowDefaultsComposedToAttrsWithStyle []
+    defaultsComposedToAttrs
+        { style = defaultStyleAttribute
+        , universal = defaultUniversalAttributes
+        , onMouseEvents = defaultOnMouseEvents
+        , onEvent = Nothing
+        , onBlurEvent = Nothing
+        , onFocusEvent = Nothing
+        }
 
 
 
@@ -899,7 +906,7 @@ h1 :
     -> List (Node msg)
     -> Node msg
 h1 =
-    H 1 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h1S ])
+    H 1 << (flowDefaultsComposedToAttrs)
 
 
 {-| -}
@@ -908,7 +915,7 @@ h2 :
     -> List (Node msg)
     -> Node msg
 h2 =
-    H 2 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h2S ])
+    H 2 << (flowDefaultsComposedToAttrs)
 
 
 {-| -}
@@ -917,7 +924,7 @@ h3 :
     -> List (Node msg)
     -> Node msg
 h3 =
-    H 3 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h3S ])
+    H 3 << (flowDefaultsComposedToAttrs)
 
 
 {-| -}
@@ -926,7 +933,7 @@ h4 :
     -> List (Node msg)
     -> Node msg
 h4 =
-    H 4 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h4S ])
+    H 4 << (flowDefaultsComposedToAttrs)
 
 
 {-| -}
@@ -935,7 +942,7 @@ h5 :
     -> List (Node msg)
     -> Node msg
 h5 =
-    H 5 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h5S ])
+    H 5 << (flowDefaultsComposedToAttrs)
 
 
 {-| -}
@@ -944,7 +951,7 @@ h6 :
     -> List (Node msg)
     -> Node msg
 h6 =
-    H 6 << (flowDefaultsComposedToAttrsWithStyle [ Elegant.h6S ])
+    H 6 << (flowDefaultsComposedToAttrs)
 
 
 {-| -}
@@ -1570,7 +1577,7 @@ label attributes content attrs =
                         , onFocusEvent = Nothing
                         , onMouseEvents = defaultOnMouseEvents
                         , position = After
-                        , style = styleAttribute []
+                        , style = defaultStyleAttribute
                         , universal = defaultUniversalAttributes
                         }
                         attributes
@@ -1795,39 +1802,39 @@ class val ({ universal } as attrs) =
 
 {-| -}
 style :
-    List (Style -> Style)
+    Style
     -> { a | style : StyleAttribute }
     -> { a | style : StyleAttribute }
 style val ({ style } as attrs) =
     let
         newStyle =
-            { style | standard = style.standard ++ val }
+            { style | standard = Just val }
     in
         { attrs | style = newStyle }
 
 
 {-| -}
 hoverStyle :
-    List (Style -> Style)
+    Style
     -> { a | style : StyleAttribute }
     -> { a | style : StyleAttribute }
 hoverStyle val ({ style } as attrs) =
     let
         newHoverStyle =
-            { style | hover = style.hover ++ val }
+            { style | hover = Just val }
     in
         { attrs | style = newHoverStyle }
 
 
 {-| -}
 focusStyle :
-    List (Style -> Style)
+    Style
     -> { a | style : StyleAttribute }
     -> { a | style : StyleAttribute }
 focusStyle val ({ style } as attrs) =
     let
         newStyle =
-            { style | focus = style.focus ++ val }
+            { style | focus = Just val }
     in
         { attrs | style = newStyle }
 
@@ -1940,10 +1947,11 @@ handleStyle { style } =
         { standard, hover, focus } =
             style
     in
-        [ BodyBuilderHtml.style standard
-        , BodyBuilderHtml.hoverStyle hover
-        , BodyBuilderHtml.focusStyle focus
+        [ Maybe.map (BodyBuilderHtml.style >> List.singleton) standard |> Maybe.withDefault []
+        , Maybe.map (BodyBuilderHtml.hoverStyle >> List.singleton) hover |> Maybe.withDefault []
+        , Maybe.map (BodyBuilderHtml.focusStyle >> List.singleton) focus |> Maybe.withDefault []
         ]
+            |> List.concat
             |> compose
 
 

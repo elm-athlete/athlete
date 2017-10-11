@@ -111,6 +111,7 @@ module BodyBuilderHtml
 @docs onFocus
 @docs on
 @docs data
+
 -}
 
 import Html
@@ -130,9 +131,9 @@ type alias Tree msg =
     , min : Maybe String
     , step : Maybe String
     , defaultValue : Maybe String
-    , style : Style
-    , hoverStyle : Style
-    , focusStyle : Style
+    , style : Maybe Style
+    , hoverStyle : Maybe Style
+    , focusStyle : Maybe Style
     , checked : Maybe Bool
     , value : Maybe String
     , href : Maybe String
@@ -197,9 +198,9 @@ base =
         , min = Nothing
         , step = Nothing
         , defaultValue = Nothing
-        , style = Elegant.defaultStyle
-        , hoverStyle = Elegant.defaultStyle
-        , focusStyle = Elegant.defaultStyle
+        , style = Nothing
+        , hoverStyle = Nothing
+        , focusStyle = Nothing
         , checked = Nothing
         , value = Nothing
         , href = Nothing
@@ -277,7 +278,7 @@ fold fun accumulator (HtmlAttributes tree) =
         tree.content
 
 
-getAllStyles : HtmlAttributes msg -> List { style : Style, suffix : Maybe String, mediaQuery : Maybe ( Maybe Int, Maybe Int ) }
+getAllStyles : HtmlAttributes msg -> List { style : Maybe Style, suffix : Maybe String, mediaQuery : Maybe ( Maybe Int, Maybe Int ) }
 getAllStyles =
     fold
         (\node accumulator ->
@@ -315,7 +316,9 @@ htmlAttributesToCss val =
     let
         csses : List String
         csses =
-            (Elegant.stylesToCss (getAllStyles val))
+            []
+
+        -- (Elegant.stylesToCss (getAllStyles val))
     in
         Html.div []
             (csses
@@ -349,9 +352,9 @@ htmlAttributesToHtml (HtmlAttributes val) =
                 Just tag_ ->
                     Html.node tag_
                         (List.concat
-                            [ classes val.style
-                            , hoverClasses val.hoverStyle
-                            , focusClasses val.focusStyle
+                            [ val.style |> Maybe.map classes |> Maybe.withDefault []
+                            , val.hoverStyle |> Maybe.map hoverClasses |> Maybe.withDefault []
+                            , val.focusStyle |> Maybe.map focusClasses |> Maybe.withDefault []
                             , [ Html.Attributes.autocomplete val.autocomplete ]
                             , Helpers.emptyListOrApply Html.Attributes.class
                                 (if val.class |> List.isEmpty then
@@ -546,21 +549,21 @@ onInput val (HtmlAttributes attrs) =
 
 
 {-| -}
-style : List (Style -> Style) -> HtmlAttributes msg -> HtmlAttributes msg
+style : Style -> HtmlAttributes msg -> HtmlAttributes msg
 style val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | style = (compose val) attrs.style }
+    HtmlAttributes { attrs | style = Just val }
 
 
 {-| -}
-hoverStyle : List (Style -> Style) -> HtmlAttributes msg -> HtmlAttributes msg
+hoverStyle : Style -> HtmlAttributes msg -> HtmlAttributes msg
 hoverStyle val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | hoverStyle = (compose val) attrs.hoverStyle }
+    HtmlAttributes { attrs | hoverStyle = Just val }
 
 
 {-| -}
-focusStyle : List (Style -> Style) -> HtmlAttributes msg -> HtmlAttributes msg
+focusStyle : Style -> HtmlAttributes msg -> HtmlAttributes msg
 focusStyle val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | focusStyle = (compose val) attrs.focusStyle }
+    HtmlAttributes { attrs | focusStyle = Just val }
 
 
 {-| -}
