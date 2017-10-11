@@ -2,20 +2,18 @@ module Elegant exposing (..)
 
 import Html exposing (Html)
 import Html.Attributes
-import List.Extra
-import Maybe.Extra as Maybe exposing ((?))
 import Helpers.Setters exposing (..)
 import Helpers.Shared exposing (..)
-import Helpers.Css
-import Helpers.Style exposing (..)
+import Helpers.Style as CommonStyle
 import Display exposing (DisplayBox)
 import Elegant.Convert
+import Dict exposing (Dict)
 
 
 {-| Contains all style for an element used with Elegant.
 -}
 type Style
-    = Style StyleAndScreenWidths
+    = Style CommonStyle.Style
 
 
 {-| -}
@@ -24,10 +22,18 @@ style display =
     Style
         { display = Just display
         , screenWidths = []
+        , suffix = Nothing
         }
 
 
-withScreenWidth : List ScreenWidth -> Modifier Style
+setSuffix : String -> Style -> Style
+setSuffix value (Style style) =
+    style
+        |> CommonStyle.setSuffix value
+        |> Style
+
+
+withScreenWidth : List CommonStyle.ScreenWidth -> Modifier Style
 withScreenWidth screenWidth (Style style) =
     style
         |> setScreenWidths screenWidth
@@ -110,14 +116,14 @@ inlineStyle =
 classes : Style -> String
 classes (Style style) =
     style
-        |> Elegant.Convert.classesNamesFromStyleAndScreenWidths Nothing
+        |> Elegant.Convert.classesNamesFromStyle
         |> String.join " "
 
 
-classesWithSuffix : String -> Style -> String
-classesWithSuffix suffix (Style style) =
+classesWithSuffix : Style -> String
+classesWithSuffix (Style style) =
     style
-        |> Elegant.Convert.classesNamesFromStyleAndScreenWidths (Just suffix)
+        |> Elegant.Convert.classesNamesFromStyle
         |> String.join " "
 
 
@@ -125,147 +131,29 @@ classesWithSuffix suffix (Style style) =
 -}
 classesHover : Style -> String
 classesHover =
-    classesWithSuffix "hover"
+    classesWithSuffix
 
 
 {-| Generate all the classes of a list of Focus Styles
 -}
 classesFocus : Style -> String
 classesFocus =
-    classesWithSuffix "focus"
+    classesWithSuffix
+
+
+stylesToCss : List Style -> ( Dict String (List String), List String )
+stylesToCss styles =
+    styles
+        |> List.map toCommonStyle
+        |> Elegant.Convert.stylesToCss
+
+
+toCommonStyle : Style -> CommonStyle.Style
+toCommonStyle (Style style) =
+    style
 
 
 
---
---
--- generateSelector : Maybe String -> Maybe String
--- generateSelector =
---     Maybe.map ((++) ":")
---
---
--- type alias ConditionalStyle =
---     { style : Style
---     , suffix : Maybe String
---     , mediaQuery : Maybe ( Maybe Int, Maybe Int )
---     }
---
---
--- type alias AtomicClass =
---     { mediaQuery : Maybe String
---     , className : String
---     , mediaQueryId : Maybe String
---     , selector : Maybe String
---     , property : String
---     }
---
---
--- generateMediaQueryId : ( Maybe Int, Maybe Int ) -> String
--- generateMediaQueryId ( min, max ) =
---     String.filter Helpers.Css.isValidInCssName (toString min ++ toString max)
---
---
--- coupleToAtomicClass : Maybe String -> Maybe ( Maybe Int, Maybe Int ) -> ( String, String ) -> AtomicClass
--- coupleToAtomicClass suffix mediaQuery property =
---     { mediaQuery = Maybe.map generateMediaQuery mediaQuery
---     , className = Elegant.Convert.generateClassName suffix property
---     , mediaQueryId = Maybe.map generateMediaQueryId mediaQuery
---     , selector = generateSelector suffix
---     , property = generateProperty property
---     }
---
---
--- compileConditionalStyle : ConditionalStyle -> List AtomicClass
--- compileConditionalStyle { style, suffix, mediaQuery } =
---     List.map (coupleToAtomicClass suffix mediaQuery) (compileStyle style)
---
---
--- compileAtomicClass : AtomicClass -> String
--- compileAtomicClass { mediaQuery, className, mediaQueryId, selector, property } =
---     inMediaQuery mediaQuery
---         (compileStyleToCss className mediaQueryId selector property)
---
---
--- {-| Generate all the css from a list of tuple : styles and hover
--- -}
--- stylesToCss : List ConditionalStyle -> List String
--- stylesToCss styles =
---     styles
---         |> List.concatMap compileScreenWidths
---         |> List.concatMap compileConditionalStyle
---         |> List.map compileAtomicClass
---         |> List.append [ boxSizingCss ]
---         |> List.Extra.unique
---
---
--- boxSizingCss : String
--- boxSizingCss =
---     "*{box-sizing: border-box;}"
---
---
--- screenWidthToCompiledStyle :
---     Maybe String
---     -> ScreenWidth
---     -> ConditionalStyle
--- screenWidthToCompiledStyle suffix { min, max, style } =
---     ConditionalStyle style suffix (Just ( min, max ))
---
---
--- compileScreenWidths : ConditionalStyle -> List ConditionalStyle
--- compileScreenWidths ({ suffix, style } as style_) =
---     let
---         (Style { screenWidths }) =
---             style
---     in
---         style_ :: List.map (screenWidthToCompiledStyle suffix) screenWidths
---
---
--- generateMediaQuery : ( Maybe Int, Maybe Int ) -> String
--- generateMediaQuery ( min, max ) =
---     "@media " ++ mediaQuerySelector min max
---
---
--- inMediaQuery : Maybe String -> String -> String
--- inMediaQuery mediaQuery content =
---     case mediaQuery of
---         Nothing ->
---             content
---
---         Just queries ->
---             queries ++ Helpers.Css.surroundWithBraces content
---
---
--- mediaQuerySelector : Maybe Int -> Maybe Int -> String
--- mediaQuerySelector min max =
---     case min of
---         Nothing ->
---             case max of
---                 Nothing ->
---                     ""
---
---                 Just max_ ->
---                     "(max-width: " ++ toString max_ ++ "px)"
---
---         Just min_ ->
---             case max of
---                 Nothing ->
---                     "(min-width: " ++ toString min_ ++ "px)"
---
---                 Just max_ ->
---                     "(min-width: " ++ toString min_ ++ "px) and (max-width: " ++ toString max_ ++ "px)"
---
---
--- generateProperty : ( String, String ) -> String
--- generateProperty ( attribute, value ) =
---     attribute ++ ":" ++ value
---
---
--- compileStyleToCss : String -> Maybe String -> Maybe String -> String -> String
--- compileStyleToCss className mediaQueryId selector property =
---     "."
---         ++ className
---         ++ (mediaQueryId ? "")
---         ++ (selector ? "")
---         ++ Helpers.Css.surroundWithBraces property
 -- Alias
 
 

@@ -2,6 +2,7 @@ module BodyBuilder.Elements exposing (..)
 
 import Elegant exposing (..)
 import BodyBuilder exposing (..)
+import Function
 
 
 -- import Function exposing (..)
@@ -12,10 +13,11 @@ import Layout
 import Position
 
 
--- stickyView : List (Elegant.Style -> Elegant.Style) -> String -> List (Node msg) -> Node msg
-
-
-stickyView : a -> String -> List (Node msg) -> Node msg
+stickyView
+    : List (Layout.Layout -> Layout.Layout)
+    -> String
+    -> List (Node msg)
+    -> Node msg
 stickyView sectionStyle sectionName elements =
     div []
         [ div
@@ -25,8 +27,7 @@ stickyView sectionStyle sectionName elements =
                         [ Display.dimensions [ Display.width (percent 100) ] ]
                         [ Layout.position <|
                             Position.sticky [ Position.top (px 0) ]
-
-                        -- , sectionStyle |> compose
+                        , sectionStyle |> Function.compose
                         ]
             ]
             [ text sectionName ]

@@ -121,6 +121,7 @@ import Function exposing (compose)
 import Elegant exposing (Style)
 import Elegant.Helpers as Helpers
 import Json.Decode exposing (Decoder)
+import Maybe.Extra
 
 
 type alias Tree msg =
@@ -278,32 +279,14 @@ fold fun accumulator (HtmlAttributes tree) =
         tree.content
 
 
-getAllStyles : HtmlAttributes msg -> List { style : Maybe Style, suffix : Maybe String, mediaQuery : Maybe ( Maybe Int, Maybe Int ) }
+getAllStyles : HtmlAttributes msg -> List Style
 getAllStyles =
     fold
-        (\node accumulator ->
-            let
-                customStyle =
-                    { style = node.style
-                    , suffix = Nothing
-                    , mediaQuery = Nothing
-                    }
-
-                hoverStyle =
-                    { style = node.hoverStyle
-                    , suffix = Just "hover"
-                    , mediaQuery = Nothing
-                    }
-
-                focusStyle =
-                    { style = node.focusStyle
-                    , suffix = Just "focus"
-                    , mediaQuery = Nothing
-                    }
-            in
-                customStyle :: hoverStyle :: focusStyle :: accumulator
+        (\{ style, hoverStyle, focusStyle } accumulator ->
+            style :: hoverStyle :: focusStyle :: accumulator
         )
         []
+        >> Maybe.Extra.values
 
 
 htmlAttributeToCss : String -> Html.Html msg
@@ -313,17 +296,12 @@ htmlAttributeToCss val =
 
 htmlAttributesToCss : HtmlAttributes msg -> Html.Html msg
 htmlAttributesToCss val =
-    let
-        csses : List String
-        csses =
-            []
-
-        -- (Elegant.stylesToCss (getAllStyles val))
-    in
-        Html.div []
-            (csses
-                |> List.map htmlAttributeToCss
-            )
+    val
+        |> getAllStyles
+        |> Elegant.stylesToCss
+        |> Tuple.second
+        |> List.map htmlAttributeToCss
+        |> Html.div []
 
 
 addLabelContent : Label msg -> HtmlAttributes msg -> List (HtmlAttributes msg)
@@ -557,13 +535,13 @@ style val (HtmlAttributes attrs) =
 {-| -}
 hoverStyle : Style -> HtmlAttributes msg -> HtmlAttributes msg
 hoverStyle val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | hoverStyle = Just val }
+    HtmlAttributes { attrs | hoverStyle = val |> Elegant.setSuffix "hover" |> Just }
 
 
 {-| -}
 focusStyle : Style -> HtmlAttributes msg -> HtmlAttributes msg
 focusStyle val (HtmlAttributes attrs) =
-    HtmlAttributes { attrs | focusStyle = Just val }
+    HtmlAttributes { attrs | focusStyle = val |> Elegant.setSuffix "focus" |> Just }
 
 
 {-| -}

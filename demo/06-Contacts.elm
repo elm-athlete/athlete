@@ -36,9 +36,9 @@ import Typography
 import Typography.Character as Character
 import Constants
 import Padding
-import Background
 import Display.Overflow as Overflow
 import Position
+import Function
 
 
 type Route
@@ -89,6 +89,7 @@ gray =
     Color.grayscale 0.1
 
 
+fullWidth : Display.BlockDetails -> Display.BlockDetails
 fullWidth =
     Display.dimensions [ Display.width (percent 100) ]
 
@@ -126,6 +127,7 @@ titleView contact =
         [ text contact.name ]
 
 
+commonButtonStyleLayout : List (Layout.Layout -> Layout.Layout)
 commonButtonStyleLayout =
     [ Layout.padding [ Padding.all Constants.medium ]
     , Layout.cursor Cursor.pointer
@@ -133,6 +135,7 @@ commonButtonStyleLayout =
     ]
 
 
+navItemGroup : Float -> Display.Align -> String -> Node Msg
 navItemGroup width alignment content =
     div
         [ onClick <| StandardHistoryWrapper Back
@@ -143,9 +146,9 @@ navItemGroup width alignment content =
                     [ Display.overflow [ Overflow.overflowXY Overflow.hidden ]
                     , Display.textOverflowEllipsis
                     ]
-                    [ commonButtonStyleLayout
+                    [ commonButtonStyleLayout |> Function.compose
                     , Layout.typography
-                        [ Typography.character [ Elegant.color Color.black ]
+                        [ Elegant.color Color.black
                         , Typography.whiteSpaceNoWrap
                         ]
                     ]
@@ -161,13 +164,14 @@ header =
                 Display.flexChildContainer
                     [ Display.direction Display.row ]
                     [ Display.basis (px 200) ]
+                    []
                     [ Layout.position <| Position.fixed []
                     , Layout.background [ Elegant.color <| Color.rgba 255 255 255 0.9 ]
                     ]
         ]
-        [ navItemGroup 30 Display.left "← BACK"
+        [ navItemGroup 30 Display.center "← BACK"
         , navItemGroup 40 Display.center "POKEMON"
-        , navItemGroup 30 Display.right ""
+        , navItemGroup 30 Display.center ""
         ]
 
 
@@ -191,6 +195,7 @@ showView bodyFun data =
                     Display.flexChild
                         [ Display.shrink 1000000 ]
                         []
+                        []
 
             -- [ Elegant.overflowYScroll
             -- , Elegant.fullWidth
@@ -209,7 +214,13 @@ contactBodyView data =
             text ""
 
         Just contact ->
-            div [ style [ pageCenter ] ] [ text contact.name, br [], text contact.phoneNumber ]
+            div
+                [-- style [ pageCenter ]
+                ]
+                [ text contact.name
+                , br []
+                , text contact.phoneNumber
+                ]
 
 
 filterByInitial : List Contact -> List ( Char, List Contact )
@@ -226,7 +237,9 @@ filterByInitial =
 initialView : ( Char, List Contact ) -> Node Msg
 initialView ( initial, contacts ) =
     stickyView
-        [ Elegant.backgroundColor gray, Elegant.paddingLeft Elegant.large ]
+        [ Layout.background [ Elegant.color gray ]
+        , Layout.padding [ Padding.left Constants.large ]
+        ]
         (String.fromChar initial)
         (contacts |> List.map titleView)
 
@@ -239,12 +252,15 @@ contactsView =
 contactsIndex : List Contact -> Node Msg
 contactsIndex contacts =
     div
-        [ style
-            [ Elegant.backgroundColor gray
-            , Elegant.height (Vh 100)
-            , Elegant.overflowYScroll
-            , Elegant.fullWidth
-            ]
+        [ style <|
+            Elegant.style <|
+                Display.block
+                    [ Display.dimensions
+                        [ Display.height (vh 100), Display.width (percent 100) ]
+                    , Display.overflow [ Overflow.overflowY Overflow.scroll ]
+                    ]
+                    [ Layout.background [ Elegant.color gray ]
+                    ]
         ]
         (contacts |> contactsView)
 
@@ -270,7 +286,18 @@ insidePageView page data transition =
 
 view : Model -> Node Msg
 view { history, data } =
-    div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
+    div
+        [ style <|
+            Elegant.style <|
+                Display.block []
+                    [ Layout.typography
+                        [ Typography.character
+                            [ Character.fontFamilySansSerif
+                            , Character.size Constants.zeta
+                            ]
+                        ]
+                    ]
+        ]
         [ historyView insidePageView history data ]
 
 
@@ -335,6 +362,572 @@ initContacts =
     , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
     , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
     , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
+    , { name = "Blastoise", id = 9, phoneNumber = "+33389399383" }
+    , { name = "Caterpie", id = 10, phoneNumber = "+33389399383" }
+    , { name = "Metapod", id = 11, phoneNumber = "+33389399383" }
+    , { name = "Butterfree", id = 12, phoneNumber = "+33389399383" }
+    , { name = "Weedle", id = 13, phoneNumber = "+33389399383" }
+    , { name = "Kakuna", id = 14, phoneNumber = "+33389399383" }
+    , { name = "Beedrill", id = 15, phoneNumber = "+33389399383" }
+    , { name = "Pidgey", id = 16, phoneNumber = "+33389399383" }
+    , { name = "Pidgeotto", id = 17, phoneNumber = "+33389399383" }
+    , { name = "Pidgeot", id = 18, phoneNumber = "+33389399383" }
+    , { name = "Rattata", id = 19, phoneNumber = "+33389399383" }
+    , { name = "Raticate", id = 20, phoneNumber = "+33389399383" }
+    , { name = "Spearow", id = 21, phoneNumber = "+33389399383" }
+    , { name = "Fearow", id = 22, phoneNumber = "+33389399383" }
+    , { name = "Ekans", id = 23, phoneNumber = "+33389399383" }
+    , { name = "Arbok", id = 24, phoneNumber = "+33389399383" }
+    , { name = "Pikachudagger", id = 25, phoneNumber = "+33389399383" }
+    , { name = "Raichu", id = 26, phoneNumber = "+33389399383" }
+    , { name = "Sandshrew", id = 27, phoneNumber = "+33389399383" }
+    , { name = "Sandslash", id = 28, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♀", id = 29, phoneNumber = "+33389399383" }
+    , { name = "Nidorina", id = 30, phoneNumber = "+33389399383" }
+    , { name = "Nidoqueen", id = 31, phoneNumber = "+33389399383" }
+    , { name = "Nidoran♂", id = 32, phoneNumber = "+33389399383" }
+    , { name = "Nidorino", id = 33, phoneNumber = "+33389399383" }
+    , { name = "Nidoking", id = 34, phoneNumber = "+33389399383" }
+    , { name = "Clefairy", id = 35, phoneNumber = "+33389399383" }
+    , { name = "Clefable", id = 36, phoneNumber = "+33389399383" }
+    , { name = "Vulpix", id = 37, phoneNumber = "+33389399383" }
+    , { name = "Ninetales", id = 38, phoneNumber = "+33389399383" }
+    , { name = "Jigglypuff", id = 39, phoneNumber = "+33389399383" }
+    , { name = "Wigglytuff", id = 40, phoneNumber = "+33389399383" }
+    , { name = "Zubat", id = 41, phoneNumber = "+33389399383" }
+    , { name = "Golbat", id = 42, phoneNumber = "+33389399383" }
+    , { name = "Oddish", id = 43, phoneNumber = "+33389399383" }
+    , { name = "Gloom", id = 44, phoneNumber = "+33389399383" }
+    , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
+    , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
+    , { name = "Charmanderdagger", id = 4, phoneNumber = "+33389399383" }
+    , { name = "Charmeleon", id = 5, phoneNumber = "+33389399383" }
+    , { name = "Charizard", id = 6, phoneNumber = "+33389399383" }
+    , { name = "Squirtledagger", id = 7, phoneNumber = "+33389399383" }
+    , { name = "Wartortle", id = 8, phoneNumber = "+33389399383" }
     ]
 
 
