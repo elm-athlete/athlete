@@ -2,6 +2,7 @@ module BodyBuilder.Elements exposing (..)
 
 import Elegant exposing (..)
 import BodyBuilder exposing (..)
+import BodyBuilder.Attributes
 import Function
 
 
@@ -21,7 +22,7 @@ stickyView
 stickyView sectionStyle sectionName elements =
     div []
         [ div
-            [ BodyBuilder.style <|
+            [ BodyBuilder.Attributes.style <|
                 Elegant.style <|
                     Display.block
                         [ Display.dimensions [ Display.width (percent 100) ] ]
