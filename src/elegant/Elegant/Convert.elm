@@ -4,10 +4,7 @@ import Helpers.Css
 import List.Extra
 import Maybe.Extra exposing ((?))
 import Dict exposing (Dict)
-
-
--- import Helpers.Shared exposing (..)
-
+import SHA
 import Helpers.Style exposing (..)
 import Display
 
@@ -93,7 +90,11 @@ addScreenWidthToClassName min max className =
    before returning the result.
 
    Using the same classes names generator than before, the classes matches easily
-   and gives the correct behavior.
+   and gives the correct behavior. The main function (fetchStylesOrCompute) is a
+   caching function. The first thing done is to fetch if the Style has already
+   been compiled. If it is, it just extract the styles from the cache, and returns
+   them. Otherwise, it compiles the styles, and inserts them into the cache, for
+   later use.
 -}
 
 
@@ -110,7 +111,9 @@ fetchStylesOrCompute : Style -> ( Dict String (List String), List String ) -> ( 
 fetchStylesOrCompute style ( cache, accumulator ) =
     let
         styleHash =
-            toString style
+            style
+                |> toString
+                |> SHA.sha1sum
     in
         case Dict.get styleHash cache of
             Nothing ->
