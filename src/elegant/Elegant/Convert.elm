@@ -46,23 +46,7 @@ classesNamesFromStyle ({ screenWidths, display, suffix } as style) =
 
 classesNameGeneration : Maybe String -> List ( String, String ) -> List String
 classesNameGeneration suffix =
-    List.map (generateClassName suffix)
-
-
-generateClassName : Maybe String -> ( String, String ) -> String
-generateClassName suffix ( attribute, value ) =
-    [ attribute, value ]
-        |> String.join "-"
-        |> addSuffixToClassName suffix
-        |> Helpers.Css.cssValidName
-
-
-addSuffixToClassName : Maybe String -> String -> String
-addSuffixToClassName suffix className =
-    suffix
-        |> Maybe.map Helpers.Css.prependUnderscore
-        |> Maybe.withDefault ""
-        |> (++) className
+    List.map (Helpers.Css.generateClassName suffix)
 
 
 screenWidthToClassesNames : Maybe String -> ScreenWidth -> List String
@@ -184,52 +168,12 @@ compileConditionalStyle { display, suffix, mediaQuery } =
 
 coupleToAtomicClass : Maybe String -> Maybe ( Maybe Int, Maybe Int ) -> ( String, String ) -> AtomicClass
 coupleToAtomicClass suffix mediaQuery property =
-    { mediaQuery = Maybe.map generateMediaQuery mediaQuery
-    , className = generateClassName suffix property
-    , mediaQueryId = Maybe.map generateMediaQueryId mediaQuery
-    , selector = generateSelector suffix
-    , property = generateProperty property
+    { mediaQuery = Maybe.map Helpers.Css.generateMediaQuery mediaQuery
+    , className = Helpers.Css.generateClassName suffix property
+    , mediaQueryId = Maybe.map Helpers.Css.generateMediaQueryId mediaQuery
+    , selector = Helpers.Css.generateSelector suffix
+    , property = Helpers.Css.generateProperty property
     }
-
-
-generateMediaQuery : ( Maybe Int, Maybe Int ) -> String
-generateMediaQuery ( min, max ) =
-    "@media " ++ mediaQuerySelector min max
-
-
-mediaQuerySelector : Maybe Int -> Maybe Int -> String
-mediaQuerySelector min max =
-    case min of
-        Nothing ->
-            case max of
-                Nothing ->
-                    ""
-
-                Just max_ ->
-                    "(max-width: " ++ toString max_ ++ "px)"
-
-        Just min_ ->
-            case max of
-                Nothing ->
-                    "(min-width: " ++ toString min_ ++ "px)"
-
-                Just max_ ->
-                    "(min-width: " ++ toString min_ ++ "px) and (max-width: " ++ toString max_ ++ "px)"
-
-
-generateMediaQueryId : ( Maybe Int, Maybe Int ) -> String
-generateMediaQueryId ( min, max ) =
-    String.filter Helpers.Css.isValidInCssName (toString min ++ toString max)
-
-
-generateSelector : Maybe String -> Maybe String
-generateSelector =
-    Maybe.map ((++) ":")
-
-
-generateProperty : ( String, String ) -> String
-generateProperty ( attribute, value ) =
-    attribute ++ ":" ++ value
 
 
 compileAtomicClass : AtomicClass -> String
@@ -241,8 +185,7 @@ compileAtomicClass { mediaQuery, className, mediaQueryId, selector, property } =
 inMediaQuery : Maybe String -> String -> String
 inMediaQuery mediaQuery content =
     mediaQuery
-        |> Maybe.map
-            (flip (++) (Helpers.Css.surroundWithBraces content))
+        |> Maybe.map (flip (++) (Helpers.Css.surroundWithBraces content))
         |> Maybe.withDefault content
 
 

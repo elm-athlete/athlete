@@ -1,7 +1,6 @@
 module Helpers.Css
     exposing
         ( applyCssFunction
-        , isValidInCssName
         , prependUnderscore
         , cssValidName
         , surroundWithBraces
@@ -9,6 +8,12 @@ module Helpers.Css
         , surroundWithQuotes
         , surroundWithSingleQuotes
         , joiner
+        , generateMediaQueryId
+        , generateSelector
+        , generateProperty
+        , generateMediaQuery
+        , generateClassName
+        , addSuffixToClassName
         )
 
 import Char
@@ -17,11 +22,6 @@ import Char
 applyCssFunction : String -> String -> String
 applyCssFunction funName content =
     funName ++ (surroundWithParentheses content)
-
-
-isValidInCssName : Char -> Bool
-isValidInCssName char =
-    isAlphaNum char || char == '-' || char == '_'
 
 
 prependUnderscore : String -> String
@@ -64,8 +64,69 @@ joiner ( a, b ) ( c, d ) =
     ( a ++ " " ++ c, b ++ d )
 
 
+generateMediaQueryId : ( Maybe Int, Maybe Int ) -> String
+generateMediaQueryId ( min, max ) =
+    cssValidName (toString min ++ toString max)
+
+
+generateSelector : Maybe String -> Maybe String
+generateSelector =
+    Maybe.map ((++) ":")
+
+
+generateProperty : ( String, String ) -> String
+generateProperty ( attribute, value ) =
+    attribute ++ ":" ++ value
+
+
+generateMediaQuery : ( Maybe Int, Maybe Int ) -> String
+generateMediaQuery ( min, max ) =
+    "@media " ++ mediaQuerySelector min max
+
+
+mediaQuerySelector : Maybe Int -> Maybe Int -> String
+mediaQuerySelector min max =
+    case min of
+        Nothing ->
+            case max of
+                Nothing ->
+                    ""
+
+                Just max_ ->
+                    "(max-width: " ++ toString max_ ++ "px)"
+
+        Just min_ ->
+            case max of
+                Nothing ->
+                    "(min-width: " ++ toString min_ ++ "px)"
+
+                Just max_ ->
+                    "(min-width: " ++ toString min_ ++ "px) and (max-width: " ++ toString max_ ++ "px)"
+
+
+generateClassName : Maybe String -> ( String, String ) -> String
+generateClassName suffix ( attribute, value ) =
+    [ attribute, value ]
+        |> String.join "-"
+        |> addSuffixToClassName suffix
+        |> cssValidName
+
+
+addSuffixToClassName : Maybe String -> String -> String
+addSuffixToClassName suffix className =
+    suffix
+        |> Maybe.map prependUnderscore
+        |> Maybe.withDefault ""
+        |> (++) className
+
+
 
 -- Internals
+
+
+isValidInCssName : Char -> Bool
+isValidInCssName char =
+    isAlphaNum char || char == '-' || char == '_'
 
 
 isBetween : Char -> Char -> Char -> Bool
