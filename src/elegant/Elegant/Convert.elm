@@ -106,122 +106,25 @@ stylesToCss styles =
         |> List.Extra.unique
 
 
-type FetchOrComputeStyle
-    = FetchedAtomicCss (List String)
-    | ComputedAtomicClasses (List AtomicClass)
-
-
-type FetchOrComputeAtomicClasses
-    = FetchedAtomicClassesCss (List String)
-    | ComputedAtomicCss ( String, AtomicClass )
-
-
-fetchStylesOrCompute :
-    Style
-    -> ( Dict String (List String), List String )
-    -> ( Dict String (List String), List String )
+fetchStylesOrCompute : Style -> ( Dict String (List String), List String ) -> ( Dict String (List String), List String )
 fetchStylesOrCompute style ( cache, accumulator ) =
-    case fetchStyleAtomicCss cache style of
-        FetchedAtomicCss fetchedAtomicCss ->
-            ( cache, fetchedAtomicCss ++ accumulator )
-
-        ComputedAtomicClasses computedAtomicClasses ->
-            let
-                { fetched, computed } =
-                    fetchAtomicClassAtomicCss cache computedAtomicClasses
-
-                atomicCss =
-                    fetched ++ (List.map Tuple.first computed)
-            in
-                computed
-                    |> List.foldl insertAtomicClassAtomicCss cache
-                    |> Dict.insert (toString style) atomicCss
-                    |> flip (,) (atomicCss ++ accumulator)
-
-
-insertAtomicClassAtomicCss : ( String, AtomicClass ) -> Dict String (List String) -> Dict String (List String)
-insertAtomicClassAtomicCss ( computedCss, atomicClass ) cacheAcc =
-    Dict.insert (toString atomicClass) [ computedCss ] cacheAcc
-
-
-fetchStyleAtomicCss : Dict String (List String) -> Style -> FetchOrComputeStyle
-fetchStyleAtomicCss cache style =
-    case Dict.get (toString style) cache of
-        Just atomicCss ->
-            FetchedAtomicCss atomicCss
-
-        Nothing ->
-            style
-                |> extractScreenWidths
-                |> List.concatMap compileConditionalStyle
-                |> ComputedAtomicClasses
-
-
-fetchAtomicClassAtomicCss :
-    Dict String (List String)
-    -> List AtomicClass
-    -> { fetched : List String, computed : List ( String, AtomicClass ) }
-fetchAtomicClassAtomicCss cache atomicClasses =
     let
-        computedAtomicCss =
-            List.map (getAtomicClassAtomicCss cache) atomicClasses
+        styleHash =
+            toString style
     in
-        { fetched =
-            computedAtomicCss
-                |> List.filter selectFetchedAtomicClassesCss
-                |> List.concatMap extractFetchedAtomicClassesCss
-        , computed =
-            computedAtomicCss
-                |> List.filter selectComputedAtomicClassesCss
-                |> List.concatMap extractComputedAtomicClassesCss
-        }
+        case Dict.get styleHash cache of
+            Nothing ->
+                let
+                    computedStyles =
+                        style
+                            |> extractScreenWidths
+                            |> List.concatMap compileConditionalStyle
+                            |> List.map compileAtomicClass
+                in
+                    ( Dict.insert styleHash computedStyles cache, List.append computedStyles accumulator )
 
-
-getAtomicClassAtomicCss : Dict String (List String) -> AtomicClass -> FetchOrComputeAtomicClasses
-getAtomicClassAtomicCss cache atomicClass =
-    case Dict.get (toString atomicClass) cache of
-        Nothing ->
-            ComputedAtomicCss ( compileAtomicClass atomicClass, atomicClass )
-
-        Just atomicCss ->
-            FetchedAtomicClassesCss atomicCss
-
-
-selectFetchedAtomicClassesCss : FetchOrComputeAtomicClasses -> Bool
-selectFetchedAtomicClassesCss fetchedAtomicClassesCss =
-    case fetchedAtomicClassesCss of
-        FetchedAtomicClassesCss _ ->
-            True
-
-        ComputedAtomicCss _ ->
-            False
-
-
-extractFetchedAtomicClassesCss : FetchOrComputeAtomicClasses -> List String
-extractFetchedAtomicClassesCss fetchAtomicClassAtomicCss =
-    case fetchAtomicClassAtomicCss of
-        FetchedAtomicClassesCss value ->
-            value
-
-        ComputedAtomicCss _ ->
-            []
-
-
-selectComputedAtomicClassesCss : FetchOrComputeAtomicClasses -> Bool
-selectComputedAtomicClassesCss =
-    not << selectFetchedAtomicClassesCss
-
-
-extractComputedAtomicClassesCss :
-    FetchOrComputeAtomicClasses
-    -> List ( String, AtomicClass )
-extractComputedAtomicClassesCss fetchAtomicClassAtomicCss =
-    case fetchAtomicClassAtomicCss of
-        FetchedAtomicClassesCss _ ->
-            []
-
-        ComputedAtomicCss value ->
-            [ value ]
+            Just computedStyles ->
+                ( cache, List.append computedStyles accumulator )
 
 
 type alias ConditionalStyle =
