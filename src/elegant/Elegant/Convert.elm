@@ -144,20 +144,6 @@ insertAtomicClassAtomicCss ( computedCss, atomicClass ) cacheAcc =
     Dict.insert (toString atomicClass) [ computedCss ] cacheAcc
 
 
-
--- case fetchAtomicClassAtomicCss cache computedAtomicClasses of
---     FetchedAtomicClassesCss fetchedAtomicCss ->
---         ( Dict.insert (toString style) fetchedAtomicCss cache
---         , fetchedAtomicCss :: accumulator
---         )
---     ComputedAtomicCss computedAtomicCss ->
---         ( computedAtomicCss
---             |> List.foldr insertAtomicClassAtomicCss cache
---             |> Dict.insert (toString style) computedAtomicCss
---         , computedAtomicCss :: accumulator
---         )
-
-
 fetchStyleAtomicCss : Dict String (List String) -> Style -> FetchOrComputeStyle
 fetchStyleAtomicCss cache style =
     case Dict.get (toString style) cache of
@@ -226,8 +212,8 @@ selectComputedAtomicClassesCss =
     not << selectFetchedAtomicClassesCss
 
 
-extractComputedAtomicClassesCss
-    : FetchOrComputeAtomicClasses
+extractComputedAtomicClassesCss :
+    FetchOrComputeAtomicClasses
     -> List ( String, AtomicClass )
 extractComputedAtomicClassesCss fetchAtomicClassAtomicCss =
     case fetchAtomicClassAtomicCss of
@@ -236,26 +222,6 @@ extractComputedAtomicClassesCss fetchAtomicClassAtomicCss =
 
         ComputedAtomicCss value ->
             [ value ]
-
-
--- bar style ( cache, accumulator ) =
---     let
---         styleHash =
---             toString style
---     in
---         case Dict.get styleHash cache of
---             Nothing ->
---                 let
---                     computedStyles =
---                         style
---                             |> extractScreenWidths
---                             |> List.concatMap compileConditionalStyle
---                             |> List.map compileAtomicClass
---                 in
---                     ( Dict.insert styleHash computedStyles cache, List.append computedStyles accumulator )
---
---             Just computedStyles ->
---                 ( cache, List.append computedStyles accumulator )
 
 
 type alias ConditionalStyle =
