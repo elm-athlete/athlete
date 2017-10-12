@@ -97,33 +97,165 @@ addScreenWidthToClassName min max className =
 -}
 
 
-stylesToCss : List Style -> (Dict String (List String), List String)
+stylesToCss : List Style -> List String
 stylesToCss styles =
     styles
-        |> List.foldr fetchStylesOrCompute (Dict.empty, [])
-        |> Tuple.mapSecond (List.append [ boxSizingCss ])
-        |> Tuple.mapSecond List.Extra.unique
+        |> List.foldr fetchStylesOrCompute ( Dict.empty, [] )
+        |> Tuple.second
+        |> List.append [ boxSizingCss ]
+        |> List.Extra.unique
 
 
-fetchStylesOrCompute : Style -> (Dict String (List String), List String) -> ( Dict String (List String), List String )
-fetchStylesOrCompute style (cache, accumulator)=
+type FetchOrComputeStyle
+    = FetchedAtomicCss (List String)
+    | ComputedAtomicClasses (List AtomicClass)
+
+
+type FetchOrComputeAtomicClasses
+    = FetchedAtomicClassesCss (List String)
+    | ComputedAtomicCss ( String, AtomicClass )
+
+
+fetchStylesOrCompute :
+    Style
+    -> ( Dict String (List String), List String )
+    -> ( Dict String (List String), List String )
+fetchStylesOrCompute style ( cache, accumulator ) =
+    case fetchStyleAtomicCss cache style of
+        FetchedAtomicCss fetchedAtomicCss ->
+            ( cache, fetchedAtomicCss ++ accumulator )
+
+        ComputedAtomicClasses computedAtomicClasses ->
+            let
+                { fetched, computed } =
+                    fetchAtomicClassAtomicCss cache computedAtomicClasses
+
+                atomicCss =
+                    fetched ++ (List.map Tuple.first computed)
+            in
+                computed
+                    |> List.foldl insertAtomicClassAtomicCss cache
+                    |> Dict.insert (toString style) atomicCss
+                    |> flip (,) (atomicCss ++ accumulator)
+
+
+insertAtomicClassAtomicCss : ( String, AtomicClass ) -> Dict String (List String) -> Dict String (List String)
+insertAtomicClassAtomicCss ( computedCss, atomicClass ) cacheAcc =
+    Dict.insert (toString atomicClass) [ computedCss ] cacheAcc
+
+
+
+-- case fetchAtomicClassAtomicCss cache computedAtomicClasses of
+--     FetchedAtomicClassesCss fetchedAtomicCss ->
+--         ( Dict.insert (toString style) fetchedAtomicCss cache
+--         , fetchedAtomicCss :: accumulator
+--         )
+--     ComputedAtomicCss computedAtomicCss ->
+--         ( computedAtomicCss
+--             |> List.foldr insertAtomicClassAtomicCss cache
+--             |> Dict.insert (toString style) computedAtomicCss
+--         , computedAtomicCss :: accumulator
+--         )
+
+
+fetchStyleAtomicCss : Dict String (List String) -> Style -> FetchOrComputeStyle
+fetchStyleAtomicCss cache style =
+    case Dict.get (toString style) cache of
+        Just atomicCss ->
+            FetchedAtomicCss atomicCss
+
+        Nothing ->
+            style
+                |> extractScreenWidths
+                |> List.concatMap compileConditionalStyle
+                |> ComputedAtomicClasses
+
+
+fetchAtomicClassAtomicCss :
+    Dict String (List String)
+    -> List AtomicClass
+    -> { fetched : List String, computed : List ( String, AtomicClass ) }
+fetchAtomicClassAtomicCss cache atomicClasses =
     let
-        styleHash =
-            toString style
+        computedAtomicCss =
+            List.map (getAtomicClassAtomicCss cache) atomicClasses
     in
-        case Dict.get styleHash cache of
-            Nothing ->
-                let
-                    computedStyles =
-                        style
-                            |> extractScreenWidths
-                            |> List.concatMap compileConditionalStyle
-                            |> List.map compileAtomicClass
-                in
-                    ( Dict.insert styleHash computedStyles cache, List.append computedStyles accumulator)
+        { fetched =
+            computedAtomicCss
+                |> List.filter selectFetchedAtomicClassesCss
+                |> List.concatMap extractFetchedAtomicClassesCss
+        , computed =
+            computedAtomicCss
+                |> List.filter selectComputedAtomicClassesCss
+                |> List.concatMap extractComputedAtomicClassesCss
+        }
 
-            Just computedStyles ->
-                ( cache, List.append computedStyles accumulator)
+
+getAtomicClassAtomicCss : Dict String (List String) -> AtomicClass -> FetchOrComputeAtomicClasses
+getAtomicClassAtomicCss cache atomicClass =
+    case Dict.get (toString atomicClass) cache of
+        Nothing ->
+            ComputedAtomicCss ( compileAtomicClass atomicClass, atomicClass )
+
+        Just atomicCss ->
+            FetchedAtomicClassesCss atomicCss
+
+
+selectFetchedAtomicClassesCss : FetchOrComputeAtomicClasses -> Bool
+selectFetchedAtomicClassesCss fetchedAtomicClassesCss =
+    case fetchedAtomicClassesCss of
+        FetchedAtomicClassesCss _ ->
+            True
+
+        ComputedAtomicCss _ ->
+            False
+
+
+extractFetchedAtomicClassesCss : FetchOrComputeAtomicClasses -> List String
+extractFetchedAtomicClassesCss fetchAtomicClassAtomicCss =
+    case fetchAtomicClassAtomicCss of
+        FetchedAtomicClassesCss value ->
+            value
+
+        ComputedAtomicCss _ ->
+            []
+
+
+selectComputedAtomicClassesCss : FetchOrComputeAtomicClasses -> Bool
+selectComputedAtomicClassesCss =
+    not << selectFetchedAtomicClassesCss
+
+
+extractComputedAtomicClassesCss
+    : FetchOrComputeAtomicClasses
+    -> List ( String, AtomicClass )
+extractComputedAtomicClassesCss fetchAtomicClassAtomicCss =
+    case fetchAtomicClassAtomicCss of
+        FetchedAtomicClassesCss _ ->
+            []
+
+        ComputedAtomicCss value ->
+            [ value ]
+
+
+-- bar style ( cache, accumulator ) =
+--     let
+--         styleHash =
+--             toString style
+--     in
+--         case Dict.get styleHash cache of
+--             Nothing ->
+--                 let
+--                     computedStyles =
+--                         style
+--                             |> extractScreenWidths
+--                             |> List.concatMap compileConditionalStyle
+--                             |> List.map compileAtomicClass
+--                 in
+--                     ( Dict.insert styleHash computedStyles cache, List.append computedStyles accumulator )
+--
+--             Just computedStyles ->
+--                 ( cache, List.append computedStyles accumulator )
 
 
 type alias ConditionalStyle =

@@ -7,7 +7,6 @@ import Helpers.Shared exposing (..)
 import Helpers.Style as CommonStyle
 import Display exposing (DisplayBox)
 import Elegant.Convert
-import Dict exposing (Dict)
 
 
 {-| Contains all style for an element used with Elegant.
@@ -141,7 +140,7 @@ classesFocus =
     classesWithSuffix
 
 
-stylesToCss : List Style -> ( Dict String (List String), List String )
+stylesToCss : List Style -> List String
 stylesToCss styles =
     styles
         |> List.map toCommonStyle

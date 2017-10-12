@@ -299,7 +299,6 @@ htmlAttributesToCss val =
     val
         |> getAllStyles
         |> Elegant.stylesToCss
-        |> Tuple.second
         |> List.map htmlAttributeToCss
         |> Html.div []
 
