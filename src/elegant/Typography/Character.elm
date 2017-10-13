@@ -70,7 +70,7 @@ module Typography.Character
 -}
 
 import Helpers.Shared exposing (..)
-import Helpers.Setters exposing (..)
+import Elegant.Setters exposing (..)
 import Helpers.Css
 
 

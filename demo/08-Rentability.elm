@@ -374,7 +374,7 @@ textToHtml : String -> List (Node msg)
 textToHtml =
     (>>)
         (String.split "\n")
-        (List.foldl (\e accu -> accu ++ [ text e, br [] ]) [])
+        (List.foldr (\e accu -> accu ++ [ text e, br [] ]) [])
 
 
 appartmentBodyView : Appartment -> Node msg

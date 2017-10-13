@@ -61,7 +61,7 @@ module Border
 
 import Color exposing (Color)
 import Helpers.Shared exposing (..)
-import Helpers.Setters exposing (..)
+import Elegant.Setters exposing (..)
 import Surrounded exposing (Surrounded)
 
 

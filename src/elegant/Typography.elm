@@ -88,7 +88,7 @@ import Color exposing (Color)
 import Either exposing (Either(..))
 import Typography.Character as Character exposing (Character)
 import Helpers.Shared exposing (..)
-import Helpers.Setters exposing (..)
+import Elegant.Setters exposing (..)
 
 
 {-| The `Typography` record contains everything about fonts rendering,

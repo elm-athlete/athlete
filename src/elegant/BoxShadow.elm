@@ -43,7 +43,7 @@ module BoxShadow
 import Color exposing (Color)
 import Color.Convert
 import Helpers.Shared exposing (..)
-import Helpers.Setters exposing (..)
+import Elegant.Setters exposing (..)
 import Elegant.Helpers as Helpers
 
 

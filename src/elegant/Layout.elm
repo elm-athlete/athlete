@@ -63,7 +63,7 @@ It contains only modifiers, and they can be found in the respective modules.
 -}
 
 import Helpers.Shared exposing (..)
-import Helpers.Setters exposing (..)
+import Elegant.Setters exposing (..)
 import Typography
 import Padding
 import Border

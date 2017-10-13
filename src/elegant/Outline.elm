@@ -42,7 +42,7 @@ module Outline
 -}
 
 import Color exposing (Color)
-import Helpers.Setters exposing (..)
+import Elegant.Setters exposing (..)
 import Helpers.Shared exposing (..)
 
 

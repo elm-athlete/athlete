@@ -4,7 +4,6 @@ import Helpers.Css
 import List.Extra
 import Maybe.Extra exposing ((?))
 import Dict exposing (Dict)
-import SHA
 import Helpers.Style exposing (..)
 import Display
 
@@ -95,9 +94,7 @@ fetchStylesOrCompute : Style -> ( Dict String (List String), List String ) -> ( 
 fetchStylesOrCompute style ( cache, accumulator ) =
     let
         styleHash =
-            style
-                |> toString
-                |> SHA.sha1sum
+            style |> toString
     in
         case Dict.get styleHash cache of
             Nothing ->

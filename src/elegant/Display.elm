@@ -179,7 +179,7 @@ import Either exposing (Either(..))
 import Helpers.Css
 import Layout
 import Helpers.Shared exposing (..)
-import Helpers.Setters exposing (..)
+import Elegant.Setters exposing (..)
 import Display.Overflow as Overflow
 
 

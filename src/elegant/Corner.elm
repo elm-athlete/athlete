@@ -57,7 +57,7 @@ module Corner
 -}
 
 import Helpers.Shared exposing (..)
-import Helpers.Setters as Setters
+import Elegant.Setters as Setters
 
 
 {-| The `Corner` record contains everything about corner radius (also called border radius in CSS).

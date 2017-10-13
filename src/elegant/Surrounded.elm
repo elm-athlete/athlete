@@ -3,7 +3,7 @@ module Surrounded exposing (..)
 import Function
 import List.Extra
 import Helpers.Shared exposing (..)
-import Helpers.Setters exposing (..)
+import Elegant.Setters exposing (..)
 
 
 type alias Surrounded surroundType =

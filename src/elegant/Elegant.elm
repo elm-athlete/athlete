@@ -2,11 +2,11 @@ module Elegant exposing (..)
 
 import Html exposing (Html)
 import Html.Attributes
-import Helpers.Setters exposing (..)
 import Helpers.Shared exposing (..)
 import Helpers.Style as CommonStyle
 import Display exposing (DisplayBox)
 import Elegant.Convert
+import Elegant.Setters exposing (..)
 
 
 {-| Contains all style for an element used with Elegant.

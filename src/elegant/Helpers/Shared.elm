@@ -6,6 +6,17 @@ import Function
 import Color.Convert
 import Color exposing (Color)
 import Maybe.Extra
+import ParseInt
+
+parseInt : String -> Int
+parseInt =
+    ParseInt.parseInt >> Result.withDefault 0
+
+
+parseColor : String -> Color
+parseColor =
+    Color.Convert.hexToColor >> Result.withDefault Color.white
+
 
 unwrapEmptyList : (a -> List b) -> Maybe a -> List b
 unwrapEmptyList =
