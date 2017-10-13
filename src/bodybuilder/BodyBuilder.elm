@@ -57,7 +57,7 @@ h6 =
 
 button : Modifiers (ButtonAttributes msg) -> List (Node msg) -> Node msg
 button =
-    parentNode
+    visibleNode
         BodyBuilder.Attributes.defaultButtonAttributes
         BodyBuilder.Attributes.buttonAttributesToHtmlAttributes
         "button"
@@ -66,7 +66,7 @@ button =
 {-| -}
 a : Modifiers (AAttributes msg) -> List (Node msg) -> Node msg
 a =
-    parentNode
+    visibleNode
         BodyBuilder.Attributes.defaultAattributes
         BodyBuilder.Attributes.aAttributesToHtmlAttributes
         "a"
@@ -105,44 +105,56 @@ span =
 {-| -}
 textarea : Modifiers (TextareaAttributes msg) -> Node msg
 textarea =
-    parentNode
-        BodyBuilder.Attributes.defaultTextareaAttributes
-        BodyBuilder.Attributes.textareaAttributesToHtmlAttributes
-        "textarea"
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultTextareaAttributes
+            BodyBuilder.Attributes.textareaAttributesToHtmlAttributes
+            "textarea"
+        )
+        []
 
 
 {-| -}
 img : String -> String -> Modifiers (ImgAttributes msg) -> Node msg
 img alt src =
-    parentNode
-        (BodyBuilder.Attributes.defaultImgAttributes alt src)
-        BodyBuilder.Attributes.imgAttributesToHtmlAttributes
-        "img"
+    flip
+        (visibleNode
+            (BodyBuilder.Attributes.defaultImgAttributes alt src)
+            BodyBuilder.Attributes.imgAttributesToHtmlAttributes
+            "img"
+        )
+        []
 
 
 {-| -}
 audio : Modifiers (AudioAttributes msg) -> Node msg
 audio =
-    parentNode
-        BodyBuilder.Attributes.defaultAudioAttributes
-        BodyBuilder.Attributes.audioAttributesToHtmlAttributes
-        "audio"
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultAudioAttributes
+            BodyBuilder.Attributes.audioAttributesToHtmlAttributes
+            "audio"
+        )
+        []
 
 
 {-| -}
 progress : Modifiers (ProgressAttributes msg) -> Node msg
 progress =
-    parentNode
-        BodyBuilder.Attributes.defaultProgressAttributes
-        BodyBuilder.Attributes.progressAttributesToHtmlAttributes
-        "progress"
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultProgressAttributes
+            BodyBuilder.Attributes.progressAttributesToHtmlAttributes
+            "progress"
+        )
+        []
 
 
 {-| TODO
 -}
 table : List (Node msg) -> List (List (Node msg)) -> Node msg
-table =
-    parentNode {} (\_ -> []) "table"
+table children table =
+    visibleNode BodyBuilder.Attributes.defaultFlowAttributes (\_ -> []) "table" [] []
 
 
 {-| -}
@@ -163,18 +175,22 @@ container =
     div []
 
 
+{-| TODO
+-}
 mapLis : List (Node msg) -> List (Node msg)
 mapLis =
     List.map (\content -> li [] [ content ])
 
 
-{-| -}
+{-| TODO
+-}
 olLi : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 olLi attributes insideLis =
     ol attributes (mapLis insideLis)
 
 
-{-| -}
+{-| TODO
+-}
 ulLi : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 ulLi attributes insideLis =
     ul attributes (mapLis insideLis)
@@ -183,16 +199,19 @@ ulLi attributes insideLis =
 {-| -}
 script : Modifiers (ScriptAttributes msg) -> Node msg
 script =
-    parentNode
-        BodyBuilder.Attributes.defaultScriptAttributes
-        BodyBuilder.Attributes.scriptAttributesToHtmlAttributes
-        "script"
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultScriptAttributes
+            BodyBuilder.Attributes.scriptAttributesToHtmlAttributes
+            "script"
+        )
+        []
 
 
 {-| -}
 inputHidden : Modifiers InputHiddenAttributes -> Node msg
 inputHidden =
-    parentNode
+    hiddenNode
         BodyBuilder.Attributes.defaultInputHiddenAttributes
         BodyBuilder.Attributes.inputHiddenAttributesToHtmlAttributes
         "input"
@@ -201,209 +220,133 @@ inputHidden =
 {-| -}
 inputText : Modifiers (InputTextAttributes msg) -> Node msg
 inputText =
-    parentNode
-        BodyBuilder.Attributes.defaultInputTextAttributes
-        BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
-        "input"
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputTextAttributes
+            BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 inputNumber : Modifiers (InputNumberAttributes msg) -> Node msg
 inputNumber =
-    InputNumber
-        << defaultsComposedToAttrs
-            { universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , name = Nothing
-            , type_ = "number"
-            , value = Nothing
-            , onMouseEvents = defaultOnMouseEvents
-            , onInputEvent = Nothing
-            , fromStringInput = parseInt
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            , min = Nothing
-            , max = Nothing
-            , step = Nothing
-            , label = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputNumberAttributes
+            BodyBuilder.Attributes.inputNumberAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 inputColor : Modifiers (InputColorAttributes msg) -> Node msg
 inputColor =
-    InputColor
-        << defaultsComposedToAttrs
-            { universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , name = Nothing
-            , type_ = "color"
-            , value = Nothing
-            , onMouseEvents = defaultOnMouseEvents
-            , onInputEvent = Nothing
-            , fromStringInput = parseColor
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            , label = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputColorAttributes
+            BodyBuilder.Attributes.inputColorAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 inputCheckbox : Modifiers (InputCheckboxAttributes msg) -> Node msg
 inputCheckbox =
-    InputCheckbox
-        << defaultsComposedToAttrs
-            { name = Nothing
-            , type_ = "checkbox"
-            , value = Nothing
-            , checked = False
-            , universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , onMouseEvents = defaultOnMouseEvents
-            , onCheckEvent = Nothing
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            , label = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputCheckboxAttributes
+            BodyBuilder.Attributes.inputCheckboxAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 inputFile : Modifiers (InputFileAttributes msg) -> Node msg
 inputFile =
-    InputFile
-        << defaultsComposedToAttrs
-            { name = Nothing
-            , type_ = "file"
-            , universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , onMouseEvents = defaultOnMouseEvents
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            , label = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputFileAttributes
+            BodyBuilder.Attributes.inputFileAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 inputPassword : Modifiers (InputPasswordAttributes msg) -> Node msg
 inputPassword =
-    InputPassword
-        << defaultsComposedToAttrs
-            { name = Nothing
-            , type_ = "password"
-            , value = Nothing
-            , universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , onMouseEvents = defaultOnMouseEvents
-            , onInputEvent = Nothing
-            , fromStringInput = identity
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            , placeholder = Nothing
-            , autocomplete = True
-            , label = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputPasswordAttributes
+            BodyBuilder.Attributes.inputPasswordAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 inputRadio : Modifiers (InputRadioAttributes msg) -> Node msg
 inputRadio =
-    InputRadio
-        << defaultsComposedToAttrs
-            { name = Nothing
-            , type_ = "radio"
-            , value = Nothing
-            , universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , onMouseEvents = defaultOnMouseEvents
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            , label = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputRadioAttributes
+            BodyBuilder.Attributes.inputRadioAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 inputRange : Modifiers (InputRangeAttributes msg) -> Node msg
 inputRange =
-    InputRange
-        << defaultsComposedToAttrs
-            { universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , name = Nothing
-            , type_ = "range"
-            , value = Nothing
-            , onMouseEvents = defaultOnMouseEvents
-            , onInputEvent = Nothing
-            , fromStringInput = parseInt
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            , min = Nothing
-            , max = Nothing
-            , step = Nothing
-            , label = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputRangeAttributes
+            BodyBuilder.Attributes.inputRangeAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 inputSubmit : Modifiers (InputSubmitAttributes msg) -> Node msg
 inputSubmit =
-    InputSubmit
-        << defaultsComposedToAttrs
-            { type_ = "submit"
-            , universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , onMouseEvents = defaultOnMouseEvents
-            , disabled = False
-            , onSubmitEvent = Nothing
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            , value = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputSubmitAttributes
+            BodyBuilder.Attributes.inputSubmitAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 inputUrl : Modifiers (InputUrlAttributes msg) -> Node msg
 inputUrl =
-    InputUrl
-        << defaultsComposedToAttrs
-            { name = Nothing
-            , value = Nothing
-            , type_ = "url"
-            , universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , onMouseEvents = defaultOnMouseEvents
-            , onInputEvent = Nothing
-            , fromStringInput = identity
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            , placeholder = Nothing
-            , autocomplete = True
-            , label = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultInputUrlAttributes
+            BodyBuilder.Attributes.inputUrlAttributesToHtmlAttributes
+            "input"
+        )
+        []
 
 
 {-| -}
 select : Modifiers (SelectAttributes msg) -> Node msg
 select =
-    Select
-        << defaultsComposedToAttrs
-            { value = Nothing
-            , options = []
-            , universal = defaultUniversalAttributes
-            , style = defaultStyleAttribute
-            , onMouseEvents = defaultOnMouseEvents
-            , onEvent = Nothing
-            , onBlurEvent = Nothing
-            , onFocusEvent = Nothing
-            }
+    flip
+        (visibleNode
+            BodyBuilder.Attributes.defaultSelectAttributes
+            BodyBuilder.Attributes.selectAttributesToHtmlAttributes
+            "select"
+        )
+        []
 
 
 text : String -> Node msg
@@ -436,14 +379,14 @@ toVirtualDomClassName =
     Elegant.classes >> Html.Attributes.class
 
 
-parentNode :
+visibleNode :
     BodyBuilder.Attributes.VisibleAttributes a
     -> (BodyBuilder.Attributes.VisibleAttributes a -> List (Html.Attribute msg))
     -> String
     -> Modifiers (BodyBuilder.Attributes.VisibleAttributes a)
     -> List (Node msg)
     -> Node msg
-parentNode defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers content =
+visibleNode defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers content =
     let
         computedAttributes =
             Function.compose attributesModifiers <| defaultAttributes
@@ -473,6 +416,15 @@ parentNode defaultAttributes attributesToVirtualDomAttributes tag attributesModi
                     )
 
 
+hiddenNode : a -> (a -> List (Html.Attribute msg)) -> String -> List (a -> a) -> Node msg
+hiddenNode defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers =
+    defaultAttributes
+        |> (Function.compose attributesModifiers)
+        |> attributesToVirtualDomAttributes
+        |> flip (Html.node tag) []
+        |> Node []
+
+
 extractStyles : Node msg -> List Elegant.Style -> List Elegant.Style
 extractStyles { styles } accumulator =
     styles ++ accumulator
@@ -485,7 +437,7 @@ extractDomNodes { dom } =
 
 flow : String -> Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 flow =
-    parentNode
+    visibleNode
         BodyBuilder.Attributes.defaultFlowAttributes
         BodyBuilder.Attributes.flowAttributesToHtmlAttributes
 

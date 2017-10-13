@@ -181,8 +181,12 @@ disabledAttributeToHtmlAttributes =
 
 
 {-| -}
+type alias ButtonAttributesBase msg a =
+    DisabledAttribute (VisibleAttributesAndEvents msg a)
+
+
 type alias ButtonAttributes msg =
-    DisabledAttribute (VisibleAttributesAndEvents msg {})
+    ButtonAttributesBase msg {}
 
 
 defaultButtonAttributes : ButtonAttributes msg
@@ -454,8 +458,12 @@ type alias PlaceholderAttribute a =
 
 
 {-| -}
+type alias InputTextAttributesBase msg a =
+    AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a)))
+
+
 type alias InputTextAttributes msg =
-    AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg {})))
+    InputTextAttributesBase msg {}
 
 
 defaultInputTextAttributes : InputTextAttributes msg
@@ -479,4 +487,293 @@ defaultInputTextAttributes =
 
 inputTextAttributesToHtmlAttributes : InputTextAttributes msg -> List (Html.Attribute msg)
 inputTextAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias InputNumberAttributes msg =
+    StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {})))))
+
+
+{-| -}
+type alias StepAttribute a =
+    { a | step : Maybe Int }
+
+
+{-| -}
+type alias MaxAttribute a =
+    { a | max : Maybe Int }
+
+
+{-| -}
+type alias MinAttribute a =
+    { a | min : Maybe Int }
+
+
+defaultInputNumberAttributes : InputNumberAttributes msg
+defaultInputNumberAttributes =
+    { universal = defaultUniversalAttributes
+    , style = Nothing
+    , name = Nothing
+    , type_ = "number"
+    , value = Nothing
+    , onMouseEvents = Nothing
+    , onInputEvent = Nothing
+    , fromStringInput = parseInt
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , min = Nothing
+    , max = Nothing
+    , step = Nothing
+    , label = Nothing
+    }
+
+
+inputNumberAttributesToHtmlAttributes : InputNumberAttributes msg -> List (Html.Attribute msg)
+inputNumberAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias InputColorAttributes msg =
+    OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {}))
+
+
+defaultInputColorAttributes : InputColorAttributes msg
+defaultInputColorAttributes =
+    { universal = defaultUniversalAttributes
+    , style = Nothing
+    , name = Nothing
+    , type_ = "color"
+    , value = Nothing
+    , onMouseEvents = Nothing
+    , onInputEvent = Nothing
+    , fromStringInput = parseColor
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , label = Nothing
+    }
+
+
+inputColorAttributesToHtmlAttributes : InputColorAttributes msg -> List (Html.Attribute msg)
+inputColorAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias InputCheckboxAttributes msg =
+    OnCheckEvent msg (InputStringValueAttributes msg { checked : Bool })
+
+
+defaultInputCheckboxAttributes : InputCheckboxAttributes msg
+defaultInputCheckboxAttributes =
+    { name = Nothing
+    , type_ = "checkbox"
+    , value = Nothing
+    , checked = False
+    , universal = defaultUniversalAttributes
+    , style = Nothing
+    , onMouseEvents = Nothing
+    , onCheckEvent = Nothing
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , label = Nothing
+    }
+
+
+inputCheckboxAttributesToHtmlAttributes : InputCheckboxAttributes msg -> List (Html.Attribute msg)
+inputCheckboxAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias InputFileAttributes msg =
+    InputVisibleAttributes msg {}
+
+
+defaultInputFileAttributes : InputFileAttributes msg
+defaultInputFileAttributes =
+    { name = Nothing
+    , type_ = "file"
+    , universal = defaultUniversalAttributes
+    , style = Nothing
+    , onMouseEvents = Nothing
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , label = Nothing
+    }
+
+
+inputFileAttributesToHtmlAttributes : InputFileAttributes msg -> List (Html.Attribute msg)
+inputFileAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias InputPasswordAttributes msg =
+    InputTextAttributes msg
+
+
+defaultInputPasswordAttributes : InputPasswordAttributes msg
+defaultInputPasswordAttributes =
+    { name = Nothing
+    , type_ = "password"
+    , value = Nothing
+    , universal = defaultUniversalAttributes
+    , style = Nothing
+    , onMouseEvents = Nothing
+    , onInputEvent = Nothing
+    , fromStringInput = identity
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , placeholder = Nothing
+    , autocomplete = True
+    , label = Nothing
+    }
+
+
+inputPasswordAttributesToHtmlAttributes : InputPasswordAttributes msg -> List (Html.Attribute msg)
+inputPasswordAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias InputRadioAttributes msg =
+    InputStringValueAttributes msg {}
+
+
+defaultInputRadioAttributes : InputRadioAttributes msg
+defaultInputRadioAttributes =
+    { name = Nothing
+    , type_ = "radio"
+    , value = Nothing
+    , universal = defaultUniversalAttributes
+    , style = Nothing
+    , onMouseEvents = Nothing
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , label = Nothing
+    }
+
+
+inputRadioAttributesToHtmlAttributes : InputRadioAttributes msg -> List (Html.Attribute msg)
+inputRadioAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias InputRangeAttributes msg =
+    InputNumberAttributes msg
+
+
+defaultInputRangeAttributes : InputRangeAttributes msg
+defaultInputRangeAttributes =
+    { universal = defaultUniversalAttributes
+    , style = Nothing
+    , name = Nothing
+    , type_ = "range"
+    , value = Nothing
+    , onMouseEvents = Nothing
+    , onInputEvent = Nothing
+    , fromStringInput = parseInt
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , min = Nothing
+    , max = Nothing
+    , step = Nothing
+    , label = Nothing
+    }
+
+
+inputRangeAttributesToHtmlAttributes : InputRangeAttributes msg -> List (Html.Attribute msg)
+inputRangeAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias InputSubmitAttributes msg =
+    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg { type_ : String }))
+
+
+defaultInputSubmitAttributes : InputSubmitAttributes msg
+defaultInputSubmitAttributes =
+    { type_ = "submit"
+    , universal = defaultUniversalAttributes
+    , style = Nothing
+    , onMouseEvents = Nothing
+    , disabled = False
+    , onSubmitEvent = Nothing
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , value = Nothing
+    }
+
+
+inputSubmitAttributesToHtmlAttributes : InputSubmitAttributes msg -> List (Html.Attribute msg)
+inputSubmitAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias InputUrlAttributes msg =
+    InputTextAttributes msg
+
+
+defaultInputUrlAttributes : InputUrlAttributes msg
+defaultInputUrlAttributes =
+    { name = Nothing
+    , value = Nothing
+    , type_ = "url"
+    , universal = defaultUniversalAttributes
+    , style = Nothing
+    , onMouseEvents = Nothing
+    , onInputEvent = Nothing
+    , fromStringInput = identity
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , placeholder = Nothing
+    , autocomplete = True
+    , label = Nothing
+    }
+
+
+inputUrlAttributesToHtmlAttributes : InputUrlAttributes msg -> List (Html.Attribute msg)
+inputUrlAttributesToHtmlAttributes _ =
+    []
+
+
+{-| -}
+type alias SelectAttributes msg =
+    StringValue (OptionsAttribute (VisibleAttributesAndEvents msg {}))
+
+
+{-| -}
+type alias OptionsAttribute a =
+    { a | options : List { value : String, label : String } }
+
+
+defaultSelectAttributes : SelectAttributes msg
+defaultSelectAttributes =
+    { value = Nothing
+    , options = []
+    , universal = defaultUniversalAttributes
+    , style = Nothing
+    , onMouseEvents = Nothing
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    }
+
+
+selectAttributesToHtmlAttributes : SelectAttributes msg -> List (Html.Attribute msg)
+selectAttributesToHtmlAttributes _ =
     []

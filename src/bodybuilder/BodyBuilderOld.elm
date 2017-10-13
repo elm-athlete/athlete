@@ -82,26 +82,6 @@ type alias VisibleAttributesAndEvents msg a =
     OnEvent msg (OnFocusEvent msg (OnBlurEvent msg (OnMouseEvents msg (VisibleAttributes a))))
 
 
-{-| -}
-type alias OptionsAttribute a =
-    { a | options : List { value : String, label : String } }
-
-
-{-| -}
-type alias MinAttribute a =
-    { a | min : Maybe Int }
-
-
-{-| -}
-type alias MaxAttribute a =
-    { a | max : Maybe Int }
-
-
-{-| -}
-type alias StepAttribute a =
-    { a | step : Maybe Int }
-
-
 
 {-
    ███████ ██      ███████ ███    ███      █████  ████████ ████████ ██████  ███████
@@ -115,56 +95,6 @@ type alias StepAttribute a =
 {-| -}
 type alias IframeAttributes msg =
     SrcAttribute (VisibleAttributesAndEvents msg {})
-
-
-{-| -}
-type alias InputNumberAttributes msg =
-    StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {})))))
-
-
-{-| -}
-type alias InputColorAttributes msg =
-    OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {}))
-
-
-{-| -}
-type alias InputCheckboxAttributes msg =
-    OnCheckEvent msg (InputStringValueAttributes msg { checked : Bool })
-
-
-{-| -}
-type alias InputFileAttributes msg =
-    InputVisibleAttributes msg {}
-
-
-{-| -}
-type alias InputPasswordAttributes msg =
-    InputTextAttributes msg {}
-
-
-{-| -}
-type alias InputRadioAttributes msg =
-    InputStringValueAttributes msg {}
-
-
-{-| -}
-type alias InputRangeAttributes msg =
-    InputNumberAttributes msg
-
-
-{-| -}
-type alias InputSubmitAttributes msg =
-    ValueAttribute String (OnSubmitEvent msg (ButtonAttributes msg { type_ : String }))
-
-
-{-| -}
-type alias InputUrlAttributes msg =
-    InputTextAttributes msg {}
-
-
-{-| -}
-type alias SelectAttributes msg =
-    StringValue (OptionsAttribute (VisibleAttributesAndEvents msg {}))
 
 
 {-| -}
@@ -855,13 +785,6 @@ type alias StyledDom msg =
     { styles : List Style
     , dom : VirtualDom.Node msg
     }
-
-
-toTree : Node msg -> StyledDom msg
-toTree node =
-    case node of
-        A attributes children ->
-            VirtualDom.node "a" attributes
 
 
 {-| -}
