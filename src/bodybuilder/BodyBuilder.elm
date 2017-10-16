@@ -18,14 +18,14 @@ type alias Cache =
     Dict String String
 
 
-type alias DomAndStyle msg =
+type alias StyleAndDom msg =
     { styles : List Elegant.Style
     , dom : Html msg
     }
 
 
 type alias NodeContent msg =
-    Cache -> ( DomAndStyle msg, Cache )
+    Cache -> ( StyleAndDom msg, Cache )
 
 
 div : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
@@ -364,7 +364,7 @@ select =
 
 text : String -> Node msg
 text content =
-    Node (\cache -> ( DomAndStyle [] (Html.text content), cache ))
+    Node (\cache -> ( StyleAndDom [] (Html.text content), cache ))
 
 
 program :
@@ -399,10 +399,10 @@ toVirtualDomClassName style ( attributes, cache ) =
                     classes =
                         Elegant.classes style
                 in
-                    ( (Html.Attributes.class classes) :: attributes, (Dict.insert hash classes cache) )
+                    ( Html.Attributes.class classes :: attributes, (Dict.insert hash classes cache) )
 
             Just classes ->
-                ( (classes |> Html.Attributes.class) :: attributes, cache )
+                ( Html.Attributes.class classes :: attributes, cache )
 
 
 visibleNode :
@@ -412,59 +412,57 @@ visibleNode :
     -> Modifiers (BodyBuilder.Attributes.VisibleAttributes a)
     -> List (Node msg)
     -> Node msg
-visibleNode defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers content =
-    Node <|
-        \cache ->
-            let
-                computedAttributes =
-                    Function.compose attributesModifiers <| defaultAttributes
-
-                -- debug =
-                --   Debug.log "cache" cache
-                ( cacheNew, nodesResults ) =
-                    content
-                        |> List.map extractNodeContent
-                        |> List.foldr extractStylesCache ( cache, [] )
-
-                styledDomWithStyle ( style, ( classesNamesProperty, cacheNewNew ) ) =
-                    ( DomAndStyle
-                        (style ++ (List.foldr extractStyles [] nodesResults))
-                        (Html.node tag
-                            (classesNamesProperty ++ (attributesToVirtualDomAttributes computedAttributes))
-                            (List.map extractDomNodes nodesResults)
-                        )
-                    , cacheNewNew
-                    )
-            in
-                styledDomWithStyle <|
-                    case computedAttributes.style of
-                        Nothing ->
-                            ( [], ( [], cache ) )
-
-                        Just { standard, focus, hover } ->
-                            ( [ standard, focus, hover ]
-                                |> Maybe.Extra.values
-                            , [ standard
-                              , focus
-                              , hover
-                              ]
-                                |> Maybe.Extra.values
-                                |> List.foldr toVirtualDomClassName ( [], cache )
-                            )
+visibleNode defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers =
+    Node << visibleNodeHelp defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers
 
 
-extractNodeContent : Node msg -> NodeContent msg
-extractNodeContent (Node content) =
-    content
-
-
-extractStylesCache : (Cache -> ( DomAndStyle msg, Cache )) -> ( Cache, List (DomAndStyle msg) ) -> ( Cache, List (DomAndStyle msg) )
-extractStylesCache nodeCreation ( cache, nodesRes ) =
+visibleNodeHelp :
+    BodyBuilder.Attributes.VisibleAttributes a
+    -> (BodyBuilder.Attributes.VisibleAttributes a -> List (Html.Attribute msg))
+    -> String
+    -> Modifiers (BodyBuilder.Attributes.VisibleAttributes a)
+    -> List (Node msg)
+    -> NodeContent msg
+visibleNodeHelp defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers children cache =
     let
-        ( resNode, cacheNew ) =
-            nodeCreation cache
+        computedAttributes =
+            Function.compose attributesModifiers <| defaultAttributes
+
+        ( newCache, resultingChildren ) =
+            List.foldr extractStylesWithCache ( cache, [] ) children
+
+        styledDomWithStyle ( style, ( classesNamesProperty, resultingCache ) ) =
+            ( StyleAndDom
+                (style ++ (List.foldr extractStyles [] resultingChildren))
+                (Html.node tag
+                    (classesNamesProperty ++ (attributesToVirtualDomAttributes computedAttributes))
+                    (List.map extractDomNodes resultingChildren)
+                )
+            , resultingCache
+            )
     in
-        ( cacheNew, resNode :: nodesRes )
+        styledDomWithStyle <|
+            case computedAttributes.style of
+                Nothing ->
+                    ( [], ( [], newCache ) )
+
+                Just { standard, focus, hover } ->
+                    let
+                        presentStyles =
+                            Maybe.Extra.values [ standard, focus, hover ]
+                    in
+                        ( presentStyles
+                        , List.foldr toVirtualDomClassName ( [], newCache ) presentStyles
+                        )
+
+
+extractStylesWithCache : Node msg -> ( Cache, List (StyleAndDom msg) ) -> ( Cache, List (StyleAndDom msg) )
+extractStylesWithCache (Node nodeContent) ( cache, resultingNodes ) =
+    let
+        ( resNode, newCache ) =
+            nodeContent cache
+    in
+        ( newCache, resNode :: resultingNodes )
 
 
 hiddenNode : a -> (a -> List (Html.Attribute msg)) -> String -> List (a -> a) -> Node msg
@@ -475,17 +473,17 @@ hiddenNode defaultAttributes attributesToVirtualDomAttributes tag attributesModi
                 |> (Function.compose attributesModifiers)
                 |> attributesToVirtualDomAttributes
                 |> flip (Html.node tag) []
-                |> DomAndStyle []
+                |> StyleAndDom []
             , cache
             )
 
 
-extractStyles : DomAndStyle msg -> List Elegant.Style -> List Elegant.Style
+extractStyles : StyleAndDom msg -> List Elegant.Style -> List Elegant.Style
 extractStyles { styles } accumulator =
     styles ++ accumulator
 
 
-extractDomNodes : DomAndStyle msg -> Html msg
+extractDomNodes : StyleAndDom msg -> Html msg
 extractDomNodes { dom } =
     dom
 
