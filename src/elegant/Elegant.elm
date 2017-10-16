@@ -83,7 +83,7 @@ screenWidthLE max lessStyle (Style style) =
 toInlineStyles : Style -> List ( String, String )
 toInlineStyles (Style style) =
     style.display
-        |> Maybe.map Elegant.Convert.compileStyle
+        |> Maybe.map Elegant.Convert.computeStyle
         |> Maybe.withDefault []
 
 
@@ -117,27 +117,6 @@ classes (Style style) =
     style
         |> Elegant.Convert.classesNamesFromStyle
         |> String.join " "
-
-
-classesWithSuffix : Style -> String
-classesWithSuffix (Style style) =
-    style
-        |> Elegant.Convert.classesNamesFromStyle
-        |> String.join " "
-
-
-{-| Generate all the classes of a list of Hover Styles
--}
-classesHover : Style -> String
-classesHover =
-    classesWithSuffix
-
-
-{-| Generate all the classes of a list of Focus Styles
--}
-classesFocus : Style -> String
-classesFocus =
-    classesWithSuffix
 
 
 stylesToCss : List Style -> List String

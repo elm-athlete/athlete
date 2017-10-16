@@ -106,8 +106,7 @@ mediaQuerySelector min max =
 
 generateClassName : Maybe String -> ( String, String ) -> String
 generateClassName suffix ( attribute, value ) =
-    [ attribute, value ]
-        |> String.join "-"
+    (attribute ++ "-" ++ value)
         |> addSuffixToClassName suffix
         |> cssValidName
 

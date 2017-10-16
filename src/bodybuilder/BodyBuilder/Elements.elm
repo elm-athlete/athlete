@@ -14,11 +14,11 @@ import Layout
 import Position
 
 
-stickyView
-    : List (Layout.Layout -> Layout.Layout)
-    -> String
-    -> List (Node msg)
-    -> Node msg
+-- stickyView
+--     : List (Layout.Layout -> Layout.Layout)
+--     -> String
+--     -> List (Node msg)
+--     -> Node msg
 stickyView sectionStyle sectionName elements =
     div []
         [ div

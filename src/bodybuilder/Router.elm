@@ -42,6 +42,7 @@ pages and history (backward and forward)
 
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes exposing (..)
+import BodyBuilder.Events exposing (..)
 import Elegant exposing (SizeUnit, percent)
 import AnimationFrame
 import Time exposing (Time)

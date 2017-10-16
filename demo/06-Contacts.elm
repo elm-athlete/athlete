@@ -9,6 +9,7 @@ I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes
+import BodyBuilder.Events
 import BodyBuilder.Elements exposing (..)
 import Elegant exposing (SizeUnit, px, pt, percent, vh)
 import Color
@@ -98,7 +99,7 @@ fullWidth =
 titleView : Contact -> Node Msg
 titleView contact =
     BodyBuilder.button
-        [ BodyBuilder.Attributes.onClick <| HistoryMsgWrapper <| ContactShow contact.id
+        [ BodyBuilder.Events.onClick <| HistoryMsgWrapper <| ContactShow contact.id
         , BodyBuilder.Attributes.style <|
             Elegant.style <|
                 Display.block
@@ -139,7 +140,7 @@ commonButtonStyleLayout =
 navItemGroup : Float -> Display.Align -> String -> Node Msg
 navItemGroup width alignment content =
     div
-        [ BodyBuilder.Attributes.onClick <| StandardHistoryWrapper Back
+        [ BodyBuilder.Events.onClick <| StandardHistoryWrapper Back
         , BodyBuilder.Attributes.style <|
             Elegant.style <|
                 Display.flexChild

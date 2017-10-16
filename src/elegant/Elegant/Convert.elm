@@ -8,8 +8,8 @@ import Helpers.Style exposing (..)
 import Display
 
 
-compileStyle : Display.DisplayBox -> List ( String, String )
-compileStyle displayBox =
+computeStyle : Display.DisplayBox -> List ( String, String )
+computeStyle displayBox =
     Display.displayBoxToCouples displayBox
 
 
@@ -34,7 +34,7 @@ classesNamesFromStyle ({ screenWidths, display, suffix } as style) =
     let
         standardClassesNames =
             display
-                |> Maybe.map compileStyle
+                |> Maybe.map computeStyle
                 |> Maybe.withDefault []
                 |> classesNameGeneration suffix
     in
@@ -51,16 +51,17 @@ classesNameGeneration suffix =
 screenWidthToClassesNames : Maybe String -> ScreenWidth -> List String
 screenWidthToClassesNames suffix { min, max, style } =
     style
-        |> compileStyle
+        |> computeStyle
         |> classesNameGeneration suffix
-        |> List.map (addScreenWidthToClassName min max)
+        |> List.map
+            (addScreenWidthToClassName
+                (Helpers.Css.cssValidName (toString min ++ toString max))
+            )
 
 
-addScreenWidthToClassName : Maybe Int -> Maybe Int -> String -> String
-addScreenWidthToClassName min max className =
-    (toString min ++ toString max)
-        |> Helpers.Css.cssValidName
-        |> (++) className
+addScreenWidthToClassName : String -> String -> String
+addScreenWidthToClassName =
+    flip (++)
 
 
 
@@ -159,7 +160,7 @@ type alias AtomicClass =
 compileConditionalStyle : ConditionalStyle -> List AtomicClass
 compileConditionalStyle { display, suffix, mediaQuery } =
     display
-        |> compileStyle
+        |> computeStyle
         |> List.map (coupleToAtomicClass suffix mediaQuery)
 
 
@@ -176,7 +177,7 @@ coupleToAtomicClass suffix mediaQuery property =
 compileAtomicClass : AtomicClass -> String
 compileAtomicClass { mediaQuery, className, mediaQueryId, selector, property } =
     inMediaQuery mediaQuery <|
-        compileStyleToCss className mediaQueryId selector property
+        computeStyleToCss className mediaQueryId selector property
 
 
 inMediaQuery : Maybe String -> String -> String
@@ -186,8 +187,8 @@ inMediaQuery mediaQuery content =
         |> Maybe.withDefault content
 
 
-compileStyleToCss : String -> Maybe String -> Maybe String -> String -> String
-compileStyleToCss className mediaQueryId selector property =
+computeStyleToCss : String -> Maybe String -> Maybe String -> String -> String
+computeStyleToCss className mediaQueryId selector property =
     String.join ""
         [ "."
         , className
