@@ -61,7 +61,7 @@ fullWidth =
     Display.dimensions [ Display.width (percent 100) ]
 
 
--- titleView : Contact -> Node Msg
+titleView : Contact -> Node Msg
 titleView contact =
     BodyBuilder.button
         [ BodyBuilder.Events.onClick <| SelectContact <| Just contact.id
@@ -102,7 +102,7 @@ commonButtonStyleLayout =
     ]
 
 
--- navItemGroup : Float -> Display.Align -> String -> Node Msg
+navItemGroup : Float -> Display.Align -> String -> Node Msg
 navItemGroup width alignment content =
     div
         [ BodyBuilder.Events.onClick <| SelectContact Nothing
@@ -123,7 +123,7 @@ navItemGroup width alignment content =
         [ text content ]
 
 
--- header : Node Msg
+header : Node Msg
 header =
     div
         [ BodyBuilder.Attributes.style <|
@@ -142,10 +142,7 @@ header =
         ]
 
 
--- showView :
---     (a -> Node Msg)
---     -> a
---     -> Node Msg
+showView : (a -> Node Msg) -> a -> Node Msg
 showView bodyFun data =
     div
         [ BodyBuilder.Attributes.style <|
@@ -174,7 +171,7 @@ showView bodyFun data =
         ]
 
 
--- contactBodyView : { b | maybeContact : Maybe Contact } -> Node msg
+contactBodyView : { b | maybeContact : Maybe Contact } -> Node msg
 contactBodyView data =
     case data.maybeContact of
         Nothing ->
@@ -201,7 +198,7 @@ filterByInitial =
         >> Dict.toList
 
 
--- initialView : ( Char, List Contact ) -> Node Msg
+initialView : ( Char, List Contact ) -> Node Msg
 initialView ( initial, contacts ) =
     stickyView
         [ Layout.background [ Elegant.color gray ]
@@ -211,12 +208,12 @@ initialView ( initial, contacts ) =
         (contacts |> List.map titleView)
 
 
--- contactsView : List Contact -> List (Node Msg)
+contactsView : List Contact -> List (Node Msg)
 contactsView =
     filterByInitial >> List.map initialView
 
 
--- contactsIndex : List Contact -> Node Msg
+contactsIndex : List Contact -> Node Msg
 contactsIndex contacts =
     div
         [ BodyBuilder.Attributes.style <|
@@ -232,12 +229,12 @@ contactsIndex contacts =
         (contacts |> contactsView)
 
 
--- contactsShow : Int -> List Contact -> Node Msg
+contactsShow : Int -> List Contact -> Node Msg
 contactsShow id contacts =
     div [] [ showView contactBodyView { maybeContact = (contacts |> find_by .id id) } ]
 
 
--- view : Model -> Node Msg
+view : Model -> Node Msg
 view { contacts, selected } =
     div
         [ BodyBuilder.Attributes.style <|

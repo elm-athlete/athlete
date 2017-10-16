@@ -10,80 +10,65 @@ import Helpers.Shared exposing (..)
 import Dict exposing (Dict)
 
 
-type alias Node msg =
+type Node msg
+    = Node (NodeContent msg)
+
+
+type alias Cache =
+    Dict String String
+
+
+type alias DomAndStyle msg =
     { styles : List Elegant.Style
     , dom : Html msg
     }
 
 
+type alias NodeContent msg =
+    Cache -> ( DomAndStyle msg, Cache )
 
--- div : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 
-
+div : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 div =
     flow "div"
 
 
-
--- br : Modifiers (FlowAttributes msg) -> Node msg
-
-
+br : Modifiers (FlowAttributes msg) -> Node msg
 br =
     flip (flow "br") []
 
 
-
--- h1 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+h1 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 h1 =
     flow "h1"
 
 
-
--- h2 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+h2 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 h2 =
     flow "h2"
 
 
-
--- h3 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+h3 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 h3 =
     flow "h3"
 
 
-
--- h4 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+h4 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 h4 =
     flow "h4"
 
 
-
--- h5 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+h5 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 h5 =
     flow "h5"
 
 
-
--- h6 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+h6 : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 h6 =
     flow "h6"
 
 
-
--- button : Modifiers (ButtonAttributes msg) -> List (Node msg) -> Node msg
-
-
+button : Modifiers (ButtonAttributes msg) -> List (Node msg) -> Node msg
 button =
     visibleNode
         BodyBuilder.Attributes.defaultButtonAttributes
@@ -92,12 +77,7 @@ button =
 
 
 {-| -}
-
-
-
--- a : Modifiers (AAttributes msg) -> List (Node msg) -> Node msg
-
-
+a : Modifiers (AAttributes msg) -> List (Node msg) -> Node msg
 a =
     visibleNode
         BodyBuilder.Attributes.defaultAattributes
@@ -106,67 +86,37 @@ a =
 
 
 {-| -}
-
-
-
--- ul : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+ul : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 ul =
     flow "ul"
 
 
 {-| -}
-
-
-
--- ol : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+ol : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 ol =
     flow "ol"
 
 
 {-| -}
-
-
-
--- li : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+li : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 li =
     flow "li"
 
 
 {-| -}
-
-
-
--- p : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+p : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 p =
     flow "p"
 
 
 {-| -}
-
-
-
--- span : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+span : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 span =
     flow "span"
 
 
 {-| -}
-
-
-
--- textarea : Modifiers (TextareaAttributes msg) -> Node msg
-
-
+textarea : Modifiers (TextareaAttributes msg) -> Node msg
 textarea =
     flip
         (visibleNode
@@ -178,12 +128,7 @@ textarea =
 
 
 {-| -}
-
-
-
--- img : String -> String -> Modifiers (ImgAttributes msg) -> Node msg
-
-
+img : String -> String -> Modifiers (ImgAttributes msg) -> Node msg
 img alt src =
     flip
         (visibleNode
@@ -195,12 +140,7 @@ img alt src =
 
 
 {-| -}
-
-
-
--- audio : Modifiers (AudioAttributes msg) -> Node msg
-
-
+audio : Modifiers (AudioAttributes msg) -> Node msg
 audio =
     flip
         (visibleNode
@@ -212,12 +152,7 @@ audio =
 
 
 {-| -}
-
-
-
--- progress : Modifiers (ProgressAttributes msg) -> Node msg
-
-
+progress : Modifiers (ProgressAttributes msg) -> Node msg
 progress =
     flip
         (visibleNode
@@ -230,92 +165,52 @@ progress =
 
 {-| TODO
 -}
-
-
-
--- table : List (Node msg) -> List (List (Node msg)) -> Node msg
-
-
+table : List (Node msg) -> List (List (Node msg)) -> Node msg
 table children table =
     visibleNode BodyBuilder.Attributes.defaultFlowAttributes (\_ -> []) "table" [] []
 
 
 {-| -}
-
-
-
--- node : String -> Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+node : String -> Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 node =
     flow
 
 
 {-| -}
-
-
-
--- leaf : Modifiers (FlowAttributes msg) -> Node msg
-
-
+leaf : Modifiers (FlowAttributes msg) -> Node msg
 leaf =
     flip div []
 
 
 {-| -}
-
-
-
--- container : List (Node msg) -> Node msg
-
-
+container : List (Node msg) -> Node msg
 container =
     div []
 
 
 {-| TODO
 -}
-
-
-
--- mapLis : List (Node msg) -> List (Node msg)
-
-
+mapLis : List (Node msg) -> List (Node msg)
 mapLis =
     List.map (\content -> li [] [ content ])
 
 
 {-| TODO
 -}
-
-
-
--- olLi : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+olLi : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 olLi attributes insideLis =
     ol attributes (mapLis insideLis)
 
 
 {-| TODO
 -}
-
-
-
--- ulLi : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-
-
+ulLi : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 ulLi attributes insideLis =
     ul attributes (mapLis insideLis)
 
 
 {-| -}
-
-
-
--- script : Modifiers (ScriptAttributes msg) -> Node msg
-
-
+script : Modifiers (ScriptAttributes msg) -> Node msg
 script =
     flip
         (visibleNode
@@ -336,12 +231,7 @@ inputHidden =
 
 
 {-| -}
-
-
-
--- inputText : Modifiers (InputTextAttributes msg) -> Node msg
-
-
+inputText : Modifiers (InputTextAttributes msg) -> Node msg
 inputText =
     flip
         (visibleNode
@@ -353,12 +243,7 @@ inputText =
 
 
 {-| -}
-
-
-
--- inputNumber : Modifiers (InputNumberAttributes msg) -> Node msg
-
-
+inputNumber : Modifiers (InputNumberAttributes msg) -> Node msg
 inputNumber =
     flip
         (visibleNode
@@ -370,12 +255,7 @@ inputNumber =
 
 
 {-| -}
-
-
-
--- inputColor : Modifiers (InputColorAttributes msg) -> Node msg
-
-
+inputColor : Modifiers (InputColorAttributes msg) -> Node msg
 inputColor =
     flip
         (visibleNode
@@ -387,12 +267,7 @@ inputColor =
 
 
 {-| -}
-
-
-
--- inputCheckbox : Modifiers (InputCheckboxAttributes msg) -> Node msg
-
-
+inputCheckbox : Modifiers (InputCheckboxAttributes msg) -> Node msg
 inputCheckbox =
     flip
         (visibleNode
@@ -404,12 +279,7 @@ inputCheckbox =
 
 
 {-| -}
-
-
-
--- inputFile : Modifiers (InputFileAttributes msg) -> Node msg
-
-
+inputFile : Modifiers (InputFileAttributes msg) -> Node msg
 inputFile =
     flip
         (visibleNode
@@ -421,12 +291,7 @@ inputFile =
 
 
 {-| -}
-
-
-
--- inputPassword : Modifiers (InputPasswordAttributes msg) -> Node msg
-
-
+inputPassword : Modifiers (InputPasswordAttributes msg) -> Node msg
 inputPassword =
     flip
         (visibleNode
@@ -438,12 +303,7 @@ inputPassword =
 
 
 {-| -}
-
-
-
--- inputRadio : Modifiers (InputRadioAttributes msg) -> Node msg
-
-
+inputRadio : Modifiers (InputRadioAttributes msg) -> Node msg
 inputRadio =
     flip
         (visibleNode
@@ -455,12 +315,7 @@ inputRadio =
 
 
 {-| -}
-
-
-
--- inputRange : Modifiers (InputRangeAttributes msg) -> Node msg
-
-
+inputRange : Modifiers (InputRangeAttributes msg) -> Node msg
 inputRange =
     flip
         (visibleNode
@@ -472,12 +327,7 @@ inputRange =
 
 
 {-| -}
-
-
-
--- inputSubmit : Modifiers (InputSubmitAttributes msg) -> Node msg
-
-
+inputSubmit : Modifiers (InputSubmitAttributes msg) -> Node msg
 inputSubmit =
     flip
         (visibleNode
@@ -489,12 +339,7 @@ inputSubmit =
 
 
 {-| -}
-
-
-
--- inputUrl : Modifiers (InputUrlAttributes msg) -> Node msg
-
-
+inputUrl : Modifiers (InputUrlAttributes msg) -> Node msg
 inputUrl =
     flip
         (visibleNode
@@ -506,12 +351,7 @@ inputUrl =
 
 
 {-| -}
-
-
-
--- select : Modifiers (SelectAttributes msg) -> Node msg
-
-
+select : Modifiers (SelectAttributes msg) -> Node msg
 select =
     flip
         (visibleNode
@@ -522,16 +362,16 @@ select =
         []
 
 
-text : String -> Dict String String -> ( Node msg, Dict String String )
-text content cache =
-    ( Node [] (Html.text content), cache )
+text : String -> Node msg
+text content =
+    Node (\cache -> ( DomAndStyle [] (Html.text content), cache ))
 
 
 program :
     { init : ( model, Cmd msg )
     , subscriptions : model -> Sub msg
     , update : msg -> model -> ( model, Cmd msg )
-    , view : model -> (Dict String String -> ( Node msg, Dict String String ))
+    , view : model -> Node msg
     }
     -> Program Never model msg
 program { init, update, subscriptions, view } =
@@ -547,7 +387,7 @@ program { init, update, subscriptions, view } =
 -- Internals
 
 
-toVirtualDomClassName : Elegant.Style -> ( List (Html.Attribute msg), Dict String String ) -> ( List (Html.Attribute msg), Dict String String )
+toVirtualDomClassName : Elegant.Style -> ( List (Html.Attribute msg), Cache ) -> ( List (Html.Attribute msg), Cache )
 toVirtualDomClassName style ( attributes, cache ) =
     let
         hash =
@@ -570,48 +410,55 @@ visibleNode :
     -> (BodyBuilder.Attributes.VisibleAttributes a -> List (Html.Attribute msg))
     -> String
     -> Modifiers (BodyBuilder.Attributes.VisibleAttributes a)
-    -> List (Dict String String -> ( Node msg, Dict String String ))
-    -> (Dict String String -> ( Node msg, Dict String String ))
+    -> List (Node msg)
+    -> Node msg
 visibleNode defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers content =
-    \cache ->
-        let
-            computedAttributes =
-                Function.compose attributesModifiers <| defaultAttributes
+    Node <|
+        \cache ->
+            let
+                computedAttributes =
+                    Function.compose attributesModifiers <| defaultAttributes
 
-            -- debug =
-            --   Debug.log "cache" cache
-            ( cacheNew, nodesResults ) =
-                content
-                    |> List.foldr extractStylesCache ( cache, [] )
+                -- debug =
+                --   Debug.log "cache" cache
+                ( cacheNew, nodesResults ) =
+                    content
+                        |> List.map extractNodeContent
+                        |> List.foldr extractStylesCache ( cache, [] )
 
-            styledDomWithStyle ( style, ( classesNamesProperty, cacheNewNew ) ) =
-                ( Node
-                    (style ++ (List.foldr extractStyles [] nodesResults))
-                    (Html.node tag
-                        (classesNamesProperty ++ (attributesToVirtualDomAttributes computedAttributes))
-                        (List.map extractDomNodes nodesResults)
-                    )
-                , cacheNewNew
-                )
-        in
-            styledDomWithStyle <|
-                case computedAttributes.style of
-                    Nothing ->
-                        ( [], ( [], cache ) )
-
-                    Just { standard, focus, hover } ->
-                        ( [ standard, focus, hover ]
-                            |> Maybe.Extra.values
-                        , [ standard
-                          , focus
-                          , hover
-                          ]
-                            |> Maybe.Extra.values
-                            |> List.foldr toVirtualDomClassName ( [], cache )
+                styledDomWithStyle ( style, ( classesNamesProperty, cacheNewNew ) ) =
+                    ( DomAndStyle
+                        (style ++ (List.foldr extractStyles [] nodesResults))
+                        (Html.node tag
+                            (classesNamesProperty ++ (attributesToVirtualDomAttributes computedAttributes))
+                            (List.map extractDomNodes nodesResults)
                         )
+                    , cacheNewNew
+                    )
+            in
+                styledDomWithStyle <|
+                    case computedAttributes.style of
+                        Nothing ->
+                            ( [], ( [], cache ) )
+
+                        Just { standard, focus, hover } ->
+                            ( [ standard, focus, hover ]
+                                |> Maybe.Extra.values
+                            , [ standard
+                              , focus
+                              , hover
+                              ]
+                                |> Maybe.Extra.values
+                                |> List.foldr toVirtualDomClassName ( [], cache )
+                            )
 
 
-extractStylesCache : (Dict String String -> ( Node msg, Dict String String )) -> ( Dict String String, List (Node msg) ) -> ( Dict String String, List (Node msg) )
+extractNodeContent : Node msg -> NodeContent msg
+extractNodeContent (Node content) =
+    content
+
+
+extractStylesCache : (Cache -> ( DomAndStyle msg, Cache )) -> ( Cache, List (DomAndStyle msg) ) -> ( Cache, List (DomAndStyle msg) )
 extractStylesCache nodeCreation ( cache, nodesRes ) =
     let
         ( resNode, cacheNew ) =
@@ -622,38 +469,45 @@ extractStylesCache nodeCreation ( cache, nodesRes ) =
 
 hiddenNode : a -> (a -> List (Html.Attribute msg)) -> String -> List (a -> a) -> Node msg
 hiddenNode defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers =
-    defaultAttributes
-        |> (Function.compose attributesModifiers)
-        |> attributesToVirtualDomAttributes
-        |> flip (Html.node tag) []
-        |> Node []
+    Node <|
+        \cache ->
+            ( defaultAttributes
+                |> (Function.compose attributesModifiers)
+                |> attributesToVirtualDomAttributes
+                |> flip (Html.node tag) []
+                |> DomAndStyle []
+            , cache
+            )
 
 
-extractStyles : Node msg -> List Elegant.Style -> List Elegant.Style
+extractStyles : DomAndStyle msg -> List Elegant.Style -> List Elegant.Style
 extractStyles { styles } accumulator =
     styles ++ accumulator
 
 
-extractDomNodes : Node msg -> Html msg
+extractDomNodes : DomAndStyle msg -> Html msg
 extractDomNodes { dom } =
     dom
 
 
-flow : String -> Modifiers (FlowAttributes msg) -> List (Dict String String -> ( Node msg, Dict String String )) -> Dict String String -> ( Node msg, Dict String String )
+flow :
+    String
+    -> Modifiers (FlowAttributes msg)
+    -> List (Node msg)
+    -> Node msg
 flow =
     visibleNode
         BodyBuilder.Attributes.defaultFlowAttributes
         BodyBuilder.Attributes.flowAttributesToHtmlAttributes
 
 
-toVirtualDom : (Dict String String -> ( Node msg, Dict String String )) -> Html msg
-toVirtualDom tree =
+toVirtualDom : Node msg -> Html msg
+toVirtualDom (Node tree) =
     let
-        ( nodes, cache ) =
-            tree Dict.empty
-
         { styles, dom } =
-            nodes
+            Dict.empty
+                |> tree
+                |> Tuple.first
     in
         Html.div []
             [ Html.node "style" [] [ computeStyles styles ]
