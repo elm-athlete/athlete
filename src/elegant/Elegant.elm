@@ -126,6 +126,12 @@ stylesToCss styles =
         |> Elegant.Convert.stylesToCss
 
 
+styleToCss : Style -> List String
+styleToCss (Style style) =
+    style
+        |> Elegant.Convert.fetchStylesOrCompute
+
+
 toCommonStyle : Style -> CommonStyle.Style
 toCommonStyle (Style style) =
     style

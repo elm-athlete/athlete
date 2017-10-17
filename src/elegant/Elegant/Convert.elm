@@ -3,9 +3,9 @@ module Elegant.Convert exposing (..)
 import Helpers.Css
 import List.Extra
 import Maybe.Extra exposing ((?))
-import Dict exposing (Dict)
 import Helpers.Style exposing (..)
 import Display
+import Native.Elegant
 
 
 computeStyle : Display.DisplayBox -> List ( String, String )
@@ -85,19 +85,18 @@ addScreenWidthToClassName =
 stylesToCss : List Style -> List String
 stylesToCss styles =
     styles
-        |> List.foldr fetchStylesOrCompute ( Dict.empty, [] )
-        |> Tuple.second
+        |> List.concatMap fetchStylesOrCompute
         |> List.append [ boxSizingCss ]
         |> List.Extra.unique
 
 
-fetchStylesOrCompute : Style -> ( Dict String (List String), List String ) -> ( Dict String (List String), List String )
-fetchStylesOrCompute style ( cache, accumulator ) =
+fetchStylesOrCompute : Style -> List String
+fetchStylesOrCompute style =
     let
         styleHash =
             style |> toString
     in
-        case Dict.get styleHash cache of
+        case Native.Elegant.fetchStyles styleHash of
             Nothing ->
                 let
                     computedStyles =
@@ -105,11 +104,12 @@ fetchStylesOrCompute style ( cache, accumulator ) =
                             |> extractScreenWidths
                             |> List.concatMap compileConditionalStyle
                             |> List.map compileAtomicClass
+                            |> Native.Elegant.addStyles styleHash
                 in
-                    ( Dict.insert styleHash computedStyles cache, List.append computedStyles accumulator )
+                    computedStyles
 
             Just computedStyles ->
-                ( cache, List.append computedStyles accumulator )
+                computedStyles
 
 
 type alias ConditionalStyle =
