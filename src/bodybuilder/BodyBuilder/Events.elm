@@ -14,10 +14,13 @@ module BodyBuilder.Events
         , OnIntInputEvent
         , OnColorInputEvent
         , onInput
+        , inputEventToHtmlEvent
         , OnCheckEvent
         , onCheck
+        , checkEventToHtmlEvent
         , OnSubmitEvent
         , onSubmit
+        , submitEventToHtmlEvent
         , OnFocusEvent
         , onFocus
         , focusEventToHtmlAttributes
@@ -150,6 +153,16 @@ onInput val attrs =
     { attrs | onInputEvent = Just val }
 
 
+inputEventToHtmlEvent : ( Maybe (a -> msg), String -> a ) -> List (Html.Attribute msg)
+inputEventToHtmlEvent ( onInputEvent, fromStringInput ) =
+    case onInputEvent of
+        Just fun ->
+            [ Html.Events.onInput (fromStringInput >> fun) ]
+
+        Nothing ->
+            []
+
+
 {-| -}
 type alias OnStringInputEvent msg a =
     OnInputEvent String msg a
@@ -176,6 +189,11 @@ onCheck val attrs =
     { attrs | onCheckEvent = Just val }
 
 
+checkEventToHtmlEvent : OnCheckEvent msg a -> List (Html.Attribute msg)
+checkEventToHtmlEvent =
+    unwrapMaybeAttribute Html.Events.onCheck << .onCheckEvent
+
+
 {-| -}
 type alias OnSubmitEvent msg a =
     { a | onSubmitEvent : Maybe msg }
@@ -185,6 +203,11 @@ type alias OnSubmitEvent msg a =
 onSubmit : msg -> Modifier (OnSubmitEvent msg a)
 onSubmit val attrs =
     { attrs | onSubmitEvent = Just val }
+
+
+submitEventToHtmlEvent : OnSubmitEvent msg a -> List (Html.Attribute msg)
+submitEventToHtmlEvent =
+    unwrapMaybeAttribute Html.Events.onSubmit << .onSubmitEvent
 
 
 {-| -}

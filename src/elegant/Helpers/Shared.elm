@@ -8,6 +8,7 @@ import Color exposing (Color)
 import Maybe.Extra
 import ParseInt
 
+
 parseInt : String -> Int
 parseInt =
     ParseInt.parseInt >> Result.withDefault 0
@@ -21,6 +22,11 @@ parseColor =
 unwrapEmptyList : (a -> List b) -> Maybe a -> List b
 unwrapEmptyList =
     Maybe.Extra.unwrap []
+
+
+unwrapMaybeAttribute : (a -> b) -> Maybe a -> List b
+unwrapMaybeAttribute fun =
+    Maybe.Extra.unwrap [] (fun >> List.singleton)
 
 
 type SizeUnit

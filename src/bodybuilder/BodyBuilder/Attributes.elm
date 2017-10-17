@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Elegant
 import Color exposing (Color)
+import Color.Convert
 
 
 -- import Function
@@ -79,9 +80,9 @@ defaultUniversalAttributes =
 universalAttributesToHtmlAttributes : UniversalAttributes a -> List (Html.Attribute msg)
 universalAttributesToHtmlAttributes universal =
     [ .class >> List.map Html.Attributes.class
-    , .id >> unwrapEmptyList (Html.Attributes.id >> List.singleton)
-    , .tabindex >> unwrapEmptyList (Html.Attributes.tabindex >> List.singleton)
-    , .title >> unwrapEmptyList (Html.Attributes.title >> List.singleton)
+    , .id >> unwrapMaybeAttribute Html.Attributes.id
+    , .tabindex >> unwrapMaybeAttribute Html.Attributes.tabindex
+    , .title >> unwrapMaybeAttribute Html.Attributes.title
     ]
         |> List.concatMap (callOn universal)
 
@@ -238,8 +239,12 @@ defaultAattributes =
 
 
 aAttributesToHtmlAttributes : AAttributes msg -> List (Html.Attribute msg)
-aAttributesToHtmlAttributes _ =
-    []
+aAttributesToHtmlAttributes attributes =
+    [ unwrapMaybeAttribute Html.Attributes.href << .href
+    , unwrapMaybeAttribute Html.Attributes.target << .target
+    ]
+        |> List.concatMap (callOn attributes)
+        |> List.append (visibleAttributesToHtmlAttributes attributes)
 
 
 {-| -}
@@ -268,8 +273,13 @@ defaultTextareaAttributes =
 
 
 textareaAttributesToHtmlAttributes : TextareaAttributes msg -> List (Html.Attribute msg)
-textareaAttributesToHtmlAttributes _ =
-    []
+textareaAttributesToHtmlAttributes attributes =
+    [ unwrapMaybeAttribute Html.Attributes.value << .value
+    , unwrapMaybeAttribute Html.Attributes.name << .name
+    ]
+        |> List.concatMap (callOn attributes)
+        |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
+        |> List.append (visibleAttributesToHtmlAttributes attributes)
 
 
 {-| -}
@@ -313,8 +323,18 @@ defaultImgAttributes alt src =
 
 
 imgAttributesToHtmlAttributes : ImgAttributes msg -> List (Html.Attribute msg)
-imgAttributesToHtmlAttributes _ =
-    []
+imgAttributesToHtmlAttributes attributes =
+    [ unwrapMaybeAttribute Html.Attributes.height << .height
+    , unwrapMaybeAttribute Html.Attributes.width << .width
+    ]
+        |> List.concatMap (callOn attributes)
+        |> List.append
+            ([ Html.Attributes.alt << .alt
+             , Html.Attributes.src << .src
+             ]
+                |> List.map (callOn attributes)
+            )
+        |> List.append (visibleAttributesToHtmlAttributes attributes)
 
 
 {-| -}
@@ -335,8 +355,8 @@ defaultAudioAttributes =
 
 
 audioAttributesToHtmlAttributes : AudioAttributes msg -> List (Html.Attribute msg)
-audioAttributesToHtmlAttributes _ =
-    []
+audioAttributesToHtmlAttributes attributes =
+    Html.Attributes.src attributes.src :: visibleAttributesToHtmlAttributes attributes
 
 
 {-| -}
@@ -356,8 +376,8 @@ defaultProgressAttributes =
 
 
 progressAttributesToHtmlAttributes : ProgressAttributes msg -> List (Html.Attribute msg)
-progressAttributesToHtmlAttributes _ =
-    []
+progressAttributesToHtmlAttributes =
+    visibleAttributesToHtmlAttributes
 
 
 type alias ScriptAttributes msg =
@@ -382,12 +402,17 @@ defaultScriptAttributes =
 
 
 scriptAttributesToHtmlAttributes : ScriptAttributes msg -> List (Html.Attribute msg)
-scriptAttributesToHtmlAttributes _ =
-    []
+scriptAttributesToHtmlAttributes attributes =
+    Html.Attributes.src attributes.src :: visibleAttributesToHtmlAttributes attributes
 
 
 type alias InputAttributes a =
     NameAttribute { a | type_ : String }
+
+
+inputAttributesToHtmlAttributes : InputAttributes a -> List (Html.Attribute msg)
+inputAttributesToHtmlAttributes attributes =
+    Html.Attributes.type_ attributes.type_ :: unwrapMaybeAttribute Html.Attributes.name attributes.name
 
 
 {-| -}
@@ -410,8 +435,10 @@ defaultInputHiddenAttributes =
 
 
 inputHiddenAttributesToHtmlAttributes : InputHiddenAttributes -> List (Html.Attribute msg)
-inputHiddenAttributesToHtmlAttributes _ =
-    []
+inputHiddenAttributesToHtmlAttributes attributes =
+    unwrapMaybeAttribute Html.Attributes.value attributes.value
+        |> List.append (inputAttributesToHtmlAttributes attributes)
+        |> List.append (universalAttributesToHtmlAttributes attributes.universal)
 
 
 {-| -}
@@ -441,6 +468,15 @@ type alias LabelAttributes msg =
 
 type alias InputVisibleAttributes msg a =
     LabelAttribute msg (VisibleAttributesAndEvents msg (InputAttributes a))
+
+
+inputVisibleToHtmlAttributes :
+    VisibleAttributesAndEvents msg { a | name : Maybe String, type_ : String }
+    -> List (Html.Attribute msg)
+inputVisibleToHtmlAttributes attributes =
+    List.append
+        (visibleAttributesToHtmlAttributes attributes)
+        (inputAttributesToHtmlAttributes attributes)
 
 
 type alias InputStringValueAttributes msg a =
@@ -486,8 +522,15 @@ defaultInputTextAttributes =
 
 
 inputTextAttributesToHtmlAttributes : InputTextAttributes msg -> List (Html.Attribute msg)
-inputTextAttributesToHtmlAttributes _ =
-    []
+inputTextAttributesToHtmlAttributes attributes =
+    Html.Attributes.autocomplete attributes.autocomplete
+        :: ([ unwrapMaybeAttribute Html.Attributes.placeholder << .placeholder
+            , unwrapMaybeAttribute Html.Attributes.value << .value
+            ]
+                |> List.concatMap (callOn attributes)
+                |> List.append (inputVisibleToHtmlAttributes attributes)
+                |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
+           )
 
 
 {-| -}
@@ -531,8 +574,14 @@ defaultInputNumberAttributes =
 
 
 inputNumberAttributesToHtmlAttributes : InputNumberAttributes msg -> List (Html.Attribute msg)
-inputNumberAttributesToHtmlAttributes _ =
-    []
+inputNumberAttributesToHtmlAttributes attributes =
+    [ unwrapMaybeAttribute Html.Attributes.value << (Maybe.map toString << .value)
+    , unwrapMaybeAttribute Html.Attributes.min << (Maybe.map toString << .min)
+    , unwrapMaybeAttribute Html.Attributes.max << (Maybe.map toString << .max)
+    ]
+        |> List.concatMap (callOn attributes)
+        |> List.append (inputVisibleToHtmlAttributes attributes)
+        |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
 
 
 {-| -}
@@ -558,8 +607,10 @@ defaultInputColorAttributes =
 
 
 inputColorAttributesToHtmlAttributes : InputColorAttributes msg -> List (Html.Attribute msg)
-inputColorAttributesToHtmlAttributes _ =
-    []
+inputColorAttributesToHtmlAttributes attributes =
+    unwrapMaybeAttribute Html.Attributes.value (Maybe.map Color.Convert.colorToCssRgb <| attributes.value)
+        |> List.append (inputVisibleToHtmlAttributes attributes)
+        |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
 
 
 {-| -}
@@ -585,8 +636,11 @@ defaultInputCheckboxAttributes =
 
 
 inputCheckboxAttributesToHtmlAttributes : InputCheckboxAttributes msg -> List (Html.Attribute msg)
-inputCheckboxAttributesToHtmlAttributes _ =
-    []
+inputCheckboxAttributesToHtmlAttributes attributes =
+    Html.Attributes.checked attributes.checked
+        |> flip (::) (unwrapMaybeAttribute Html.Attributes.value (Maybe.map toString <| attributes.value))
+        |> List.append (inputVisibleToHtmlAttributes attributes)
+        |> List.append (checkEventToHtmlEvent attributes)
 
 
 {-| -}
@@ -609,8 +663,8 @@ defaultInputFileAttributes =
 
 
 inputFileAttributesToHtmlAttributes : InputFileAttributes msg -> List (Html.Attribute msg)
-inputFileAttributesToHtmlAttributes _ =
-    []
+inputFileAttributesToHtmlAttributes =
+    inputVisibleToHtmlAttributes
 
 
 {-| -}
@@ -638,8 +692,8 @@ defaultInputPasswordAttributes =
 
 
 inputPasswordAttributesToHtmlAttributes : InputPasswordAttributes msg -> List (Html.Attribute msg)
-inputPasswordAttributesToHtmlAttributes _ =
-    []
+inputPasswordAttributesToHtmlAttributes =
+    inputTextAttributesToHtmlAttributes
 
 
 {-| -}
@@ -663,8 +717,10 @@ defaultInputRadioAttributes =
 
 
 inputRadioAttributesToHtmlAttributes : InputRadioAttributes msg -> List (Html.Attribute msg)
-inputRadioAttributesToHtmlAttributes _ =
-    []
+inputRadioAttributesToHtmlAttributes attributes =
+    List.append
+        (unwrapMaybeAttribute Html.Attributes.value attributes.value)
+        (inputVisibleToHtmlAttributes attributes)
 
 
 {-| -}
@@ -693,8 +749,8 @@ defaultInputRangeAttributes =
 
 
 inputRangeAttributesToHtmlAttributes : InputRangeAttributes msg -> List (Html.Attribute msg)
-inputRangeAttributesToHtmlAttributes _ =
-    []
+inputRangeAttributesToHtmlAttributes =
+    inputNumberAttributesToHtmlAttributes
 
 
 {-| -}
@@ -718,8 +774,14 @@ defaultInputSubmitAttributes =
 
 
 inputSubmitAttributesToHtmlAttributes : InputSubmitAttributes msg -> List (Html.Attribute msg)
-inputSubmitAttributesToHtmlAttributes _ =
-    []
+inputSubmitAttributesToHtmlAttributes attributes =
+    List.concat
+        [ submitEventToHtmlEvent attributes
+        , unwrapMaybeAttribute Html.Attributes.value attributes.value
+        , Html.Attributes.disabled attributes.disabled
+            :: Html.Attributes.type_ attributes.type_
+            :: visibleAttributesToHtmlAttributes attributes
+        ]
 
 
 {-| -}
@@ -747,8 +809,8 @@ defaultInputUrlAttributes =
 
 
 inputUrlAttributesToHtmlAttributes : InputUrlAttributes msg -> List (Html.Attribute msg)
-inputUrlAttributesToHtmlAttributes _ =
-    []
+inputUrlAttributesToHtmlAttributes =
+    inputTextAttributesToHtmlAttributes
 
 
 {-| -}
@@ -775,5 +837,6 @@ defaultSelectAttributes =
 
 
 selectAttributesToHtmlAttributes : SelectAttributes msg -> List (Html.Attribute msg)
-selectAttributesToHtmlAttributes _ =
-    []
+selectAttributesToHtmlAttributes attributes =
+    unwrapMaybeAttribute Html.Attributes.value attributes.value
+        |> List.append (visibleAttributesToHtmlAttributes attributes)
