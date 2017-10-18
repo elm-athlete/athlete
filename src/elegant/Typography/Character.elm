@@ -256,7 +256,7 @@ sizeToCouple val =
 
 familyToCouple : FontFamily -> ( String, String )
 familyToCouple fontFamily =
-    ( "font-style", fontFamilyToString fontFamily )
+    ( "font-family", fontFamilyToString fontFamily )
 
 
 fontFamilyToString : FontFamily -> String

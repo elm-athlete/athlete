@@ -123,9 +123,12 @@ gray =
     Color.grayscale 0.9
 
 
+standardCellStyle :
+    { a | style : List Elegant.Style }
+    -> { a | style : List Elegant.Style }
 standardCellStyle =
-    [ BodyBuilder.Attributes.style <|
-        Elegant.style <|
+    BodyBuilder.Attributes.style
+        [ Elegant.style <|
             Display.block
                 [ Display.alignment Display.left
                 , Display.fullWidth
@@ -145,11 +148,11 @@ standardCellStyle =
                 , Layout.padding [ Padding.all Constants.large ]
                 , Layout.background [ Elegant.color Color.white ]
                 ]
-    , BodyBuilder.Attributes.focusStyle <|
-        Elegant.style <|
-            Display.block []
-                [ Layout.background [ Elegant.color <| Color.grayscale 0.05 ] ]
-    ]
+        , Elegant.setSuffix "focus" <|
+            Elegant.style <|
+                Display.block []
+                    [ Layout.background [ Elegant.color <| Color.grayscale 0.05 ] ]
+        ]
 
 
 titleView : Appartment -> Node Msg
@@ -163,9 +166,12 @@ titleView appartment =
         [ text appartment.attributes.title ]
 
 
-style =
-    BodyBuilder.Attributes.style <|
-        Elegant.style
+style :
+    Display.DisplayBox
+    -> { a | style : List Elegant.Style }
+    -> { a | style : List Elegant.Style }
+style styleContent =
+    BodyBuilder.Attributes.style [ Elegant.style styleContent ]
 
 
 titleViewWithDelete :
@@ -173,13 +179,12 @@ titleViewWithDelete :
     -> Node Msg
 titleViewWithDelete appartment =
     button
-        [ standardCellStyle
-        ]
+        [ standardCellStyle ]
         [ div
             [ style <| Display.blockFlexContainer [] [] []
             ]
             [ div [ BodyBuilder.Events.onClick <| DestroyAppartment appartment.id ] [ text "⛔" ]
-            , div [ style (Display.block [ Layout.padding [ Padding.left Constants.medium ] ]) ] [ text appartment.attributes.title ]
+            , div [ style (Display.block [] [ Layout.padding [ Padding.left Constants.medium ] ]) ] [ text appartment.attributes.title ]
             ]
         ]
 
@@ -194,11 +199,7 @@ showView data =
             pageWithHeader
                 (Router.headerElement
                     { left = Router.headerButton (StandardHistoryWrapper Router.Back) "← BACK"
-                    , center =
-                        div
-                            []
-                            [ text appartment.attributes.title
-                            ]
+                    , center = title appartment.attributes.title
                     , right = Router.headerButton (HistoryMsgWrapper (AppartmentEditMsg appartment.id)) "Edit"
                     }
                 )
@@ -267,8 +268,9 @@ minSalary model =
     (model |> monthlyBankDebt) * 3
 
 
+pad : { a | style : List Elegant.Style } -> { a | style : List Elegant.Style }
 pad =
-    style [ Display.block [] [ Padding.all Constants.medium ] ]
+    style (Display.block [] [ Layout.padding [ Padding.all Constants.medium ] ])
 
 
 result : String -> a -> Node msg
@@ -350,9 +352,12 @@ mainElement : Node msg -> Node msg
 mainElement html =
     div
         [ style
-            [ Display.overflow [ Overflow.overflowY Overflow.scroll ]
-            , Display.fullWidth
-            ]
+            (Display.block
+                [ Display.overflow [ Overflow.overflowY Overflow.scroll ]
+                , Display.fullWidth
+                ]
+                []
+            )
         ]
         [ html
         ]
@@ -360,6 +365,7 @@ mainElement html =
 
 {-| returns a background with a color
 -}
+backgroundColor : Color.Color -> Elegant.Modifier Layout.Layout
 backgroundColor color =
     Layout.background [ Elegant.color color ]
 
@@ -368,11 +374,11 @@ pageWithHeader : Node msg -> Node msg -> Node msg
 pageWithHeader header page =
     div
         [ style
-            [ Display.blockFlexContainer
-                [ Display.column ]
-                [ Display.height (Elegant.vh 100) ]
+            (Display.blockFlexContainer
+                [ Display.direction Display.column ]
+                [ Display.dimensions [ Display.height (Elegant.vh 100) ] ]
                 [ backgroundColor Color.white ]
-            ]
+            )
         ]
         [ header
         , mainElement page
@@ -389,7 +395,7 @@ editView data =
             pageWithHeader
                 (Router.headerElement
                     { left = Router.headerButton (StandardHistoryWrapper Router.Back) "x"
-                    , center = div [] [ text appartment.attributes.title ]
+                    , center = title appartment.attributes.title
                     , right = div [] []
                     }
                 )
@@ -405,10 +411,15 @@ textToHtml =
 
 appartmentBodyView : Appartment -> Node msg
 appartmentBodyView appartment =
-    div [ style [ Layout.padding [ Padding.horizontal Constants.medium ] ] ]
+    div [ style (Display.block [] [ Layout.padding [ Padding.horizontal Constants.medium ] ]) ]
         ([ div [] (textToHtml appartment.attributes.details)
          ]
         )
+
+
+title : String -> Node msg
+title content =
+    div [ blockStyle [] [ Layout.padding [ Padding.all (Elegant.px 12) ] ] ] [ text content ]
 
 
 appartmentsIndex : List Appartment -> Node Msg
@@ -416,11 +427,11 @@ appartmentsIndex appartments =
     pageWithHeader
         (Router.headerElement
             { left = Router.headerButton (HistoryMsgWrapper AppartmentsIndexEditMsg) "edit"
-            , center = div [] [ text "Rentabilize" ]
+            , center = title "Rentabilize"
             , right = Router.headerButton (HistoryMsgWrapper AppartmentNewMsg) "new"
             }
         )
-        (div [ style [ backgroundColor gray ] ]
+        (div [ style (Display.block [] [ backgroundColor gray ]) ]
             (appartments |> List.map titleView)
         )
 
@@ -430,11 +441,11 @@ appartmentsIndexEdit appartments =
     pageWithHeader
         (Router.headerElement
             { left = Router.headerButton (StandardHistoryWrapper Router.Back) "done"
-            , center = div [] [ text "Rentabilize" ]
+            , center = title "Rentabilize"
             , right = text ""
             }
         )
-        (div [ style [ backgroundColor gray ] ]
+        (div [ style (Display.block [] [ backgroundColor gray ]) ]
             (appartments |> List.map titleViewWithDelete)
         )
 
@@ -457,7 +468,7 @@ appartmentsNew draftAppartment =
     pageWithHeader
         (Router.headerElement
             { left = Router.headerButton (StandardHistoryWrapper Router.Back) "cancel"
-            , center = div [] [ text draftAppartment.title ]
+            , center = title draftAppartment.title
             , right = Router.headerButton SaveAppartmentAttributes "save"
             }
         )
@@ -491,13 +502,25 @@ insidePageView page data transition =
                 appartmentsNew data.draftAppartment
 
 
+blockStyle :
+    List (Display.BlockDetails -> Display.BlockDetails)
+    -> List (Layout.Layout -> Layout.Layout)
+    -> { a | style : List Elegant.Style }
+    -> { a | style : List Elegant.Style }
+blockStyle blockDetails =
+    style << Display.block blockDetails
+
+
 view : Model -> Node Msg
 view { history, data } =
     div
-        [ style
-            [ Typography.character
-                [ Character.fontFamilySansSerif
-                , Character.size Constants.zeta
+        [ blockStyle
+            []
+            [ Layout.typography
+                [ Typography.character
+                    [ Character.fontFamilySansSerif
+                    , Character.size Constants.zeta
+                    ]
                 ]
             ]
         ]

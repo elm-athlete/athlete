@@ -341,13 +341,14 @@ overflowHiddenContainer :
     -> Node msg
 overflowHiddenContainer attributes content =
     div
-        [ style [
-            Elegant.style <|
+        [ style
+            [ Elegant.style <|
                 Display.block
                     [ Display.overflow
                         [ Display.Overflow.overflowXY Display.Overflow.hidden ]
                     ]
-                    []]
+                    []
+            ]
         ]
         [ div attributes content ]
 
@@ -360,14 +361,15 @@ pageView :
     -> Node msg
 pageView insidePageView_ transition data page =
     div
-        [ style [
-            Elegant.style <|
+        [ style
+            [ Elegant.style <|
                 Display.block
                     [ Display.dimensions [ Display.width (percent 100) ] ]
                     [ Layout.boxShadow
                         [-- BoxShadow.
                         ]
-                    ]]
+                    ]
+            ]
 
         -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
         ]
@@ -397,16 +399,17 @@ historyView insidePageView_ history data =
                         overflowHiddenContainer
                             []
                             [ div
-                                [ style [
-                                    Elegant.style <|
+                                [ style
+                                    [ Elegant.style <|
                                         Display.block
                                             [ Display.dimensions [ Display.width (percent 100) ] ]
-                                            []]
+                                            []
+                                    ]
                                 ]
                                 (List.map (pageView insidePageView_ history.transition data) (history |> beforeTransition))
                             , div
                                 [ style
-                                    [Elegant.style <|
+                                    [ Elegant.style <|
                                         Display.block
                                             [ Display.dimensions [ Display.width (percent 100) ] ]
                                             [ Layout.position <|
@@ -414,7 +417,8 @@ historyView insidePageView_ history data =
                                                     [ Position.bottom <|
                                                         percentage ((getMaybeTransitionValue <| history.transition) - 1)
                                                     ]
-                                            ]]
+                                            ]
+                                    ]
                                 ]
                                 (List.map (pageView insidePageView_ history.transition data) (history |> afterTransition))
                             ]
@@ -422,7 +426,7 @@ historyView insidePageView_ history data =
                     SlideRight ->
                         overflowHiddenContainer
                             [ style
-                                [Elegant.style <|
+                                [ Elegant.style <|
                                     Display.blockFlexContainer []
                                         [ Display.dimensions [ Display.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
                                         [ Layout.position <|
@@ -432,7 +436,8 @@ historyView insidePageView_ history data =
                                                         getMaybeTransitionValue <|
                                                             history.transition
                                                 ]
-                                        ]]
+                                        ]
+                                ]
                             ]
                             (List.map (pageView insidePageView_ history.transition data) visiblePages_)
 
@@ -492,17 +497,16 @@ initHistoryAndData route data =
     }
 
 
-headerButtonStyle : SizeUnit -> Display.DisplayBox
-headerButtonStyle width =
-    Display.block
-        [ Display.dimensions [ Display.width width ]
-        , Display.overflow
+headerButtonStyle width align =
+    Display.flexChild
+        [ Display.basis width
+        ]
+        [ Display.overflow
             [ Display.Overflow.overflowXY Display.Overflow.hidden ]
         , Display.textOverflowEllipsis
+        , align
         ]
-        [ Layout.padding
-            [ Padding.all (Elegant.px 12) ]
-        , Layout.cursor Cursor.pointer
+        [ Layout.cursor Cursor.pointer
         , Layout.typography
             [ Typography.character
                 [ Typography.Character.size (Elegant.px 12) ]
@@ -512,17 +516,17 @@ headerButtonStyle width =
 
 headerButtonStyleLeft : Display.DisplayBox
 headerButtonStyleLeft =
-    headerButtonStyle <| percent 30
+    headerButtonStyle (percent 30) (Display.alignment Display.left)
 
 
 headerButtonStyleCenter : Display.DisplayBox
 headerButtonStyleCenter =
-    headerButtonStyle <| percent 40
+    headerButtonStyle (percent 40) Display.alignCenter
 
 
 headerButtonStyleRight : Display.DisplayBox
 headerButtonStyleRight =
-    headerButtonStyle <| percent 30
+    headerButtonStyle (percent 30) (Display.alignment Display.right)
 
 
 {-| display header
@@ -548,9 +552,9 @@ headerElement { left, center, right } =
                         []
                 ]
             ]
-            [ div [ style  [ Elegant.style <| headerButtonStyleLeft ] ] [ left ]
-            , div [ style  [ Elegant.style <| headerButtonStyleCenter ] ] [ center ]
-            , div [ style  [ Elegant.style <| headerButtonStyleRight ] ] [ right ]
+            [ div [ style [ Elegant.style <| headerButtonStyleLeft ] ] [ left ]
+            , div [ style [ Elegant.style <| headerButtonStyleCenter ] ] [ center ]
+            , div [ style [ Elegant.style <| headerButtonStyleRight ] ] [ right ]
             ]
         ]
 
@@ -561,6 +565,7 @@ headerButton : msg -> String -> Node msg
 headerButton msg content =
     div
         [ onClick <| msg
+        , style [ Elegant.style <| Display.block [] [ Layout.padding [ Padding.all (Elegant.px 12) ] ] ]
         ]
         [ text content
         ]
