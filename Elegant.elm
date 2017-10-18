@@ -1,4 +1,0 @@
-module Elegant exposing (..)
-
-defaultStyle =
-    
