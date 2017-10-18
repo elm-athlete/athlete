@@ -18,6 +18,11 @@ type alias ValueAttribute b a =
     { a | value : Maybe b }
 
 
+value : a -> { c | value : b } -> { c | value : Maybe a }
+value val attrs =
+    { attrs | value = Just val }
+
+
 {-| -}
 type alias StringValue a =
     ValueAttribute String a
@@ -39,7 +44,7 @@ type alias VisibleAttributesAndEvents msg a =
 
 type alias VisibleAttributes a =
     { a
-        | style : Maybe StyleAttribute
+        | style : List Elegant.Style
         , universal : UniversalAttributes {}
     }
 
@@ -88,54 +93,12 @@ universalAttributesToHtmlAttributes universal =
 
 
 {-| -}
-type alias StyleAttribute =
-    { standard : Maybe Elegant.Style
-    , hover : Maybe Elegant.Style
-    , focus : Maybe Elegant.Style
-    }
-
-
-defaultStyleAttribute : StyleAttribute
-defaultStyleAttribute =
-    { standard = Nothing
-    , hover = Nothing
-    , focus = Nothing
-    }
-
-
-{-| -}
 style :
-    Elegant.Style
-    -> { a | style : Maybe StyleAttribute }
-    -> { a | style : Maybe StyleAttribute }
+    List Elegant.Style
+    -> { a | style : List Elegant.Style }
+    -> { a | style : List Elegant.Style }
 style val ({ style } as attrs) =
-    style
-        |> Maybe.withDefault defaultStyleAttribute
-        |> setStandard val
-        |> setStyleIn attrs
-
-
-{-| -}
-hoverStyle :
-    Elegant.Style
-    -> { a | style : Maybe StyleAttribute }
-    -> { a | style : Maybe StyleAttribute }
-hoverStyle val ({ style } as attrs) =
-    style
-        |> Maybe.withDefault defaultStyleAttribute
-        |> setHover val
-        |> setStyleIn attrs
-
-
-{-| -}
-focusStyle :
-    Elegant.Style
-    -> { a | style : Maybe StyleAttribute }
-    -> { a | style : Maybe StyleAttribute }
-focusStyle val ({ style } as attrs) =
-    style
-        |> Maybe.withDefault defaultStyleAttribute
-        |> setFocus val
+    (val ++ style)
         |> setStyleIn attrs
 
 
@@ -150,7 +113,7 @@ defaultFlowAttributes =
     , onEvent = Nothing
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
-    , style = Nothing
+    , style = []
     , universal = defaultUniversalAttributes
     }
 
@@ -197,7 +160,7 @@ defaultButtonAttributes =
     , onEvent = Nothing
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
-    , style = Nothing
+    , style = []
     , universal = defaultUniversalAttributes
     }
 
@@ -229,7 +192,7 @@ defaultAattributes : AAttributes msg
 defaultAattributes =
     { href = Nothing
     , target = Nothing
-    , style = Nothing
+    , style = []
     , universal = defaultUniversalAttributes
     , onMouseEvents = Nothing
     , onEvent = Nothing
@@ -262,7 +225,7 @@ defaultTextareaAttributes =
     { value = Nothing
     , name = Nothing
     , universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , onInputEvent = Nothing
     , fromStringInput = identity
@@ -312,7 +275,7 @@ defaultImgAttributes alt src =
     { src = src
     , alt = alt
     , universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , width = Nothing
     , height = Nothing
@@ -345,7 +308,7 @@ type alias AudioAttributes msg =
 defaultAudioAttributes : AudioAttributes msg
 defaultAudioAttributes =
     { universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , src = ""
     , onEvent = Nothing
@@ -367,7 +330,7 @@ type alias ProgressAttributes msg =
 defaultProgressAttributes : ProgressAttributes msg
 defaultProgressAttributes =
     { universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
@@ -392,7 +355,7 @@ defaultScriptAttributes : ScriptAttributes msg
 defaultScriptAttributes =
     { universal = defaultUniversalAttributes
     , src = ""
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
@@ -505,7 +468,7 @@ type alias InputTextAttributes msg =
 defaultInputTextAttributes : InputTextAttributes msg
 defaultInputTextAttributes =
     { universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , name = Nothing
     , type_ = "text"
     , value = Nothing
@@ -556,7 +519,7 @@ type alias MinAttribute a =
 defaultInputNumberAttributes : InputNumberAttributes msg
 defaultInputNumberAttributes =
     { universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , name = Nothing
     , type_ = "number"
     , value = Nothing
@@ -592,7 +555,7 @@ type alias InputColorAttributes msg =
 defaultInputColorAttributes : InputColorAttributes msg
 defaultInputColorAttributes =
     { universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , name = Nothing
     , type_ = "color"
     , value = Nothing
@@ -625,7 +588,7 @@ defaultInputCheckboxAttributes =
     , value = Nothing
     , checked = False
     , universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , onCheckEvent = Nothing
     , onEvent = Nothing
@@ -653,7 +616,7 @@ defaultInputFileAttributes =
     { name = Nothing
     , type_ = "file"
     , universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
@@ -678,7 +641,7 @@ defaultInputPasswordAttributes =
     , type_ = "password"
     , value = Nothing
     , universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , onInputEvent = Nothing
     , fromStringInput = identity
@@ -707,7 +670,7 @@ defaultInputRadioAttributes =
     , type_ = "radio"
     , value = Nothing
     , universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
@@ -731,7 +694,7 @@ type alias InputRangeAttributes msg =
 defaultInputRangeAttributes : InputRangeAttributes msg
 defaultInputRangeAttributes =
     { universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , name = Nothing
     , type_ = "range"
     , value = Nothing
@@ -762,7 +725,7 @@ defaultInputSubmitAttributes : InputSubmitAttributes msg
 defaultInputSubmitAttributes =
     { type_ = "submit"
     , universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , disabled = False
     , onSubmitEvent = Nothing
@@ -795,7 +758,7 @@ defaultInputUrlAttributes =
     , value = Nothing
     , type_ = "url"
     , universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , onInputEvent = Nothing
     , fromStringInput = identity
@@ -828,7 +791,7 @@ defaultSelectAttributes =
     { value = Nothing
     , options = []
     , universal = defaultUniversalAttributes
-    , style = Nothing
+    , style = []
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing

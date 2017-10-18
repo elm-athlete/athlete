@@ -1,29 +1,9 @@
 module BodyBuilder.Setters exposing (..)
 
 
-setStyleIn : { a | style : Maybe b } -> b -> { a | style : Maybe b }
+setStyleIn : { a | style : b } -> b -> { a | style : b }
 setStyleIn record styleAttribute =
-    { record | style = Just styleAttribute }
-
-
-setStandard : b -> { a | standard : Maybe b } -> { a | standard : Maybe b }
-setStandard styleElegant record =
-    { record | standard = Just styleElegant }
-
-
-setStandardIn : { a | standard : Maybe b } -> b -> { a | standard : Maybe b }
-setStandardIn record styleElegant =
-    setStandard styleElegant record
-
-
-setFocus : b -> { a | focus : Maybe b } -> { a | focus : Maybe b }
-setFocus styleElegant record =
-    { record | focus = Just styleElegant }
-
-
-setHover : b -> { a | hover : Maybe b } -> { a | hover : Maybe b }
-setHover styleElegant record =
-    { record | hover = Just styleElegant }
+    { record | style = styleAttribute }
 
 
 setClick : b -> { a | click : Maybe b } -> { a | click : Maybe b }

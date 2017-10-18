@@ -109,5 +109,4 @@ toStyle : Display.DisplayBox -> Html.Attribute msg
 toStyle =
     Elegant.style
         >> Elegant.toInlineStyles
-        >> Debug.log "after compiling"
         >> Html.Attributes.style

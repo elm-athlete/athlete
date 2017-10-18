@@ -94,8 +94,7 @@ fetchStylesOrCompute : Style -> List String
 fetchStylesOrCompute style =
     let
         styleHash =
-            style
-                |> toString
+            style |> toString
     in
         case Native.Elegant.fetchStyles styleHash of
             Nothing ->

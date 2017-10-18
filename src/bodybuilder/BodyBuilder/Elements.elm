@@ -14,22 +14,23 @@ import Layout
 import Position
 
 
-stickyView
-    : List (Layout.Layout -> Layout.Layout)
+stickyView :
+    List (Layout.Layout -> Layout.Layout)
     -> String
     -> List (Node msg)
     -> Node msg
 stickyView sectionStyle sectionName elements =
     div []
         [ div
-            [ BodyBuilder.Attributes.style <|
-                Elegant.style <|
+            [ BodyBuilder.Attributes.style
+                [ Elegant.style <|
                     Display.block
                         [ Display.dimensions [ Display.width (percent 100) ] ]
                         [ Layout.position <|
                             Position.sticky [ Position.top (px 0) ]
                         , sectionStyle |> Function.compose
                         ]
+                ]
             ]
             [ text sectionName ]
         , div [] elements

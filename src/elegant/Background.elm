@@ -277,7 +277,7 @@ Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
 backgroundToCouples : Background -> List ( String, String )
 backgroundToCouples background =
-    [ unwrapToCouple .color colorToCouple background
+    [ unwrapToCouple .color backgroundColorToCouple background
     , backgroundImagesToCouple background.images
     ]
         |> List.concat
@@ -287,12 +287,17 @@ backgroundToCouples background =
 -- Internals
 
 
+backgroundColorToCouple : Color -> ( String, String )
+backgroundColorToCouple color =
+    ( "background-color", Color.Convert.colorToCssRgb color )
+
+
 backgroundImagesToCouple : List BackgroundImage -> List ( String, String )
 backgroundImagesToCouple backgroundImages =
     [ extractMaybeValue .image imageToString "background-image"
     , extractMaybeValue .position positionToString "background-position"
     ]
-        |> List.map (callOn backgroundImages)
+        |> List.concatMap (callOn backgroundImages)
 
 
 extractMaybeValue :
@@ -300,13 +305,21 @@ extractMaybeValue :
     -> (value -> String)
     -> String
     -> List BackgroundImage
-    -> ( String, String )
+    -> List ( String, String )
 extractMaybeValue getter valueToString property =
     List.map getter
         >> List.map (Maybe.map valueToString)
         >> Maybe.Extra.values
         >> String.join ", "
-        >> (,) property
+        >> tupleIfNotEmpty property
+
+
+tupleIfNotEmpty : String -> String -> List ( String, String )
+tupleIfNotEmpty property value =
+    if String.isEmpty value then
+        []
+    else
+        [ ( property, value ) ]
 
 
 positionToString : Vector SizeUnit -> String

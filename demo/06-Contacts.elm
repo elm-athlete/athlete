@@ -100,31 +100,32 @@ titleView : Contact -> Node Msg
 titleView contact =
     BodyBuilder.button
         [ BodyBuilder.Events.onClick <| HistoryMsgWrapper <| ContactShow contact.id
-        , BodyBuilder.Attributes.style <|
-            Elegant.style <|
-                Display.block
-                    [ Display.alignment Display.right
-                    , fullWidth
+        , BodyBuilder.Attributes.style
+            [ Display.block
+                [ Display.alignment Display.right
+                , fullWidth
+                ]
+                [ Layout.cursor Cursor.pointer
+                , Layout.border
+                    [ Border.all [ Border.none ]
+                    , Border.bottom [ Border.solid, Elegant.color gray ]
                     ]
-                    [ Layout.cursor Cursor.pointer
-                    , Layout.border
-                        [ Border.all [ Border.none ]
-                        , Border.bottom [ Border.solid, Elegant.color gray ]
+                , Layout.outline [ Outline.none ]
+                , Layout.typography
+                    [ Typography.character
+                        [ Character.fontFamilyInherit
+                        , Character.size Constants.zeta
                         ]
-                    , Layout.outline [ Outline.none ]
-                    , Layout.typography
-                        [ Typography.character
-                            [ Character.fontFamilyInherit
-                            , Character.size Constants.zeta
-                            ]
-                        ]
-                    , Layout.padding [ Padding.all Constants.large ]
-                    , Layout.background [ Elegant.color Color.white ]
                     ]
-        , BodyBuilder.Attributes.focusStyle <|
-            Elegant.style <|
-                Display.block []
-                    [ Layout.background [ Elegant.color <| Color.grayscale 0.05 ] ]
+                , Layout.padding [ Padding.all Constants.large ]
+                , Layout.background [ Elegant.color Color.white ]
+                ]
+                |> Elegant.style
+            , [ Layout.background [ Elegant.color <| Color.grayscale 0.05 ] ]
+                |> Display.block []
+                |> Elegant.style
+                |> Elegant.setSuffix "hover"
+            ]
         ]
         [ text contact.name ]
 
@@ -141,8 +142,8 @@ navItemGroup : Float -> Display.Align -> String -> Node Msg
 navItemGroup width alignment content =
     div
         [ BodyBuilder.Events.onClick <| StandardHistoryWrapper Back
-        , BodyBuilder.Attributes.style <|
-            Elegant.style <|
+        , BodyBuilder.Attributes.style
+            [ Elegant.style <|
                 Display.flexChild
                     [ Display.basis (percent width), Display.alignSelf alignment ]
                     [ Display.overflow [ Overflow.overflowXY Overflow.hidden ]
@@ -154,6 +155,7 @@ navItemGroup width alignment content =
                         , Typography.whiteSpaceNoWrap
                         ]
                     ]
+            ]
         ]
         [ text content ]
 
@@ -161,8 +163,8 @@ navItemGroup width alignment content =
 header : Node Msg
 header =
     div
-        [ BodyBuilder.Attributes.style <|
-            Elegant.style <|
+        [ BodyBuilder.Attributes.style
+            [ Elegant.style <|
                 Display.flexChildContainer
                     [ Display.direction Display.row ]
                     [ Display.basis (px 200) ]
@@ -170,6 +172,7 @@ header =
                     [ Layout.position <| Position.fixed []
                     , Layout.background [ Elegant.color <| Color.rgba 255 255 255 0.9 ]
                     ]
+            ]
         ]
         [ navItemGroup 30 Display.center "← BACK"
         , navItemGroup 40 Display.center "POKEMON"
@@ -183,21 +186,23 @@ showView :
     -> Node Msg
 showView bodyFun data =
     div
-        [ BodyBuilder.Attributes.style <|
-            Elegant.style <|
+        [ BodyBuilder.Attributes.style
+            [ Elegant.style <|
                 Display.blockFlexContainer
                     [ Display.direction Display.column ]
                     [ Display.dimensions [ Display.height (vh 100) ] ]
                     [ Layout.background [ Elegant.color Color.white ] ]
+            ]
         ]
         [ header
         , div
-            [ BodyBuilder.Attributes.style <|
-                Elegant.style <|
+            [ BodyBuilder.Attributes.style
+                [ Elegant.style <|
                     Display.flexChild
                         [ Display.shrink 1000000 ]
                         []
                         []
+                ]
 
             -- [ Elegant.overflowYScroll
             -- , Elegant.fullWidth
@@ -254,8 +259,8 @@ contactsView =
 contactsIndex : List Contact -> Node Msg
 contactsIndex contacts =
     div
-        [ BodyBuilder.Attributes.style <|
-            Elegant.style <|
+        [ BodyBuilder.Attributes.style
+            [ Elegant.style <|
                 Display.block
                     [ Display.dimensions
                         [ Display.height (vh 100), Display.width (percent 100) ]
@@ -263,6 +268,7 @@ contactsIndex contacts =
                     ]
                     [ Layout.background [ Elegant.color gray ]
                     ]
+            ]
         ]
         (contacts |> contactsView)
 
@@ -289,8 +295,8 @@ insidePageView page data transition =
 view : Model -> Node Msg
 view { history, data } =
     div
-        [ BodyBuilder.Attributes.style <|
-            Elegant.style <|
+        [ BodyBuilder.Attributes.style
+            [ Elegant.style <|
                 Display.block []
                     [ Layout.typography
                         [ Typography.character
@@ -299,6 +305,7 @@ view { history, data } =
                             ]
                         ]
                     ]
+            ]
         ]
         [ historyView insidePageView history data ]
 

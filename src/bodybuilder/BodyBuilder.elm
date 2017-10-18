@@ -3,12 +3,12 @@ module BodyBuilder exposing (..)
 import Html exposing (Html)
 import Html.Attributes
 import Elegant
-import Maybe.Extra
 import BodyBuilder.Attributes exposing (..)
 import Function
 import Helpers.Shared exposing (..)
 import Native.BodyBuilder
 import Native.Elegant
+import List.Extra
 
 
 type alias Node msg =
@@ -378,8 +378,7 @@ toVirtualDomClassName : Elegant.Style -> Html.Attribute msg
 toVirtualDomClassName style =
     let
         styleHash =
-            style
-                |> toString
+            style |> toString
     in
         Html.Attributes.class <|
             case Native.BodyBuilder.fetchClassesNames styleHash of
@@ -406,22 +405,14 @@ visibleNode :
 visibleNode defaultAttributes attributesToVirtualDomAttributes tag attributesModifiers content =
     let
         computedAttributes =
-            Function.compose attributesModifiers <| defaultAttributes
-
-        styledDomWithStyle style =
-            (Html.node tag
-                (List.map toVirtualDomClassName style ++ (attributesToVirtualDomAttributes computedAttributes))
-                (content)
-            )
+            Function.compose attributesModifiers <|
+                defaultAttributes
     in
-        styledDomWithStyle <|
-            case computedAttributes.style of
-                Nothing ->
-                    []
-
-                Just { standard, focus, hover } ->
-                    [ standard, focus, hover ]
-                        |> Maybe.Extra.values
+        Html.node tag
+            (List.map toVirtualDomClassName computedAttributes.style
+                ++ (attributesToVirtualDomAttributes computedAttributes)
+            )
+            content
 
 
 hiddenNode : a -> (a -> List (Html.Attribute msg)) -> String -> List (a -> a) -> Node msg
@@ -451,5 +442,6 @@ computeStyles : () -> Html msg
 computeStyles _ =
     Native.Elegant.getAllStyles ()
         |> List.concat
+        |> List.Extra.unique
         |> String.join "\n"
         |> Html.text

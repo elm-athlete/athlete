@@ -341,13 +341,13 @@ overflowHiddenContainer :
     -> Node msg
 overflowHiddenContainer attributes content =
     div
-        [ style <|
+        [ style [
             Elegant.style <|
                 Display.block
                     [ Display.overflow
                         [ Display.Overflow.overflowXY Display.Overflow.hidden ]
                     ]
-                    []
+                    []]
         ]
         [ div attributes content ]
 
@@ -360,14 +360,14 @@ pageView :
     -> Node msg
 pageView insidePageView_ transition data page =
     div
-        [ style <|
+        [ style [
             Elegant.style <|
                 Display.block
                     [ Display.dimensions [ Display.width (percent 100) ] ]
                     [ Layout.boxShadow
                         [-- BoxShadow.
                         ]
-                    ]
+                    ]]
 
         -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
         ]
@@ -397,16 +397,16 @@ historyView insidePageView_ history data =
                         overflowHiddenContainer
                             []
                             [ div
-                                [ style <|
+                                [ style [
                                     Elegant.style <|
                                         Display.block
                                             [ Display.dimensions [ Display.width (percent 100) ] ]
-                                            []
+                                            []]
                                 ]
                                 (List.map (pageView insidePageView_ history.transition data) (history |> beforeTransition))
                             , div
-                                [ style <|
-                                    Elegant.style <|
+                                [ style
+                                    [Elegant.style <|
                                         Display.block
                                             [ Display.dimensions [ Display.width (percent 100) ] ]
                                             [ Layout.position <|
@@ -414,15 +414,15 @@ historyView insidePageView_ history data =
                                                     [ Position.bottom <|
                                                         percentage ((getMaybeTransitionValue <| history.transition) - 1)
                                                     ]
-                                            ]
+                                            ]]
                                 ]
                                 (List.map (pageView insidePageView_ history.transition data) (history |> afterTransition))
                             ]
 
                     SlideRight ->
                         overflowHiddenContainer
-                            [ style <|
-                                Elegant.style <|
+                            [ style
+                                [Elegant.style <|
                                     Display.blockFlexContainer []
                                         [ Display.dimensions [ Display.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
                                         [ Layout.position <|
@@ -432,7 +432,7 @@ historyView insidePageView_ history data =
                                                         getMaybeTransitionValue <|
                                                             history.transition
                                                 ]
-                                        ]
+                                        ]]
                             ]
                             (List.map (pageView insidePageView_ history.transition data) visiblePages_)
 
@@ -532,23 +532,25 @@ headerElement :
     -> Node msg
 headerElement { left, center, right } =
     div
-        [ style <|
-            Elegant.style <|
+        [ style
+            [ Elegant.style <|
                 Display.block
                     [ Display.dimensions [ Display.width <| percent 100 ] ]
                     [ Layout.position <| Position.sticky [] ]
+            ]
         ]
         [ div
-            [ style <|
-                Elegant.style <|
+            [ style
+                [ Elegant.style <|
                     Display.blockFlexContainer
                         [ Display.direction Display.row ]
                         [ Display.dimensions [ Display.width (percent 100) ] ]
                         []
+                ]
             ]
-            [ div [ style <| Elegant.style <| headerButtonStyleLeft ] [ left ]
-            , div [ style <| Elegant.style <| headerButtonStyleCenter ] [ center ]
-            , div [ style <| Elegant.style <| headerButtonStyleRight ] [ right ]
+            [ div [ style  [ Elegant.style <| headerButtonStyleLeft ] ] [ left ]
+            , div [ style  [ Elegant.style <| headerButtonStyleCenter ] ] [ center ]
+            , div [ style  [ Elegant.style <| headerButtonStyleRight ] ] [ right ]
             ]
         ]
 
