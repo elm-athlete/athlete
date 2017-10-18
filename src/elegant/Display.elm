@@ -32,6 +32,7 @@ module Display
         , dimensions
         , width
         , height
+        , fullWidth
         , FlexDirection
         , direction
         , column
@@ -124,6 +125,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs dimensions
 @docs width
 @docs height
+@docs fullWidth
 
 
 ## FlexDirection
@@ -512,6 +514,13 @@ width value ( x, y ) =
 height : SizeUnit -> Modifier Dimensions
 height value ( x, y ) =
     ( x, y |> setDimension (Just value) )
+
+
+{-| put a fullWidth dimensions
+-}
+fullWidth : Modifier BlockDetails
+fullWidth =
+    dimensions [ width (Percent 100) ]
 
 
 {-| Contains all style which can be applied on a flex container.

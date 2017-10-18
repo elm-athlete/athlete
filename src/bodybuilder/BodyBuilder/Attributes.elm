@@ -18,6 +18,10 @@ type alias ValueAttribute b a =
     { a | value : Maybe b }
 
 
+value val attrs =
+    { attrs | value = Just val }
+
+
 {-| -}
 type alias StringValue a =
     ValueAttribute String a
@@ -225,8 +229,8 @@ type alias HrefAttribute a =
     { a | href : Maybe String }
 
 
-defaultAattributes : AAttributes msg
-defaultAattributes =
+defaultAAttributes : AAttributes msg
+defaultAAttributes =
     { href = Nothing
     , target = Nothing
     , style = Nothing

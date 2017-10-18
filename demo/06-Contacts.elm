@@ -91,11 +91,6 @@ gray =
     Color.grayscale 0.1
 
 
-fullWidth : Display.BlockDetails -> Display.BlockDetails
-fullWidth =
-    Display.dimensions [ Display.width (percent 100) ]
-
-
 titleView : Contact -> Node Msg
 titleView contact =
     BodyBuilder.button
@@ -103,8 +98,8 @@ titleView contact =
         , BodyBuilder.Attributes.style <|
             Elegant.style <|
                 Display.block
-                    [ Display.alignment Display.right
-                    , fullWidth
+                    [ Display.alignment Display.left
+                    , Display.fullWidth
                     ]
                     [ Layout.cursor Cursor.pointer
                     , Layout.border
@@ -251,6 +246,12 @@ contactsView =
     filterByInitial >> List.map initialView
 
 
+{-| returns a background with a color
+-}
+backgroundColor color =
+    background [ Elegant.color color ]
+
+
 contactsIndex : List Contact -> Node Msg
 contactsIndex contacts =
     div
@@ -261,7 +262,7 @@ contactsIndex contacts =
                         [ Display.height (vh 100), Display.width (percent 100) ]
                     , Display.overflow [ Overflow.overflowY Overflow.scroll ]
                     ]
-                    [ Layout.background [ Elegant.color gray ]
+                    [ backgroundColor gray
                     ]
         ]
         (contacts |> contactsView)

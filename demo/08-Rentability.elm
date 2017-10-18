@@ -1,33 +1,39 @@
 module Rentability exposing (..)
 
 import BodyBuilder exposing (..)
-import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
-import Elegant.Elements exposing (borderBottom)
+import BodyBuilder.Attributes
+import BodyBuilder.Events
+import Elegant exposing (SizeUnit, px, pt, percent, vh)
 import Color
-import Date
-import Date exposing (Month(..))
-import Time exposing (Time)
-import Date.Extra as Date
 import Router
     exposing
         ( History
-        , StandardHistoryMsg
-        , slideUp
+        , StandardHistoryMsg(Back)
+        , handleStandardHistory
+        , push
         , pageWithDefaultTransition
-        , pageWithTransition
-        , pageWithoutTransition
-        , headerElement
-        , headerButton
         , Page
         , Transition
         , historyView
-        , handleStandardHistory
         , maybeTransitionSubscription
         , initHistoryAndData
         )
 import Finders exposing (..)
-import Function exposing (compose)
+import Display
+import Layout
+import Cursor
+import Border
+import Outline
+import Typography
+import Typography.Character as Character
+import Constants
+import Padding
+import Display.Overflow as Overflow
+import Time exposing (Time)
 import Task
+import Date
+import Date exposing (Month(..))
+import Date.Extra as Date
 
 
 type alias Persisted a =
@@ -117,36 +123,49 @@ gray =
     Color.grayscale 0.9
 
 
-standardCellStyle :
-    { a | style : StyleAttribute }
-    -> { a | style : StyleAttribute }
 standardCellStyle =
-    [ style
-        [ Elegant.cursorPointer
-        , Elegant.textLeft
-        , Elegant.fontFamilyInherit
-        , Elegant.fontSize Elegant.zeta
-        , Elegant.borderNone
-        , borderBottom gray
-        , Elegant.padding Elegant.large
-        , Elegant.outlineNone
-        , Elegant.backgroundColor Color.white
-        , Elegant.fullWidth
-        ]
-    , focusStyle [ Elegant.backgroundColor <| Color.grayscale 0.05 ]
+    [ BodyBuilder.Attributes.style <|
+        Elegant.style <|
+            Display.block
+                [ Display.alignment Display.left
+                , Display.fullWidth
+                ]
+                [ Layout.cursor Cursor.pointer
+                , Layout.border
+                    [ Border.all [ Border.none ]
+                    , Border.bottom [ Border.solid, Elegant.color gray ]
+                    ]
+                , Layout.outline [ Outline.none ]
+                , Layout.typography
+                    [ Typography.character
+                        [ Character.fontFamilyInherit
+                        , Character.size Constants.zeta
+                        ]
+                    ]
+                , Layout.padding [ Padding.all Constants.large ]
+                , Layout.background [ Elegant.color Color.white ]
+                ]
+    , BodyBuilder.Attributes.focusStyle <|
+        Elegant.style <|
+            Display.block []
+                [ Layout.background [ Elegant.color <| Color.grayscale 0.05 ] ]
     ]
-        |> compose
 
 
 titleView : Appartment -> Node Msg
 titleView appartment =
     button
-        [ onClick <|
+        [ BodyBuilder.Events.onClick <|
             HistoryMsgWrapper <|
                 AppartmentShowMsg appartment.id
         , standardCellStyle
         ]
         [ text appartment.attributes.title ]
+
+
+style =
+    BodyBuilder.Attributes.style <|
+        Elegant.style
 
 
 titleViewWithDelete :
@@ -156,9 +175,11 @@ titleViewWithDelete appartment =
     button
         [ standardCellStyle
         ]
-        [ div [ style [ Elegant.displayFlex ] ]
-            [ div [ onClick <| DestroyAppartment appartment.id ] [ text "⛔" ]
-            , div [ style [ Elegant.paddingLeft Elegant.medium ] ] [ text appartment.attributes.title ]
+        [ div
+            [ style <| Display.blockFlexContainer [] [] []
+            ]
+            [ div [ BodyBuilder.Events.onClick <| DestroyAppartment appartment.id ] [ text "⛔" ]
+            , div [ style (Display.block [ Layout.padding [ Padding.left Constants.medium ] ]) ] [ text appartment.attributes.title ]
             ]
         ]
 
@@ -246,9 +267,8 @@ minSalary model =
     (model |> monthlyBankDebt) * 3
 
 
-pad : { a | style : StyleAttribute } -> { a | style : StyleAttribute }
 pad =
-    style [ padding Elegant.medium ]
+    style [ Display.block [] [ Padding.all Constants.medium ] ]
 
 
 result : String -> a -> Node msg
@@ -286,22 +306,22 @@ appartmentEditBodyView ({ attributes } as appartment) =
                     )
                 ]
             , inputNumber
-                [ value (attributes.monthlyRent)
-                , onInput (UpdateAppartment appartment.id << UpdateMonthlyRent)
+                [ BodyBuilder.Attributes.value (attributes.monthlyRent)
+                , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateMonthlyRent)
                 ]
             ]
         , div [ pad ]
             [ div [] [ text "Nombre de locataires" ]
             , inputNumber
-                [ value (attributes.collocs)
-                , onInput (UpdateAppartment appartment.id << UpdateCollocs)
+                [ BodyBuilder.Attributes.value (attributes.collocs)
+                , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateCollocs)
                 ]
             ]
         , div [ pad ]
             [ div [] [ text "Travaux" ]
             , inputNumber
-                [ value (attributes.works)
-                , onInput (UpdateAppartment appartment.id << UpdateWorks)
+                [ BodyBuilder.Attributes.value (attributes.works)
+                , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateWorks)
                 ]
             ]
         , result "Loyer mensuel total : " (totalMonthlyRent attributes)
@@ -330,22 +350,28 @@ mainElement : Node msg -> Node msg
 mainElement html =
     div
         [ style
-            [ Elegant.overflowYScroll
-            , Elegant.fullWidth
+            [ Display.overflow [ Overflow.overflowY Overflow.scroll ]
+            , Display.fullWidth
             ]
         ]
         [ html
         ]
 
 
+{-| returns a background with a color
+-}
+backgroundColor color =
+    Layout.background [ Elegant.color color ]
+
+
 pageWithHeader : Node msg -> Node msg -> Node msg
 pageWithHeader header page =
     div
         [ style
-            [ Elegant.backgroundColor Color.white
-            , Elegant.height (Vh 100)
-            , Elegant.displayFlex
-            , Elegant.flexDirectionColumn
+            [ Display.blockFlexContainer
+                [ Display.column ]
+                [ Display.height (Elegant.vh 100) ]
+                [ backgroundColor Color.white ]
             ]
         ]
         [ header
@@ -379,7 +405,7 @@ textToHtml =
 
 appartmentBodyView : Appartment -> Node msg
 appartmentBodyView appartment =
-    div [ style [ Elegant.paddingHorizontal Elegant.medium ] ]
+    div [ style [ Layout.padding [ Padding.horizontal Constants.medium ] ] ]
         ([ div [] (textToHtml appartment.attributes.details)
          ]
         )
@@ -394,7 +420,7 @@ appartmentsIndex appartments =
             , right = Router.headerButton (HistoryMsgWrapper AppartmentNewMsg) "new"
             }
         )
-        (div [ style [ Elegant.backgroundColor gray ] ]
+        (div [ style [ backgroundColor gray ] ]
             (appartments |> List.map titleView)
         )
 
@@ -408,7 +434,7 @@ appartmentsIndexEdit appartments =
             , right = text ""
             }
         )
-        (div [ style [ Elegant.backgroundColor gray ] ]
+        (div [ style [ backgroundColor gray ] ]
             (appartments |> List.map titleViewWithDelete)
         )
 
@@ -437,7 +463,7 @@ appartmentsNew draftAppartment =
         )
         (div
             []
-            [ inputText [ value draftAppartment.title, onInput (UpdateAppartmentAttributes << UpdateTitle) ]
+            [ inputText [ BodyBuilder.Attributes.value draftAppartment.title, BodyBuilder.Events.onInput (UpdateAppartmentAttributes << UpdateTitle) ]
             ]
         )
 
@@ -467,7 +493,14 @@ insidePageView page data transition =
 
 view : Model -> Node Msg
 view { history, data } =
-    div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
+    div
+        [ style
+            [ Typography.character
+                [ Character.fontFamilySansSerif
+                , Character.size Constants.zeta
+                ]
+            ]
+        ]
         [ Router.historyView insidePageView history data ]
 
 
