@@ -67,7 +67,7 @@ button =
 a : Modifiers (AAttributes msg) -> List (Node msg) -> Node msg
 a =
     visibleNode
-        BodyBuilder.Attributes.defaultAattributes
+        BodyBuilder.Attributes.defaultAAttributes
         BodyBuilder.Attributes.aAttributesToHtmlAttributes
         "a"
 

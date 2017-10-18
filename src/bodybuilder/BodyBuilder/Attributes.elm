@@ -188,8 +188,8 @@ type alias HrefAttribute a =
     { a | href : Maybe String }
 
 
-defaultAattributes : AAttributes msg
-defaultAattributes =
+defaultAAttributes : AAttributes msg
+defaultAAttributes =
     { href = Nothing
     , target = Nothing
     , style = []
