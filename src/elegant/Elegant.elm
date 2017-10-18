@@ -15,6 +15,14 @@ type Style
     = Style CommonStyle.Style
 
 
+type alias Modifiers a =
+    Helpers.Shared.Modifiers a
+
+
+type alias Modifier a =
+    Helpers.Shared.Modifier a
+
+
 {-| -}
 style : DisplayBox -> Style
 style display =

@@ -911,7 +911,7 @@ alignItemsToCouple =
 
 alignSelfToCouple : Align -> ( String, String )
 alignSelfToCouple =
-    (,) "align-sefl" << alignToString
+    (,) "align-self" << alignToString
 
 
 alignToString : Align -> String
