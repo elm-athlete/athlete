@@ -49,9 +49,48 @@ type alias VisibleAttributes a =
     }
 
 
+setUniversal :
+    UniversalAttributes b
+    -> { a | universal : UniversalAttributes b }
+    -> { a | universal : UniversalAttributes b }
+setUniversal val attrs =
+    { attrs | universal = val }
+
+
+setUniversalIn :
+    { a | universal : UniversalAttributes b }
+    -> UniversalAttributes b
+    -> { a | universal : UniversalAttributes b }
+setUniversalIn =
+    flip setUniversal
+
+
+setValueInUniversal :
+    (a -> UniversalAttributes b -> UniversalAttributes b)
+    -> a
+    -> { c | universal : UniversalAttributes b }
+    -> { c | universal : UniversalAttributes b }
+setValueInUniversal setter val ({ universal } as attrs) =
+    universal
+        |> setter val
+        |> setUniversalIn attrs
+
+
+{-| -}
+style : List Elegant.Style -> Modifier (VisibleAttributes a)
+style val ({ style } as attrs) =
+    (val ++ style)
+        |> setStyleIn attrs
+
+
 {-| -}
 type alias TitleAttribute a =
     { a | title : Maybe String }
+
+
+title : String -> Modifier { a | universal : UniversalAttributes b }
+title =
+    setValueInUniversal setTitle
 
 
 {-| -}
@@ -59,9 +98,19 @@ type alias IdAttribute a =
     { a | id : Maybe String }
 
 
+id : String -> Modifier { a | universal : UniversalAttributes b }
+id =
+    setValueInUniversal setId
+
+
 {-| -}
 type alias ClassAttribute a =
     { a | class : List String }
+
+
+class : List String -> Modifier { a | universal : UniversalAttributes b }
+class =
+    setValueInUniversal setClass
 
 
 {-| -}
@@ -69,8 +118,33 @@ type alias TabindexAttribute a =
     { a | tabindex : Maybe Int }
 
 
+tabindex : Int -> Modifier { a | universal : UniversalAttributes b }
+tabindex =
+    setValueInUniversal setTabIndex
+
+
 type alias UniversalAttributes a =
     TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute a)))
+
+
+setTitle : String -> { a | title : Maybe String } -> { a | title : Maybe String }
+setTitle val attrs =
+    { attrs | title = Just val }
+
+
+setTabIndex : Int -> { a | tabindex : Maybe Int } -> { a | tabindex : Maybe Int }
+setTabIndex val attrs =
+    { attrs | tabindex = Just val }
+
+
+setId : String -> { a | id : Maybe String } -> { a | id : Maybe String }
+setId val attrs =
+    { attrs | id = Just val }
+
+
+setClass : List String -> { a | class : List String } -> { a | class : List String }
+setClass val attrs =
+    { attrs | class = val }
 
 
 defaultUniversalAttributes : UniversalAttributes {}
@@ -90,16 +164,6 @@ universalAttributesToHtmlAttributes universal =
     , .title >> unwrapMaybeAttribute Html.Attributes.title
     ]
         |> List.concatMap (callOn universal)
-
-
-{-| -}
-style :
-    List Elegant.Style
-    -> { a | style : List Elegant.Style }
-    -> { a | style : List Elegant.Style }
-style val ({ style } as attrs) =
-    (val ++ style)
-        |> setStyleIn attrs
 
 
 {-| -}
@@ -137,6 +201,11 @@ flowAttributesToHtmlAttributes =
 {-| -}
 type alias DisabledAttribute a =
     { a | disabled : Bool }
+
+
+disabled : Modifier (DisabledAttribute a)
+disabled attrs =
+    { attrs | disabled = False }
 
 
 disabledAttributeToHtmlAttributes : Bool -> List (Html.Attribute msg)
@@ -183,9 +252,19 @@ type alias TargetAttribute a =
     { a | target : Maybe String }
 
 
+target : String -> Modifier (TargetAttribute a)
+target val attrs =
+    { attrs | target = Just val }
+
+
 {-| -}
 type alias HrefAttribute a =
     { a | href : Maybe String }
+
+
+href : String -> Modifier (HrefAttribute a)
+href val attrs =
+    { attrs | href = Just val }
 
 
 defaultAAttributes : AAttributes msg
@@ -218,6 +297,11 @@ type alias TextareaAttributes msg =
 {-| -}
 type alias NameAttribute a =
     { a | name : Maybe String }
+
+
+name : String -> Modifier (NameAttribute a)
+name val attrs =
+    { attrs | name = Just val }
 
 
 defaultTextareaAttributes : TextareaAttributes msg
@@ -255,9 +339,19 @@ type alias WidthAttribute a =
     { a | width : Maybe Int }
 
 
+width : Int -> Modifier (WidthAttribute a)
+width val attrs =
+    { attrs | width = Just val }
+
+
 {-| -}
 type alias HeightAttribute a =
     { a | height : Maybe Int }
+
+
+height : Int -> Modifier (HeightAttribute a)
+height val attrs =
+    { attrs | height = Just val }
 
 
 {-| -}
@@ -351,6 +445,11 @@ type alias DataAttribute a =
     { a | data : List ( String, String ) }
 
 
+data : List ( String, String ) -> Modifier (DataAttribute a)
+data val attrs =
+    { attrs | data = val }
+
+
 defaultScriptAttributes : ScriptAttributes msg
 defaultScriptAttributes =
     { universal = defaultUniversalAttributes
@@ -366,6 +465,7 @@ defaultScriptAttributes =
 
 scriptAttributesToHtmlAttributes : ScriptAttributes msg -> List (Html.Attribute msg)
 scriptAttributesToHtmlAttributes attributes =
+    -- TODO data handler
     Html.Attributes.src attributes.src :: visibleAttributesToHtmlAttributes attributes
 
 
@@ -451,9 +551,19 @@ type alias AutocompleteAttribute a =
     { a | autocomplete : Bool }
 
 
+autocomplete : Bool -> Modifier (AutocompleteAttribute a)
+autocomplete val attrs =
+    { attrs | autocomplete = val }
+
+
 {-| -}
 type alias PlaceholderAttribute a =
     { a | placeholder : Maybe String }
+
+
+placeholder : String -> Modifier (PlaceholderAttribute a)
+placeholder val attrs =
+    { attrs | placeholder = Just val }
 
 
 {-| -}
@@ -506,14 +616,29 @@ type alias StepAttribute a =
     { a | step : Maybe Int }
 
 
+step : Int -> Modifier (StepAttribute a)
+step val attrs =
+    { attrs | step = Just val }
+
+
 {-| -}
 type alias MaxAttribute a =
     { a | max : Maybe Int }
 
 
+max : Int -> Modifier (MaxAttribute a)
+max val attrs =
+    { attrs | max = Just val }
+
+
 {-| -}
 type alias MinAttribute a =
     { a | min : Maybe Int }
+
+
+min : Int -> Modifier (MinAttribute a)
+min val attrs =
+    { attrs | min = Just val }
 
 
 defaultInputNumberAttributes : InputNumberAttributes msg
@@ -579,6 +704,11 @@ inputColorAttributesToHtmlAttributes attributes =
 {-| -}
 type alias InputCheckboxAttributes msg =
     OnCheckEvent msg (InputStringValueAttributes msg { checked : Bool })
+
+
+checked : Bool -> Modifier (InputCheckboxAttributes msg)
+checked val attrs =
+    { attrs | checked = val }
 
 
 defaultInputCheckboxAttributes : InputCheckboxAttributes msg
