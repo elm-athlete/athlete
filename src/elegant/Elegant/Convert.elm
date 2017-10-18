@@ -99,17 +99,17 @@ fetchStylesOrCompute style =
         case Native.Elegant.fetchStyles styleHash of
             Nothing ->
                 let
-                    computedStyles =
+                    classesNames =
                         style
                             |> extractScreenWidths
                             |> List.concatMap compileConditionalStyle
                             |> List.map computeAtomicClass
                             |> Native.Elegant.addStyles styleHash
                 in
-                    computedStyles
+                    classesNames
 
-            Just computedStyles ->
-                computedStyles
+            Just classesNames ->
+                classesNames
 
 
 type alias ConditionalStyle =
@@ -182,12 +182,23 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
     in
         case Native.Elegant.fetchAtomicClass classHash of
             Nothing ->
-                computeStyleToCss className mediaQueryId selector property
-                    |> inMediaQuery mediaQuery
-                    |> Native.Elegant.addAtomicClass classHash
+                let
+                    classNameComplete =
+                        String.join ""
+                            [ "."
+                            , className
+                            , (mediaQueryId ? "")
+                            ]
+
+                    test =
+                        computeStyleToCss className mediaQueryId selector property
+                            |> inMediaQuery mediaQuery
+                            |> Native.Elegant.addAtomicClass classHash classNameComplete
+                in
+                    classNameComplete |> Debug.log "test"
 
             Just class ->
-                class
+                class |> Debug.log "fetched"
 
 
 inMediaQuery : Maybe String -> String -> String

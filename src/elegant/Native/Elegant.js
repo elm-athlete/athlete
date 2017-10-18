@@ -26,7 +26,7 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
   var css = document.createElement('style')
   css.setAttribute('id', 'elegant-style-sheet')
   document.getElementsByTagName("head")[0].appendChild(css);
-  css = css.sheet
+  // css = css.sheet
 
   // fetchStyle : String -> Maybe (List String)
   function fetchStyles(key) {
@@ -45,12 +45,16 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
   }
 
   // addAtomicClass : String -> String -> String
-  function addAtomicClass(key, atomicClassComputed) {
+  function addAtomicClass(key, className, atomicClassComputed) {
+    console.log(key);
+    console.log(className);
+    console.log(atomicClassComputed);
     if (!insertedClasses.has(atomicClassComputed)) {
       insertedClasses.add(atomicClassComputed)
-      css.insertRule(atomicClassComputed)
+      // css.insertRule(atomicClassComputed)
+      css.appendChild(document.createTextNode(atomicClassComputed))
     }
-    return setValAndReturnValue(atomicClassCache, key, atomicClassComputed)
+    return setValAndReturnValue(atomicClassCache, key, className)
   }
 
   // getAllStyles : List (List String)
@@ -66,7 +70,7 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
     fetchStyles: fetchStyles,
     addStyles: F2(addStyles),
     fetchAtomicClass: fetchAtomicClass,
-    addAtomicClass: F2(addAtomicClass),
+    addAtomicClass: F3(addAtomicClass),
     getAllStyles: getAllStyles
   }
 })()

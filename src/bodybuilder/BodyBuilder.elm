@@ -383,12 +383,8 @@ toVirtualDomClassName style =
         Html.Attributes.class <|
             case Native.BodyBuilder.fetchClassesNames styleHash of
                 Nothing ->
-                    let
-                        sideEffect =
-                            Elegant.styleToCss style
-                    in
                         style
-                            |> Elegant.classes
+                            |> Elegant.styleToCss
                             |> Native.BodyBuilder.addClassesNames styleHash
 
                 Just classesNames ->

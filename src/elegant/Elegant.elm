@@ -134,10 +134,11 @@ stylesToCss styles =
         |> Elegant.Convert.stylesToCss
 
 
-styleToCss : Style -> List String
+styleToCss : Style -> String
 styleToCss (Style style) =
     style
         |> Elegant.Convert.fetchStylesOrCompute
+        |> String.join " "
 
 
 toCommonStyle : Style -> CommonStyle.Style
