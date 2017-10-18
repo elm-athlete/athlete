@@ -306,7 +306,7 @@ visiblePages { transition, before, current, after } =
 
 percentage : Float -> SizeUnit
 percentage a =
-    percent <| 100 * a
+    percent <| toFloat <| round <| 100 * a -- Heavily reduces the number of generated classes...
 
 
 beforeTransition : History route -> List (Page route)

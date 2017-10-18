@@ -366,7 +366,7 @@ program { init, update, subscriptions, view } =
         { init = init
         , update = update
         , subscriptions = subscriptions
-        , view = toVirtualDom << view
+        , view = view
         }
 
 
@@ -428,14 +428,6 @@ flow =
     visibleNode
         BodyBuilder.Attributes.defaultFlowAttributes
         BodyBuilder.Attributes.flowAttributesToHtmlAttributes
-
-
-toVirtualDom : Node msg -> Html msg
-toVirtualDom dom =
-    Html.div []
-        [ Html.node "style" [] [ computeStyles () ]
-        , dom
-        ]
 
 
 computeStyles : () -> Html msg
