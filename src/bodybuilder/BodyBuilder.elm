@@ -378,7 +378,8 @@ toVirtualDomClassName : Elegant.Style -> Html.Attribute msg
 toVirtualDomClassName style =
     let
         styleHash =
-            toString style
+            style
+                |> toString
     in
         Html.Attributes.class <|
             case Native.BodyBuilder.fetchClassesNames styleHash of

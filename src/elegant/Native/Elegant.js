@@ -22,6 +22,27 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
     return styles
   }
 
+  var atomicClassCache = new Map()
+  function fetchAtomicClass(hash) {
+    const styles = atomicClassCache.get(hash)
+    if (styles !== undefined && styles !== null) {
+      return {
+        ctor: 'Just',
+        _0: styles
+      }
+    } else {
+      return {
+        ctor: 'Nothing'
+      }
+    }
+  }
+
+  // addStyle : String -> List (String) -> List (String)
+  function addAtomicClass(hash, atomicClassComputed) {
+    atomicClassCache.set(hash, atomicClassComputed)
+    return atomicClassComputed
+  }
+
   // getAllStyles : List (List String)
   function getAllStyles() {
     var styles = _elm_lang$core$Native_List.Nil
@@ -34,6 +55,8 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
   return {
     fetchStyles: fetchStyles,
     addStyles: F2(addStyles),
+    fetchAtomicClass: fetchAtomicClass,
+    addAtomicClass: F2(addAtomicClass),
     getAllStyles: getAllStyles
   }
 })()
