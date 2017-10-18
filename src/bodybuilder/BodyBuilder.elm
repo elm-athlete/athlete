@@ -376,19 +376,9 @@ program { init, update, subscriptions, view } =
 
 toVirtualDomClassName : Elegant.Style -> Html.Attribute msg
 toVirtualDomClassName style =
-    let
-        styleHash =
-            style |> toString
-    in
-        Html.Attributes.class <|
-            case Native.BodyBuilder.fetchClassesNames styleHash of
-                Nothing ->
-                        style
-                            |> Elegant.styleToCss
-                            |> Native.BodyBuilder.addClassesNames styleHash
-
-                Just classesNames ->
-                    classesNames
+    style
+        |> Elegant.styleToCss
+        |> Html.Attributes.class
 
 
 visibleNode :

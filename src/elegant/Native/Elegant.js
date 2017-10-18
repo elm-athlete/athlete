@@ -25,8 +25,9 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
   // Insert a stylesheet inside the head.
   var css = document.createElement('style')
   css.setAttribute('id', 'elegant-style-sheet')
+  // css.appendChild(document.createTextNode(""))
   document.getElementsByTagName("head")[0].appendChild(css);
-  // css = css.sheet
+  css = css.sheet
 
   // fetchStyle : String -> Maybe (List String)
   function fetchStyles(key) {
@@ -46,13 +47,9 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
 
   // addAtomicClass : String -> String -> String
   function addAtomicClass(key, className, atomicClassComputed) {
-    console.log(key);
-    console.log(className);
-    console.log(atomicClassComputed);
     if (!insertedClasses.has(atomicClassComputed)) {
       insertedClasses.add(atomicClassComputed)
-      // css.insertRule(atomicClassComputed)
-      css.appendChild(document.createTextNode(atomicClassComputed))
+      css.insertRule(atomicClassComputed)
     }
     return setValAndReturnValue(atomicClassCache, key, className)
   }
