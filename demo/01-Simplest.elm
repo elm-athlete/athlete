@@ -7,7 +7,11 @@ import Color
 
 view : a -> Node msg
 view model =
-    div [ style [ textColor Color.blue ], hoverStyle [ textColor Color.red ] ] [ text "I'm Elegantly styled by css, but my style is set inline" ]
+    div
+        [ style [ textColor Color.blue ]
+        , hoverStyle [ textColor Color.red ]
+        ]
+        [ text "I'm Elegantly styled by css, but my style is set inline" ]
 
 
 main : Program Basics.Never number msg
