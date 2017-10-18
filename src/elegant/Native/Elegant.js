@@ -1,46 +1,43 @@
+function fetch(cacheStore, key) {
+  const value = cacheStore.get(key)
+  if (value !== undefined && value !== null) {
+    return {
+      ctor: 'Just',
+      _0: value
+    }
+  } else {
+    return {
+      ctor: 'Nothing'
+    }
+  }
+}
+
+function setValAndReturnValue (cacheStore, key, value) {
+  cacheStore.set(key, value)
+  return value
+}
+
 var _elm_bodybuilder$elegant$Native_Elegant = (function() {
   var stylesCache = new Map()
+  var atomicClassCache = new Map()
 
   // fetchStyle : String -> Maybe (List String)
-  function fetchStyles(hash) {
-    const styles = stylesCache.get(hash)
-    if (styles !== undefined && styles !== null) {
-      return {
-        ctor: 'Just',
-        _0: styles
-      }
-    } else {
-      return {
-        ctor: 'Nothing'
-      }
-    }
+  function fetchStyles(key) {
+    return fetch(stylesCache, key)
   }
 
   // addStyle : String -> List (String) -> List (String)
-  function addStyles(hash, styles) {
-    stylesCache.set(hash, styles)
-    return styles
+  function addStyles(key, styles) {
+    return setValAndReturnValue(stylesCache, key, styles)
   }
 
-  var atomicClassCache = new Map()
-  function fetchAtomicClass(hash) {
-    const styles = atomicClassCache.get(hash)
-    if (styles !== undefined && styles !== null) {
-      return {
-        ctor: 'Just',
-        _0: styles
-      }
-    } else {
-      return {
-        ctor: 'Nothing'
-      }
-    }
+  function fetchAtomicClass(key) {
+    return fetch(atomicClassCache, key)
   }
 
   // addStyle : String -> List (String) -> List (String)
-  function addAtomicClass(hash, atomicClassComputed) {
-    atomicClassCache.set(hash, atomicClassComputed)
-    return atomicClassComputed
+  function addAtomicClass(key, atomicClassComputed) {
+    return setValAndReturnValue(atomicClassCache, key, atomicClassComputed)
   }
 
   // getAllStyles : List (List String)
