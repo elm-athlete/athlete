@@ -10,12 +10,12 @@ import Function
 -- import Color exposing (..)
 
 import Display
-import Layout
+import Box
 import Position
 
 
 stickyView :
-    List (Layout.Layout -> Layout.Layout)
+    List (Box.Box -> Box.Box)
     -> String
     -> List (Node msg)
     -> Node msg
@@ -26,7 +26,7 @@ stickyView sectionStyle sectionName elements =
                 [ Elegant.style <|
                     Display.block
                         [ Display.dimensions [ Display.width (percent 100) ] ]
-                        [ Layout.position <|
+                        [ Box.position <|
                             Position.sticky [ Position.top (px 0) ]
                         , sectionStyle |> Function.compose
                         ]

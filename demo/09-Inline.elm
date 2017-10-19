@@ -3,7 +3,7 @@ module Main exposing (..)
 import Html exposing (Html)
 import Html.Attributes
 import Elegant exposing (px)
-import Layout
+import Box
 import Typography
 import Typography.Character
 import BoxShadow
@@ -41,7 +41,7 @@ mainStyle =
         , Display.alignment Display.left
         , Display.listStyleCircle
         ]
-        [ Layout.typography
+        [ Box.typography
             [ Elegant.color Color.blue
             , Typography.character
                 [ Typography.Character.weight 900
@@ -49,13 +49,13 @@ mainStyle =
                 , Typography.Character.italic
                 ]
             ]
-        , Layout.padding
+        , Box.padding
             [ Padding.all (px 30) ]
-        , Layout.boxShadow
+        , Box.boxShadow
             [ BoxShadow.standard (px 30) Color.black ( px 3, px 3 )
             , BoxShadow.inset True
             ]
-        , Layout.border
+        , Box.border
             [ Border.all
                 [ Elegant.color Color.blue
                 , Border.solid
@@ -66,20 +66,20 @@ mainStyle =
             , Border.right
                 [ Elegant.color Color.lightOrange ]
             ]
-        , Layout.corner
+        , Box.corner
             [ Corner.circular Corner.all (px 200) ]
-        , Layout.margin
+        , Box.margin
             [ Margin.top <| Margin.width (px 40)
             , Margin.vertical <| Margin.width (px 30)
             , Margin.bottom Margin.auto
             ]
-        , Layout.visibility Layout.visible
-        , Layout.opacity 0.9
-        , Layout.zIndex 1000
-        , Layout.cursor Cursor.default
-        , Layout.outline
+        , Box.visibility Box.visible
+        , Box.opacity 0.9
+        , Box.zIndex 1000
+        , Box.cursor Cursor.default
+        , Box.outline
             [ Outline.none ]
-        , Layout.background
+        , Box.background
             [ Elegant.color Color.blue
             , Background.images
                 [ Background.image "https://hackage.haskell.org/package/elm-reactor-0.3.1/src/assets/favicon.ico"
@@ -96,8 +96,8 @@ mainStyle =
                     |> Background.gradient
                 ]
             ]
-        , Layout.position Position.static
-        , Layout.position <|
+        , Box.position Position.static
+        , Box.position <|
             Position.fixed
                 [ Position.top (px 30)
                 , Position.bottom (px 20)

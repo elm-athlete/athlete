@@ -30,7 +30,7 @@ import Finders exposing (..)
 import Dict exposing (Dict)
 import Dict.Extra as Dict
 import Display
-import Layout
+import Box
 import Cursor
 import Border
 import Outline
@@ -100,23 +100,23 @@ titleView contact =
                 [ Display.alignment Display.right
                 , Display.fullWidth
                 ]
-                [ Layout.cursor Cursor.pointer
-                , Layout.border
+                [ Box.cursor Cursor.pointer
+                , Box.border
                     [ Border.all [ Border.none ]
                     , Border.bottom [ Border.solid, Elegant.color gray ]
                     ]
-                , Layout.outline [ Outline.none ]
-                , Layout.typography
+                , Box.outline [ Outline.none ]
+                , Box.typography
                     [ Typography.character
                         [ Character.fontFamilyInherit
                         , Character.size Constants.zeta
                         ]
                     ]
-                , Layout.padding [ Padding.all Constants.large ]
-                , Layout.background [ Elegant.color Color.white ]
+                , Box.padding [ Padding.all Constants.large ]
+                , Box.background [ Elegant.color Color.white ]
                 ]
                 |> Elegant.style
-            , [ Layout.background [ Elegant.color <| Color.grayscale 0.05 ] ]
+            , [ Box.background [ Elegant.color <| Color.grayscale 0.05 ] ]
                 |> Display.block []
                 |> Elegant.style
                 |> Elegant.setSuffix "hover"
@@ -125,11 +125,11 @@ titleView contact =
         [ text contact.name ]
 
 
-commonButtonStyleLayout : List (Layout.Layout -> Layout.Layout)
-commonButtonStyleLayout =
-    [ Layout.padding [ Padding.all Constants.medium ]
-    , Layout.cursor Cursor.pointer
-    , Layout.typography [ Typography.character [ Character.size Constants.medium ] ]
+commonButtonStyleBox : List (Box.Box -> Box.Box)
+commonButtonStyleBox =
+    [ Box.padding [ Padding.all Constants.medium ]
+    , Box.cursor Cursor.pointer
+    , Box.typography [ Typography.character [ Character.size Constants.medium ] ]
     ]
 
 
@@ -144,8 +144,8 @@ navItemGroup width alignment content =
                     [ Display.overflow [ Overflow.overflowXY Overflow.hidden ]
                     , Display.textOverflowEllipsis
                     ]
-                    [ commonButtonStyleLayout |> Function.compose
-                    , Layout.typography
+                    [ commonButtonStyleBox |> Function.compose
+                    , Box.typography
                         [ Elegant.color Color.black
                         , Typography.whiteSpaceNoWrap
                         ]
@@ -164,8 +164,8 @@ header =
                     [ Display.direction Display.row ]
                     [ Display.basis (px 200) ]
                     []
-                    [ Layout.position <| Position.fixed []
-                    , Layout.background [ Elegant.color <| Color.rgba 255 255 255 0.9 ]
+                    [ Box.position <| Position.fixed []
+                    , Box.background [ Elegant.color <| Color.rgba 255 255 255 0.9 ]
                     ]
             ]
         ]
@@ -186,7 +186,7 @@ showView bodyFun data =
                 Display.blockFlexContainer
                     [ Display.direction Display.column ]
                     [ Display.dimensions [ Display.height (vh 100) ] ]
-                    [ Layout.background [ Elegant.color Color.white ] ]
+                    [ Box.background [ Elegant.color Color.white ] ]
             ]
         ]
         [ header
@@ -239,8 +239,8 @@ filterByInitial =
 initialView : ( Char, List Contact ) -> Node Msg
 initialView ( initial, contacts ) =
     stickyView
-        [ Layout.background [ Elegant.color gray ]
-        , Layout.padding [ Padding.left Constants.large ]
+        [ Box.background [ Elegant.color gray ]
+        , Box.padding [ Padding.left Constants.large ]
         ]
         (String.fromChar initial)
         (contacts |> List.map titleView)
@@ -253,9 +253,9 @@ contactsView =
 
 {-| returns a background with a color
 -}
-backgroundColor : Color.Color -> Layout.Layout -> Layout.Layout
+backgroundColor : Color.Color -> Box.Box -> Box.Box
 backgroundColor color =
-    Layout.background [ Elegant.color color ]
+    Box.background [ Elegant.color color ]
 
 
 contactsIndex : List Contact -> Node Msg
@@ -300,7 +300,7 @@ view { history, data } =
         [ BodyBuilder.Attributes.style
             [ Elegant.style <|
                 Display.block []
-                    [ Layout.typography
+                    [ Box.typography
                         [ Typography.character
                             [ Character.fontFamilySansSerif
                             , Character.size Constants.zeta

@@ -1,6 +1,6 @@
-module Layout
+module Box
     exposing
-        ( Layout
+        ( Box
         , default
         , Visibility
         , hidden
@@ -18,17 +18,17 @@ module Layout
         , typography
         , visibility
         , zIndex
-        , layoutToCouples
+        , boxToCouples
         )
 
-{-| Handles all modifications for the layout. You don't need to instanciate one,
+{-| Handles all modifications for the box. You don't need to instanciate one,
 as it's automatically done by Elegant and the different display elements.
 It contains only modifiers, and they can be found in the respective modules.
 
 
 # Types
 
-@docs Layout
+@docs Box
 @docs Visibility
 
 
@@ -58,7 +58,7 @@ It contains only modifiers, and they can be found in the respective modules.
 
 # Compilation
 
-@docs layoutToCouples
+@docs boxToCouples
 
 -}
 
@@ -77,17 +77,17 @@ import Background
 import Position
 
 
-{-| Represents a layout, handling the properties of blocks. They are automatically
+{-| Represents a box, handling the properties of blocks. They are automatically
 instanciated to avoid to deal with it directly. The focus is on the modifiers, available
 in respective modules.
 
     Elegant.displayBlock []
-        [ Layout.cursor Cursor.default
-        -- You can use any Layout functions here to add custom style...
+        [ Box.cursor Cursor.default
+        -- You can use any Box functions here to add custom style...
         ]
 
 -}
-type alias Layout =
+type alias Box =
     { background : Maybe Background.Background
     , border : Maybe (Surrounded Border.Border)
     , boxShadow : Maybe BoxShadow.BoxShadow
@@ -104,11 +104,11 @@ type alias Layout =
     }
 
 
-{-| Generates a default empty Layout.
+{-| Generates a default empty Box.
 -}
-default : Layout
+default : Box
 default =
-    Layout
+    Box
         Nothing
         Nothing
         Nothing
@@ -124,102 +124,102 @@ default =
         Nothing
 
 
-{-| Accepts a `Position` and modifies the Layout accordingly.
+{-| Accepts a `Position` and modifies the Box accordingly.
 -}
-position : Position.Position -> Modifier Layout
+position : Position.Position -> Modifier Box
 position =
     setMaybeValue setPosition
 
 
-{-| Accepts a list of modifiers for the `Background` and modifies the Layout accordingly.
+{-| Accepts a list of modifiers for the `Background` and modifies the Box accordingly.
 -}
-background : Modifiers Background.Background -> Modifier Layout
+background : Modifiers Background.Background -> Modifier Box
 background =
     getModifyAndSet .background setBackgroundIn Background.default
 
 
-{-| Accepts a list of modifiers for the `Border` and modifies the Layout accordingly.
+{-| Accepts a list of modifiers for the `Border` and modifies the Box accordingly.
 -}
-border : Modifiers (Surrounded Border.Border) -> Modifier Layout
+border : Modifiers (Surrounded Border.Border) -> Modifier Box
 border =
     getModifyAndSet .border setBorderIn Surrounded.default
 
 
-{-| Accepts a list of modifiers for the `BoxShadow` and modifies the Layout accordingly.
+{-| Accepts a list of modifiers for the `BoxShadow` and modifies the Box accordingly.
 -}
-boxShadow : Modifiers BoxShadow.BoxShadow -> Modifier Layout
+boxShadow : Modifiers BoxShadow.BoxShadow -> Modifier Box
 boxShadow =
     getModifyAndSet .boxShadow setBoxShadowIn BoxShadow.default
 
 
-{-| Accepts a list of modifiers for the `Corner` and modifies the Layout accordingly.
+{-| Accepts a list of modifiers for the `Corner` and modifies the Box accordingly.
 -}
-corner : Modifiers Corner.Corner -> Modifier Layout
+corner : Modifiers Corner.Corner -> Modifier Box
 corner =
     getModifyAndSet .corner setCornerIn Corner.default
 
 
-{-| Accepts a `Cursor` and modifies the Layout accordingly.
+{-| Accepts a `Cursor` and modifies the Box accordingly.
 -}
-cursor : Cursor.Cursor -> Modifier Layout
+cursor : Cursor.Cursor -> Modifier Box
 cursor =
     setMaybeValue setCursor
 
 
-{-| Accepts a list of modifiers for the `Margin` and modifies the Layout accordingly.
+{-| Accepts a list of modifiers for the `Margin` and modifies the Box accordingly.
 -}
-margin : Modifiers (Surrounded Margin.Margin) -> Modifier Layout
+margin : Modifiers (Surrounded Margin.Margin) -> Modifier Box
 margin =
     getModifyAndSet .margin setMarginIn Surrounded.default
 
 
-{-| Accepts a size for the `opacity` and modifies the Layout accordingly.
+{-| Accepts a size for the `opacity` and modifies the Box accordingly.
 -}
-opacity : Float -> Modifier Layout
+opacity : Float -> Modifier Box
 opacity =
     setMaybeValue setOpacity
 
 
-{-| Accepts a list of modifiers for the `Outline` and modifies the Layout accordingly.
+{-| Accepts a list of modifiers for the `Outline` and modifies the Box accordingly.
 -}
-outline : Modifiers Outline.Outline -> Modifier Layout
+outline : Modifiers Outline.Outline -> Modifier Box
 outline =
     getModifyAndSet .outline setOutlineIn Outline.default
 
 
-{-| Accepts a list of modifiers for the `Padding` and modifies the Layout accordingly.
+{-| Accepts a list of modifiers for the `Padding` and modifies the Box accordingly.
 -}
-padding : Modifiers (Surrounded Padding.Padding) -> Modifier Layout
+padding : Modifiers (Surrounded Padding.Padding) -> Modifier Box
 padding =
     getModifyAndSet .padding setPaddingIn Surrounded.default
 
 
-{-| Accepts a list of modifiers for the `Typography` and modifies the Layout accordingly.
+{-| Accepts a list of modifiers for the `Typography` and modifies the Box accordingly.
 -}
-typography : Modifiers Typography.Typography -> Modifier Layout
+typography : Modifiers Typography.Typography -> Modifier Box
 typography =
     getModifyAndSet .typography setTypographyIn Typography.default
 
 
-{-| Accepts a `Visibility` and modifies the Layout accordingly.
+{-| Accepts a `Visibility` and modifies the Box accordingly.
 -}
-visibility : Visibility -> Modifier Layout
+visibility : Visibility -> Modifier Box
 visibility =
     setMaybeValue setVisibility
 
 
-{-| Accepts an Int for the `zIndex` and modifies the Layout accordingly.
+{-| Accepts an Int for the `zIndex` and modifies the Box accordingly.
 -}
-zIndex : Int -> Modifier Layout
+zIndex : Int -> Modifier Box
 zIndex =
     setMaybeValue setZIndex
 
 
-{-| Compiles a `Layout` to the corresponding CSS list of tuples.
+{-| Compiles a `Box` to the corresponding CSS list of tuples.
 Compiles only the defined styles, ignoring the `Nothing` fields.
 -}
-layoutToCouples : Layout -> List ( String, String )
-layoutToCouples layout =
+boxToCouples : Box -> List ( String, String )
+boxToCouples box =
     [ unwrapToCouple .visibility visibilityToCouple
     , unwrapToCouple .opacity opacityToCouple
     , unwrapToCouple .zIndex zIndexToCouple
@@ -234,7 +234,7 @@ layoutToCouples layout =
     , unwrapToCouples .padding Padding.paddingToCouples
     , unwrapToCouples .position Position.positionToCouples
     ]
-        |> List.concatMap (callOn layout)
+        |> List.concatMap (callOn box)
 
 
 {-| Defines the visibility of an element. It can be either visible or hidden.

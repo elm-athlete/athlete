@@ -9,15 +9,72 @@ import Helpers.Shared exposing (..)
 import Native.BodyBuilder
 import Native.Elegant
 import List.Extra
+import Display
 
 
 type alias Node msg =
     Html msg
 
 
+
+-- Le outsideDisplay est toujours flex-item ou grid-item quand le parent est flex ou grid respectivement.
+--
+-- br
+--   outsideDisplay : block
+--   insideDisplay : none
+--
+-- a
+--   outsideDisplay : inline
+--   insideDisplay : flow
+--
+-- node
+--   outsideDisplay : inline
+--   insideDisplay : flow
+--
+-- Flex_flexItems
+--   outsideDisplay : inline
+--   insideDisplay : flex
+--
+-- inlineGrid_gridItems
+--   outsideDisplay : inline
+--   insideDisplay : grid
+--
+-- ul_li/ol_li
+--   outside : block
+--   inside : flow
+--
+-- h1-6/p
+--   outside : block
+--   inside : flow
+--
+--
+-- input/select/textarea/button/img/audio/video
+--   outside : inline
+--   inside : flow-root
+--
+--
+-- iframe/video/embed/canvas/object/applet
+-- table
+-- script
+-- type alias BlockAttributes msg =
+--   FlowAttributes msg
+-- node [block [dimensions []], box []]
+
+
+node : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
+node =
+    block
+
+
 div : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 div =
     flow "div"
+
+
+{-| -}
+span : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
+span =
+    flow "span"
 
 
 br : Modifiers (FlowAttributes msg) -> Node msg
@@ -97,12 +154,6 @@ p =
 
 
 {-| -}
-span : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-span =
-    flow "span"
-
-
-{-| -}
 textarea : Modifiers (TextareaAttributes msg) -> Node msg
 textarea =
     flip
@@ -155,12 +206,6 @@ progress =
 table : List (Node msg) -> List (List (Node msg)) -> Node msg
 table children table =
     visibleNode BodyBuilder.Attributes.defaultFlowAttributes (\_ -> []) "table" [] []
-
-
-{-| -}
-node : String -> Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
-node =
-    flow
 
 
 {-| -}
@@ -409,9 +454,9 @@ visibleNode defaultAttributes attributesToVirtualDomAttributes tag attributesMod
                 defaultAttributes
     in
         Html.node tag
-            (List.map toVirtualDomClassName computedAttributes.style
-                ++ (attributesToVirtualDomAttributes computedAttributes)
-            )
+            -- (List.map toVirtualDomClassName computedAttributes.style
+            (attributesToVirtualDomAttributes computedAttributes)
+            -- )
             content
 
 
@@ -428,6 +473,21 @@ flow =
     visibleNode
         BodyBuilder.Attributes.defaultFlowAttributes
         BodyBuilder.Attributes.flowAttributesToHtmlAttributes
+
+
+block : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
+block modifiers content =
+    let
+        attributes =
+            (Function.compose modifiers)
+                BodyBuilder.Attributes.defaultBlockAttributes
+
+        style =
+            attributes.box attributes.block
+    in
+        visibleNode
+            BodyBuilder.Attributes.blockAttributesToHtmlAttributes
+            "node"
 
 
 toVirtualDom : Node msg -> Html msg

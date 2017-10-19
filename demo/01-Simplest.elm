@@ -1,17 +1,19 @@
 module Simplest exposing (..)
 
 import BodyBuilder exposing (..)
-import Elegant exposing (textColor)
+import BodyBuilder.Attributes as Attrs exposing (..)
+import Elegant exposing (..)
 import Color
 
 
 view : a -> Node msg
 view model =
-    div
-        [ style [ textColor Color.blue ]
-        , hoverStyle [ textColor Color.red ]
-        ]
-        [ text "I'm Elegantly styled by css, but my style is set inline" ]
+    -- div
+    --     [ style [ textColor Color.blue ]
+    --     , hoverStyle [ textColor Color.red ]
+    --     ]
+    --     [ text "I'm Elegantly styled by css, but my style is set inline" ]
+    node [ Attrs.block [] ] []
 
 
 main : Program Basics.Never number msg

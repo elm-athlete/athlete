@@ -20,7 +20,7 @@ import Router
         )
 import Finders exposing (..)
 import Display
-import Layout
+import Box
 import Cursor
 import Border
 import Outline
@@ -133,25 +133,25 @@ standardCellStyle =
                 [ Display.alignment Display.left
                 , Display.fullWidth
                 ]
-                [ Layout.cursor Cursor.pointer
-                , Layout.border
+                [ Box.cursor Cursor.pointer
+                , Box.border
                     [ Border.all [ Border.none ]
                     , Border.bottom [ Border.solid, Elegant.color gray ]
                     ]
-                , Layout.outline [ Outline.none ]
-                , Layout.typography
+                , Box.outline [ Outline.none ]
+                , Box.typography
                     [ Typography.character
                         [ Character.fontFamilyInherit
                         , Character.size Constants.zeta
                         ]
                     ]
-                , Layout.padding [ Padding.all Constants.large ]
-                , Layout.background [ Elegant.color Color.white ]
+                , Box.padding [ Padding.all Constants.large ]
+                , Box.background [ Elegant.color Color.white ]
                 ]
         , Elegant.setSuffix "focus" <|
             Elegant.style <|
                 Display.block []
-                    [ Layout.background [ Elegant.color <| Color.grayscale 0.05 ] ]
+                    [ Box.background [ Elegant.color <| Color.grayscale 0.05 ] ]
         ]
 
 
@@ -184,7 +184,7 @@ titleViewWithDelete appartment =
             [ style <| Display.blockFlexContainer [] [] []
             ]
             [ div [ BodyBuilder.Events.onClick <| DestroyAppartment appartment.id ] [ text "⛔" ]
-            , div [ style (Display.block [] [ Layout.padding [ Padding.left Constants.medium ] ]) ] [ text appartment.attributes.title ]
+            , div [ style (Display.block [] [ Box.padding [ Padding.left Constants.medium ] ]) ] [ text appartment.attributes.title ]
             ]
         ]
 
@@ -270,7 +270,7 @@ minSalary model =
 
 pad : { a | style : List Elegant.Style } -> { a | style : List Elegant.Style }
 pad =
-    style (Display.block [] [ Layout.padding [ Padding.all Constants.medium ] ])
+    style (Display.block [] [ Box.padding [ Padding.all Constants.medium ] ])
 
 
 result : String -> a -> Node msg
@@ -365,9 +365,9 @@ mainElement html =
 
 {-| returns a background with a color
 -}
-backgroundColor : Color.Color -> Elegant.Modifier Layout.Layout
+backgroundColor : Color.Color -> Elegant.Modifier Box.Box
 backgroundColor color =
-    Layout.background [ Elegant.color color ]
+    Box.background [ Elegant.color color ]
 
 
 pageWithHeader : Node msg -> Node msg -> Node msg
@@ -411,7 +411,7 @@ textToHtml =
 
 appartmentBodyView : Appartment -> Node msg
 appartmentBodyView appartment =
-    div [ style (Display.block [] [ Layout.padding [ Padding.horizontal Constants.medium ] ]) ]
+    div [ style (Display.block [] [ Box.padding [ Padding.horizontal Constants.medium ] ]) ]
         ([ div [] (textToHtml appartment.attributes.details)
          ]
         )
@@ -419,7 +419,7 @@ appartmentBodyView appartment =
 
 title : String -> Node msg
 title content =
-    div [ blockStyle [] [ Layout.padding [ Padding.all (Elegant.px 12) ] ] ] [ text content ]
+    div [ blockStyle [] [ Box.padding [ Padding.all (Elegant.px 12) ] ] ] [ text content ]
 
 
 appartmentsIndex : List Appartment -> Node Msg
@@ -504,7 +504,7 @@ insidePageView page data transition =
 
 blockStyle :
     List (Display.BlockDetails -> Display.BlockDetails)
-    -> List (Layout.Layout -> Layout.Layout)
+    -> List (Box.Box -> Box.Box)
     -> { a | style : List Elegant.Style }
     -> { a | style : List Elegant.Style }
 blockStyle blockDetails =
@@ -516,7 +516,7 @@ view { history, data } =
     div
         [ blockStyle
             []
-            [ Layout.typography
+            [ Box.typography
                 [ Typography.character
                     [ Character.fontFamilySansSerif
                     , Character.size Constants.zeta
