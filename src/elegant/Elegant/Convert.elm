@@ -82,34 +82,30 @@ addScreenWidthToClassName =
 -}
 
 
-stylesToCss : List Style -> List String
-stylesToCss styles =
-    styles
-        |> List.concatMap fetchStylesOrCompute
-        |> List.append [ boxSizingCss ]
-        |> List.Extra.unique
+-- stylesToCss : List Style -> List String
+-- stylesToCss styles =
+--     styles
+--         |> List.concatMap fetchStylesOrCompute
+--         |> List.append [ boxSizingCss ]
+--         |> List.Extra.unique
 
 
-fetchStylesOrCompute : Style -> List String
-fetchStylesOrCompute style =
-    let
-        styleHash =
-            style |> toString
-    in
-        case Native.Elegant.fetchStyles styleHash of
-            Nothing ->
-                let
-                    computedStyles =
-                        style
-                            |> extractScreenWidths
-                            |> List.concatMap compileConditionalStyle
-                            |> List.map computeAtomicClass
-                            |> Native.Elegant.addStyles styleHash
-                in
-                    computedStyles
+fetchStylesOrCompute : String -> Style -> List String
+fetchStylesOrCompute styleHash style =
+    case Native.Elegant.fetchStyles styleHash of
+        Nothing ->
+            let
+                classesNames =
+                    style
+                        |> extractScreenWidths
+                        |> List.concatMap compileConditionalStyle
+                        |> List.map computeAtomicClass
+                        |> Native.Elegant.addStyles styleHash
+            in
+                classesNames
 
-            Just computedStyles ->
-                computedStyles
+        Just classesNames ->
+            classesNames
 
 
 type alias ConditionalStyle =
@@ -182,9 +178,19 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
     in
         case Native.Elegant.fetchAtomicClass classHash of
             Nothing ->
-                computeStyleToCss className mediaQueryId selector property
-                    |> inMediaQuery mediaQuery
-                    |> Native.Elegant.addAtomicClass classHash
+                let
+                    classNameComplete =
+                        String.join ""
+                            [ className
+                            , (mediaQueryId ? "")
+                            ]
+
+                    test =
+                        computeStyleToCss className mediaQueryId selector property
+                            |> inMediaQuery mediaQuery
+                            |> Native.Elegant.addAtomicClass classHash classNameComplete
+                in
+                    classNameComplete
 
             Just class ->
                 class

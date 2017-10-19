@@ -483,7 +483,9 @@ block modifiers content =
                 BodyBuilder.Attributes.defaultBlockAttributes
 
         style =
-            attributes.box attributes.block
+            if List.isEmpty attributes.block then
+              Elegant.style
+              (Display.block attributes.box attributes.block)
     in
         visibleNode
             BodyBuilder.Attributes.blockAttributesToHtmlAttributes

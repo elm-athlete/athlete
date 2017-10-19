@@ -7,6 +7,7 @@ import Helpers.Style as CommonStyle
 import Display exposing (DisplayBox)
 import Elegant.Convert
 import Elegant.Setters exposing (..)
+import Native.BodyBuilder
 
 
 {-| Contains all style for an element used with Elegant.
@@ -127,17 +128,28 @@ classes (Style style) =
         |> String.join " "
 
 
-stylesToCss : List Style -> List String
-stylesToCss styles =
-    styles
-        |> List.map toCommonStyle
-        |> Elegant.Convert.stylesToCss
+-- stylesToCss : List Style -> List String
+-- stylesToCss styles =
+--     styles
+--         |> List.map toCommonStyle
+--         |> Elegant.Convert.stylesToCss
 
 
-styleToCss : Style -> List String
+styleToCss : Style -> String
 styleToCss (Style style) =
-    style
-        |> Elegant.Convert.fetchStylesOrCompute
+    let
+        styleHash =
+            toString style
+    in
+        case Native.BodyBuilder.fetchClassesNames styleHash of
+            Nothing ->
+                style
+                    |> Elegant.Convert.fetchStylesOrCompute styleHash
+                    |> String.join " "
+                    |> Native.BodyBuilder.addClassesNames styleHash
+
+            Just classesNames ->
+                classesNames
 
 
 toCommonStyle : Style -> CommonStyle.Style
