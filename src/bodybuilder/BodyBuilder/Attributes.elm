@@ -203,6 +203,11 @@ type alias BlockAttributes msg =
     VisibleAttributesAndEvents msg { block : Modifiers BlockDetails }
 
 
+block : Modifiers BlockDetails -> Modifier (BlockAttributes msg)
+block modifiers attrs =
+    { attrs | block = modifiers }
+
+
 defaultBlockAttributes : BlockAttributes msg
 defaultBlockAttributes =
     { onBlurEvent = Nothing

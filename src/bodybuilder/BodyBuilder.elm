@@ -411,7 +411,7 @@ program { init, update, subscriptions, view } =
         { init = init
         , update = update
         , subscriptions = subscriptions
-        , view = toVirtualDom << view
+        , view = view
         }
 
 
@@ -484,21 +484,24 @@ block modifiers content =
 
         style =
             if List.isEmpty attributes.block then
-              Elegant.style
-              (Display.block attributes.box attributes.block)
+                Elegant.style
+                    (Display.displayBox (Display.block attributes.block)
+                        Display.Flow
+                        (attributes.box)
+                    )
+            else
+                Elegant.style
+                    (Display.displayBox Display.Inline Display.Flow attributes.box)
     in
-        visibleNode
-            BodyBuilder.Attributes.blockAttributesToHtmlAttributes
-            "node"
+        Html.node "node"
+            ((style |> Elegant.styleToCss |> Html.Attributes.class) :: blockIfBlockPresent attributes.block :: (BodyBuilder.Attributes.blockAttributesToHtmlAttributes attributes))
+            content
 
-
-toVirtualDom : Node msg -> Html msg
-toVirtualDom dom =
-    Html.div []
-        [ Html.node "style" [] [ computeStyles () ]
-        , dom
-        ]
-
+blockIfBlockPresent blockModifiers =
+    if List.isEmpty blockModifiers then
+        Html.Attributes.attribute "block" ""
+    else
+        Html.Attributes.attribute "" ""
 
 computeStyles : () -> Html msg
 computeStyles _ =

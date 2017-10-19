@@ -259,11 +259,9 @@ children behaving like inside a flow element => considered block from children
         [ Box.padding (px 30) ]
 
 -}
-block : Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
+block : Modifiers BlockDetails -> OutsideDisplay
 block blockDetailsModifiers =
-    displayBox
-        (Block (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
-        Flow
+    Block (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers)
 
 
 {-| The display inline

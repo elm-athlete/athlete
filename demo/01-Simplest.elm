@@ -2,8 +2,6 @@ module Simplest exposing (..)
 
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attrs exposing (..)
-import Elegant exposing (..)
-import Color
 
 
 view : a -> Node msg
