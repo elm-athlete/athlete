@@ -1,9 +1,9 @@
 module BodyBuilder.Setters exposing (..)
 
 
-setStyleIn : { a | style : b } -> b -> { a | style : b }
-setStyleIn record styleAttribute =
-    { record | style = styleAttribute }
+setBoxIn : { a | box : b } -> b -> { a | box : b }
+setBoxIn record boxAttribute =
+    { record | box = boxAttribute }
 
 
 setClick : b -> { a | click : Maybe b } -> { a | click : Maybe b }

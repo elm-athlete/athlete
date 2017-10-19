@@ -9,7 +9,7 @@ import Helpers.Shared exposing (..)
 import Native.BodyBuilder
 import Native.Elegant
 import List.Extra
-
+import Display
 
 type alias Node msg =
     Html msg
@@ -158,10 +158,11 @@ table children table =
 
 
 {-| -}
-node : String -> Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
+-- node : String -> Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
+-- node =
+--     flow
 node =
     flow
-
 
 {-| -}
 leaf : Modifiers (FlowAttributes msg) -> Node msg
@@ -395,9 +396,10 @@ visibleNode defaultAttributes attributesToVirtualDomAttributes tag attributesMod
                 defaultAttributes
     in
         Html.node tag
-            (List.map toVirtualDomClassName computedAttributes.style
-                ++ (attributesToVirtualDomAttributes computedAttributes)
-            )
+            -- (List.map toVirtualDomClassName computedAttributes.style
+            -- ++ (attributesToVirtualDomAttributes computedAttributes)
+            -- )
+            (attributesToVirtualDomAttributes computedAttributes)
             content
 
 
@@ -414,6 +416,36 @@ flow =
     visibleNode
         BodyBuilder.Attributes.defaultFlowAttributes
         BodyBuilder.Attributes.flowAttributesToHtmlAttributes
+
+
+-- block : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
+-- block modifiers content =
+--     let
+--         attributes =
+--             (Function.compose modifiers)
+--                 BodyBuilder.Attributes.defaultBlockAttributes
+--
+--         style =
+--             if List.isEmpty attributes.block then
+--                 Elegant.style
+--                     (Display.displayBox (Display.block attributes.block)
+--                         Display.Flow
+--                         (attributes.box)
+--                     )
+--             else
+--                 Elegant.style
+--                     (Display.displayBox Display.Inline Display.Flow attributes.box)
+--     in
+--         Html.node "node"
+--             ((style |> Elegant.styleToCss |> Html.Attributes.class) :: blockIfBlockPresent attributes.block :: (BodyBuilder.Attributes.blockAttributesToHtmlAttributes attributes))
+--             content
+--
+--
+-- blockIfBlockPresent blockModifiers =
+--     if List.isEmpty blockModifiers then
+--         Html.Attributes.attribute "block" ""
+--     else
+--         Html.Attributes.attribute "" ""
 
 
 computeStyles : () -> Html msg

@@ -1,8 +1,9 @@
 module Display
     exposing
-        ( DisplayBox
-        , OutsideDisplay
-        , InsideDisplay
+        ( DisplayBox(..)
+        , OutsideDisplay(..)
+        , InsideDisplay(..)
+        , displayBox
         , none
         , block
         , inline
@@ -69,6 +70,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 # Types
 
 @docs DisplayBox
+@docs displayBox
 @docs OutsideDisplay
 @docs InsideDisplay
 @docs BlockDetails
@@ -226,6 +228,7 @@ type InsideDisplay
     | FlexContainer (Maybe FlexContainerDetails)
 
 
+{-| -}
 displayBox : OutsideDisplay -> InsideDisplay -> Modifiers Box.Box -> DisplayBox
 displayBox outsideDisplay insideDisplay =
     ContentsWrapper
@@ -256,11 +259,15 @@ children behaving like inside a flow element => considered block from children
         [ Box.padding (px 30) ]
 
 -}
-block : Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
+block : Modifiers BlockDetails -> OutsideDisplay
 block blockDetailsModifiers =
-    displayBox
-        (Block (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
-        Flow
+    (Block (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
+
+
+
+-- displayBox
+--     (Block (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
+--     Flow
 
 
 {-| The display inline
