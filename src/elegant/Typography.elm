@@ -93,10 +93,10 @@ import Elegant.Setters exposing (..)
 
 {-| The `Typography` record contains everything about fonts rendering,
 including character rendering. You probably won't use it as is, but instead using
-`Layout.typography` which automatically generate an empty `Typography` record. You
+`Box.typography` which automatically generate an empty `Typography` record. You
 can then use modifiers. I.E.
 
-    Layout.typography
+    Box.typography
         [ Typography.color Color.white
         , Typography.italic
         ]
@@ -114,7 +114,7 @@ type alias Typography =
 
 
 {-| Generate an empty `Typography` record, with every field equal to Nothing.
-You are free to use it as you wish, but it is instanciated automatically by `Layout.typography`.
+You are free to use it as you wish, but it is instanciated automatically by `Box.typography`.
 -}
 default : Typography
 default =

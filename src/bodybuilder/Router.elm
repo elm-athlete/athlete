@@ -48,7 +48,7 @@ import AnimationFrame
 import Time exposing (Time)
 import Display
 import Display.Overflow
-import Layout
+import Box
 import Position
 import Typography
 import Padding
@@ -365,7 +365,7 @@ pageView insidePageView_ transition data page =
             [ Elegant.style <|
                 Display.block
                     [ Display.dimensions [ Display.width (percent 100) ] ]
-                    [ Layout.boxShadow
+                    [ Box.boxShadow
                         [-- BoxShadow.
                         ]
                     ]
@@ -412,7 +412,7 @@ historyView insidePageView_ history data =
                                     [ Elegant.style <|
                                         Display.block
                                             [ Display.dimensions [ Display.width (percent 100) ] ]
-                                            [ Layout.position <|
+                                            [ Box.position <|
                                                 Position.absolute <|
                                                     [ Position.bottom <|
                                                         percentage ((getMaybeTransitionValue <| history.transition) - 1)
@@ -429,7 +429,7 @@ historyView insidePageView_ history data =
                                 [ Elegant.style <|
                                     Display.blockFlexContainer []
                                         [ Display.dimensions [ Display.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
-                                        [ Layout.position <|
+                                        [ Box.position <|
                                             Position.relative <|
                                                 [ Position.right <|
                                                     percentage <|
@@ -506,8 +506,8 @@ headerButtonStyle width align =
         , Display.textOverflowEllipsis
         , align
         ]
-        [ Layout.cursor Cursor.pointer
-        , Layout.typography
+        [ Box.cursor Cursor.pointer
+        , Box.typography
             [ Typography.character
                 [ Typography.Character.size (Elegant.px 12) ]
             ]
@@ -540,7 +540,7 @@ headerElement { left, center, right } =
             [ Elegant.style <|
                 Display.block
                     [ Display.dimensions [ Display.width <| percent 100 ] ]
-                    [ Layout.position <| Position.sticky [] ]
+                    [ Box.position <| Position.sticky [] ]
             ]
         ]
         [ div
@@ -565,7 +565,7 @@ headerButton : msg -> String -> Node msg
 headerButton msg content =
     div
         [ onClick <| msg
-        , style [ Elegant.style <| Display.block [] [ Layout.padding [ Padding.all (Elegant.px 12) ] ] ]
+        , style [ Elegant.style <| Display.block [] [ Box.padding [ Padding.all (Elegant.px 12) ] ] ]
         ]
         [ text content
         ]

@@ -179,7 +179,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 
 import Either exposing (Either(..))
 import Helpers.Css
-import Layout
+import Box
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 import Display.Overflow as Overflow
@@ -205,7 +205,7 @@ type DisplayBox
 type alias Contents =
     { outsideDisplay : OutsideDisplay
     , insideDisplay : InsideDisplay
-    , maybeLayout : Maybe Layout.Layout
+    , maybeBox : Maybe Box.Box
     }
 
 
@@ -226,17 +226,17 @@ type InsideDisplay
     | FlexContainer (Maybe FlexContainerDetails)
 
 
-displayBox : OutsideDisplay -> InsideDisplay -> Modifiers Layout.Layout -> DisplayBox
+displayBox : OutsideDisplay -> InsideDisplay -> Modifiers Box.Box -> DisplayBox
 displayBox outsideDisplay insideDisplay =
     ContentsWrapper
         << Contents outsideDisplay insideDisplay
-        << modifiedElementOrNothing Layout.default
+        << modifiedElementOrNothing Box.default
 
 
 {-| displayNone
 The "display none" <display box> is useful to simply don't show
 the element in the browser, it is on top of the hierarchy, because
-applying any text or layout style to a "display none" element doesn't
+applying any text or box style to a "display none" element doesn't
 mean anything.
 
     Display.none
@@ -253,10 +253,10 @@ children behaving like inside a flow element => considered block from children
 
     Display.block
         [ dimensions [ width (px 30) ] ]
-        [ Layout.padding (px 30) ]
+        [ Box.padding (px 30) ]
 
 -}
-block : Modifiers BlockDetails -> Modifiers Layout.Layout -> DisplayBox
+block : Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
 block blockDetailsModifiers =
     displayBox
         (Block (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
@@ -267,10 +267,10 @@ block blockDetailsModifiers =
 node behaving like an inline element
 
     Display.inline
-        [ Layout.background [ Elegant.color Color.blue ] ]
+        [ Box.background [ Elegant.color Color.blue ] ]
 
 -}
-inline : Modifiers Layout.Layout -> DisplayBox
+inline : Modifiers Box.Box -> DisplayBox
 inline =
     displayBox
         Inline
@@ -283,7 +283,7 @@ node behaving like an inline element, contained nodes will behave like flex chil
     Display.inlineFlexContainer [] []
 
 -}
-inlineFlexContainer : Modifiers FlexContainerDetails -> Modifiers Layout.Layout -> DisplayBox
+inlineFlexContainer : Modifiers FlexContainerDetails -> Modifiers Box.Box -> DisplayBox
 inlineFlexContainer flexContainerDetailsModifiers =
     displayBox
         Inline
@@ -296,7 +296,7 @@ node behaving like an block element, contained nodes will behave like flex child
     Display.blockFlexContainer [] [] []
 
 -}
-blockFlexContainer : Modifiers FlexContainerDetails -> Modifiers BlockDetails -> Modifiers Layout.Layout -> DisplayBox
+blockFlexContainer : Modifiers FlexContainerDetails -> Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
 blockFlexContainer flexContainerDetailsModifiers blockDetailsModifiers =
     displayBox
         (Block (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
@@ -309,7 +309,7 @@ node behaving like an flex child (not being a flex father himself)
     Display.flexChild [] []
 
 -}
-flexChild : Modifiers FlexItemDetails -> Modifiers BlockDetails -> Modifiers Layout.Layout -> DisplayBox
+flexChild : Modifiers FlexItemDetails -> Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
 flexChild flexItemDetailsModifiers blockDetailsModifiers =
     displayBox
         (FlexItem
@@ -325,7 +325,7 @@ node behaving like an flex child being a flex father himself.
     Display.flexChildContainer [] [] []
 
 -}
-flexChildContainer : Modifiers FlexContainerDetails -> Modifiers FlexItemDetails -> Modifiers BlockDetails -> Modifiers Layout.Layout -> DisplayBox
+flexChildContainer : Modifiers FlexContainerDetails -> Modifiers FlexItemDetails -> Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
 flexChildContainer flexContainerDetailsModifiers flexItemDetailsModifiers blockDetailsModifiers =
     displayBox
         (FlexItem
@@ -756,9 +756,9 @@ displayBoxToCouples val =
         None ->
             [ ( "display", "none" ) ]
 
-        ContentsWrapper { outsideDisplay, insideDisplay, maybeLayout } ->
+        ContentsWrapper { outsideDisplay, insideDisplay, maybeBox } ->
             outsideInsideDisplayToCouples outsideDisplay insideDisplay
-                ++ (maybeLayout |> Maybe.map Layout.layoutToCouples |> Maybe.withDefault [])
+                ++ (maybeBox |> Maybe.map Box.boxToCouples |> Maybe.withDefault [])
 
 
 

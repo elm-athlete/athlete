@@ -4,7 +4,7 @@ import BodyBuilder exposing (Node)
 import BodyBuilder.Attributes
 import Elegant exposing (px, Style)
 import Display
-import Layout
+import Box
 import Typography
 import Typography.Character as Character
 
@@ -29,14 +29,14 @@ view model =
         , BodyBuilder.p
             [ BodyBuilder.Attributes.style
                 [ Display.block []
-                    [ Layout.typography
+                    [ Box.typography
                         [ Typography.character
                             [ Character.size (px theFontSize) ]
                         ]
                     ]
                     |> Elegant.style
                 , Display.block []
-                    [ Layout.typography
+                    [ Box.typography
                         [ Typography.character
                             [ Character.size (px (theFontSize + 5)) ]
                         ]

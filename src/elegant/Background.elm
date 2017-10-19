@@ -74,10 +74,10 @@ import Helpers.Css
 
 {-| The `Background` record contains everything about background rendering,
 including character rendering. You probably won't use it as is, but instead using
-`Layout.background` which automatically generate an empty `Background` record. You
+`Box.background` which automatically generate an empty `Background` record. You
 can then use modifiers. I.E.
 
-    Layout.background
+    Box.background
         [ Elegant.color Color.white
         , Background.images
             [ Background.image "/example.photo" ]

@@ -42,8 +42,8 @@ columnStyle gutter denominator numerator =
         |> compose
 
 
-layoutStyle : SizeUnit -> Style -> Style
-layoutStyle gutter =
+boxStyle : SizeUnit -> Style -> Style
+boxStyle gutter =
     [ marginLeft (opposite gutter)
     , displayBlock
     ]
@@ -130,7 +130,7 @@ grid :
             }
     -> Node msg
 grid gutter columns =
-    div [ style [ layoutStyle gutter ] ]
+    div [ style [ boxStyle gutter ] ]
         (columns |> List.map (columnToHtml gutter))
 
 
