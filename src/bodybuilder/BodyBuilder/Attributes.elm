@@ -2,7 +2,6 @@ module BodyBuilder.Attributes exposing (..)
 
 import Html exposing (Html)
 import Html.Attributes
-import Elegant
 import Color exposing (Color)
 import Color.Convert
 import Box
@@ -20,9 +19,129 @@ type alias ValueAttribute b a =
     { a | value : Maybe b }
 
 
-value : a -> { c | value : b } -> { c | value : Maybe a }
-value val attrs =
-    { attrs | value = Just val }
+{-| -}
+type alias TitleAttribute a =
+    { a | title : Maybe String }
+
+
+{-| -}
+type alias IdAttribute a =
+    { a | id : Maybe String }
+
+
+{-| -}
+type alias StepAttribute a =
+    { a | step : Maybe Int }
+
+
+{-| -}
+type alias MaxAttribute a =
+    { a | max : Maybe Int }
+
+
+{-| -}
+type alias MinAttribute a =
+    { a | min : Maybe Int }
+
+
+{-| -}
+type alias OptionsAttribute a =
+    { a | options : List { value : String, label : String } }
+
+
+{-| -}
+type alias ClassAttribute a =
+    { a | class : List String }
+
+
+{-| -}
+type alias TabindexAttribute a =
+    { a | tabindex : Maybe Int }
+
+
+{-| -}
+type alias TargetAttribute a =
+    { a | target : Maybe String }
+
+
+{-| -}
+type alias HrefAttribute a =
+    { a | href : Maybe String }
+
+
+type alias NameAttribute a =
+    { a | name : Maybe String }
+
+
+{-| -}
+type alias WidthAttribute a =
+    { a | width : Maybe Int }
+
+
+{-| -}
+type alias HeightAttribute a =
+    { a | height : Maybe Int }
+
+
+{-| -}
+type alias SrcAttribute a =
+    { a | src : String }
+
+
+{-| -}
+type alias AltAttribute a =
+    { a | alt : String }
+
+
+{-| -}
+type alias DisabledAttribute a =
+    { a | disabled : Bool }
+
+
+type alias BlockContainer a =
+    { a | block : Modifiers BlockDetails }
+
+
+{-| -}
+type alias AutocompleteAttribute a =
+    { a | autocomplete : Bool }
+
+
+{-| -}
+type alias PlaceholderAttribute a =
+    { a | placeholder : Maybe String }
+
+
+type alias PositionAttribute a =
+    { a | position : Position }
+
+
+type alias DataAttribute a =
+    { a | data : List ( String, String ) }
+
+
+{-| -}
+type Position
+    = Before
+    | After
+
+
+type alias LabelAttribute msg a =
+    { a
+        | label :
+            Maybe
+                { attributes : LabelAttributes msg
+
+                -- , content : Node msg
+                }
+    }
+
+
+type alias VisibleAttributes a =
+    { a
+        | box : List (Box.Box -> Box.Box)
+        , universal : UniversalAttributes {}
+    }
 
 
 {-| -}
@@ -44,11 +163,146 @@ type alias VisibleAttributesAndEvents msg a =
     OnEvent msg (OnFocusEvent msg (OnBlurEvent msg (OnMouseEvents msg (VisibleAttributes a))))
 
 
-type alias VisibleAttributes a =
-    { a
-        | box : List (Box.Box -> Box.Box)
-        , universal : UniversalAttributes {}
-    }
+{-| -}
+type alias InputSubmitAttributes msg =
+    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg { type_ : String }))
+
+
+{-| -}
+type alias InputUrlAttributes msg =
+    InputTextAttributes msg
+
+
+{-| -}
+type alias InputNumberAttributes msg =
+    StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {})))))
+
+
+{-| -}
+type alias InputColorAttributes msg =
+    OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {}))
+
+
+{-| -}
+type alias InputCheckboxAttributes msg =
+    OnCheckEvent msg (InputStringValueAttributes msg { checked : Bool })
+
+
+{-| -}
+type alias InputFileAttributes msg =
+    InputVisibleAttributes msg {}
+
+
+{-| -}
+type alias InputPasswordAttributes msg =
+    InputTextAttributes msg
+
+
+{-| -}
+type alias InputRadioAttributes msg =
+    InputStringValueAttributes msg {}
+
+
+{-| -}
+type alias InputRangeAttributes msg =
+    InputNumberAttributes msg
+
+
+{-| -}
+type alias SelectAttributes msg =
+    StringValue (OptionsAttribute (FlowAttributes msg))
+
+
+type alias UniversalAttributes a =
+    TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute a)))
+
+
+{-| -}
+type alias FlowAttributes msg =
+    VisibleAttributesAndEvents msg {}
+
+
+type alias BlockAttributes msg =
+    BlockContainer (FlowAttributes msg)
+
+
+{-| -}
+type alias ButtonAttributesBase msg a =
+    DisabledAttribute (VisibleAttributesAndEvents msg a)
+
+
+type alias ButtonAttributes msg =
+    ButtonAttributesBase msg {}
+
+
+{-| -}
+type alias AAttributes msg =
+    TargetAttribute (HrefAttribute (FlowAttributes msg))
+
+
+{-| -}
+type alias TextareaAttributes msg =
+    OnStringInputEvent msg (NameAttribute (StringValue (FlowAttributes msg)))
+
+
+{-| -}
+type alias ImgAttributes msg =
+    HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (FlowAttributes msg))))
+
+
+{-| -}
+type alias AudioAttributes msg =
+    SrcAttribute (FlowAttributes msg)
+
+
+{-| -}
+type alias ProgressAttributes msg =
+    FlowAttributes msg
+
+
+type alias ScriptAttributes msg =
+    DataAttribute (SrcAttribute (FlowAttributes msg))
+
+
+type alias InputAttributes a =
+    NameAttribute { a | type_ : String }
+
+
+{-| -}
+type alias InputHiddenAttributes =
+    InputAttributes
+        (StringValue
+            { universal : UniversalAttributes {}
+            , type_ : String
+            }
+        )
+
+
+type alias LabelAttributes msg =
+    PositionAttribute (FlowAttributes msg)
+
+
+type alias InputVisibleAttributes msg a =
+    LabelAttribute msg (VisibleAttributesAndEvents msg (InputAttributes a))
+
+
+type alias InputStringValueAttributes msg a =
+    StringValue (InputVisibleAttributes msg a)
+
+
+{-| -}
+type alias InputTextAttributesBase msg a =
+    AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a)))
+
+
+type alias InputTextAttributes msg =
+    InputTextAttributesBase msg {}
+
+
+{-| -}
+value : a -> { c | value : b } -> { c | value : Maybe a }
+value val attrs =
+    { attrs | value = Just val }
 
 
 setUniversal :
@@ -85,19 +339,9 @@ box val ({ box } as attrs) =
         |> setBoxIn attrs
 
 
-{-| -}
-type alias TitleAttribute a =
-    { a | title : Maybe String }
-
-
 title : String -> Modifier { a | universal : UniversalAttributes b }
 title =
     setValueInUniversal setTitle
-
-
-{-| -}
-type alias IdAttribute a =
-    { a | id : Maybe String }
 
 
 id : String -> Modifier { a | universal : UniversalAttributes b }
@@ -105,28 +349,14 @@ id =
     setValueInUniversal setId
 
 
-{-| -}
-type alias ClassAttribute a =
-    { a | class : List String }
-
-
 class : List String -> Modifier { a | universal : UniversalAttributes b }
 class =
     setValueInUniversal setClass
 
 
-{-| -}
-type alias TabindexAttribute a =
-    { a | tabindex : Maybe Int }
-
-
 tabindex : Int -> Modifier { a | universal : UniversalAttributes b }
 tabindex =
     setValueInUniversal setTabIndex
-
-
-type alias UniversalAttributes a =
-    TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute a)))
 
 
 setTitle : String -> { a | title : Maybe String } -> { a | title : Maybe String }
@@ -168,11 +398,6 @@ universalAttributesToHtmlAttributes universal =
         |> List.concatMap (callOn universal)
 
 
-{-| -}
-type alias FlowAttributes msg =
-    VisibleAttributesAndEvents msg {}
-
-
 defaultFlowAttributes : FlowAttributes msg
 defaultFlowAttributes =
     { onBlurEvent = Nothing
@@ -199,39 +424,27 @@ flowAttributesToHtmlAttributes : FlowAttributes msg -> List (Html.Attribute msg)
 flowAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
 
--- type alias BlockAttributes msg =
---     VisibleAttributesAndEvents msg { }
 
-type alias BlockAttributes msg =
-    VisibleAttributesAndEvents msg { block : Modifiers BlockDetails }
-
+block : Modifiers BlockDetails -> Modifier (BlockAttributes msg)
+block modifiers attrs =
+    { attrs | block = modifiers }
 
 
--- block : Modifiers BlockDetails -> Modifier (BlockAttributes msg)
--- block modifiers attrs =
---     { attrs | block = modifiers }
---
---
--- defaultBlockAttributes : BlockAttributes msg
--- defaultBlockAttributes =
---     { onBlurEvent = Nothing
---     , onEvent = Nothing
---     , onFocusEvent = Nothing
---     , onMouseEvents = Nothing
---     , box = []
---     , universal = defaultUniversalAttributes
---     , block = []
---     }
---
---
--- blockAttributesToHtmlAttributes : BlockAttributes msg -> List (Html.Attribute msg)
--- blockAttributesToHtmlAttributes =
---     visibleAttributesToHtmlAttributes
+defaultBlockAttributes : BlockAttributes msg
+defaultBlockAttributes =
+    { onBlurEvent = Nothing
+    , onEvent = Nothing
+    , onFocusEvent = Nothing
+    , onMouseEvents = Nothing
+    , box = []
+    , universal = defaultUniversalAttributes
+    , block = []
+    }
 
 
-{-| -}
-type alias DisabledAttribute a =
-    { a | disabled : Bool }
+blockAttributesToHtmlAttributes : BlockAttributes msg -> List (Html.Attribute msg)
+blockAttributesToHtmlAttributes =
+    visibleAttributesToHtmlAttributes
 
 
 disabled : Modifier (DisabledAttribute a)
@@ -242,15 +455,6 @@ disabled attrs =
 disabledAttributeToHtmlAttributes : Bool -> List (Html.Attribute msg)
 disabledAttributeToHtmlAttributes =
     Html.Attributes.disabled >> List.singleton
-
-
-{-| -}
-type alias ButtonAttributesBase msg a =
-    DisabledAttribute (VisibleAttributesAndEvents msg a)
-
-
-type alias ButtonAttributes msg =
-    ButtonAttributesBase msg {}
 
 
 defaultButtonAttributes : ButtonAttributes msg
@@ -273,24 +477,9 @@ buttonAttributesToHtmlAttributes buttonAttributes =
             (visibleAttributesToHtmlAttributes buttonAttributes)
 
 
-{-| -}
-type alias AAttributes msg =
-    TargetAttribute (HrefAttribute (VisibleAttributesAndEvents msg {}))
-
-
-{-| -}
-type alias TargetAttribute a =
-    { a | target : Maybe String }
-
-
 target : String -> Modifier (TargetAttribute a)
 target val attrs =
     { attrs | target = Just val }
-
-
-{-| -}
-type alias HrefAttribute a =
-    { a | href : Maybe String }
 
 
 href : String -> Modifier (HrefAttribute a)
@@ -318,16 +507,6 @@ aAttributesToHtmlAttributes attributes =
     ]
         |> List.concatMap (callOn attributes)
         |> List.append (visibleAttributesToHtmlAttributes attributes)
-
-
-{-| -}
-type alias TextareaAttributes msg =
-    OnStringInputEvent msg (NameAttribute (StringValue (VisibleAttributesAndEvents msg {})))
-
-
-{-| -}
-type alias NameAttribute a =
-    { a | name : Maybe String }
 
 
 name : String -> Modifier (NameAttribute a)
@@ -360,39 +539,14 @@ textareaAttributesToHtmlAttributes attributes =
         |> List.append (visibleAttributesToHtmlAttributes attributes)
 
 
-{-| -}
-type alias ImgAttributes msg =
-    HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (VisibleAttributesAndEvents msg {}))))
-
-
-{-| -}
-type alias WidthAttribute a =
-    { a | width : Maybe Int }
-
-
 width : Int -> Modifier (WidthAttribute a)
 width val attrs =
     { attrs | width = Just val }
 
 
-{-| -}
-type alias HeightAttribute a =
-    { a | height : Maybe Int }
-
-
 height : Int -> Modifier (HeightAttribute a)
 height val attrs =
     { attrs | height = Just val }
-
-
-{-| -}
-type alias SrcAttribute a =
-    { a | src : String }
-
-
-{-| -}
-type alias AltAttribute a =
-    { a | alt : String }
 
 
 defaultImgAttributes : String -> String -> ImgAttributes msg
@@ -425,11 +579,6 @@ imgAttributesToHtmlAttributes attributes =
         |> List.append (visibleAttributesToHtmlAttributes attributes)
 
 
-{-| -}
-type alias AudioAttributes msg =
-    SrcAttribute (VisibleAttributesAndEvents msg {})
-
-
 defaultAudioAttributes : AudioAttributes msg
 defaultAudioAttributes =
     { universal = defaultUniversalAttributes
@@ -447,11 +596,6 @@ audioAttributesToHtmlAttributes attributes =
     Html.Attributes.src attributes.src :: visibleAttributesToHtmlAttributes attributes
 
 
-{-| -}
-type alias ProgressAttributes msg =
-    VisibleAttributesAndEvents msg {}
-
-
 defaultProgressAttributes : ProgressAttributes msg
 defaultProgressAttributes =
     { universal = defaultUniversalAttributes
@@ -466,14 +610,6 @@ defaultProgressAttributes =
 progressAttributesToHtmlAttributes : ProgressAttributes msg -> List (Html.Attribute msg)
 progressAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
-
-
-type alias ScriptAttributes msg =
-    DataAttribute (SrcAttribute (VisibleAttributesAndEvents msg {}))
-
-
-type alias DataAttribute a =
-    { a | data : List ( String, String ) }
 
 
 data : List ( String, String ) -> Modifier (DataAttribute a)
@@ -500,23 +636,9 @@ scriptAttributesToHtmlAttributes attributes =
     Html.Attributes.src attributes.src :: visibleAttributesToHtmlAttributes attributes
 
 
-type alias InputAttributes a =
-    NameAttribute { a | type_ : String }
-
-
 inputAttributesToHtmlAttributes : InputAttributes a -> List (Html.Attribute msg)
 inputAttributesToHtmlAttributes attributes =
     Html.Attributes.type_ attributes.type_ :: unwrapMaybeAttribute Html.Attributes.name attributes.name
-
-
-{-| -}
-type alias InputHiddenAttributes =
-    InputAttributes
-        (StringValue
-            { universal : UniversalAttributes {}
-            , type_ : String
-            }
-        )
 
 
 defaultInputHiddenAttributes : InputHiddenAttributes
@@ -535,35 +657,6 @@ inputHiddenAttributesToHtmlAttributes attributes =
         |> List.append (universalAttributesToHtmlAttributes attributes.universal)
 
 
-{-| -}
-type Position
-    = Before
-    | After
-
-
-type alias PositionAttribute a =
-    { a | position : Position }
-
-
-type alias LabelAttribute msg a =
-    { a
-        | label :
-            Maybe
-                { attributes : LabelAttributes msg
-
-                -- , content : Node msg
-                }
-    }
-
-
-type alias LabelAttributes msg =
-    PositionAttribute (VisibleAttributesAndEvents msg {})
-
-
-type alias InputVisibleAttributes msg a =
-    LabelAttribute msg (VisibleAttributesAndEvents msg (InputAttributes a))
-
-
 inputVisibleToHtmlAttributes :
     VisibleAttributesAndEvents msg { a | name : Maybe String, type_ : String }
     -> List (Html.Attribute msg)
@@ -573,37 +666,14 @@ inputVisibleToHtmlAttributes attributes =
         (inputAttributesToHtmlAttributes attributes)
 
 
-type alias InputStringValueAttributes msg a =
-    StringValue (InputVisibleAttributes msg a)
-
-
-{-| -}
-type alias AutocompleteAttribute a =
-    { a | autocomplete : Bool }
-
-
 autocomplete : Bool -> Modifier (AutocompleteAttribute a)
 autocomplete val attrs =
     { attrs | autocomplete = val }
 
 
-{-| -}
-type alias PlaceholderAttribute a =
-    { a | placeholder : Maybe String }
-
-
 placeholder : String -> Modifier (PlaceholderAttribute a)
 placeholder val attrs =
     { attrs | placeholder = Just val }
-
-
-{-| -}
-type alias InputTextAttributesBase msg a =
-    AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a)))
-
-
-type alias InputTextAttributes msg =
-    InputTextAttributesBase msg {}
 
 
 defaultInputTextAttributes : InputTextAttributes msg
@@ -637,34 +707,14 @@ inputTextAttributesToHtmlAttributes attributes =
            )
 
 
-{-| -}
-type alias InputNumberAttributes msg =
-    StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {})))))
-
-
-{-| -}
-type alias StepAttribute a =
-    { a | step : Maybe Int }
-
-
 step : Int -> Modifier (StepAttribute a)
 step val attrs =
     { attrs | step = Just val }
 
 
-{-| -}
-type alias MaxAttribute a =
-    { a | max : Maybe Int }
-
-
 max : Int -> Modifier (MaxAttribute a)
 max val attrs =
     { attrs | max = Just val }
-
-
-{-| -}
-type alias MinAttribute a =
-    { a | min : Maybe Int }
 
 
 min : Int -> Modifier (MinAttribute a)
@@ -703,11 +753,6 @@ inputNumberAttributesToHtmlAttributes attributes =
         |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
 
 
-{-| -}
-type alias InputColorAttributes msg =
-    OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {}))
-
-
 defaultInputColorAttributes : InputColorAttributes msg
 defaultInputColorAttributes =
     { universal = defaultUniversalAttributes
@@ -730,11 +775,6 @@ inputColorAttributesToHtmlAttributes attributes =
     unwrapMaybeAttribute Html.Attributes.value (Maybe.map Color.Convert.colorToCssRgb <| attributes.value)
         |> List.append (inputVisibleToHtmlAttributes attributes)
         |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
-
-
-{-| -}
-type alias InputCheckboxAttributes msg =
-    OnCheckEvent msg (InputStringValueAttributes msg { checked : Bool })
 
 
 checked : Bool -> Modifier (InputCheckboxAttributes msg)
@@ -767,11 +807,6 @@ inputCheckboxAttributesToHtmlAttributes attributes =
         |> List.append (checkEventToHtmlEvent attributes)
 
 
-{-| -}
-type alias InputFileAttributes msg =
-    InputVisibleAttributes msg {}
-
-
 defaultInputFileAttributes : InputFileAttributes msg
 defaultInputFileAttributes =
     { name = Nothing
@@ -789,11 +824,6 @@ defaultInputFileAttributes =
 inputFileAttributesToHtmlAttributes : InputFileAttributes msg -> List (Html.Attribute msg)
 inputFileAttributesToHtmlAttributes =
     inputVisibleToHtmlAttributes
-
-
-{-| -}
-type alias InputPasswordAttributes msg =
-    InputTextAttributes msg
 
 
 defaultInputPasswordAttributes : InputPasswordAttributes msg
@@ -820,11 +850,6 @@ inputPasswordAttributesToHtmlAttributes =
     inputTextAttributesToHtmlAttributes
 
 
-{-| -}
-type alias InputRadioAttributes msg =
-    InputStringValueAttributes msg {}
-
-
 defaultInputRadioAttributes : InputRadioAttributes msg
 defaultInputRadioAttributes =
     { name = Nothing
@@ -845,11 +870,6 @@ inputRadioAttributesToHtmlAttributes attributes =
     List.append
         (unwrapMaybeAttribute Html.Attributes.value attributes.value)
         (inputVisibleToHtmlAttributes attributes)
-
-
-{-| -}
-type alias InputRangeAttributes msg =
-    InputNumberAttributes msg
 
 
 defaultInputRangeAttributes : InputRangeAttributes msg
@@ -875,11 +895,6 @@ defaultInputRangeAttributes =
 inputRangeAttributesToHtmlAttributes : InputRangeAttributes msg -> List (Html.Attribute msg)
 inputRangeAttributesToHtmlAttributes =
     inputNumberAttributesToHtmlAttributes
-
-
-{-| -}
-type alias InputSubmitAttributes msg =
-    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg { type_ : String }))
 
 
 defaultInputSubmitAttributes : InputSubmitAttributes msg
@@ -908,11 +923,6 @@ inputSubmitAttributesToHtmlAttributes attributes =
         ]
 
 
-{-| -}
-type alias InputUrlAttributes msg =
-    InputTextAttributes msg
-
-
 defaultInputUrlAttributes : InputUrlAttributes msg
 defaultInputUrlAttributes =
     { name = Nothing
@@ -935,16 +945,6 @@ defaultInputUrlAttributes =
 inputUrlAttributesToHtmlAttributes : InputUrlAttributes msg -> List (Html.Attribute msg)
 inputUrlAttributesToHtmlAttributes =
     inputTextAttributesToHtmlAttributes
-
-
-{-| -}
-type alias SelectAttributes msg =
-    StringValue (OptionsAttribute (VisibleAttributesAndEvents msg {}))
-
-
-{-| -}
-type alias OptionsAttribute a =
-    { a | options : List { value : String, label : String } }
 
 
 defaultSelectAttributes : SelectAttributes msg
