@@ -9,7 +9,7 @@ module Display
         , inline
         , inlineFlexContainer
         , flexContainer
-        , flexChild
+        , flexItem
         , flexChildContainer
         , BlockDetails
         , FlexContainerDetails
@@ -92,7 +92,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs inline
 @docs inlineFlexContainer
 @docs flexContainer
-@docs flexChild
+@docs flexItem
 @docs flexChildContainer
 
 
@@ -314,14 +314,11 @@ node behaving like an flex child (not being a flex father himself)
     Display.flexChild [] []
 
 -}
-flexChild : Modifiers FlexItemDetails -> Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
-flexChild flexItemDetailsModifiers blockDetailsModifiers =
-    displayBox
-        (FlexItem
-            (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers)
-            (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers)
-        )
-        Flow
+flexItem : Modifiers FlexItemDetails -> Modifiers BlockDetails -> OutsideDisplay
+flexItem flexItemDetailsModifiers blockDetailsModifiers =
+    FlexItem
+        (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers)
+        (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers)
 
 
 {-| The display flexchildcontainer container :

@@ -20,6 +20,10 @@ type alias Node msg =
     Html msg
 
 
+type FlexItem msg
+    = FlexItem (Node msg)
+
+
 
 -- div : Modifiers (FlowAttributes msg) -> List (Node msg) -> Node msg
 -- div =
@@ -365,6 +369,11 @@ text =
     Html.text
 
 
+br : Node msg
+br =
+    Html.br [] []
+
+
 program :
     { init : ( model, Cmd msg )
     , subscriptions : model -> Sub msg
@@ -416,40 +425,130 @@ program =
 
 
 node : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
-node =
-    computeBlock
-        "node"
-        Nothing
-        BodyBuilder.Attributes.defaultNodeAttributes
-        BodyBuilder.Attributes.nodeAttributesToHtmlAttributes
+node modifiers =
+    let
+        attributes =
+            (Function.compose modifiers) BodyBuilder.Attributes.defaultNodeAttributes
+    in
+        computeBlock
+            "node"
+            Nothing
+            Nothing
+            attributes.block
+            BodyBuilder.Attributes.defaultNodeAttributes
+            BodyBuilder.Attributes.nodeAttributesToHtmlAttributes
+            modifiers
 
 
-flex : Modifiers FlexContainerDetails -> Modifiers (FlexAttributes msg) -> List (Node msg) -> Node msg
-flex modifiers =
-    computeBlock
-        "flex"
-        (Just modifiers)
-        BodyBuilder.Attributes.defaultFlexAttributes
-        BodyBuilder.Attributes.flexAttributesToHtmlAttributes
+flex : Modifiers (FlexContainerAttributes msg) -> List (FlexItem msg) -> Node msg
+flex modifiers flexItems =
+    let
+        attributes =
+            (Function.compose modifiers) BodyBuilder.Attributes.defaultFlexContainerAttributes
+    in
+        computeBlock
+            "flex"
+            (Just attributes.flexContainerProperties)
+            Nothing
+            attributes.block
+            BodyBuilder.Attributes.defaultFlexContainerAttributes
+            BodyBuilder.Attributes.flexContainerAttributesToHtmlAttributes
+            modifiers
+            (flexItems |> List.map extractNodeInFlexItem)
+
+
+extractNodeInFlexItem : FlexItem msg -> Node msg
+extractNodeInFlexItem (FlexItem item) =
+    item
+
+
+flexItem : Modifiers (FlexItemAttributes msg) -> List (Node msg) -> FlexItem msg
+flexItem modifiers =
+    let
+        attributes =
+            (Function.compose modifiers) BodyBuilder.Attributes.defaultFlexItemAttributes
+    in
+        FlexItem
+            << computeBlock
+                "flex-item"
+                Nothing
+                (Just attributes.flexItemProperties)
+                attributes.block
+                BodyBuilder.Attributes.defaultFlexItemAttributes
+                BodyBuilder.Attributes.flexItemAttributesToHtmlAttributes
+                modifiers
+
+
+header : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+header tag modifiers =
+    let
+        attributes =
+            (Function.compose modifiers) BodyBuilder.Attributes.defaultHeadingAttributes
+    in
+        computeBlock
+            tag
+            Nothing
+            Nothing
+            (Just attributes.block)
+            BodyBuilder.Attributes.defaultHeadingAttributes
+            BodyBuilder.Attributes.headingAttributesToHtmlAttributes
+            modifiers
+
+
+h1 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+h1 =
+    header "h1"
+
+
+h2 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+h2 =
+    header "h2"
+
+
+h3 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+h3 =
+    header "h3"
+
+
+h4 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+h4 =
+    header "h4"
+
+
+h5 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+h5 =
+    header "h5"
+
+
+h6 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+h6 =
+    header "h6"
+
+
+p : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+p =
+    header "p"
 
 
 computeBlock :
     String
     -> Maybe (Modifiers FlexContainerDetails)
-    -> BlockContainer (VisibleAttributes a)
-    -> (BlockContainer (VisibleAttributes a) -> List (Html.Attribute msg))
-    -> Modifiers (BlockContainer (VisibleAttributes a))
+    -> Maybe (Modifiers Display.FlexItemDetails)
+    -> Maybe (Modifiers Display.BlockDetails)
+    -> VisibleAttributes a
+    -> (VisibleAttributes a -> List (Html.Attribute msg))
+    -> Modifiers (VisibleAttributes a)
     -> List (Node msg)
     -> Node msg
-computeBlock tag flexModifiers defaultAttributes attributesToHtmlAttributes blockModifiers content =
+computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttributes attributesToHtmlAttributes visibleModifiers content =
     let
         attributes =
-            (Function.compose blockModifiers)
+            (Function.compose visibleModifiers)
                 defaultAttributes
     in
         Html.node tag
             (attributes
-                |> displayStyle flexModifiers
+                |> displayStyle flexModifiers flexItemModifiers blockModifiers
                 |> Elegant.styleToCss
                 |> Html.Attributes.class
                 |> flip (::) (attributesToHtmlAttributes attributes)
@@ -457,21 +556,39 @@ computeBlock tag flexModifiers defaultAttributes attributesToHtmlAttributes bloc
             content
 
 
-displayStyle : Maybe (Modifiers FlexContainerDetails) -> BlockContainer (VisibleAttributes a) -> Elegant.Style
-displayStyle flexModifiers { block, box } =
+displayStyle :
+    Maybe (Modifiers FlexContainerDetails)
+    -> Maybe (Modifiers Display.FlexItemDetails)
+    -> Maybe (Modifiers Display.BlockDetails)
+    -> VisibleAttributes a
+    -> Elegant.Style
+displayStyle flexModifiers flexItemModifiers blockModifiers { box } =
     let
         displayInside =
-            case flexModifiers of
-                Just modifiers ->
-                    Display.flexContainer modifiers
+            case flexItemModifiers of
+                Just _ ->
+                    Display.Flow
 
                 Nothing ->
-                    Display.Flow
+                    case flexModifiers of
+                        Just modifiers ->
+                            Display.flexContainer modifiers
+
+                        Nothing ->
+                            Display.Flow
+
+        displayOutside =
+            case flexItemModifiers of
+                Just modifiers ->
+                    Display.flexItem modifiers (Maybe.withDefault [] blockModifiers)
+
+                Nothing ->
+                    case blockModifiers of
+                        Just modifiers ->
+                            Display.block modifiers
+
+                        Nothing ->
+                            Display.Inline
     in
         Elegant.style <|
-            case block of
-                Just blockModifiers ->
-                    Display.displayBox (Display.block blockModifiers) displayInside box
-
-                Nothing ->
-                    Display.displayBox Display.Inline displayInside box
+            Display.displayBox displayOutside displayInside box

@@ -98,8 +98,12 @@ type alias DisabledAttribute a =
     { a | disabled : Bool }
 
 
-type alias BlockContainer a =
+type alias MaybeBlockContainer a =
     { a | block : Maybe (List (BlockDetails -> BlockDetails)) }
+
+
+type alias BlockContainer a =
+    { a | block : List (BlockDetails -> BlockDetails) }
 
 
 {-| -}
@@ -134,6 +138,14 @@ type alias CheckedContainer a =
 
 type alias UniversalContainer a =
     { a | universal : UniversalAttributes }
+
+
+type alias FlexContainerProperties a =
+    { a | flexContainerProperties : List (Display.FlexContainerDetails -> Display.FlexContainerDetails) }
+
+
+type alias FlexItemProperties a =
+    { a | flexItemProperties : List (Display.FlexItemDetails -> Display.FlexItemDetails) }
 
 
 {-| -}
@@ -225,11 +237,19 @@ type alias FlowAttributes msg =
 
 
 type alias NodeAttributes msg =
+    MaybeBlockContainer (FlowAttributes msg)
+
+
+type alias FlexContainerAttributes msg =
+    FlexContainerProperties (NodeAttributes msg)
+
+
+type alias FlexItemAttributes msg =
+    FlexItemProperties (NodeAttributes msg)
+
+
+type alias HeadingAttributes msg =
     BlockContainer (FlowAttributes msg)
-
-
-type alias FlexAttributes msg =
-    NodeAttributes msg
 
 
 {-| -}
@@ -426,9 +446,14 @@ flowAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
 
 
-block : Modifiers BlockDetails -> Modifier (NodeAttributes msg)
-block modifiers attrs =
-    { attrs | block = Just modifiers }
+block : Modifiers BlockDetails -> Modifier (MaybeBlockContainer a)
+block modifiers ({ block } as attrs) =
+    { attrs | block = Just (Maybe.withDefault [] block ++ modifiers) }
+
+
+blockProperties : Modifiers BlockDetails -> Modifier (BlockContainer a)
+blockProperties modifiers ({ block } as attrs) =
+    { attrs | block = block ++ modifiers }
 
 
 defaultNodeAttributes : NodeAttributes msg
@@ -443,9 +468,56 @@ defaultNodeAttributes =
     }
 
 
-defaultFlexAttributes : FlexAttributes msg
-defaultFlexAttributes =
-    defaultNodeAttributes
+flexContainerProperties :
+    List (Display.FlexContainerDetails -> Display.FlexContainerDetails)
+    -> Modifier (FlexContainerAttributes msg)
+flexContainerProperties modifiers ({ flexContainerProperties } as attrs) =
+    { attrs | flexContainerProperties = flexContainerProperties ++ modifiers }
+
+
+defaultFlexContainerAttributes : FlexContainerAttributes msg
+defaultFlexContainerAttributes =
+    { onBlurEvent = Nothing
+    , onEvent = Nothing
+    , onFocusEvent = Nothing
+    , onMouseEvents = Nothing
+    , box = []
+    , universal = defaultUniversalAttributes
+    , block = Nothing
+    , flexContainerProperties = []
+    }
+
+
+defaultHeadingAttributes : HeadingAttributes msg
+defaultHeadingAttributes =
+    { onBlurEvent = Nothing
+    , onEvent = Nothing
+    , onFocusEvent = Nothing
+    , onMouseEvents = Nothing
+    , box = []
+    , universal = defaultUniversalAttributes
+    , block = []
+    }
+
+
+flexItemProperties :
+    List (Display.FlexItemDetails -> Display.FlexItemDetails)
+    -> Modifier (FlexItemAttributes msg)
+flexItemProperties modifiers ({ flexItemProperties } as attrs) =
+    { attrs | flexItemProperties = flexItemProperties ++ modifiers }
+
+
+defaultFlexItemAttributes : FlexItemAttributes msg
+defaultFlexItemAttributes =
+    { onBlurEvent = Nothing
+    , onEvent = Nothing
+    , onFocusEvent = Nothing
+    , onMouseEvents = Nothing
+    , box = []
+    , block = Nothing
+    , universal = defaultUniversalAttributes
+    , flexItemProperties = []
+    }
 
 
 nodeAttributesToHtmlAttributes : NodeAttributes msg -> List (Html.Attribute msg)
@@ -453,9 +525,19 @@ nodeAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
 
 
-flexAttributesToHtmlAttributes : FlexAttributes msg -> List (Html.Attribute msg)
-flexAttributesToHtmlAttributes =
-    nodeAttributesToHtmlAttributes
+flexContainerAttributesToHtmlAttributes : FlexContainerAttributes msg -> List (Html.Attribute msg)
+flexContainerAttributesToHtmlAttributes =
+    visibleAttributesToHtmlAttributes
+
+
+flexItemAttributesToHtmlAttributes : FlexItemAttributes msg -> List (Html.Attribute msg)
+flexItemAttributesToHtmlAttributes =
+    visibleAttributesToHtmlAttributes
+
+
+headingAttributesToHtmlAttributes : HeadingAttributes msg -> List (Html.Attribute msg)
+headingAttributesToHtmlAttributes =
+    visibleAttributesToHtmlAttributes
 
 
 disabled : Modifier (DisabledAttribute a)
