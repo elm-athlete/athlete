@@ -99,7 +99,7 @@ type alias DisabledAttribute a =
 
 
 type alias BlockContainer a =
-    { a | block : Modifiers BlockDetails }
+    { a | block : Maybe (List (BlockDetails -> BlockDetails)) }
 
 
 {-| -}
@@ -120,28 +120,30 @@ type alias DataAttribute a =
     { a | data : List ( String, String ) }
 
 
+type alias TypeContainer a =
+    { a | type_ : String }
+
+
+type alias BoxContainer a =
+    { a | box : List (Box.Box -> Box.Box) }
+
+
+type alias CheckedContainer a =
+    { a | checked : Bool }
+
+
+type alias UniversalContainer a =
+    { a | universal : UniversalAttributes }
+
+
 {-| -}
 type Position
     = Before
     | After
 
 
-type alias LabelAttribute msg a =
-    { a
-        | label :
-            Maybe
-                { attributes : LabelAttributes msg
-
-                -- , content : Node msg
-                }
-    }
-
-
 type alias VisibleAttributes a =
-    { a
-        | box : List (Box.Box -> Box.Box)
-        , universal : UniversalAttributes {}
-    }
+    BoxContainer (UniversalContainer a)
 
 
 {-| -}
@@ -165,7 +167,7 @@ type alias VisibleAttributesAndEvents msg a =
 
 {-| -}
 type alias InputSubmitAttributes msg =
-    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg { type_ : String }))
+    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg (TypeContainer {})))
 
 
 {-| -}
@@ -185,7 +187,7 @@ type alias InputColorAttributes msg =
 
 {-| -}
 type alias InputCheckboxAttributes msg =
-    OnCheckEvent msg (InputStringValueAttributes msg { checked : Bool })
+    CheckedContainer (OnCheckEvent msg (InputStringValueAttributes msg {}))
 
 
 {-| -}
@@ -213,8 +215,8 @@ type alias SelectAttributes msg =
     StringValue (OptionsAttribute (FlowAttributes msg))
 
 
-type alias UniversalAttributes a =
-    TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute a)))
+type alias UniversalAttributes =
+    TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute {})))
 
 
 {-| -}
@@ -222,8 +224,12 @@ type alias FlowAttributes msg =
     VisibleAttributesAndEvents msg {}
 
 
-type alias BlockAttributes msg =
+type alias NodeAttributes msg =
     BlockContainer (FlowAttributes msg)
+
+
+type alias FlexAttributes msg =
+    NodeAttributes msg
 
 
 {-| -}
@@ -265,17 +271,12 @@ type alias ScriptAttributes msg =
 
 
 type alias InputAttributes a =
-    NameAttribute { a | type_ : String }
+    NameAttribute (TypeContainer a)
 
 
 {-| -}
 type alias InputHiddenAttributes =
-    InputAttributes
-        (StringValue
-            { universal : UniversalAttributes {}
-            , type_ : String
-            }
-        )
+    UniversalContainer (TypeContainer (InputAttributes (StringValue {})))
 
 
 type alias LabelAttributes msg =
@@ -283,7 +284,7 @@ type alias LabelAttributes msg =
 
 
 type alias InputVisibleAttributes msg a =
-    LabelAttribute msg (VisibleAttributesAndEvents msg (InputAttributes a))
+    VisibleAttributesAndEvents msg (InputAttributes a)
 
 
 type alias InputStringValueAttributes msg a =
@@ -306,26 +307,26 @@ value val attrs =
 
 
 setUniversal :
-    UniversalAttributes b
-    -> { a | universal : UniversalAttributes b }
-    -> { a | universal : UniversalAttributes b }
+    UniversalAttributes
+    -> { a | universal : UniversalAttributes }
+    -> { a | universal : UniversalAttributes }
 setUniversal val attrs =
     { attrs | universal = val }
 
 
 setUniversalIn :
-    { a | universal : UniversalAttributes b }
-    -> UniversalAttributes b
-    -> { a | universal : UniversalAttributes b }
+    { a | universal : UniversalAttributes }
+    -> UniversalAttributes
+    -> { a | universal : UniversalAttributes }
 setUniversalIn =
     flip setUniversal
 
 
 setValueInUniversal :
-    (a -> UniversalAttributes b -> UniversalAttributes b)
+    (a -> UniversalAttributes -> UniversalAttributes)
     -> a
-    -> { c | universal : UniversalAttributes b }
-    -> { c | universal : UniversalAttributes b }
+    -> { c | universal : UniversalAttributes }
+    -> { c | universal : UniversalAttributes }
 setValueInUniversal setter val ({ universal } as attrs) =
     universal
         |> setter val
@@ -339,22 +340,22 @@ box val ({ box } as attrs) =
         |> setBoxIn attrs
 
 
-title : String -> Modifier { a | universal : UniversalAttributes b }
+title : String -> Modifier { a | universal : UniversalAttributes }
 title =
     setValueInUniversal setTitle
 
 
-id : String -> Modifier { a | universal : UniversalAttributes b }
+id : String -> Modifier { a | universal : UniversalAttributes }
 id =
     setValueInUniversal setId
 
 
-class : List String -> Modifier { a | universal : UniversalAttributes b }
+class : List String -> Modifier { a | universal : UniversalAttributes }
 class =
     setValueInUniversal setClass
 
 
-tabindex : Int -> Modifier { a | universal : UniversalAttributes b }
+tabindex : Int -> Modifier { a | universal : UniversalAttributes }
 tabindex =
     setValueInUniversal setTabIndex
 
@@ -379,7 +380,7 @@ setClass val attrs =
     { attrs | class = val }
 
 
-defaultUniversalAttributes : UniversalAttributes {}
+defaultUniversalAttributes : UniversalAttributes
 defaultUniversalAttributes =
     { class = []
     , id = Nothing
@@ -388,7 +389,7 @@ defaultUniversalAttributes =
     }
 
 
-universalAttributesToHtmlAttributes : UniversalAttributes a -> List (Html.Attribute msg)
+universalAttributesToHtmlAttributes : UniversalAttributes -> List (Html.Attribute msg)
 universalAttributesToHtmlAttributes universal =
     [ .class >> List.map Html.Attributes.class
     , .id >> unwrapMaybeAttribute Html.Attributes.id
@@ -425,26 +426,36 @@ flowAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
 
 
-block : Modifiers BlockDetails -> Modifier (BlockAttributes msg)
+block : Modifiers BlockDetails -> Modifier (NodeAttributes msg)
 block modifiers attrs =
-    { attrs | block = modifiers }
+    { attrs | block = Just modifiers }
 
 
-defaultBlockAttributes : BlockAttributes msg
-defaultBlockAttributes =
+defaultNodeAttributes : NodeAttributes msg
+defaultNodeAttributes =
     { onBlurEvent = Nothing
     , onEvent = Nothing
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
     , box = []
     , universal = defaultUniversalAttributes
-    , block = []
+    , block = Nothing
     }
 
 
-blockAttributesToHtmlAttributes : BlockAttributes msg -> List (Html.Attribute msg)
-blockAttributesToHtmlAttributes =
+defaultFlexAttributes : FlexAttributes msg
+defaultFlexAttributes =
+    defaultNodeAttributes
+
+
+nodeAttributesToHtmlAttributes : NodeAttributes msg -> List (Html.Attribute msg)
+nodeAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
+
+
+flexAttributesToHtmlAttributes : FlexAttributes msg -> List (Html.Attribute msg)
+flexAttributesToHtmlAttributes =
+    nodeAttributesToHtmlAttributes
 
 
 disabled : Modifier (DisabledAttribute a)
@@ -691,7 +702,6 @@ defaultInputTextAttributes =
     , onFocusEvent = Nothing
     , placeholder = Nothing
     , autocomplete = True
-    , label = Nothing
     }
 
 
@@ -705,6 +715,10 @@ inputTextAttributesToHtmlAttributes attributes =
                 |> List.append (inputVisibleToHtmlAttributes attributes)
                 |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
            )
+
+
+
+-- From HERE
 
 
 step : Int -> Modifier (StepAttribute a)
@@ -738,7 +752,6 @@ defaultInputNumberAttributes =
     , min = Nothing
     , max = Nothing
     , step = Nothing
-    , label = Nothing
     }
 
 
@@ -766,7 +779,6 @@ defaultInputColorAttributes =
     , onEvent = Nothing
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
-    , label = Nothing
     }
 
 
@@ -795,7 +807,6 @@ defaultInputCheckboxAttributes =
     , onEvent = Nothing
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
-    , label = Nothing
     }
 
 
@@ -817,7 +828,6 @@ defaultInputFileAttributes =
     , onEvent = Nothing
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
-    , label = Nothing
     }
 
 
@@ -841,7 +851,6 @@ defaultInputPasswordAttributes =
     , onFocusEvent = Nothing
     , placeholder = Nothing
     , autocomplete = True
-    , label = Nothing
     }
 
 
@@ -861,7 +870,6 @@ defaultInputRadioAttributes =
     , onEvent = Nothing
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
-    , label = Nothing
     }
 
 
@@ -888,7 +896,6 @@ defaultInputRangeAttributes =
     , min = Nothing
     , max = Nothing
     , step = Nothing
-    , label = Nothing
     }
 
 
@@ -938,7 +945,6 @@ defaultInputUrlAttributes =
     , onFocusEvent = Nothing
     , placeholder = Nothing
     , autocomplete = True
-    , label = Nothing
     }
 
 

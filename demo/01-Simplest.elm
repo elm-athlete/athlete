@@ -1,25 +1,38 @@
 module Simplest exposing (..)
 
-import BodyBuilder exposing (..)
-import BodyBuilder.Attributes as Attrs
-import Elegant
+import BodyBuilder as Builder exposing (Node)
+import BodyBuilder.Attributes as Attributes
+import Elegant exposing (px, percent)
+import Display
+import Box
+import Padding
 import Color
 
 
 view : a -> Node msg
 view model =
-    -- div
-    --     [ style [ textColor Color.blue ]
-    --     , hoverStyle [ textColor Color.red ]
-    --     ]
-    --     [ text "I'm Elegantly styled by css, but my style is set inline" ]
-    -- node [ Attrs.block [] ] []
-    text "Bonjour"
+    Builder.node
+        [ Attributes.block [ Display.alignCenter ]
+        , Attributes.box [ Box.background [ Elegant.color Color.lightPurple ] ]
+        ]
+        [ Builder.node [] [ Builder.text "I'm inline!" ]
+        , Builder.node
+            [ Attributes.box [ Box.padding [ Padding.vertical (px 30) ] ] ]
+            [ Builder.text "I'm inline too!" ]
+        , Builder.node
+            [ Attributes.block [] ]
+            [ Builder.text "But I'm a block!" ]
+        , Builder.node [] [ Builder.text "I'm still inline for me!" ]
+        , Builder.flex
+            []
+            [ Attributes.block [] ]
+            [ Builder.text "I'm a flex element" ]
+        ]
 
 
 main : Program Basics.Never number msg
 main =
-    program
+    Builder.program
         { init = ( 0, Cmd.none )
         , update = (\msg model -> ( model, Cmd.none ))
         , subscriptions = always Sub.none
