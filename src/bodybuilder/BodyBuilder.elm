@@ -7,6 +7,7 @@ import BodyBuilder.Attributes exposing (..)
 import Function
 import Helpers.Shared exposing (..)
 import Display exposing (FlexContainerDetails)
+import Box
 
 
 -- import Native.BodyBuilder
@@ -548,9 +549,9 @@ p =
 
 computeBlock :
     String
-    -> Maybe ( Modifiers FlexContainerDetails, List StyleSelector )
-    -> Maybe ( Modifiers Display.FlexItemDetails, List StyleSelector )
-    -> Maybe ( Modifiers Display.BlockDetails, List StyleSelector )
+    -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector ))
+    -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector ))
+    -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector ))
     -> VisibleAttributes a
     -> (VisibleAttributes a -> List (Html.Attribute msg))
     -> Modifiers (VisibleAttributes a)
@@ -563,7 +564,7 @@ computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttribute
                 defaultAttributes
     in
         Html.node tag
-            (attributes
+            (attributes.box
                 |> displayStyle flexModifiers flexItemModifiers blockModifiers
                 |> Elegant.styleToCss
                 |> Html.Attributes.class
@@ -572,13 +573,30 @@ computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttribute
             content
 
 
+type alias MediaQueriesStyled =
+    { flexContainer : Modifiers Display.FlexContainerDetails
+    , flexItem : Modifiers Display.FlexItemDetails
+    , block : Modifiers Display.BlockDetails
+    , box : Modifiers Box.Box
+    }
+
+--
+-- foo :
+--     List ( Modifiers FlexContainerDetails, StyleSelector )
+--     -> List ( Modifiers Display.FlexItemDetails, StyleSelector )
+--     -> List ( Modifiers Display.BlockDetails, StyleSelector )
+--     -> List ( Modifiers Box.Box, StyleSelector )
+--     -> List (List )
+-- foo flex
+
+
 displayStyle :
-    Maybe ( Modifiers FlexContainerDetails, List StyleSelector )
-    -> Maybe ( Modifiers Display.FlexItemDetails, List StyleSelector )
-    -> Maybe ( Modifiers Display.BlockDetails, List StyleSelector )
-    -> VisibleAttributes a
+    Maybe (List ( Modifiers FlexContainerDetails, StyleSelector ))
+    -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector ))
+    -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector ))
+    -> List ( Modifiers Box.Box, StyleSelector )
     -> Elegant.Style
-displayStyle flexModifiers flexItemModifiers blockModifiers { box } =
+displayStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
     let
         displayInside =
             case flexItemModifiers of

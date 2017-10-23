@@ -36,13 +36,11 @@ view model =
                 [ Box.background []
                 , Box.background [ Elegant.color Color.lightPurple ]
                 ]
-                |> Attributes.selector
-                    [ Attributes.media [ Attributes.greater (px 700) ]
-                    , Attributes.hover
-                    ]
+                |> Attributes.media (Attributes.between (px 700) (px 700))
+                |> Attributes.hover
             ]
 
-        -- , Events.onClick msg
+        -- , Events.onClick msge
         ]
         [ Builder.node [] [ Builder.text "I'm inline!" ]
         , Builder.node

@@ -1,44 +1,62 @@
 module BodyBuilder.Setters exposing (..)
 
 
-setBox : b -> { a | box : b } -> { a | box : b }
+setBox : b -> { a | box : List b } -> { a | box : List b }
 setBox =
     flip setBoxIn
 
 
-setBoxIn : { a | box : b } -> b -> { a | box : b }
-setBoxIn record boxAttribute =
-    { record | box = boxAttribute }
+setBoxIn : { a | box : List b } -> b -> { a | box : List b }
+setBoxIn ({ box } as record) boxAttribute =
+    { record | box = boxAttribute :: box }
 
 
-setBlock : b -> { a | block : b } -> { a | block : b }
+setBlock : b -> { a | block : List b } -> { a | block : List b }
 setBlock =
     flip setBlockIn
 
 
-setBlockIn : { a | block : b } -> b -> { a | block : b }
-setBlockIn record blockAttribute =
-    { record | block = blockAttribute }
+setBlockIn : { a | block : List b } -> b -> { a | block : List b }
+setBlockIn ({ block } as record) blockAttribute =
+    { record | block = blockAttribute :: block }
 
 
-setFlexContainerProperties : c -> { b | flexContainerProperties : a } -> { b | flexContainerProperties : c }
+setMaybeBlock : b -> { a | block : Maybe (List b) } -> { a | block : Maybe (List b) }
+setMaybeBlock =
+    flip setMaybeBlockIn
+
+
+setMaybeBlockIn : { a | block : Maybe (List b) } -> b -> { a | block : Maybe (List b) }
+setMaybeBlockIn ({ block } as record) blockAttribute =
+    { record
+        | block =
+            case block of
+                Nothing ->
+                    Just [ blockAttribute ]
+
+                Just modifiers ->
+                    Just (blockAttribute :: modifiers)
+    }
+
+
+setFlexContainerProperties : c -> { b | flexContainerProperties : List c } -> { b | flexContainerProperties : List c }
 setFlexContainerProperties =
     flip setFlexContainerPropertiesIn
 
 
-setFlexContainerPropertiesIn : { b | flexContainerProperties : a } -> c -> { b | flexContainerProperties : c }
-setFlexContainerPropertiesIn record flexContainerProperties =
-    { record | flexContainerProperties = flexContainerProperties }
+setFlexContainerPropertiesIn : { b | flexContainerProperties : List c } -> c -> { b | flexContainerProperties : List c }
+setFlexContainerPropertiesIn ({ flexContainerProperties } as record) flexContainerAttribute =
+    { record | flexContainerProperties = flexContainerAttribute :: flexContainerProperties }
 
 
-setFlexItemProperties : c -> { b | flexItemProperties : a } -> { b | flexItemProperties : c }
+setFlexItemProperties : c -> { b | flexItemProperties : List c } -> { b | flexItemProperties : List c }
 setFlexItemProperties =
     flip setFlexItemPropertiesIn
 
 
-setFlexItemPropertiesIn : { b | flexItemProperties : a } -> c -> { b | flexItemProperties : c }
-setFlexItemPropertiesIn record flexItemProperties =
-    { record | flexItemProperties = flexItemProperties }
+setFlexItemPropertiesIn : { b | flexItemProperties : List c } -> c -> { b | flexItemProperties : List c }
+setFlexItemPropertiesIn ({ flexItemProperties } as record) flexItemAttribute =
+    { record | flexItemProperties = flexItemAttribute :: flexItemProperties }
 
 
 setStyleIn : { a | style : b } -> b -> { a | style : b }
