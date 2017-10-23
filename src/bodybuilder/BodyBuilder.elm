@@ -228,16 +228,6 @@ type FlexItem msg
 --         "input"
 --
 --
--- {-| -}
--- inputText : Modifiers (InputTextAttributes msg) -> Node msg
--- inputText =
---     flip
---         (visibleNode
---             BodyBuilder.Attributes.defaultInputTextAttributes
---             BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
---             "input"
---         )
---         []
 --
 --
 -- {-| -}
@@ -496,6 +486,23 @@ button modifiers =
             modifiers
 
 
+{-| -}
+inputText : Modifiers (InputTextAttributes msg) -> Node msg
+inputText modifiers =
+    let
+        attributes =
+            (Function.compose modifiers) BodyBuilder.Attributes.defaultInputTextAttributes
+    in
+        computeBlock
+            "input"
+            Nothing
+            Nothing
+            attributes.block
+            BodyBuilder.Attributes.defaultInputTextAttributes
+            BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
+            modifiers
+            []
+
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 heading tag modifiers =
     let
@@ -580,7 +587,8 @@ type alias MediaQueriesStyled =
     , box : Modifiers Box.Box
     }
 
---
+
+
 -- foo :
 --     List ( Modifiers FlexContainerDetails, StyleSelector )
 --     -> List ( Modifiers Display.FlexItemDetails, StyleSelector )
@@ -588,7 +596,9 @@ type alias MediaQueriesStyled =
 --     -> List ( Modifiers Box.Box, StyleSelector )
 --     -> List (List )
 -- foo flex
-
+concatModifiers : ( appendable, a ) -> appendable -> appendable
+concatModifiers (modifiers, _ ) acc=
+    acc ++ modifiers
 
 displayStyle :
     Maybe (List ( Modifiers FlexContainerDetails, StyleSelector ))
@@ -598,31 +608,43 @@ displayStyle :
     -> Elegant.Style
 displayStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
     let
+        flexModifiers_ =
+            Maybe.map (List.foldr concatModifiers []) flexModifiers
+
+        flexItemModifiers_ =
+            Maybe.map (List.foldr concatModifiers []) flexItemModifiers
+
+        blockModifiers_ =
+            Maybe.map (List.foldr concatModifiers []) blockModifiers
+
+        boxModifiers_ =
+            List.foldr concatModifiers [] boxModifiers
+
         displayInside =
-            case flexItemModifiers of
+            case flexItemModifiers_ of
                 Just _ ->
                     Display.Flow
 
                 Nothing ->
-                    case flexModifiers of
+                    case flexModifiers_ of
                         Just modifiers ->
-                            Display.flexContainer (Tuple.first modifiers)
+                            Display.flexContainer modifiers
 
                         Nothing ->
                             Display.Flow
 
         displayOutside =
-            case flexItemModifiers of
+            case flexItemModifiers_ of
                 Just modifiers ->
-                    Display.flexItem (Tuple.first modifiers) <| Tuple.first <| Maybe.withDefault ( [], [] ) blockModifiers
+                    Display.flexItem modifiers <| Maybe.withDefault [] blockModifiers_
 
                 Nothing ->
-                    case blockModifiers of
+                    case blockModifiers_ of
                         Just modifiers ->
-                            Display.block (Tuple.first modifiers)
+                            Display.block modifiers
 
                         Nothing ->
                             Display.Inline
     in
         Elegant.style <|
-            Display.displayBox displayOutside displayInside (Tuple.first box)
+            Display.displayBox displayOutside displayInside boxModifiers_

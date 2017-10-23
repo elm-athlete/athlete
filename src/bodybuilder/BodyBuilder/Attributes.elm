@@ -367,7 +367,7 @@ type alias InputStringValueAttributes msg a =
 
 {-| -}
 type alias InputTextAttributesBase msg a =
-    AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a)))
+    MaybeBlockContainer (AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a))))
 
 
 type alias InputTextAttributes msg =
@@ -838,6 +838,7 @@ defaultInputTextAttributes : InputTextAttributes msg
 defaultInputTextAttributes =
     { universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , name = Nothing
     , type_ = "text"
     , value = Nothing
@@ -990,6 +991,7 @@ defaultInputPasswordAttributes =
     , value = Nothing
     , universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , onMouseEvents = Nothing
     , onInputEvent = Nothing
     , fromStringInput = identity
@@ -1085,6 +1087,7 @@ defaultInputUrlAttributes =
     , type_ = "url"
     , universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , onMouseEvents = Nothing
     , onInputEvent = Nothing
     , fromStringInput = identity
