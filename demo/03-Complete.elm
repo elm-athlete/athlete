@@ -1,13 +1,11 @@
 module Demo exposing (..)
 
 import Elegant exposing (..)
-import Elegant.Elements exposing (..)
 import Color exposing (..)
 import Color.Manipulate as Color
-import BodyBuilder exposing (..)
+import BodyBuilder as Builder exposing (..)
+import BodyBuilder.Attributes as Attributes
 import Function exposing (..)
-import Elegant.Grid exposing (..)
-import Elegant.Elements as Elements exposing (..)
 
 
 type Msg
@@ -236,7 +234,7 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
                 , span [] [ text "I like BodyBuilder" ]
                 ]
             ]
-        , inputFile [ style [ Elegant.displayBlock ] ]
+        , inputFile [ style [ Attributes.block ] ]
         , inputPassword [ style [ Elegant.displayBlock ], value "" ]
         , inputRadio [ style [ Elegant.displayBlock ], value "Test" ]
         , inputUrl [ style [ Elegant.displayBlock ], name "inputUrl" ]

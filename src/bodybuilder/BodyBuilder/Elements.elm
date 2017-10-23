@@ -20,20 +20,20 @@ stickyView :
     -> List (Node msg)
     -> Node msg
 stickyView sectionStyle sectionName elements =
-    div []
-        [ div
+    node []
+        [ node
             [ BodyBuilder.Attributes.style
-                [ Elegant.style <|
-                    Display.block
-                        [ Display.dimensions [ Display.width (percent 100) ] ]
-                        [ Box.position <|
-                            Position.sticky [ Position.top (px 0) ]
-                        , sectionStyle |> Function.compose
-                        ]
+                [ BodyBuilder.Attributes.block
+                    [ Display.dimensions [ Display.width (percent 100) ] ]
+                , BodyBuilder.Attributes.box
+                    [ Box.position <|
+                        Position.sticky [ Position.top (px 0) ]
+                    , sectionStyle |> Function.compose
+                    ]
                 ]
             ]
             [ text sectionName ]
-        , div [] elements
+        , node [] elements
         ]
 
 

@@ -1,45 +1,59 @@
 module Counter exposing (..)
 
-import BodyBuilder exposing (..)
-import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize, Style)
-import Elegant.Elements
+import BodyBuilder as Builder exposing (..)
+import BodyBuilder.Attributes as Attributes exposing (..)
+import BodyBuilder.Events as Events exposing (..)
+import Display
+import Box
+import Constants
+import Border
+import Elegant exposing (px, percent, vh)
+import Typography
+import Padding
 import Function exposing (compose)
 import Color
+import Color.Extra as Color
+import Typography.Character as Character
+import Background
 
 
-buttonStyle : Style -> Style
 buttonStyle =
-    [ Elegant.paddingVertical Elegant.zero
-    , Elegant.borderWidth 0
-    , Elegant.fontSize (Px 10)
-    , Elegant.backgroundColor Elegant.transparent
+    [ Attributes.box
+        [ Box.padding [ Padding.vertical Constants.zero ]
+        , Box.border [ Border.all [ Border.thickness 0 ] ]
+        , Box.typography [ Typography.character [ Character.size (px 10) ] ]
+        , Box.background [ Elegant.color Color.transparent ]
+        ]
     ]
         |> compose
 
 
 counter : a -> Node Msg
 counter model =
-    div [ style [ Elegant.displayInlineBlock ] ]
-        [ div
+    node [ style [ Display.block [] ] ]
+        [ flex
             [ style
-                [ Elegant.displayFlex
-                , Elegant.alignItemsCenter
-                , Elegant.Elements.border Color.gray
+                [ Attributes.flexContainerProperties
+                    [ Display.alignCenter
+                    ]
+                , Attributes.box
+                    [ Box.border [ Border.all [ Elegant.color Color.gray ] ] ]
                 ]
             ]
             [ inputText
                 [ style
-                    [ padding Elegant.zero
-                    , fontSize (Px 20)
-                    , Elegant.borderWidth 0
+                    [ Attributes.box
+                        [ Box.padding [ Padding.all Constants.zero ]
+                        , Box.typography [ Typography.character [ Character.size (px 20) ] ]
+                        , Box.border [ Border.all [ Border.thickness 0 ] ]
+                        ]
                     ]
                 , onInput Change
                 , value (model |> toString)
                 ]
-            , div
+            , flex
                 [ style
-                    [ Elegant.displayFlex
-                    , Elegant.flexDirectionColumn
+                    [ Attributes.flexContainerProperties [ Display.column ]
                     ]
                 ]
                 [ button [ onClick Add, style [ buttonStyle ] ] [ text "+" ]
@@ -51,7 +65,15 @@ counter model =
 
 view : a -> Node Msg
 view model =
-    div [ style [ Elegant.displayFlex, Elegant.alignItemsCenter, Elegant.height (Vh 100), Elegant.justifyContentCenter ] ]
+    Builder.flex
+        [ style
+            [ Attributes.block [ Display.dimensions [ Display.height (vh 100) ] ]
+            , Attributes.flexContainerProperties
+                [ Display.alignCenter
+                , Display.justifyContent Display.justifyContentCenter
+                ]
+            ]
+        ]
         [ counter model
         ]
 

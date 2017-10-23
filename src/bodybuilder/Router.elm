@@ -41,7 +41,7 @@ pages and history (backward and forward)
 -}
 
 import BodyBuilder exposing (..)
-import BodyBuilder.Attributes exposing (..)
+import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
 import Elegant exposing (SizeUnit, percent)
 import AnimationFrame
@@ -54,6 +54,7 @@ import Typography
 import Padding
 import Cursor
 import Typography.Character
+import Color
 
 
 type Easing
@@ -306,7 +307,11 @@ visiblePages { transition, before, current, after } =
 
 percentage : Float -> SizeUnit
 percentage a =
-    percent <| toFloat <| round <| 100 * a -- Heavily reduces the number of generated classes...
+    percent <| toFloat <| round <| 100 * a
+
+
+
+-- Heavily reduces the number of generated classes...
 
 
 beforeTransition : History route -> List (Page route)
@@ -335,22 +340,18 @@ afterTransition history =
                 [ history.current ]
 
 
-overflowHiddenContainer :
-    List (FlowAttributes msg -> FlowAttributes msg)
-    -> List (Node msg)
-    -> Node msg
 overflowHiddenContainer attributes content =
-    div
-        [ style
-            [ Elegant.style <|
-                Display.block
-                    [ Display.overflow
-                        [ Display.Overflow.overflowXY Display.Overflow.hidden ]
-                    ]
-                    []
+    flex
+        ([ style
+            [ Attributes.block
+                [ Display.overflow
+                    [ Display.Overflow.overflowXY Display.Overflow.hidden ]
+                ]
             ]
-        ]
-        [ div attributes content ]
+         ]
+            ++ attributes
+        )
+        content
 
 
 pageView :
@@ -360,15 +361,15 @@ pageView :
     -> a
     -> Node msg
 pageView insidePageView_ transition data page =
-    div
-        [ style
-            [ Elegant.style <|
-                Display.block
-                    [ Display.dimensions [ Display.width (percent 100) ] ]
-                    [ Box.boxShadow
-                        [-- BoxShadow.
-                        ]
+    node
+        [ Attributes.style
+            [ Attributes.block
+                [ Display.dimensions [ Display.width (percent 100) ] ]
+            , Attributes.box
+                [ Box.boxShadow
+                    [-- BoxShadow.
                     ]
+                ]
             ]
 
         -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
@@ -391,33 +392,34 @@ historyView insidePageView_ history data =
     in
         case history.transition of
             Nothing ->
-                overflowHiddenContainer [] [ pageView insidePageView_ Nothing data history.current ]
+                overflowHiddenContainer []
+                    [ flexItem
+                        [ Attributes.style [ Attributes.flexItemProperties [ Display.basis (percent 100) ] ] ]
+                        [ pageView insidePageView_ Nothing data history.current ]
+                    ]
 
             Just transition ->
                 case transition.kind of
                     SlideUp ->
-                        overflowHiddenContainer
-                            []
-                            [ div
+                        overflowHiddenContainer []
+                            [ flexItem
                                 [ style
-                                    [ Elegant.style <|
-                                        Display.block
-                                            [ Display.dimensions [ Display.width (percent 100) ] ]
-                                            []
+                                    [ Attributes.block []
+                                    , Attributes.flexItemProperties [ Display.basis (percent 100) ]
                                     ]
                                 ]
                                 (List.map (pageView insidePageView_ history.transition data) (history |> beforeTransition))
-                            , div
+                            , flexItem
                                 [ style
-                                    [ Elegant.style <|
-                                        Display.block
-                                            [ Display.dimensions [ Display.width (percent 100) ] ]
-                                            [ Box.position <|
-                                                Position.absolute <|
-                                                    [ Position.bottom <|
-                                                        percentage ((getMaybeTransitionValue <| history.transition) - 1)
-                                                    ]
-                                            ]
+                                    [ Attributes.block []
+                                    , Attributes.flexItemProperties [ Display.basis (percent 100) ]
+                                    , Attributes.box
+                                        [ Box.position <|
+                                            Position.absolute <|
+                                                [ Position.bottom <|
+                                                    percentage ((getMaybeTransitionValue <| history.transition) - 1)
+                                                ]
+                                        ]
                                     ]
                                 ]
                                 (List.map (pageView insidePageView_ history.transition data) (history |> afterTransition))
@@ -426,20 +428,19 @@ historyView insidePageView_ history data =
                     SlideRight ->
                         overflowHiddenContainer
                             [ style
-                                [ Elegant.style <|
-                                    Display.blockFlexContainer []
-                                        [ Display.dimensions [ Display.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
-                                        [ Box.position <|
-                                            Position.relative <|
-                                                [ Position.right <|
-                                                    percentage <|
-                                                        getMaybeTransitionValue <|
-                                                            history.transition
-                                                ]
-                                        ]
+                                [ Attributes.block
+                                    [ Display.dimensions [ Display.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
+                                , Attributes.box
+                                    [ Box.position
+                                        (Position.relative
+                                            ([ Position.right (percentage (getMaybeTransitionValue history.transition)) ])
+                                        )
+                                    ]
                                 ]
                             ]
-                            (List.map (pageView insidePageView_ history.transition data) visiblePages_)
+                            (List.map (BodyBuilder.flexItem [ Attributes.style [ Attributes.flexItemProperties [ Display.basis (percent 100) ] ] ] << List.singleton)
+                                (List.map (pageView insidePageView_ history.transition data) visiblePages_)
+                            )
 
 
 {-| maybe transition subscription
@@ -498,33 +499,32 @@ initHistoryAndData route data =
 
 
 headerButtonStyle width align =
-    Display.flexChild
-        [ Display.basis width
-        ]
-        [ Display.overflow
-            [ Display.Overflow.overflowXY Display.Overflow.hidden ]
-        , Display.textOverflowEllipsis
-        , align
-        ]
-        [ Box.cursor Cursor.pointer
-        , Box.typography
-            [ Typography.character
-                [ Typography.Character.size (Elegant.px 12) ]
+    Attributes.style
+        [ Attributes.flexItemProperties [ Display.basis width ]
+        , Attributes.block
+            [ Display.overflow
+                [ Display.Overflow.overflowXY Display.Overflow.hidden ]
+            , Display.textOverflowEllipsis
+            , align
+            ]
+        , Attributes.box
+            [ Box.cursor Cursor.pointer
+            , Box.typography
+                [ Typography.character
+                    [ Typography.Character.size (Elegant.px 12) ]
+                ]
             ]
         ]
 
 
-headerButtonStyleLeft : Display.DisplayBox
 headerButtonStyleLeft =
     headerButtonStyle (percent 30) (Display.alignment Display.left)
 
 
-headerButtonStyleCenter : Display.DisplayBox
 headerButtonStyleCenter =
     headerButtonStyle (percent 40) Display.alignCenter
 
 
-headerButtonStyleRight : Display.DisplayBox
 headerButtonStyleRight =
     headerButtonStyle (percent 30) (Display.alignment Display.right)
 
@@ -535,26 +535,25 @@ headerElement :
     { a | center : Node msg, left : Node msg, right : Node msg }
     -> Node msg
 headerElement { left, center, right } =
-    div
+    node
         [ style
-            [ Elegant.style <|
-                Display.block
-                    [ Display.dimensions [ Display.width <| percent 100 ] ]
-                    [ Box.position <| Position.sticky [] ]
-            ]
-        ]
-        [ div
-            [ style
-                [ Elegant.style <|
-                    Display.blockFlexContainer
-                        [ Display.direction Display.row ]
-                        [ Display.dimensions [ Display.width (percent 100) ] ]
-                        []
+            [ Attributes.block
+                [ Display.dimensions [ Display.width <| percent 100 ] ]
+            , Attributes.box
+                [ Box.position <| Position.sticky []
+                , Box.background [ Elegant.color Color.lightPurple ]
                 ]
             ]
-            [ div [ style [ Elegant.style <| headerButtonStyleLeft ] ] [ left ]
-            , div [ style [ Elegant.style <| headerButtonStyleCenter ] ] [ center ]
-            , div [ style [ Elegant.style <| headerButtonStyleRight ] ] [ right ]
+        ]
+        [ flex
+            [ style
+                [ Attributes.block [ Display.dimensions [ Display.width (percent 100) ] ]
+                , Attributes.flexContainerProperties [ Display.direction Display.row ]
+                ]
+            ]
+            [ flexItem [ headerButtonStyleLeft ] [ left ]
+            , flexItem [ headerButtonStyleCenter ] [ center ]
+            , flexItem [ headerButtonStyleRight ] [ right ]
             ]
         ]
 
@@ -563,9 +562,9 @@ headerElement { left, center, right } =
 -}
 headerButton : msg -> String -> Node msg
 headerButton msg content =
-    div
+    node
         [ onClick <| msg
-        , style [ Elegant.style <| Display.block [] [ Box.padding [ Padding.all (Elegant.px 12) ] ] ]
+        , style [ Attributes.block [], Attributes.box [ Box.padding [ Padding.all (Elegant.px 12) ] ] ]
         ]
         [ text content
         ]

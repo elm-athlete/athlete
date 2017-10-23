@@ -25,6 +25,7 @@ module Display
         , alignment
         , alignCenter
         , right
+        , cnter
         , left
         , justify
         , overflow
@@ -114,6 +115,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs alignment
 @docs alignCenter
 @docs right
+@docs cnter
 @docs left
 @docs justify
 
@@ -441,6 +443,13 @@ alignCenter =
 right : Alignment
 right =
     AlignmentRight
+
+
+{-| Defines the alignment as center.
+-}
+cnter : Alignment
+cnter =
+    AlignmentCenter
 
 
 {-| Defines the alignment as left.

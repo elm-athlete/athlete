@@ -8,8 +8,8 @@ I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 -}
 
 import BodyBuilder exposing (..)
-import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
-import Elegant.Elements exposing (borderBottom)
+import Elegant
+import BodyBuilder.Events as Events
 import Color
 import Date
 import Date exposing (Month(..))
@@ -83,7 +83,7 @@ gray =
 titleView : Blogpost -> Node Msg
 titleView blogpost =
     button
-        [ onClick <| HistoryMsgWrapper <| BlogpostShow blogpost.id
+        [ Events.onClick <| HistoryMsgWrapper <| BlogpostShow blogpost.id
         , style
             [ Elegant.cursorPointer
             , Elegant.borderNone

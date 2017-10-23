@@ -29,6 +29,8 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
   document.getElementsByTagName("head")[0].appendChild(css);
   css = css.sheet
 
+  css.insertRule('*{box-sizing: border-box}')
+
   // fetchStyle : String -> Maybe (List String)
   function fetchStyles(key) {
     return fetch(stylesCache, key)
