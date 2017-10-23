@@ -479,6 +479,22 @@ flexItem modifiers =
                 modifiers
 
 
+button : Modifiers (ButtonAttributes msg) -> List (Node msg) -> Node msg
+button modifiers =
+    let
+        attributes =
+            (Function.compose modifiers) BodyBuilder.Attributes.defaultButtonAttributes
+    in
+        computeBlock
+            "button"
+            Nothing
+            Nothing
+            attributes.block
+            BodyBuilder.Attributes.defaultButtonAttributes
+            BodyBuilder.Attributes.buttonAttributesToHtmlAttributes
+            modifiers
+
+
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 heading tag modifiers =
     let

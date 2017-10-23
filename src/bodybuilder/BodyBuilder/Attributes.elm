@@ -290,7 +290,7 @@ type alias HeadingAttributes msg =
 
 {-| -}
 type alias ButtonAttributesBase msg a =
-    DisabledAttribute (VisibleAttributesAndEvents msg a)
+    MaybeBlockContainer (DisabledAttribute (VisibleAttributesAndEvents msg a))
 
 
 type alias ButtonAttributes msg =
@@ -415,6 +415,16 @@ blockProperties =
     waitForStyleSelector setBlock
 
 
+flexContainerProperties : Modifiers Display.FlexContainerDetails -> StyleModifier (FlexContainerAttributes msg)
+flexContainerProperties =
+    waitForStyleSelector setFlexContainerProperties
+
+
+flexItemProperties : Modifiers Display.FlexItemDetails -> StyleModifier (FlexItemAttributes msg)
+flexItemProperties =
+    waitForStyleSelector setFlexItemProperties
+
+
 selector : List StyleSelector -> StyleModifier a -> StyleModifier a
 selector queries modifier =
     modifier << (++) queries
@@ -523,14 +533,6 @@ defaultNodeAttributes =
     }
 
 
-
--- flexContainerProperties :
---     List (Display.FlexContainerDetails -> Display.FlexContainerDetails)
---     -> Modifier (FlexContainerAttributes msg)
--- flexContainerProperties modifiers ({ flexContainerProperties } as attrs) =
---     { attrs | flexContainerProperties = flexContainerProperties ++ modifiers }
-
-
 defaultFlexContainerAttributes : FlexContainerAttributes msg
 defaultFlexContainerAttributes =
     { onBlurEvent = Nothing
@@ -554,14 +556,6 @@ defaultHeadingAttributes =
     , universal = defaultUniversalAttributes
     , block = ( [], [] )
     }
-
-
-
--- flexItemProperties :
---     List (Display.FlexItemDetails -> Display.FlexItemDetails)
---     -> Modifier (FlexItemAttributes msg)
--- flexItemProperties modifiers ({ flexItemProperties } as attrs) =
---     { attrs | flexItemProperties = flexItemProperties ++ modifiers }
 
 
 defaultFlexItemAttributes : FlexItemAttributes msg
@@ -615,6 +609,7 @@ defaultButtonAttributes =
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
     , box = ( [], [] )
+    , block = Nothing
     , universal = defaultUniversalAttributes
     }
 
@@ -1048,6 +1043,7 @@ defaultInputSubmitAttributes =
     { type_ = "submit"
     , universal = defaultUniversalAttributes
     , box = ( [], [] )
+    , block = Nothing
     , onMouseEvents = Nothing
     , disabled = False
     , onSubmitEvent = Nothing

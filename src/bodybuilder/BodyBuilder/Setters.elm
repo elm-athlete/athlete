@@ -21,6 +21,26 @@ setBlockIn record blockAttribute =
     { record | block = blockAttribute }
 
 
+setFlexContainerProperties : c -> { b | flexContainerProperties : a } -> { b | flexContainerProperties : c }
+setFlexContainerProperties =
+    flip setFlexContainerPropertiesIn
+
+
+setFlexContainerPropertiesIn : { b | flexContainerProperties : a } -> c -> { b | flexContainerProperties : c }
+setFlexContainerPropertiesIn record flexContainerProperties =
+    { record | flexContainerProperties = flexContainerProperties }
+
+
+setFlexItemProperties : c -> { b | flexItemProperties : a } -> { b | flexItemProperties : c }
+setFlexItemProperties =
+    flip setFlexItemPropertiesIn
+
+
+setFlexItemPropertiesIn : { b | flexItemProperties : a } -> c -> { b | flexItemProperties : c }
+setFlexItemPropertiesIn record flexItemProperties =
+    { record | flexItemProperties = flexItemProperties }
+
+
 setStyleIn : { a | style : b } -> b -> { a | style : b }
 setStyleIn record styleAttribute =
     { record | style = styleAttribute }
