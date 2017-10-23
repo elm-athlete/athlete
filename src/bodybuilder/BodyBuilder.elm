@@ -479,8 +479,8 @@ flexItem modifiers =
                 modifiers
 
 
-header : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
-header tag modifiers =
+heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+heading tag modifiers =
     let
         attributes =
             (Function.compose modifiers) BodyBuilder.Attributes.defaultHeadingAttributes
@@ -497,37 +497,37 @@ header tag modifiers =
 
 h1 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h1 =
-    header "h1"
+    heading "h1"
 
 
 h2 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h2 =
-    header "h2"
+    heading "h2"
 
 
 h3 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h3 =
-    header "h3"
+    heading "h3"
 
 
 h4 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h4 =
-    header "h4"
+    heading "h4"
 
 
 h5 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h5 =
-    header "h5"
+    heading "h5"
 
 
 h6 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h6 =
-    header "h6"
+    heading "h6"
 
 
 p : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 p =
-    header "p"
+    heading "p"
 
 
 computeBlock :
