@@ -2,7 +2,10 @@ module Simplest exposing (..)
 
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Events as Events
+
+
+-- import BodyBuilder.Events as Events
+
 import Elegant exposing (px, percent)
 import Display
 import Box
@@ -25,42 +28,53 @@ type Msg
 view : a -> Node Msg
 view model =
     Builder.node
-        [ Attributes.block [ Display.alignCenter ]
-        , Attributes.box
-            [ Box.background []
-
-            -- |> media [ mobile, greater (px 700), orientation landscape ]
-            -- |> hover
-            , Box.background [ Elegant.color Color.lightPurple ]
-
-            -- |> active
+        [ Attributes.style
+            [ Attributes.block [ Display.alignCenter ]
+            , Attributes.box
+                [ Box.background [ Elegant.color Color.blue ] ]
+            , Attributes.box
+                [ Box.background []
+                , Box.background [ Elegant.color Color.lightPurple ]
+                ]
+                |> Attributes.selector
+                    [ Attributes.media [ Attributes.greater (px 700) ]
+                    , Attributes.hover
+                    ]
             ]
+
+        -- , Events.onClick msg
         ]
         [ Builder.node [] [ Builder.text "I'm inline!" ]
         , Builder.node
-            [ Attributes.box [ Box.padding [ Padding.vertical (px 30) ] ] ]
+            [ Attributes.style [ Attributes.box [ Box.padding [ Padding.vertical (px 30) ] ] ] ]
             [ Builder.text "I'm inline too!" ]
         , Builder.node
-            [ Attributes.block [] ]
+            [ Attributes.style [ Attributes.block [] ] ]
             [ Builder.text "But I'm a block!" ]
         , Builder.node [] [ Builder.text "I'm still inline for me!" ]
         , Builder.flex
-            [ Attributes.block [] -- Base
-            , Attributes.block [] -- |> media (greater (px 700)) -- When x > 700px
-            , Attributes.flexContainerProperties []
-            , Attributes.flexContainerProperties [] -- |> media (less (px 700))
-            , Attributes.flexContainerProperties [] -- |> media (greater (px 700))
+            [ Attributes.style
+                [ Attributes.block [] -- Base
+                , Attributes.block [] -- |> media (greater (px 700)) -- When x > 700px
+
+                -- , Attributes.flexContainerProperties []
+                -- , Attributes.flexContainerProperties [] -- |> media (less (px 700))
+                -- , Attributes.flexContainerProperties [] -- |> media (greater (px 700))
+                ]
             ]
             [ Builder.flexItem
-                [ Attributes.flexItemProperties
-                    [ Display.alignSelf Display.center
-                    , Display.basis (px 30)
+                [ Attributes.style
+                    [ -- Attributes.flexItemProperties
+                      -- [ Display.alignSelf Display.center
+                      -- , Display.basis (px 30)
+                      -- ]
+                      Attributes.block []
                     ]
-                , Attributes.block []
-                , Events.onClick None
+
+                -- , Events.onClick None
                 ]
                 [ Builder.node
-                    [ Attributes.block [] ]
+                    [ Attributes.style [ Attributes.block [] ] ]
                     [ Builder.text "I'm inside a flexItem" ]
                 ]
             ]

@@ -1,9 +1,29 @@
 module BodyBuilder.Setters exposing (..)
 
 
+setBox : b -> { a | box : b } -> { a | box : b }
+setBox =
+    flip setBoxIn
+
+
 setBoxIn : { a | box : b } -> b -> { a | box : b }
 setBoxIn record boxAttribute =
     { record | box = boxAttribute }
+
+
+setBlock : b -> { a | block : b } -> { a | block : b }
+setBlock =
+    flip setBlockIn
+
+
+setBlockIn : { a | block : b } -> b -> { a | block : b }
+setBlockIn record blockAttribute =
+    { record | block = blockAttribute }
+
+
+setStyleIn : { a | style : b } -> b -> { a | style : b }
+setStyleIn record styleAttribute =
+    { record | style = styleAttribute }
 
 
 setClick : b -> { a | click : Maybe b } -> { a | click : Maybe b }

@@ -532,9 +532,9 @@ p =
 
 computeBlock :
     String
-    -> Maybe (Modifiers FlexContainerDetails)
-    -> Maybe (Modifiers Display.FlexItemDetails)
-    -> Maybe (Modifiers Display.BlockDetails)
+    -> Maybe ( Modifiers FlexContainerDetails, List StyleSelector )
+    -> Maybe ( Modifiers Display.FlexItemDetails, List StyleSelector )
+    -> Maybe ( Modifiers Display.BlockDetails, List StyleSelector )
     -> VisibleAttributes a
     -> (VisibleAttributes a -> List (Html.Attribute msg))
     -> Modifiers (VisibleAttributes a)
@@ -557,9 +557,9 @@ computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttribute
 
 
 displayStyle :
-    Maybe (Modifiers FlexContainerDetails)
-    -> Maybe (Modifiers Display.FlexItemDetails)
-    -> Maybe (Modifiers Display.BlockDetails)
+    Maybe ( Modifiers FlexContainerDetails, List StyleSelector )
+    -> Maybe ( Modifiers Display.FlexItemDetails, List StyleSelector )
+    -> Maybe ( Modifiers Display.BlockDetails, List StyleSelector )
     -> VisibleAttributes a
     -> Elegant.Style
 displayStyle flexModifiers flexItemModifiers blockModifiers { box } =
@@ -572,7 +572,7 @@ displayStyle flexModifiers flexItemModifiers blockModifiers { box } =
                 Nothing ->
                     case flexModifiers of
                         Just modifiers ->
-                            Display.flexContainer modifiers
+                            Display.flexContainer (Tuple.first modifiers)
 
                         Nothing ->
                             Display.Flow
@@ -580,15 +580,15 @@ displayStyle flexModifiers flexItemModifiers blockModifiers { box } =
         displayOutside =
             case flexItemModifiers of
                 Just modifiers ->
-                    Display.flexItem modifiers (Maybe.withDefault [] blockModifiers)
+                    Display.flexItem (Tuple.first modifiers) <| Tuple.first <| Maybe.withDefault ( [], [] ) blockModifiers
 
                 Nothing ->
                     case blockModifiers of
                         Just modifiers ->
-                            Display.block modifiers
+                            Display.block (Tuple.first modifiers)
 
                         Nothing ->
                             Display.Inline
     in
         Elegant.style <|
-            Display.displayBox displayOutside displayInside box
+            Display.displayBox displayOutside displayInside (Tuple.first box)

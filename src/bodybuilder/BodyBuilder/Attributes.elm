@@ -6,6 +6,7 @@ import Color exposing (Color)
 import Color.Convert
 import Box
 import Display exposing (BlockDetails)
+import Function
 
 
 -- import Function
@@ -13,6 +14,41 @@ import Display exposing (BlockDetails)
 import Helpers.Shared exposing (..)
 import BodyBuilder.Setters exposing (..)
 import BodyBuilder.Events exposing (..)
+
+
+type StyleSelector
+    = MediaQueryWrapper (List MediaQuery)
+    | PseudoClass String
+
+
+type MediaQuery
+    = Greater SizeUnit
+    | Lesser SizeUnit
+
+
+media : List MediaQuery -> StyleSelector
+media =
+    MediaQueryWrapper
+
+
+greater : SizeUnit -> MediaQuery
+greater =
+    Greater
+
+
+lesser : SizeUnit -> MediaQuery
+lesser =
+    Lesser
+
+
+pseudoClass : String -> StyleSelector
+pseudoClass =
+    PseudoClass
+
+
+hover : StyleSelector
+hover =
+    pseudoClass "hover"
 
 
 type alias ValueAttribute b a =
@@ -99,11 +135,11 @@ type alias DisabledAttribute a =
 
 
 type alias MaybeBlockContainer a =
-    { a | block : Maybe (List (BlockDetails -> BlockDetails)) }
+    { a | block : Maybe ( List (BlockDetails -> BlockDetails), List StyleSelector ) }
 
 
 type alias BlockContainer a =
-    { a | block : List (BlockDetails -> BlockDetails) }
+    { a | block : ( List (BlockDetails -> BlockDetails), List StyleSelector ) }
 
 
 {-| -}
@@ -129,7 +165,7 @@ type alias TypeContainer a =
 
 
 type alias BoxContainer a =
-    { a | box : List (Box.Box -> Box.Box) }
+    { a | box : ( Modifiers Box.Box, List StyleSelector ) }
 
 
 type alias CheckedContainer a =
@@ -141,11 +177,11 @@ type alias UniversalContainer a =
 
 
 type alias FlexContainerProperties a =
-    { a | flexContainerProperties : List (Display.FlexContainerDetails -> Display.FlexContainerDetails) }
+    { a | flexContainerProperties : ( Modifiers Display.FlexContainerDetails, List StyleSelector ) }
 
 
 type alias FlexItemProperties a =
-    { a | flexItemProperties : List (Display.FlexItemDetails -> Display.FlexItemDetails) }
+    { a | flexItemProperties : ( Modifiers Display.FlexItemDetails, List StyleSelector ) }
 
 
 {-| -}
@@ -353,11 +389,40 @@ setValueInUniversal setter val ({ universal } as attrs) =
         |> setUniversalIn attrs
 
 
-{-| -}
-box : List (Box.Box -> Box.Box) -> Modifier (VisibleAttributes a)
-box val ({ box } as attrs) =
-    val
-        |> setBoxIn attrs
+type alias StyleModifier b =
+    List StyleSelector -> Modifier b
+
+
+style : List (StyleModifier a) -> Modifier a
+style styles =
+    styles
+        |> List.map (callOn [])
+        |> Function.compose
+
+
+box : Modifiers Box.Box -> StyleModifier (BoxContainer a)
+box =
+    waitForStyleSelector setBox
+
+
+block : Modifiers BlockDetails -> StyleModifier (MaybeBlockContainer a)
+block =
+    waitForStyleSelector (setBlock << Just)
+
+
+blockProperties : Modifiers BlockDetails -> StyleModifier (BlockContainer a)
+blockProperties =
+    waitForStyleSelector setBlock
+
+
+selector : List StyleSelector -> StyleModifier a -> StyleModifier a
+selector queries modifier =
+    modifier << (++) queries
+
+
+waitForStyleSelector : (( a, List StyleSelector ) -> b -> b) -> a -> List StyleSelector -> Modifier b
+waitForStyleSelector setter val mediaQueries =
+    (setter ( val, mediaQueries ))
 
 
 title : String -> Modifier { a | universal : UniversalAttributes }
@@ -425,7 +490,7 @@ defaultFlowAttributes =
     , onEvent = Nothing
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
-    , box = []
+    , box = ( [], [] )
     , universal = defaultUniversalAttributes
     }
 
@@ -446,33 +511,24 @@ flowAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
 
 
-block : Modifiers BlockDetails -> Modifier (MaybeBlockContainer a)
-block modifiers ({ block } as attrs) =
-    { attrs | block = Just (Maybe.withDefault [] block ++ modifiers) }
-
-
-blockProperties : Modifiers BlockDetails -> Modifier (BlockContainer a)
-blockProperties modifiers ({ block } as attrs) =
-    { attrs | block = block ++ modifiers }
-
-
 defaultNodeAttributes : NodeAttributes msg
 defaultNodeAttributes =
     { onBlurEvent = Nothing
     , onEvent = Nothing
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
-    , box = []
+    , box = ( [], [] )
     , universal = defaultUniversalAttributes
     , block = Nothing
     }
 
 
-flexContainerProperties :
-    List (Display.FlexContainerDetails -> Display.FlexContainerDetails)
-    -> Modifier (FlexContainerAttributes msg)
-flexContainerProperties modifiers ({ flexContainerProperties } as attrs) =
-    { attrs | flexContainerProperties = flexContainerProperties ++ modifiers }
+
+-- flexContainerProperties :
+--     List (Display.FlexContainerDetails -> Display.FlexContainerDetails)
+--     -> Modifier (FlexContainerAttributes msg)
+-- flexContainerProperties modifiers ({ flexContainerProperties } as attrs) =
+--     { attrs | flexContainerProperties = flexContainerProperties ++ modifiers }
 
 
 defaultFlexContainerAttributes : FlexContainerAttributes msg
@@ -481,10 +537,10 @@ defaultFlexContainerAttributes =
     , onEvent = Nothing
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
-    , box = []
+    , box = ( [], [] )
     , universal = defaultUniversalAttributes
     , block = Nothing
-    , flexContainerProperties = []
+    , flexContainerProperties = ( [], [] )
     }
 
 
@@ -494,17 +550,18 @@ defaultHeadingAttributes =
     , onEvent = Nothing
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
-    , box = []
+    , box = ( [], [] )
     , universal = defaultUniversalAttributes
-    , block = []
+    , block = ( [], [] )
     }
 
 
-flexItemProperties :
-    List (Display.FlexItemDetails -> Display.FlexItemDetails)
-    -> Modifier (FlexItemAttributes msg)
-flexItemProperties modifiers ({ flexItemProperties } as attrs) =
-    { attrs | flexItemProperties = flexItemProperties ++ modifiers }
+
+-- flexItemProperties :
+--     List (Display.FlexItemDetails -> Display.FlexItemDetails)
+--     -> Modifier (FlexItemAttributes msg)
+-- flexItemProperties modifiers ({ flexItemProperties } as attrs) =
+--     { attrs | flexItemProperties = flexItemProperties ++ modifiers }
 
 
 defaultFlexItemAttributes : FlexItemAttributes msg
@@ -513,10 +570,10 @@ defaultFlexItemAttributes =
     , onEvent = Nothing
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
-    , box = []
+    , box = ( [], [] )
     , block = Nothing
     , universal = defaultUniversalAttributes
-    , flexItemProperties = []
+    , flexItemProperties = ( [], [] )
     }
 
 
@@ -557,7 +614,7 @@ defaultButtonAttributes =
     , onEvent = Nothing
     , onFocusEvent = Nothing
     , onMouseEvents = Nothing
-    , box = []
+    , box = ( [], [] )
     , universal = defaultUniversalAttributes
     }
 
@@ -584,7 +641,7 @@ defaultAAttributes : AAttributes msg
 defaultAAttributes =
     { href = Nothing
     , target = Nothing
-    , box = []
+    , box = ( [], [] )
     , universal = defaultUniversalAttributes
     , onMouseEvents = Nothing
     , onEvent = Nothing
@@ -612,7 +669,7 @@ defaultTextareaAttributes =
     { value = Nothing
     , name = Nothing
     , universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , onInputEvent = Nothing
     , fromStringInput = identity
@@ -647,7 +704,7 @@ defaultImgAttributes alt src =
     { src = src
     , alt = alt
     , universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , width = Nothing
     , height = Nothing
@@ -675,7 +732,7 @@ imgAttributesToHtmlAttributes attributes =
 defaultAudioAttributes : AudioAttributes msg
 defaultAudioAttributes =
     { universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , src = ""
     , onEvent = Nothing
@@ -692,7 +749,7 @@ audioAttributesToHtmlAttributes attributes =
 defaultProgressAttributes : ProgressAttributes msg
 defaultProgressAttributes =
     { universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
@@ -714,7 +771,7 @@ defaultScriptAttributes : ScriptAttributes msg
 defaultScriptAttributes =
     { universal = defaultUniversalAttributes
     , src = ""
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
@@ -772,7 +829,7 @@ placeholder val attrs =
 defaultInputTextAttributes : InputTextAttributes msg
 defaultInputTextAttributes =
     { universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , name = Nothing
     , type_ = "text"
     , value = Nothing
@@ -821,7 +878,7 @@ min val attrs =
 defaultInputNumberAttributes : InputNumberAttributes msg
 defaultInputNumberAttributes =
     { universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , name = Nothing
     , type_ = "number"
     , value = Nothing
@@ -851,7 +908,7 @@ inputNumberAttributesToHtmlAttributes attributes =
 defaultInputColorAttributes : InputColorAttributes msg
 defaultInputColorAttributes =
     { universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , name = Nothing
     , type_ = "color"
     , value = Nothing
@@ -883,7 +940,7 @@ defaultInputCheckboxAttributes =
     , value = Nothing
     , checked = False
     , universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , onCheckEvent = Nothing
     , onEvent = Nothing
@@ -905,7 +962,7 @@ defaultInputFileAttributes =
     { name = Nothing
     , type_ = "file"
     , universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
@@ -924,7 +981,7 @@ defaultInputPasswordAttributes =
     , type_ = "password"
     , value = Nothing
     , universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , onInputEvent = Nothing
     , fromStringInput = identity
@@ -947,7 +1004,7 @@ defaultInputRadioAttributes =
     , type_ = "radio"
     , value = Nothing
     , universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
@@ -965,7 +1022,7 @@ inputRadioAttributesToHtmlAttributes attributes =
 defaultInputRangeAttributes : InputRangeAttributes msg
 defaultInputRangeAttributes =
     { universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , name = Nothing
     , type_ = "range"
     , value = Nothing
@@ -990,7 +1047,7 @@ defaultInputSubmitAttributes : InputSubmitAttributes msg
 defaultInputSubmitAttributes =
     { type_ = "submit"
     , universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , disabled = False
     , onSubmitEvent = Nothing
@@ -1018,7 +1075,7 @@ defaultInputUrlAttributes =
     , value = Nothing
     , type_ = "url"
     , universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , onInputEvent = Nothing
     , fromStringInput = identity
@@ -1040,7 +1097,7 @@ defaultSelectAttributes =
     { value = Nothing
     , options = []
     , universal = defaultUniversalAttributes
-    , box = []
+    , box = ( [], [] )
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
