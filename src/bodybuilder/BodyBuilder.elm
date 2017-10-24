@@ -422,7 +422,7 @@ node modifiers =
             (Function.compose modifiers) BodyBuilder.Attributes.defaultNodeAttributes
     in
         computeBlock
-            "node"
+            "bb-node"
             Nothing
             Nothing
             attributes.block
@@ -438,7 +438,7 @@ flex modifiers flexItems =
             (Function.compose modifiers) BodyBuilder.Attributes.defaultFlexContainerAttributes
     in
         computeBlock
-            "flex"
+            "bb-flex"
             (Just attributes.flexContainerProperties)
             Nothing
             attributes.block
@@ -461,7 +461,7 @@ flexItem modifiers =
     in
         FlexItem
             << computeBlock
-                "flex-item"
+                "bb-flex-item"
                 Nothing
                 (Just attributes.flexItemProperties)
                 attributes.block
