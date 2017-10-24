@@ -10,6 +10,7 @@ import Helpers.Shared exposing (..)
 import BodyBuilder.Setters exposing (..)
 import BodyBuilder.Events exposing (..)
 import Function
+import Json.Decode exposing (Decoder)
 
 
 type alias StyleSelector =
@@ -227,48 +228,22 @@ type alias ColorValue a =
     ValueAttribute Color a
 
 
+{-| OnEvent msg (OnFocusEvent msg (OnBlurEvent msg (OnMouseEvents msg (VisibleAttributes a))))
+-}
 type alias VisibleAttributesAndEvents msg a =
-    OnEvent msg (OnFocusEvent msg (OnBlurEvent msg (OnMouseEvents msg (VisibleAttributes a))))
-
-
-{-| -}
-type alias InputSubmitAttributes msg =
-    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg (TypeContainer {})))
-
-
-{-| -}
-type alias InputUrlAttributes msg =
-    InputTextAttributes msg
-
-
-{-| -}
-type alias InputNumberAttributes msg =
-    StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {})))))
-
-
-{-| -}
-type alias InputColorAttributes msg =
-    OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {}))
-
-
-{-| -}
-type alias InputCheckboxAttributes msg =
-    CheckedContainer (OnCheckEvent msg (InputStringValueAttributes msg {}))
-
-
-{-| -}
-type alias InputFileAttributes msg =
-    InputVisibleAttributes msg {}
+    { a
+        | onMouseEvents : Maybe (OnMouseEventsInside msg)
+        , onEvent : Maybe ( String, Decoder msg )
+        , onBlurEvent : Maybe msg
+        , onFocusEvent : Maybe msg
+        , box : List ( Modifiers Box.Box, StyleSelector )
+        , universal : UniversalAttributes
+    }
 
 
 {-| -}
 type alias InputPasswordAttributes msg =
     InputTextAttributes msg
-
-
-{-| -}
-type alias InputRadioAttributes msg =
-    InputStringValueAttributes msg {}
 
 
 {-| -}
@@ -281,8 +256,15 @@ type alias SelectAttributes msg =
     StringValue (OptionsAttribute (FlowAttributes msg))
 
 
+{-|
+TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute {})))
+-}
 type alias UniversalAttributes =
-    TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute {})))
+    { title : Maybe String
+    , tabindex : Maybe Int
+    , id : Maybe String
+    , class : List String
+    }
 
 
 {-| -}
@@ -357,12 +339,59 @@ type alias LabelAttributes msg =
     PositionAttribute (FlowAttributes msg)
 
 
+{-|
+  This code should be simplified with the later, but it's very faster without the function calls
+  VisibleAttributesAndEvents msg (InputAttributes a)
+-}
 type alias InputVisibleAttributes msg a =
-    VisibleAttributesAndEvents msg (InputAttributes a)
+    { a
+        | name : Maybe String
+        , type_ : String
+        , universal : UniversalAttributes
+        , box : List ( Modifiers Box.Box, StyleSelector )
+        , onMouseEvents : Maybe (OnMouseEventsInside msg)
+        , onEvent : Maybe ( String, Decoder msg )
+        , onBlurEvent : Maybe msg
+        , onFocusEvent : Maybe msg
+    }
 
 
+{-|
+  StringValue (InputVisibleAttributes msg a)
+-}
 type alias InputStringValueAttributes msg a =
-    StringValue (InputVisibleAttributes msg a)
+    { a
+        | name : Maybe String
+        , type_ : String
+        , universal : UniversalAttributes
+        , box : List ( Modifiers Box.Box, StyleSelector )
+        , onMouseEvents : Maybe (OnMouseEventsInside msg)
+        , onEvent : Maybe ( String, Decoder msg )
+        , onBlurEvent : Maybe msg
+        , onFocusEvent : Maybe msg
+        , value : Maybe String
+    }
+
+
+{-|
+  InputStringValueAttributes msg {}
+-}
+type alias InputRadioAttributes msg =
+    { name : Maybe String
+    , type_ : String
+    , universal : UniversalAttributes
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , value : Maybe String
+    }
+
+
+{-| -}
+type alias InputCheckboxAttributes msg =
+    CheckedContainer (OnCheckEvent msg (InputStringValueAttributes msg {}))
 
 
 {-| -}
@@ -372,6 +401,31 @@ type alias InputTextAttributesBase msg a =
 
 type alias InputTextAttributes msg =
     InputTextAttributesBase msg {}
+
+
+{-| -}
+type alias InputSubmitAttributes msg =
+    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg (TypeContainer {})))
+
+
+{-| -}
+type alias InputUrlAttributes msg =
+    InputTextAttributes msg
+
+
+{-| -}
+type alias InputNumberAttributes msg =
+    StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {})))))
+
+
+{-| -}
+type alias InputColorAttributes msg =
+    OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {}))
+
+
+{-| -}
+type alias InputFileAttributes msg =
+    InputVisibleAttributes msg {}
 
 
 {-| -}
@@ -445,7 +499,7 @@ flexItemProperties =
 
 waitForStyleSelector : (( a, StyleSelector ) -> b -> b) -> a -> StyleModifier b
 waitForStyleSelector setter val selector =
-    (setter ( val, selector ))
+    setter ( val, selector )
 
 
 title : String -> Modifier { a | universal : UniversalAttributes }

@@ -1,6 +1,7 @@
 module BodyBuilder.Events
     exposing
         ( OnMouseEvents
+        , OnMouseEventsInside
         , onClick
         , onDoubleClick
         , onMouseUp
@@ -38,23 +39,6 @@ import Json.Decode exposing (Decoder)
 import Color exposing (Color)
 import Helpers.Shared exposing (..)
 import BodyBuilder.Setters exposing (..)
-
-
-{-| -}
-type alias OnMouseEvents msg a =
-    { a | onMouseEvents : Maybe (OnMouseEventsInside msg) }
-
-
-type alias OnMouseEventsInside msg =
-    { click : Maybe msg
-    , doubleClick : Maybe msg
-    , mouseDown : Maybe msg
-    , mouseUp : Maybe msg
-    , mouseEnter : Maybe msg
-    , mouseLeave : Maybe msg
-    , mouseOver : Maybe msg
-    , mouseOut : Maybe msg
-    }
 
 
 defaultOnMouseEvents : OnMouseEventsInside msg
@@ -140,27 +124,28 @@ mouseEventsToHtmlAttributes events =
         |> List.concatMap (callOn events)
 
 
+{-| -}
+type alias OnMouseEvents msg a =
+    { a | onMouseEvents : Maybe (OnMouseEventsInside msg) }
+
+
+type alias OnMouseEventsInside msg =
+    { click : Maybe msg
+    , doubleClick : Maybe msg
+    , mouseDown : Maybe msg
+    , mouseUp : Maybe msg
+    , mouseEnter : Maybe msg
+    , mouseLeave : Maybe msg
+    , mouseOver : Maybe msg
+    , mouseOut : Maybe msg
+    }
+
+
 type alias OnInputEvent b msg a =
     { a
         | onInputEvent : Maybe (b -> msg)
         , fromStringInput : String -> b
     }
-
-
-{-| -}
-onInput : (a -> msg) -> Modifier (OnInputEvent a msg b)
-onInput val attrs =
-    { attrs | onInputEvent = Just val }
-
-
-inputEventToHtmlEvent : ( Maybe (a -> msg), String -> a ) -> List (Html.Attribute msg)
-inputEventToHtmlEvent ( onInputEvent, fromStringInput ) =
-    case onInputEvent of
-        Just fun ->
-            [ Html.Events.onInput (fromStringInput >> fun) ]
-
-        Nothing ->
-            []
 
 
 {-| -}
@@ -184,6 +169,42 @@ type alias OnCheckEvent msg a =
 
 
 {-| -}
+type alias OnSubmitEvent msg a =
+    { a | onSubmitEvent : Maybe msg }
+
+
+{-| -}
+type alias OnFocusEvent msg a =
+    { a | onFocusEvent : Maybe msg }
+
+
+{-| -}
+type alias OnBlurEvent msg a =
+    { a | onBlurEvent : Maybe msg }
+
+
+{-| -}
+type alias OnEvent msg a =
+    { a | onEvent : Maybe ( String, Decoder msg ) }
+
+
+{-| -}
+onInput : (a -> msg) -> Modifier (OnInputEvent a msg b)
+onInput val attrs =
+    { attrs | onInputEvent = Just val }
+
+
+inputEventToHtmlEvent : ( Maybe (a -> msg), String -> a ) -> List (Html.Attribute msg)
+inputEventToHtmlEvent ( onInputEvent, fromStringInput ) =
+    case onInputEvent of
+        Just fun ->
+            [ Html.Events.onInput (fromStringInput >> fun) ]
+
+        Nothing ->
+            []
+
+
+{-| -}
 onCheck : (Bool -> msg) -> Modifier (OnCheckEvent msg a)
 onCheck val attrs =
     { attrs | onCheckEvent = Just val }
@@ -192,11 +213,6 @@ onCheck val attrs =
 checkEventToHtmlEvent : OnCheckEvent msg a -> List (Html.Attribute msg)
 checkEventToHtmlEvent =
     unwrapMaybeAttribute Html.Events.onCheck << .onCheckEvent
-
-
-{-| -}
-type alias OnSubmitEvent msg a =
-    { a | onSubmitEvent : Maybe msg }
 
 
 {-| -}
@@ -211,11 +227,6 @@ submitEventToHtmlEvent =
 
 
 {-| -}
-type alias OnFocusEvent msg a =
-    { a | onFocusEvent : Maybe msg }
-
-
-{-| -}
 onFocus : msg -> Modifier (OnFocusEvent msg a)
 onFocus val attrs =
     { attrs | onFocusEvent = Just val }
@@ -227,11 +238,6 @@ focusEventToHtmlAttributes =
 
 
 {-| -}
-type alias OnBlurEvent msg a =
-    { a | onBlurEvent : Maybe msg }
-
-
-{-| -}
 onBlur : msg -> Modifier (OnBlurEvent msg a)
 onBlur val attrs =
     { attrs | onBlurEvent = Just val }
@@ -240,11 +246,6 @@ onBlur val attrs =
 onBlurEventToHtmlAttributes : msg -> List (Html.Attribute msg)
 onBlurEventToHtmlAttributes =
     Html.Events.onBlur >> List.singleton
-
-
-{-| -}
-type alias OnEvent msg a =
-    { a | onEvent : Maybe ( String, Decoder msg ) }
 
 
 {-| -}
