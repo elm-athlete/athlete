@@ -10,72 +10,81 @@ import Border
 import Elegant exposing (px, percent, vh)
 import Typography
 import Padding
-import Function exposing (compose)
 import Color
 import Color.Extra as Color
 import Typography.Character as Character
-import Background
 
 
 buttonStyle =
-    [ Attributes.box
+    [ Attributes.block [ Display.dimensions [ Display.height (percent 100) ] ]
+    , Attributes.box
         [ Box.padding [ Padding.vertical Constants.zero ]
-        , Box.border [ Border.all [ Border.thickness 0 ] ]
+        , Box.border [ Border.all [ Border.thickness (px 0) ] ]
         , Box.typography [ Typography.character [ Character.size (px 10) ] ]
         , Box.background [ Elegant.color Color.transparent ]
+        , Box.padding [ Padding.horizontal Constants.small ]
         ]
     ]
-        |> compose
 
 
-counter : a -> Node Msg
 counter model =
-    node [ style [ Display.block [] ] ]
-        [ flex
-            [ style
-                [ Attributes.flexContainerProperties
-                    [ Display.alignCenter
-                    ]
-                , Attributes.box
-                    [ Box.border [ Border.all [ Elegant.color Color.gray ] ] ]
+    flex
+        [ style
+            [ Attributes.block [ Display.dimensions [ Display.minHeight (px 50) ] ]
+            , Attributes.flexContainerProperties
+                [ Display.align Display.stretch
+                ]
+            , Attributes.box
+                [ Box.border [ Border.full Color.gray ]
                 ]
             ]
+        ]
+        [ flexItem []
             [ inputText
                 [ style
-                    [ Attributes.box
+                    [ Attributes.block [ Display.dimensions [ Display.height (percent 100) ] ]
+                    , Attributes.box
                         [ Box.padding [ Padding.all Constants.zero ]
                         , Box.typography [ Typography.character [ Character.size (px 20) ] ]
-                        , Box.border [ Border.all [ Border.thickness 0 ] ]
+                        , Box.border [ Border.all [ Border.thickness (px 0) ] ]
+                        , Box.padding [ Padding.left Constants.small ]
                         ]
                     ]
                 , onInput Change
                 , value (model |> toString)
                 ]
-            , flex
+            ]
+        , flexItem []
+            [ flex
                 [ style
-                    [ Attributes.flexContainerProperties [ Display.column ]
+                    [ Attributes.block [ Display.dimensions [ Display.height (percent 100) ] ]
+                    , Attributes.flexContainerProperties [ Display.direction Display.column, Display.align Display.stretch ]
                     ]
                 ]
-                [ button [ onClick Add, style [ buttonStyle ] ] [ text "+" ]
-                , button [ onClick Substract, style [ buttonStyle ] ] [ text "-" ]
+                [ flexItem [ style [ Attributes.flexItemProperties [ Display.basis (percent 100) ] ] ] [ button [ onClick Add, style buttonStyle ] [ text "+" ] ]
+                , flexItem [ style [ Attributes.flexItemProperties [ Display.basis (percent 100) ] ] ] [ button [ onClick Substract, style buttonStyle ] [ text "-" ] ]
                 ]
             ]
         ]
 
 
-view : a -> Node Msg
-view model =
+windowCentered : Node msg -> Node msg
+windowCentered content =
     Builder.flex
         [ style
             [ Attributes.block [ Display.dimensions [ Display.height (vh 100) ] ]
             , Attributes.flexContainerProperties
-                [ Display.alignCenter
+                [ Display.align Display.center
                 , Display.justifyContent Display.justifyContentCenter
                 ]
             ]
         ]
-        [ counter model
-        ]
+        [ flexItem [ style [ Attributes.block [] ] ] [ content ] ]
+
+
+view : a -> Node Msg
+view model =
+    windowCentered (counter model)
 
 
 type Msg
@@ -84,7 +93,7 @@ type Msg
     | Change String
 
 
-update : Msg -> number -> ( number, Cmd msg )
+update : Msg -> number -> ( number, Cmd Msg )
 update msg model =
     case msg of
         Add ->

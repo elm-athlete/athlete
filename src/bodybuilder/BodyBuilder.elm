@@ -419,7 +419,7 @@ node modifiers =
             (Function.compose modifiers) BodyBuilder.Attributes.defaultNodeAttributes
     in
         computeBlock
-            "node"
+            "bb-node"
             Nothing
             Nothing
             attributes.block
@@ -435,7 +435,7 @@ flex modifiers flexItems =
             (Function.compose modifiers) BodyBuilder.Attributes.defaultFlexContainerAttributes
     in
         computeBlock
-            "flex"
+            "bb-flex"
             (Just attributes.flexContainerProperties)
             Nothing
             attributes.block
@@ -458,7 +458,7 @@ flexItem modifiers =
     in
         FlexItem
             << computeBlock
-                "flex-item"
+                "bb-flex-item"
                 Nothing
                 (Just attributes.flexItemProperties)
                 attributes.block
@@ -497,6 +497,24 @@ inputText modifiers =
             attributes.block
             BodyBuilder.Attributes.defaultInputTextAttributes
             BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
+            modifiers
+            []
+
+
+{-| -}
+inputNumber : Modifiers (InputNumberAttributes msg) -> Node msg
+inputNumber modifiers =
+    let
+        attributes =
+            (Function.compose modifiers) BodyBuilder.Attributes.defaultInputNumberAttributes
+    in
+        computeBlock
+            "input"
+            Nothing
+            Nothing
+            attributes.block
+            BodyBuilder.Attributes.defaultInputNumberAttributes
+            BodyBuilder.Attributes.inputNumberAttributesToHtmlAttributes
             modifiers
             []
 

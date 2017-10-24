@@ -15,6 +15,7 @@ module Router
         , handleStandardHistory
         , maybeTransitionSubscription
         , initHistoryAndData
+        , pageWithHeader
         )
 
 {-| Router based on BodyBuilder and Elegant implementing transitions between
@@ -35,6 +36,7 @@ pages and history (backward and forward)
 @docs pageWithoutTransition
 
 @docs headerElement
+@docs pageWithHeader
 @docs headerButton
 @docs historyView
 
@@ -47,7 +49,7 @@ import Elegant exposing (SizeUnit, percent)
 import AnimationFrame
 import Time exposing (Time)
 import Display
-import Display.Overflow
+import Display.Overflow as Overflow
 import Box
 import Position
 import Typography
@@ -345,7 +347,7 @@ overflowHiddenContainer attributes content =
         ([ style
             [ Attributes.block
                 [ Display.overflow
-                    [ Display.Overflow.overflowXY Display.Overflow.hidden ]
+                    [ Overflow.overflowXY Overflow.hidden ]
                 ]
             ]
          ]
@@ -375,6 +377,38 @@ pageView insidePageView_ transition data page =
         -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
         ]
         [ insidePageView_ page data transition ]
+
+
+{-|
+-}
+pageWithHeader : Node msg -> Node msg -> Node msg
+pageWithHeader header page =
+    flex
+        [ style
+            [ Attributes.flexContainerProperties [ Display.direction Display.column ]
+            , Attributes.block [ Display.dimensions [ Display.height (Elegant.vh 100) ] ]
+            , Attributes.box [ Box.background [ Elegant.color Color.white ] ]
+            ]
+        ]
+        [ flexItem [] [ header ]
+        , flexItem [] [ mainElement page ]
+        ]
+
+
+{-|
+-}
+mainElement : Node msg -> Node msg
+mainElement html =
+    node
+        [ style
+            [ Attributes.block
+                [ Display.overflow [ Overflow.overflowY Overflow.scroll ]
+                , Display.fullWidth
+                ]
+            ]
+        ]
+        [ html
+        ]
 
 
 {-| display the current possible transition from one page to the other using
@@ -411,7 +445,7 @@ historyView insidePageView_ history data =
                                 (List.map (pageView insidePageView_ history.transition data) (history |> beforeTransition))
                             , flexItem
                                 [ style
-                                    [ Attributes.block []
+                                    [ Attributes.block [ Display.dimensions [ Display.width (percent 100) ] ]
                                     , Attributes.flexItemProperties [ Display.basis (percent 100) ]
                                     , Attributes.box
                                         [ Box.position <|
@@ -503,7 +537,7 @@ headerButtonStyle width align =
         [ Attributes.flexItemProperties [ Display.basis width ]
         , Attributes.block
             [ Display.overflow
-                [ Display.Overflow.overflowXY Display.Overflow.hidden ]
+                [ Overflow.overflowXY Overflow.hidden ]
             , Display.textOverflowEllipsis
             , align
             ]
@@ -541,7 +575,7 @@ headerElement { left, center, right } =
                 [ Display.dimensions [ Display.width <| percent 100 ] ]
             , Attributes.box
                 [ Box.position <| Position.sticky []
-                , Box.background [ Elegant.color Color.lightPurple ]
+                , Box.background [ Elegant.color Color.white ]
                 ]
             ]
         ]

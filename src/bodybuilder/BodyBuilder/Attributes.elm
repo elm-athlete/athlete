@@ -415,7 +415,7 @@ type alias InputUrlAttributes msg =
 
 {-| -}
 type alias InputNumberAttributes msg =
-    StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {})))))
+    MaybeBlockContainer (StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {}))))))
 
 
 {-| -}
@@ -954,6 +954,7 @@ defaultInputNumberAttributes =
     , min = Nothing
     , max = Nothing
     , step = Nothing
+    , block = Nothing
     }
 
 
@@ -986,7 +987,7 @@ defaultInputColorAttributes =
 
 inputColorAttributesToHtmlAttributes : InputColorAttributes msg -> List (Html.Attribute msg)
 inputColorAttributesToHtmlAttributes attributes =
-    unwrapMaybeAttribute Html.Attributes.value (Maybe.map Color.Convert.colorToCssRgb <| attributes.value)
+    unwrapMaybeAttribute Html.Attributes.value (Maybe.map Color.Convert.colorToCssRgba <| attributes.value)
         |> List.append (inputVisibleToHtmlAttributes attributes)
         |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
 
@@ -1099,6 +1100,7 @@ defaultInputRangeAttributes =
     , min = Nothing
     , max = Nothing
     , step = Nothing
+    , block = Nothing
     }
 
 

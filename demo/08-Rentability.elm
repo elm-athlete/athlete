@@ -1,7 +1,7 @@
 module Rentability exposing (..)
 
 import BodyBuilder exposing (..)
-import BodyBuilder.Attributes
+import BodyBuilder.Attributes as Attributes exposing (style)
 import BodyBuilder.Events
 import Elegant exposing (SizeUnit, px, pt, percent, vh)
 import Color
@@ -17,6 +17,7 @@ import Router
         , historyView
         , maybeTransitionSubscription
         , initHistoryAndData
+        , pageWithHeader
         )
 import Finders exposing (..)
 import Display
@@ -28,7 +29,6 @@ import Typography
 import Typography.Character as Character
 import Constants
 import Padding
-import Display.Overflow as Overflow
 import Time exposing (Time)
 import Task
 import Date
@@ -123,35 +123,28 @@ gray =
     Color.grayscale 0.9
 
 
-standardCellStyle :
-    { a | style : List Elegant.Style }
-    -> { a | style : List Elegant.Style }
 standardCellStyle =
-    BodyBuilder.Attributes.style
-        [ Elegant.style <|
-            Display.block
-                [ Display.alignment Display.left
-                , Display.fullWidth
+    style
+        [ Attributes.block
+            [ Display.alignment Display.left
+            , Display.fullWidth
+            ]
+        , Attributes.box
+            [ Box.cursor Cursor.pointer
+            , Box.border
+                [ Border.all [ Border.none ]
+                , Border.bottom [ Border.solid, Elegant.color gray ]
                 ]
-                [ Box.cursor Cursor.pointer
-                , Box.border
-                    [ Border.all [ Border.none ]
-                    , Border.bottom [ Border.solid, Elegant.color gray ]
+            , Box.outline [ Outline.none ]
+            , Box.typography
+                [ Typography.character
+                    [ Character.fontFamilyInherit
+                    , Character.size Constants.zeta
                     ]
-                , Box.outline [ Outline.none ]
-                , Box.typography
-                    [ Typography.character
-                        [ Character.fontFamilyInherit
-                        , Character.size Constants.zeta
-                        ]
-                    ]
-                , Box.padding [ Padding.all Constants.large ]
-                , Box.background [ Elegant.color Color.white ]
                 ]
-        , Elegant.setSuffix "focus" <|
-            Elegant.style <|
-                Display.block []
-                    [ Box.background [ Elegant.color <| Color.grayscale 0.05 ] ]
+            , Box.padding [ Padding.all Constants.large ]
+            , Box.background [ Elegant.color Color.white ]
+            ]
         ]
 
 
@@ -166,25 +159,17 @@ titleView appartment =
         [ text appartment.attributes.title ]
 
 
-style :
-    Display.DisplayBox
-    -> { a | style : List Elegant.Style }
-    -> { a | style : List Elegant.Style }
-style styleContent =
-    BodyBuilder.Attributes.style [ Elegant.style styleContent ]
-
-
 titleViewWithDelete :
     Appartment
     -> Node Msg
 titleViewWithDelete appartment =
     button
         [ standardCellStyle ]
-        [ div
-            [ style <| Display.blockFlexContainer [] [] []
-            ]
-            [ div [ BodyBuilder.Events.onClick <| DestroyAppartment appartment.id ] [ text "⛔" ]
-            , div [ style (Display.block [] [ Box.padding [ Padding.left Constants.medium ] ]) ] [ text appartment.attributes.title ]
+        [ flex
+            []
+            [ flexItem [ BodyBuilder.Events.onClick <| DestroyAppartment appartment.id ] [ text "⛔" ]
+            , flexItem [ style [ Attributes.box [ Box.padding [ Padding.left Constants.medium ] ] ] ]
+                [ text appartment.attributes.title ]
             ]
         ]
 
@@ -193,7 +178,7 @@ showView : { b | maybeAppartment : Maybe Appartment } -> Node Msg
 showView data =
     case data.maybeAppartment of
         Nothing ->
-            div [] [ text "Error" ]
+            node [] [ text "Error" ]
 
         Just appartment ->
             pageWithHeader
@@ -268,16 +253,18 @@ minSalary model =
     (model |> monthlyBankDebt) * 3
 
 
-pad : { a | style : List Elegant.Style } -> { a | style : List Elegant.Style }
 pad =
-    style (Display.block [] [ Box.padding [ Padding.all Constants.medium ] ])
+    style
+        [ Attributes.block []
+        , Attributes.box [ Box.padding [ Padding.all Constants.medium ] ]
+        ]
 
 
 result : String -> a -> Node msg
 result label value =
-    div [ pad ]
+    node [ pad ]
         [ text <| label
-        , br []
+        , br
         , text (value |> toString)
         ]
 
@@ -294,10 +281,10 @@ totalMonthlyRent { collocs, monthlyRent } =
 
 appartmentEditBodyView : Appartment -> Node Msg
 appartmentEditBodyView ({ attributes } as appartment) =
-    div []
+    node []
         [ result "Renta standard en % : " (renta attributes.collocs)
-        , div [ pad ]
-            [ div []
+        , node [ pad ]
+            [ node [ style [ Attributes.block [] ] ]
                 [ text
                     ("Loyer mensuel "
                         ++ (if attributes.collocs > 1 then
@@ -308,21 +295,21 @@ appartmentEditBodyView ({ attributes } as appartment) =
                     )
                 ]
             , inputNumber
-                [ BodyBuilder.Attributes.value (attributes.monthlyRent)
+                [ Attributes.value (attributes.monthlyRent)
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateMonthlyRent)
                 ]
             ]
-        , div [ pad ]
-            [ div [] [ text "Nombre de locataires" ]
+        , node [ pad ]
+            [ node [ style [ Attributes.block [] ] ] [ text "Nombre de locataires" ]
             , inputNumber
-                [ BodyBuilder.Attributes.value (attributes.collocs)
+                [ Attributes.value (attributes.collocs)
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateCollocs)
                 ]
             ]
-        , div [ pad ]
-            [ div [] [ text "Travaux" ]
+        , node [ pad ]
+            [ node [ style [ Attributes.block [] ] ] [ text "Travaux" ]
             , inputNumber
-                [ BodyBuilder.Attributes.value (attributes.works)
+                [ Attributes.value (attributes.works)
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateWorks)
                 ]
             ]
@@ -348,21 +335,6 @@ toPositiveInt i =
 -- assurance : Generali
 
 
-mainElement : Node msg -> Node msg
-mainElement html =
-    div
-        [ style
-            (Display.block
-                [ Display.overflow [ Overflow.overflowY Overflow.scroll ]
-                , Display.fullWidth
-                ]
-                []
-            )
-        ]
-        [ html
-        ]
-
-
 {-| returns a background with a color
 -}
 backgroundColor : Color.Color -> Elegant.Modifier Box.Box
@@ -370,33 +342,18 @@ backgroundColor color =
     Box.background [ Elegant.color color ]
 
 
-pageWithHeader : Node msg -> Node msg -> Node msg
-pageWithHeader header page =
-    div
-        [ style
-            (Display.blockFlexContainer
-                [ Display.direction Display.column ]
-                [ Display.dimensions [ Display.height (Elegant.vh 100) ] ]
-                [ backgroundColor Color.white ]
-            )
-        ]
-        [ header
-        , mainElement page
-        ]
-
-
 editView : { a | maybeAppartment : Maybe Appartment } -> Node Msg
 editView data =
     case data.maybeAppartment of
         Nothing ->
-            div [] [ text "Error" ]
+            node [] [ text "Error" ]
 
         Just appartment ->
             pageWithHeader
                 (Router.headerElement
                     { left = Router.headerButton (StandardHistoryWrapper Router.Back) "x"
                     , center = title appartment.attributes.title
-                    , right = div [] []
+                    , right = node [] []
                     }
                 )
                 (appartmentEditBodyView appartment)
@@ -406,20 +363,27 @@ textToHtml : String -> List (Node msg)
 textToHtml =
     (>>)
         (String.split "\n")
-        (List.foldr (\e accu -> accu ++ [ text e, br [] ]) [])
+        (List.foldr (\e accu -> accu ++ [ text e, br ]) [])
 
 
 appartmentBodyView : Appartment -> Node msg
 appartmentBodyView appartment =
-    div [ style (Display.block [] [ Box.padding [ Padding.horizontal Constants.medium ] ]) ]
-        ([ div [] (textToHtml appartment.attributes.details)
+    node
+        [ style [ Attributes.block [], Attributes.box [ Box.padding [ Padding.horizontal Constants.medium ] ] ] ]
+        ([ node [] (textToHtml appartment.attributes.details)
          ]
         )
 
 
 title : String -> Node msg
 title content =
-    div [ blockStyle [] [ Box.padding [ Padding.all (Elegant.px 12) ] ] ] [ text content ]
+    node
+        [ style
+            [ Attributes.block []
+            , Attributes.box [ Box.padding [ Padding.all (Elegant.px 12) ] ]
+            ]
+        ]
+        [ text content ]
 
 
 appartmentsIndex : List Appartment -> Node Msg
@@ -431,7 +395,7 @@ appartmentsIndex appartments =
             , right = Router.headerButton (HistoryMsgWrapper AppartmentNewMsg) "new"
             }
         )
-        (div [ style (Display.block [] [ backgroundColor gray ]) ]
+        (node [ style [ Attributes.block [], Attributes.box [ backgroundColor gray ] ] ]
             (appartments |> List.map titleView)
         )
 
@@ -445,14 +409,14 @@ appartmentsIndexEdit appartments =
             , right = text ""
             }
         )
-        (div [ style (Display.block [] [ backgroundColor gray ]) ]
+        (node [ style [ Attributes.block [], Attributes.box [ backgroundColor gray ] ] ]
             (appartments |> List.map titleViewWithDelete)
         )
 
 
 appartmentsShow : Int -> List Appartment -> Node Msg
 appartmentsShow id appartments =
-    div [] [ showView { maybeAppartment = (appartments |> find_by .id id) } ]
+    node [] [ showView { maybeAppartment = (appartments |> find_by .id id) } ]
 
 
 appartmentsEdit :
@@ -460,7 +424,7 @@ appartmentsEdit :
     -> List Appartment
     -> Node Msg
 appartmentsEdit id appartments =
-    div [] [ editView { maybeAppartment = (appartments |> find_by .id id) } ]
+    node [] [ editView { maybeAppartment = (appartments |> find_by .id id) } ]
 
 
 appartmentsNew : AppartmentAttributes -> Node Msg
@@ -472,9 +436,9 @@ appartmentsNew draftAppartment =
             , right = Router.headerButton SaveAppartmentAttributes "save"
             }
         )
-        (div
+        (node
             []
-            [ inputText [ BodyBuilder.Attributes.value draftAppartment.title, BodyBuilder.Events.onInput (UpdateAppartmentAttributes << UpdateTitle) ]
+            [ inputText [ Attributes.value draftAppartment.title, BodyBuilder.Events.onInput (UpdateAppartmentAttributes << UpdateTitle) ]
             ]
         )
 
@@ -502,24 +466,17 @@ insidePageView page data transition =
                 appartmentsNew data.draftAppartment
 
 
-blockStyle :
-    List (Display.BlockDetails -> Display.BlockDetails)
-    -> List (Box.Box -> Box.Box)
-    -> { a | style : List Elegant.Style }
-    -> { a | style : List Elegant.Style }
-blockStyle blockDetails =
-    style << Display.block blockDetails
-
-
 view : Model -> Node Msg
 view { history, data } =
-    div
-        [ blockStyle
-            []
-            [ Box.typography
-                [ Typography.character
-                    [ Character.fontFamilySansSerif
-                    , Character.size Constants.zeta
+    node
+        [ style
+            [ Attributes.block []
+            , Attributes.box
+                [ Box.typography
+                    [ Typography.character
+                        [ Character.fontFamilySansSerif
+                        , Character.size Constants.zeta
+                        ]
                     ]
                 ]
             ]

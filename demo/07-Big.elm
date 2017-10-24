@@ -3,6 +3,8 @@ module Main exposing (..)
 import Html exposing (Html)
 import Html.Attributes
 import Elegant exposing (px)
+import BodyBuilder exposing (node, text)
+import BodyBuilder.Attributes as Attributes
 import Box
 import Typography
 import Typography.Character
@@ -19,16 +21,16 @@ import Position
 import Display
 import Display.Overflow
 
+
 main : Html msg
 main =
-    Html.div
-        [ toStyle <| mainStyle ]
-        [ Html.text "Just a text." ]
+    node
+        [ Attributes.style mainStyle ]
+        [ text "Just a text." ]
 
 
-mainStyle : Display.DisplayBox
 mainStyle =
-    Display.block
+    [ Attributes.block
         [ Display.overflow
             [ Display.Overflow.overflowX Display.Overflow.hidden
             , Display.Overflow.overflowY Display.Overflow.visible
@@ -41,6 +43,7 @@ mainStyle =
         , Display.alignment Display.left
         , Display.listStyleCircle
         ]
+    , Attributes.box
         [ Box.typography
             [ Elegant.color Color.blue
             , Typography.character
@@ -103,10 +106,4 @@ mainStyle =
                 , Position.bottom (px 20)
                 ]
         ]
-
-
-toStyle : Display.DisplayBox -> Html.Attribute msg
-toStyle =
-    Elegant.style
-        >> Elegant.toInlineStyles
-        >> Html.Attributes.style
+    ]

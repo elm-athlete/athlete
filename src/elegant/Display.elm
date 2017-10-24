@@ -35,6 +35,8 @@ module Display
         , dimensions
         , width
         , height
+        , minHeight
+        , maxHeight
         , fullWidth
         , FlexDirection
         , direction
@@ -132,6 +134,8 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs width
 @docs height
 @docs fullWidth
+@docs minHeight
+@docs maxHeight
 
 
 ## FlexDirection
@@ -528,6 +532,18 @@ width value ( x, y ) =
 height : SizeUnit -> Modifier Dimensions
 height value ( x, y ) =
     ( x, y |> setDimension (Just value) )
+
+
+{-| -}
+minHeight : SizeUnit -> Modifier Dimensions
+minHeight value ( x, y ) =
+    ( x, y |> setMin (Just value) )
+
+
+{-| -}
+maxHeight : SizeUnit -> Modifier Dimensions
+maxHeight value ( x, y ) =
+    ( x, y |> setMax (Just value) )
 
 
 {-| put a fullWidth dimensions
