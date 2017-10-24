@@ -8,10 +8,22 @@ I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 -}
 
 import BodyBuilder exposing (..)
+import BodyBuilder.Attributes as Attributes exposing (..)
+import Padding
+import Constants
 import Elegant
 import BodyBuilder.Events as Events
 import Color
-import Date
+import Elegant exposing (SizeUnit, px, pt, percent, vh)
+import Color
+import Finders exposing (..)
+import Display
+import Box
+import Cursor
+import Border
+import Outline
+import Typography
+import Typography.Character as Character
 import Date exposing (Month(..))
 import Date.Extra as Date
 import Router
@@ -84,95 +96,108 @@ titleView : Blogpost -> Node Msg
 titleView blogpost =
     button
         [ Events.onClick <| HistoryMsgWrapper <| BlogpostShow blogpost.id
-        , style
-            [ Elegant.cursorPointer
-            , Elegant.borderNone
-            , borderBottom gray
-            , Elegant.outlineNone
-            , Elegant.textLeft
-            , Elegant.fontFamilyInherit
-            , Elegant.fontSize Elegant.zeta
-            , Elegant.padding Elegant.large
-            , Elegant.backgroundColor Color.white
-            , Elegant.fullWidth
-            ]
-        , focusStyle [ Elegant.backgroundColor <| Color.grayscale 0.05 ]
+        , standardCellStyle
         ]
         [ text blogpost.title ]
 
 
-header : Node Msg
-header =
-    div [ style [ Elegant.positionFixed, Elegant.fullWidth, Elegant.backgroundColor (Color.rgba 255 255 255 0.9) ] ]
-        [ div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow, Elegant.fullWidth ] ]
-            [ div
-                [ onClick <| StandardHistoryWrapper Back
-                , style
-                    [ Elegant.textColor Color.black
-                    , Elegant.padding Elegant.medium
-                    , Elegant.cursorPointer
-                    , Elegant.fontSize (Px 12)
-                    , Elegant.whiteSpaceNoWrap
-                    , Elegant.overflowHidden
-                    , Elegant.width (Percent 30)
-                    , Elegant.textOverflowEllipsis
-                    ]
-                ]
-                [ text "← BACK"
-                ]
-            , div
-                [ onClick <| StandardHistoryWrapper Back
-                , style
-                    [ Elegant.textColor Color.black
-                    , Elegant.padding Elegant.medium
-                    , Elegant.cursorPointer
-                    , Elegant.fontSize (Px 12)
-                    , Elegant.textCenter
-                    , Elegant.width (Percent 40)
-                    ]
-                ]
-                [ text "TRAAAVEL"
-                ]
-            , div
-                [ onClick <| StandardHistoryWrapper Back
-                , style
-                    [ Elegant.textColor Color.black
-                    , Elegant.padding Elegant.medium
-                    , Elegant.cursorPointer
-                    , Elegant.fontSize (Px 12)
-                    , Elegant.textCenter
-                    , Elegant.width (Percent 30)
-                    ]
-                ]
-                [ text ""
-                ]
-            ]
-        ]
+
+-- titleView : Blogpost -> Node Msg
+-- titleView blogpost =
+--     button
+--         [ Events.onClick <| HistoryMsgWrapper <| BlogpostShow blogpost.id
+--         , style
+--             [ Elegant.cursorPointer
+--             , Elegant.borderNone
+--             , borderBottom gray
+--             , Elegant.outlineNone
+--             , Elegant.textLeft
+--             , Elegant.fontFamilyInherit
+--             , Elegant.fontSize Elegant.zeta
+--             , Elegant.padding Elegant.large
+--             , Elegant.backgroundColor Color.white
+--             , Elegant.fullWidth
+--             ]
+--         , focusStyle [ Elegant.backgroundColor <| Color.grayscale 0.05 ]
+--         ]
+--         [ text blogpost.title ]
+--
+-- header : Node Msg
+-- header =
+--     div [ style [ Elegant.positionFixed, Elegant.fullWidth, Elegant.backgroundColor (Color.rgba 255 255 255 0.9) ] ]
+--         [ div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow, Elegant.fullWidth ] ]
+--             [ div
+--                 [ onClick <| StandardHistoryWrapper Back
+--                 , style
+--                     [ Elegant.textColor Color.black
+--                     , Elegant.padding Elegant.medium
+--                     , Elegant.cursorPointer
+--                     , Elegant.fontSize (Px 12)
+--                     , Elegant.whiteSpaceNoWrap
+--                     , Elegant.overflowHidden
+--                     , Elegant.width (Percent 30)
+--                     , Elegant.textOverflowEllipsis
+--                     ]
+--                 ]
+--                 [ text "← BACK"
+--                 ]
+--             , div
+--                 [ onClick <| StandardHistoryWrapper Back
+--                 , style
+--                     [ Elegant.textColor Color.black
+--                     , Elegant.padding Elegant.medium
+--                     , Elegant.cursorPointer
+--                     , Elegant.fontSize (Px 12)
+--                     , Elegant.textCenter
+--                     , Elegant.width (Percent 40)
+--                     ]
+--                 ]
+--                 [ text "TRAAAVEL"
+--                 ]
+--             , div
+--                 [ onClick <| StandardHistoryWrapper Back
+--                 , style
+--                     [ Elegant.textColor Color.black
+--                     , Elegant.padding Elegant.medium
+--                     , Elegant.cursorPointer
+--                     , Elegant.fontSize (Px 12)
+--                     , Elegant.textCenter
+--                     , Elegant.width (Percent 30)
+--                     ]
+--                 ]
+--                 [ text ""
+--                 ]
+--             ]
+--         ]
 
 
-showView :
-    (a -> Node Msg)
-    -> a
-    -> Node Msg
-showView bodyFun data =
-    div
-        [ style
-            [ Elegant.backgroundColor Color.white
-            , Elegant.height (Vh 100)
-            , Elegant.displayFlex
-            , Elegant.flexDirectionColumn
-            ]
-        ]
-        [ header
-        , div
+showView : { b | maybeBlogpost : Maybe Blogpost } -> Node Msg
+showView data =
+    case data.maybeBlogpost of
+        Nothing ->
+            node [] [ text "Error" ]
+
+        Just blogPost ->
+            Router.pageWithHeader
+                (Router.headerElement
+                    { left = Router.headerButton (StandardHistoryWrapper Router.Back) "← BACK"
+                    , center = Router.headerButton (StandardHistoryWrapper Router.Back) "Blog"
+                    , right = node [] []
+                    }
+                )
+                (blogpostView blogPost)
+
+
+blogpostView : Blogpost -> Node msg
+blogpostView blogpost =
+    node []
+        [ node
             [ style
-                [ Elegant.overflowYScroll
-                , Elegant.fullWidth
-                , Elegant.flexShrink 1000000
+                [ Attributes.block []
+                , Attributes.box [ Box.padding [ Padding.horizontal Constants.medium ] ]
                 ]
             ]
-            [ bodyFun data
-            ]
+            (textToHtml blogpost.content)
         ]
 
 
@@ -180,34 +205,65 @@ textToHtml : String -> List (Node msg)
 textToHtml =
     (>>)
         (String.split "\n")
-        (List.foldr (\e accu -> accu ++ [ text e, br [] ]) [])
+        (List.foldr (\e accu -> [ text e, br ] ++ accu) [])
 
 
-blogpostBodyView : { b | maybeBlogpost : Maybe Blogpost } -> Node msg
-blogpostBodyView data =
-    case data.maybeBlogpost of
-        Nothing ->
-            text ""
 
-        Just blogpost ->
-            div []
-                ([ img ""
-                    blogpost.image
-                    [ style [ Elegant.fullWidth ] ]
-                 , div [] (textToHtml blogpost.content)
-                 ]
-                )
+-- blogpostBodyView : { b | maybeBlogpost : Maybe Blogpost } -> Node msg
+-- blogpostBodyView data =
+--     case data.maybeBlogpost of
+--         Nothing ->
+--             text ""
+--
+--         Just blogpost ->
+--             node []
+--                 ([ img ""
+--                     blogpost.image
+--                     [ style [ Elegant.fullWidth ] ]
+--                  , node [] (textToHtml blogpost.content)
+--                  ]
+--                 )
+
+
+standardCellStyle =
+    style
+        [ Attributes.block
+            [ Display.alignment Display.left
+            , Display.fullWidth
+            ]
+        , Attributes.box
+            [ Box.cursor Cursor.pointer
+            , Box.border
+                [ Border.all [ Border.none ]
+                , Border.bottom [ Border.solid, Elegant.color gray ]
+                ]
+            , Box.outline [ Outline.none ]
+            , Box.typography
+                [ Typography.character
+                    [ Character.fontFamilyInherit
+                    , Character.size Constants.zeta
+                    ]
+                ]
+            , Box.padding [ Padding.all Constants.large ]
+            , Box.background [ Elegant.color Color.white ]
+            ]
+        ]
 
 
 blogpostsIndex : List Blogpost -> Node Msg
 blogpostsIndex blogposts =
-    div [ style [ Elegant.backgroundColor gray, Elegant.height (Vh 100) ] ]
+    node
+        [ style
+            [ Attributes.block [ Display.dimensions [ Display.height (vh 100) ] ]
+            , Attributes.box [ Box.background [ Elegant.color gray ] ]
+            ]
+        ]
         (blogposts |> List.map titleView)
 
 
 blogpostsShow : Int -> List Blogpost -> Node Msg
 blogpostsShow id blogposts =
-    div [] [ showView blogpostBodyView { maybeBlogpost = (blogposts |> find_by .id id) } ]
+    node [] [ showView { maybeBlogpost = (blogposts |> find_by .id id) } ]
 
 
 insidePageView : Page Route -> Data -> Maybe Transition -> Node Msg
@@ -226,7 +282,19 @@ insidePageView page data transition =
 
 view : Model -> Node Msg
 view { history, data } =
-    div [ style [ Elegant.fontFamilySansSerif, Elegant.fontSize Elegant.zeta ] ]
+    node
+        [ style
+            [ Attributes.block []
+            , Attributes.box
+                [ Box.typography
+                    [ Typography.character
+                        [ Character.fontFamilySansSerif
+                        , Character.size Constants.zeta
+                        ]
+                    ]
+                ]
+            ]
+        ]
         [ historyView insidePageView history data ]
 
 

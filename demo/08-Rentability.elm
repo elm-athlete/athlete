@@ -17,6 +17,7 @@ import Router
         , historyView
         , maybeTransitionSubscription
         , initHistoryAndData
+        , pageWithHeader
         )
 import Finders exposing (..)
 import Display
@@ -28,7 +29,6 @@ import Typography
 import Typography.Character as Character
 import Constants
 import Padding
-import Display.Overflow as Overflow
 import Time exposing (Time)
 import Task
 import Date
@@ -284,7 +284,7 @@ appartmentEditBodyView ({ attributes } as appartment) =
     node []
         [ result "Renta standard en % : " (renta attributes.collocs)
         , node [ pad ]
-            [ node []
+            [ node [ style [ Attributes.block [] ] ]
                 [ text
                     ("Loyer mensuel "
                         ++ (if attributes.collocs > 1 then
@@ -300,14 +300,14 @@ appartmentEditBodyView ({ attributes } as appartment) =
                 ]
             ]
         , node [ pad ]
-            [ node [] [ text "Nombre de locataires" ]
+            [ node [ style [ Attributes.block [] ] ] [ text "Nombre de locataires" ]
             , inputNumber
                 [ Attributes.value (attributes.collocs)
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateCollocs)
                 ]
             ]
         , node [ pad ]
-            [ node [] [ text "Travaux" ]
+            [ node [ style [ Attributes.block [] ] ] [ text "Travaux" ]
             , inputNumber
                 [ Attributes.value (attributes.works)
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateWorks)
@@ -335,39 +335,11 @@ toPositiveInt i =
 -- assurance : Generali
 
 
-mainElement : Node msg -> Node msg
-mainElement html =
-    node
-        [ style
-            [ Attributes.block
-                [ Display.overflow [ Overflow.overflowY Overflow.scroll ]
-                , Display.fullWidth
-                ]
-            ]
-        ]
-        [ html
-        ]
-
-
 {-| returns a background with a color
 -}
 backgroundColor : Color.Color -> Elegant.Modifier Box.Box
 backgroundColor color =
     Box.background [ Elegant.color color ]
-
-
-pageWithHeader : Node msg -> Node msg -> Node msg
-pageWithHeader header page =
-    flex
-        [ style
-            [ Attributes.flexContainerProperties [ Display.direction Display.column ]
-            , Attributes.block [ Display.dimensions [ Display.height (Elegant.vh 100) ] ]
-            , Attributes.box [ Box.background [ Elegant.color Color.white ] ]
-            ]
-        ]
-        [ flexItem [] [ header ]
-        , flexItem [] [ mainElement page ]
-        ]
 
 
 editView : { a | maybeAppartment : Maybe Appartment } -> Node Msg
