@@ -300,18 +300,6 @@ type FlexItem msg
 --
 --
 -- {-| -}
--- inputRange : Modifiers (InputRangeAttributes msg) -> Node msg
--- inputRange =
---     flip
---         (visibleNode
---             BodyBuilder.Attributes.defaultInputRangeAttributes
---             BodyBuilder.Attributes.inputRangeAttributesToHtmlAttributes
---             "input"
---         )
---         []
---
---
--- {-| -}
 -- inputSubmit : Modifiers (InputSubmitAttributes msg) -> Node msg
 -- inputSubmit =
 --     flip
@@ -497,6 +485,24 @@ inputText modifiers =
             attributes.block
             BodyBuilder.Attributes.defaultInputTextAttributes
             BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
+            modifiers
+            []
+
+
+{-| -}
+inputRange : Modifiers (InputRangeAttributes msg) -> Node msg
+inputRange modifiers =
+    let
+        attributes =
+            (Function.compose modifiers) BodyBuilder.Attributes.defaultInputRangeAttributes
+    in
+        computeBlock
+            "input"
+            Nothing
+            Nothing
+            attributes.block
+            BodyBuilder.Attributes.defaultInputRangeAttributes
+            BodyBuilder.Attributes.inputRangeAttributesToHtmlAttributes
             modifiers
             []
 

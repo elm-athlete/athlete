@@ -45,12 +45,13 @@ pages and history (backward and forward)
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
-import Elegant exposing (SizeUnit, percent)
+import Elegant exposing (SizeUnit, px, percent)
 import AnimationFrame
 import Time exposing (Time)
 import Display
 import Display.Overflow as Overflow
 import Box
+import BoxShadow
 import Position
 import Typography
 import Padding
@@ -369,7 +370,7 @@ pageView insidePageView_ transition data page =
                 [ Display.dimensions [ Display.width (percent 100) ] ]
             , Attributes.box
                 [ Box.boxShadow
-                    [-- BoxShadow.
+                    [ BoxShadow.standard (px 1) (Color.rgba 1 1 1 0.5) ( px 2, px 2 )
                     ]
                 ]
             ]
@@ -472,7 +473,16 @@ historyView insidePageView_ history data =
                                     ]
                                 ]
                             ]
-                            (List.map (BodyBuilder.flexItem [ Attributes.style [ Attributes.flexItemProperties [ Display.basis (percent 100) ] ] ] << List.singleton)
+                            (List.map
+                                (BodyBuilder.flexItem
+                                    [ Attributes.style
+                                        [ Attributes.flexItemProperties
+                                            [ Display.basis (percent 100)
+                                            ]
+                                        ]
+                                    ]
+                                    << List.singleton
+                                )
                                 (List.map (pageView insidePageView_ history.transition data) visiblePages_)
                             )
 
