@@ -131,6 +131,7 @@ commonButtonStyleBox =
     ]
 
 
+navItemGroup : Float -> Display.Alignment -> String -> FlexItem Msg
 navItemGroup width alignment content =
     BodyBuilder.flexItem
         [ Events.onClick <| StandardHistoryWrapper Back
@@ -209,6 +210,7 @@ showView bodyFun data =
         ]
 
 
+fullFlexCenter : List (Node msg) -> Node msg
 fullFlexCenter content =
     flex
         [ -- style [ pageCenter ]
