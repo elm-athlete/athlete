@@ -33,6 +33,14 @@ style display =
         , suffix = Nothing
         }
 
+{-| -}
+emptyStyle : Style
+emptyStyle =
+    Style
+        { display = Nothing
+        , screenWidths = []
+        , suffix = Nothing
+        }
 
 setSuffix : String -> Style -> Style
 setSuffix value (Style style) =

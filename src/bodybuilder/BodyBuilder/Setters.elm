@@ -107,3 +107,55 @@ setOnMouseEnter mouseEnter record =
 setOnMouseEventsIn : { a | onMouseEvents : Maybe b } -> b -> { a | onMouseEvents : Maybe b }
 setOnMouseEventsIn record onMouseEvents =
     { record | onMouseEvents = Just onMouseEvents }
+
+
+setFlexContainer : List (a -> a) -> { b | flexContainer : Maybe (List (a -> a)) } -> { b | flexContainer : Maybe (List (a -> a)) }
+setFlexContainer modifiers ({ flexContainer } as record) =
+    { record
+        | flexContainer =
+            case flexContainer of
+                Nothing ->
+                    Just modifiers
+
+                Just modifiers_ ->
+                    Just (modifiers ++ modifiers_)
+    }
+
+
+setFlexItem : List (a -> a) -> { b | flexItem : Maybe (List (a -> a)) } -> { b | flexItem : Maybe (List (a -> a)) }
+setFlexItem modifiers ({ flexItem } as record) =
+    { record
+        | flexItem =
+            case flexItem of
+                Nothing ->
+                    Just modifiers
+
+                Just modifiers_ ->
+                    Just (modifiers ++ modifiers_)
+    }
+
+
+setMediaBlock : List (a -> a) -> { b | block : Maybe (List (a -> a)) } -> { b | block : Maybe (List (a -> a)) }
+setMediaBlock modifiers ({ block } as record) =
+    { record
+        | block =
+            case block of
+                Nothing ->
+                    Just modifiers
+
+                Just modifiers_ ->
+                    Just (modifiers ++ modifiers_)
+    }
+
+
+setMediaBox : List (a -> a) -> { b | box : Maybe (List (a -> a)) } -> { b | box : Maybe (List (a -> a)) }
+setMediaBox modifiers ({ box } as record) =
+    { record
+        | box =
+            case box of
+                Nothing ->
+                    Just modifiers
+
+                Just modifiers_ ->
+                    Just (modifiers ++ modifiers_)
+    }

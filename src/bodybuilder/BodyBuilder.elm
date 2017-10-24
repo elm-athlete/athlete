@@ -7,14 +7,8 @@ import BodyBuilder.Attributes exposing (..)
 import Function
 import Helpers.Shared exposing (..)
 import Display exposing (FlexContainerDetails)
-import Box
-
-
--- import Native.BodyBuilder
--- import Native.Elegant
--- import List.Extra
-
 import Display
+import BodyBuilder.Convert
 
 
 type alias Node msg =
@@ -503,6 +497,7 @@ inputText modifiers =
             modifiers
             []
 
+
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 heading tag modifiers =
     let
@@ -572,79 +567,10 @@ computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttribute
     in
         Html.node tag
             (attributes.box
-                |> displayStyle flexModifiers flexItemModifiers blockModifiers
-                |> Elegant.styleToCss
+                |> BodyBuilder.Convert.displayStyle flexModifiers flexItemModifiers blockModifiers
+                |> List.map Elegant.styleToCss
+                |> String.join " "
                 |> Html.Attributes.class
                 |> flip (::) (attributesToHtmlAttributes attributes)
             )
             content
-
-
-type alias MediaQueriesStyled =
-    { flexContainer : Modifiers Display.FlexContainerDetails
-    , flexItem : Modifiers Display.FlexItemDetails
-    , block : Modifiers Display.BlockDetails
-    , box : Modifiers Box.Box
-    }
-
-
-
--- foo :
---     List ( Modifiers FlexContainerDetails, StyleSelector )
---     -> List ( Modifiers Display.FlexItemDetails, StyleSelector )
---     -> List ( Modifiers Display.BlockDetails, StyleSelector )
---     -> List ( Modifiers Box.Box, StyleSelector )
---     -> List (List )
--- foo flex
-concatModifiers : ( appendable, a ) -> appendable -> appendable
-concatModifiers (modifiers, _ ) acc=
-    acc ++ modifiers
-
-displayStyle :
-    Maybe (List ( Modifiers FlexContainerDetails, StyleSelector ))
-    -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector ))
-    -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector ))
-    -> List ( Modifiers Box.Box, StyleSelector )
-    -> Elegant.Style
-displayStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
-    let
-        flexModifiers_ =
-            Maybe.map (List.foldr concatModifiers []) flexModifiers
-
-        flexItemModifiers_ =
-            Maybe.map (List.foldr concatModifiers []) flexItemModifiers
-
-        blockModifiers_ =
-            Maybe.map (List.foldr concatModifiers []) blockModifiers
-
-        boxModifiers_ =
-            List.foldr concatModifiers [] boxModifiers
-
-        displayInside =
-            case flexItemModifiers_ of
-                Just _ ->
-                    Display.Flow
-
-                Nothing ->
-                    case flexModifiers_ of
-                        Just modifiers ->
-                            Display.flexContainer modifiers
-
-                        Nothing ->
-                            Display.Flow
-
-        displayOutside =
-            case flexItemModifiers_ of
-                Just modifiers ->
-                    Display.flexItem modifiers <| Maybe.withDefault [] blockModifiers_
-
-                Nothing ->
-                    case blockModifiers_ of
-                        Just modifiers ->
-                            Display.block modifiers
-
-                        Nothing ->
-                            Display.Inline
-    in
-        Elegant.style <|
-            Display.displayBox displayOutside displayInside boxModifiers_

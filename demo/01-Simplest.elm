@@ -2,23 +2,12 @@ module Simplest exposing (..)
 
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
-
-
--- import BodyBuilder.Events as Events
-
+import BodyBuilder.Events as Events
 import Elegant exposing (px, percent)
 import Display
 import Box
 import Padding
 import Color
-
-
--- hover =
---     pseudoClass "hover"
---
---
--- active =
---     pseudoClass "active"
 
 
 type Msg
@@ -30,17 +19,17 @@ view model =
     Builder.node
         [ Attributes.style
             [ Attributes.block [ Display.alignCenter ]
+            , Attributes.block []
+                |> Attributes.media (Attributes.between 300 600)
+                |> Attributes.hover
             , Attributes.box
                 [ Box.background [ Elegant.color Color.blue ] ]
             , Attributes.box
-                [ Box.background []
-                , Box.background [ Elegant.color Color.lightPurple ]
-                ]
-                |> Attributes.media (Attributes.between (px 700) (px 700))
+                [ Box.background [ Elegant.color Color.lightPurple ] ]
+                |> Attributes.media (Attributes.between 300 600)
                 |> Attributes.hover
             ]
-
-        -- , Events.onClick msge
+        , Events.onClick None
         ]
         [ Builder.node [] [ Builder.text "I'm inline!" ]
         , Builder.node

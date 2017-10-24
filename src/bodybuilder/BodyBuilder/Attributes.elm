@@ -25,9 +25,9 @@ defaultStyleSelector =
 
 
 type MediaQuery
-    = Greater SizeUnit
-    | Lesser SizeUnit
-    | Between SizeUnit SizeUnit
+    = Greater Int
+    | Lesser Int
+    | Between Int Int
 
 
 media : MediaQuery -> StyleModifier a -> StyleModifier a
@@ -40,17 +40,17 @@ setMedia mediaQuery styleSelector =
     { styleSelector | media = Just mediaQuery }
 
 
-greater : SizeUnit -> MediaQuery
+greater : Int -> MediaQuery
 greater =
     Greater
 
 
-lesser : SizeUnit -> MediaQuery
+lesser : Int -> MediaQuery
 lesser =
     Lesser
 
 
-between : SizeUnit -> SizeUnit -> MediaQuery
+between : Int -> Int -> MediaQuery
 between =
     Between
 
