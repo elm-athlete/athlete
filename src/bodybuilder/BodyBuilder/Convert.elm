@@ -12,10 +12,10 @@ import Maybe.Extra
 
 
 type alias MediaQueriesStyled =
-    { flexContainer : Maybe (Modifiers Display.FlexContainerDetails)
-    , flexItem : Maybe (Modifiers Display.FlexItemDetails)
-    , block : Maybe (Modifiers Display.BlockDetails)
-    , box : Maybe (Modifiers Box.Box)
+    { flexContainer : Maybe Display.FlexContainerDetails
+    , flexItem : Maybe Display.FlexItemDetails
+    , block : Maybe Display.BlockDetails
+    , box : Maybe Box.Box
     }
 
 
@@ -32,7 +32,7 @@ toElegantStyle isFlex components =
                 Nothing ->
                     Nothing
 
-                Just ( styleSelector, mediaQuery ) ->
+                Just ( styleSelector, _ ) ->
                     styleSelector.pseudoClass
 
         computedDisplay =
@@ -93,35 +93,35 @@ toDisplayBox isFlex ( { media }, { flexContainer, flexItem, block, box } ) =
                 Nothing ->
                     case flexContainer of
                         Just modifiers ->
-                            Display.flexContainer modifiers
+                            Display.FlexContainer (Just modifiers)
 
                         Nothing ->
                             if isFlex then
-                                Display.flexContainer []
+                                Display.FlexContainer Nothing
                             else
                                 Display.Flow
 
         displayOutside =
             case flexItem of
                 Just modifiers ->
-                    Display.flexItem modifiers <| Maybe.withDefault [] block
+                    Display.FlexItem (Just modifiers) block
 
                 Nothing ->
                     case block of
                         Just modifiers ->
-                            Display.block modifiers
+                            Display.Block (Just modifiers)
 
                         Nothing ->
                             Display.Inline
     in
-        ( media, Display.displayBox displayOutside displayInside (Maybe.withDefault [] box) )
+        ( media, Display.ContentsWrapper (Display.Contents displayOutside displayInside box) )
 
 
 displayStyle :
-    Maybe (List ( Modifiers Display.FlexContainerDetails, Attributes.StyleSelector ))
-    -> Maybe (List ( Modifiers Display.FlexItemDetails, Attributes.StyleSelector ))
-    -> Maybe (List ( Modifiers Display.BlockDetails, Attributes.StyleSelector ))
-    -> List ( Modifiers Box.Box, Attributes.StyleSelector )
+    Maybe (List ( Attributes.StyleSelector, Display.FlexContainerDetails ))
+    -> Maybe (List ( Attributes.StyleSelector, Display.FlexItemDetails ))
+    -> Maybe (List ( Attributes.StyleSelector, Display.BlockDetails ))
+    -> List ( Attributes.StyleSelector, Box.Box )
     -> List Elegant.Style
 displayStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
     Dict.empty
@@ -135,8 +135,8 @@ displayStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
 
 
 addModifiers :
-    Maybe (List ( Modifiers a, Attributes.StyleSelector ))
-    -> (Modifiers a -> MediaQueriesStyled -> MediaQueriesStyled)
+    Maybe (List ( Attributes.StyleSelector, a ))
+    -> (a -> MediaQueriesStyled -> MediaQueriesStyled)
     -> Dict String ( Attributes.StyleSelector, MediaQueriesStyled )
     -> Dict String ( Attributes.StyleSelector, MediaQueriesStyled )
 addModifiers modifiers setterInMediaQuery result =
@@ -146,8 +146,6 @@ addModifiers modifiers setterInMediaQuery result =
 
         Just modifiers_ ->
             modifiers_
-                |> List.Extra.groupWhile (\x y -> Tuple.second x == Tuple.second y)
-                |> List.concatMap mergeModifiers
                 |> List.foldr (addInResults setterInMediaQuery) result
 
 
@@ -170,11 +168,11 @@ concatModifiers ( modifiers, _ ) acc =
 
 
 addInResults :
-    (Modifiers a -> MediaQueriesStyled -> MediaQueriesStyled)
-    -> ( Attributes.StyleSelector, Modifiers a )
+    (a -> MediaQueriesStyled -> MediaQueriesStyled)
+    -> ( Attributes.StyleSelector, a )
     -> Dict String ( Attributes.StyleSelector, MediaQueriesStyled )
     -> Dict String ( Attributes.StyleSelector, MediaQueriesStyled )
-addInResults setter ( styleSelector, modifiers ) results =
+addInResults setter ( styleSelector, elem ) results =
     let
         key =
             toString styleSelector
@@ -182,11 +180,11 @@ addInResults setter ( styleSelector, modifiers ) results =
         case Dict.get key results of
             Nothing ->
                 defaultMediaQueriesStyled
-                    |> setter modifiers
+                    |> setter elem
                     |> (,) styleSelector
                     |> flip (Dict.insert key) results
 
             Just mediaQueries ->
                 mediaQueries
-                    |> Tuple.mapSecond (setter modifiers)
+                    |> Tuple.mapSecond (setter elem)
                     |> flip (Dict.insert key) results

@@ -615,26 +615,26 @@ cacheDisplayStyle (( flexModifiers, flexItemModifiers, blockModifiers, boxModifi
             Maybe.map
                 (List.Extra.groupWhile (\x y -> Tuple.second x == Tuple.second y)
                     >> List.concatMap BodyBuilder.Convert.mergeModifiers
-                    >>List.map
-                    (Tuple.mapSecond
-                        (\modifiers ->
-                            (Function.compose modifiers)
-                                (Display.BlockDetails Nothing Nothing Nothing Nothing Nothing)
+                    >> List.map
+                        (Tuple.mapSecond
+                            (\modifiers ->
+                                (Function.compose modifiers)
+                                    (Display.BlockDetails Nothing Nothing Nothing Nothing Nothing)
+                            )
                         )
-                    )
                 )
                 blockModifiers
 
         test4 =
             (List.Extra.groupWhile (\x y -> Tuple.second x == Tuple.second y)
                 >> List.concatMap BodyBuilder.Convert.mergeModifiers
-                >>List.map
-                (Tuple.mapSecond
-                    (\modifiers ->
-                        (Function.compose modifiers)
-                            (Box.default)
+                >> List.map
+                    (Tuple.mapSecond
+                        (\modifiers ->
+                            (Function.compose modifiers)
+                                (Box.default)
+                        )
                     )
-                )
             )
                 boxModifiers
 
@@ -643,12 +643,8 @@ cacheDisplayStyle (( flexModifiers, flexItemModifiers, blockModifiers, boxModifi
     in
         case Native.BodyBuilder.fetchDisplayStyle hash of
             Nothing ->
-                BodyBuilder.Convert.displayStyle flexModifiers flexItemModifiers blockModifiers boxModifiers
+                BodyBuilder.Convert.displayStyle test test2 test3 test4
                     |> Native.BodyBuilder.addDisplayStyle hash
 
             Just classesNames ->
                 classesNames
-
-
-
--- |> Debug.log "test"

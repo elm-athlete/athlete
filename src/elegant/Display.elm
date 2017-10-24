@@ -3,6 +3,7 @@ module Display
         ( DisplayBox(..)
         , OutsideDisplay(..)
         , InsideDisplay(..)
+        , Contents
         , displayBox
         , none
         , block
@@ -71,6 +72,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 # Types
 
 @docs DisplayBox
+@docs Contents
 @docs displayBox
 @docs OutsideDisplay
 @docs InsideDisplay
@@ -206,6 +208,7 @@ type DisplayBox
     | ContentsWrapper Contents
 
 
+{-| -}
 type alias Contents =
     { outsideDisplay : OutsideDisplay
     , insideDisplay : InsideDisplay

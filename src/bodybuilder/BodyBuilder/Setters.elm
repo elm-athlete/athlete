@@ -109,53 +109,21 @@ setOnMouseEventsIn record onMouseEvents =
     { record | onMouseEvents = Just onMouseEvents }
 
 
-setFlexContainer : List (a -> a) -> { b | flexContainer : Maybe (List (a -> a)) } -> { b | flexContainer : Maybe (List (a -> a)) }
+setFlexContainer : a -> { b | flexContainer : Maybe a } -> { b | flexContainer : Maybe a }
 setFlexContainer modifiers ({ flexContainer } as record) =
-    { record
-        | flexContainer =
-            case flexContainer of
-                Nothing ->
-                    Just modifiers
-
-                Just modifiers_ ->
-                    Just (modifiers ++ modifiers_)
-    }
+    { record | flexContainer = Just modifiers }
 
 
-setFlexItem : List (a -> a) -> { b | flexItem : Maybe (List (a -> a)) } -> { b | flexItem : Maybe (List (a -> a)) }
+setFlexItem : a -> { b | flexItem : Maybe a } -> { b | flexItem : Maybe a }
 setFlexItem modifiers ({ flexItem } as record) =
-    { record
-        | flexItem =
-            case flexItem of
-                Nothing ->
-                    Just modifiers
-
-                Just modifiers_ ->
-                    Just (modifiers ++ modifiers_)
-    }
+    { record | flexItem = Just modifiers }
 
 
-setMediaBlock : List (a -> a) -> { b | block : Maybe (List (a -> a)) } -> { b | block : Maybe (List (a -> a)) }
+setMediaBlock : a -> { b | block : Maybe a } -> { b | block : Maybe a }
 setMediaBlock modifiers ({ block } as record) =
-    { record
-        | block =
-            case block of
-                Nothing ->
-                    Just modifiers
-
-                Just modifiers_ ->
-                    Just (modifiers ++ modifiers_)
-    }
+    { record | block = Just modifiers }
 
 
-setMediaBox : List (a -> a) -> { b | box : Maybe (List (a -> a)) } -> { b | box : Maybe (List (a -> a)) }
+setMediaBox : a -> { b | box : Maybe a } -> { b | box : Maybe a }
 setMediaBox modifiers ({ box } as record) =
-    { record
-        | box =
-            case box of
-                Nothing ->
-                    Just modifiers
-
-                Just modifiers_ ->
-                    Just (modifiers ++ modifiers_)
-    }
+    { record | box = Just modifiers }
