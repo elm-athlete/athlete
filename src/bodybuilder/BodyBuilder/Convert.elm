@@ -8,6 +8,7 @@ import Box
 import BodyBuilder.Attributes as Attributes
 import List.Extra
 import Dict exposing (Dict)
+import Maybe.Extra
 
 
 type alias MediaQueriesStyled =
@@ -23,8 +24,8 @@ defaultMediaQueriesStyled =
     MediaQueriesStyled Nothing Nothing Nothing Nothing
 
 
-toElegantStyle : List ( Attributes.StyleSelector, MediaQueriesStyled ) -> Elegant.Style
-toElegantStyle components =
+toElegantStyle : Bool -> List ( Attributes.StyleSelector, MediaQueriesStyled ) -> Elegant.Style
+toElegantStyle isFlex components =
     let
         suffix =
             case List.head components of
@@ -35,7 +36,7 @@ toElegantStyle components =
                     styleSelector.pseudoClass
 
         computedDisplay =
-            List.map toDisplayBox components
+            List.map (toDisplayBox isFlex) components
 
         baseStyle =
             case List.Extra.find (\( media, display ) -> media == Nothing) computedDisplay of
@@ -81,8 +82,8 @@ toScreenWidth ( mediaQuery, display ) =
                     ]
 
 
-toDisplayBox : ( Attributes.StyleSelector, MediaQueriesStyled ) -> ( Maybe Attributes.MediaQuery, Display.DisplayBox )
-toDisplayBox ( { media }, { flexContainer, flexItem, block, box } ) =
+toDisplayBox : Bool -> ( Attributes.StyleSelector, MediaQueriesStyled ) -> ( Maybe Attributes.MediaQuery, Display.DisplayBox )
+toDisplayBox isFlex ( { media }, { flexContainer, flexItem, block, box } ) =
     let
         displayInside =
             case flexItem of
@@ -95,7 +96,10 @@ toDisplayBox ( { media }, { flexContainer, flexItem, block, box } ) =
                             Display.flexContainer modifiers
 
                         Nothing ->
-                            Display.Flow
+                            if isFlex then
+                                Display.flexContainer []
+                            else
+                                Display.Flow
 
         displayOutside =
             case flexItem of
@@ -127,8 +131,7 @@ displayStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
         |> addModifiers (Just boxModifiers) setMediaBox
         |> Dict.values
         |> List.Extra.groupWhile (\x y -> (Tuple.first >> .pseudoClass) x == (Tuple.first >> .pseudoClass) y)
-        |> List.map toElegantStyle
-        -- |> Debug.log "styles"
+        |> List.map (toElegantStyle (Maybe.Extra.isJust flexModifiers))
 
 
 addModifiers :
