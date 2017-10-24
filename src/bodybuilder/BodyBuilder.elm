@@ -9,9 +9,6 @@ import Helpers.Shared exposing (..)
 import Display exposing (FlexContainerDetails)
 import Display
 import BodyBuilder.Convert
-import Native.BodyBuilder
-import Box
-import List.Extra
 
 
 type alias Node msg =
@@ -587,82 +584,14 @@ computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttribute
                 defaultAttributes
     in
         Html.node tag
-            (cacheDisplayStyle ( flexModifiers, flexItemModifiers, blockModifiers, attributes.box )
+            (BodyBuilder.Convert.toElegantStyle
+                flexModifiers
+                flexItemModifiers
+                blockModifiers
+                attributes.box
                 |> List.map Elegant.styleToCss
                 |> String.join " "
                 |> Html.Attributes.class
                 |> flip (::) (attributesToHtmlAttributes attributes)
             )
             content
-
-
-cacheDisplayStyle :
-    ( Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )), Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector )), Maybe (List ( Modifiers Display.BlockDetails, StyleSelector )), List ( Modifiers Box.Box, StyleSelector ) )
-    -> List Elegant.Style
-cacheDisplayStyle (( flexModifiers, flexItemModifiers, blockModifiers, boxModifiers ) as styles) =
-    let
-        test =
-            flexModifiers
-                |> Maybe.map
-                    (List.Extra.groupWhile (\x y -> Tuple.second x == Tuple.second y)
-                        >> List.concatMap BodyBuilder.Convert.mergeModifiers
-                        >> List.map
-                            (Tuple.mapSecond
-                                (\modifiers ->
-                                    (Function.compose modifiers)
-                                        (Display.FlexContainerDetails Nothing Nothing Nothing Nothing)
-                                )
-                            )
-                    )
-
-        test2 =
-            Maybe.map
-                (List.Extra.groupWhile (\x y -> Tuple.second x == Tuple.second y)
-                    >> List.concatMap BodyBuilder.Convert.mergeModifiers
-                    >> List.map
-                        (Tuple.mapSecond
-                            (\modifiers ->
-                                (Function.compose modifiers)
-                                    (Display.FlexItemDetails Nothing Nothing Nothing Nothing)
-                            )
-                        )
-                )
-                flexItemModifiers
-
-        test3 =
-            Maybe.map
-                (List.Extra.groupWhile (\x y -> Tuple.second x == Tuple.second y)
-                    >> List.concatMap BodyBuilder.Convert.mergeModifiers
-                    >> List.map
-                        (Tuple.mapSecond
-                            (\modifiers ->
-                                (Function.compose modifiers)
-                                    (Display.BlockDetails Nothing Nothing Nothing Nothing Nothing)
-                            )
-                        )
-                )
-                blockModifiers
-
-        test4 =
-            (List.Extra.groupWhile (\x y -> Tuple.second x == Tuple.second y)
-                >> List.concatMap BodyBuilder.Convert.mergeModifiers
-                >> List.map
-                    (Tuple.mapSecond
-                        (\modifiers ->
-                            (Function.compose modifiers)
-                                (Box.default)
-                        )
-                    )
-            )
-                boxModifiers
-
-        hash =
-            ( test, test2, test3, test4 ) |> toString
-    in
-        case Native.BodyBuilder.fetchDisplayStyle hash of
-            Nothing ->
-                BodyBuilder.Convert.displayStyle test test2 test3 test4
-                    |> Native.BodyBuilder.addDisplayStyle hash
-
-            Just classesNames ->
-                classesNames
