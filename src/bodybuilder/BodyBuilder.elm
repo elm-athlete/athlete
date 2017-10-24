@@ -503,6 +503,25 @@ inputText modifiers =
             modifiers
             []
 
+
+{-| -}
+inputNumber : Modifiers (InputNumberAttributes msg) -> Node msg
+inputNumber modifiers =
+    let
+        attributes =
+            (Function.compose modifiers) BodyBuilder.Attributes.defaultInputNumberAttributes
+    in
+        computeBlock
+            "input"
+            Nothing
+            Nothing
+            attributes.block
+            BodyBuilder.Attributes.defaultInputNumberAttributes
+            BodyBuilder.Attributes.inputNumberAttributesToHtmlAttributes
+            modifiers
+            []
+
+
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 heading tag modifiers =
     let
@@ -596,9 +615,12 @@ type alias MediaQueriesStyled =
 --     -> List ( Modifiers Box.Box, StyleSelector )
 --     -> List (List )
 -- foo flex
+
+
 concatModifiers : ( appendable, a ) -> appendable -> appendable
-concatModifiers (modifiers, _ ) acc=
+concatModifiers ( modifiers, _ ) acc =
     acc ++ modifiers
+
 
 displayStyle :
     Maybe (List ( Modifiers FlexContainerDetails, StyleSelector ))

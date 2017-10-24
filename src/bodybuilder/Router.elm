@@ -411,7 +411,7 @@ historyView insidePageView_ history data =
                                 (List.map (pageView insidePageView_ history.transition data) (history |> beforeTransition))
                             , flexItem
                                 [ style
-                                    [ Attributes.block []
+                                    [ Attributes.block [ Display.dimensions [ Display.width (percent 100) ] ]
                                     , Attributes.flexItemProperties [ Display.basis (percent 100) ]
                                     , Attributes.box
                                         [ Box.position <|
@@ -541,7 +541,7 @@ headerElement { left, center, right } =
                 [ Display.dimensions [ Display.width <| percent 100 ] ]
             , Attributes.box
                 [ Box.position <| Position.sticky []
-                , Box.background [ Elegant.color Color.lightPurple ]
+                , Box.background [ Elegant.color Color.white ]
                 ]
             ]
         ]

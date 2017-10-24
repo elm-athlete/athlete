@@ -415,7 +415,7 @@ type alias InputUrlAttributes msg =
 
 {-| -}
 type alias InputNumberAttributes msg =
-    StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {})))))
+    MaybeBlockContainer (StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {}))))))
 
 
 {-| -}
@@ -954,6 +954,7 @@ defaultInputNumberAttributes =
     , min = Nothing
     , max = Nothing
     , step = Nothing
+    , block = Nothing
     }
 
 
@@ -1099,6 +1100,7 @@ defaultInputRangeAttributes =
     , min = Nothing
     , max = Nothing
     , step = Nothing
+    , block = Nothing
     }
 
 
