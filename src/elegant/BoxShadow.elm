@@ -148,7 +148,7 @@ blurAndSpreadRadiusToStringList blurRadius spreadRadius =
 
 maybeColorToStringList : Maybe Color -> List String
 maybeColorToStringList =
-    Maybe.map Color.Convert.colorToCssRgb
+    Maybe.map Color.Convert.colorToCssRgba
         >> Maybe.map List.singleton
         >> Maybe.withDefault []
 

@@ -986,7 +986,7 @@ defaultInputColorAttributes =
 
 inputColorAttributesToHtmlAttributes : InputColorAttributes msg -> List (Html.Attribute msg)
 inputColorAttributesToHtmlAttributes attributes =
-    unwrapMaybeAttribute Html.Attributes.value (Maybe.map Color.Convert.colorToCssRgb <| attributes.value)
+    unwrapMaybeAttribute Html.Attributes.value (Maybe.map Color.Convert.colorToCssRgba <| attributes.value)
         |> List.append (inputVisibleToHtmlAttributes attributes)
         |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
 

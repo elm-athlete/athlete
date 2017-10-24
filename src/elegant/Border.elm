@@ -15,6 +15,7 @@ module Border
         , vertical
         , all
         , borderToCouples
+        , full
         )
 
 {-| Border contains everything about borders rendering.
@@ -56,6 +57,10 @@ module Border
 # Compilation
 
 @docs borderToCouples
+
+# Sugar
+
+@docs full
 
 -}
 
@@ -175,6 +180,13 @@ vertical =
 all : Modifiers Border -> Modifier (Surrounded Border)
 all =
     Surrounded.all default
+
+
+{-| Accepts a color modifier
+-}
+full : Color -> Modifier (Surrounded Border)
+full color =
+    all [ (setColor << Just) color, thickness (Px 1), solid ]
 
 
 {-| Compiles a `Surrounded Border` record to the corresponding CSS list of tuples.

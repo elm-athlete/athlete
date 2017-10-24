@@ -10,54 +10,62 @@ import Border
 import Elegant exposing (px, percent, vh)
 import Typography
 import Padding
-import Function exposing (compose)
 import Color
 import Color.Extra as Color
 import Typography.Character as Character
-import Background
 
 
 buttonStyle =
-    [ Attributes.box
+    [ Attributes.block [ Display.dimensions [ Display.height (percent 100) ] ]
+    , Attributes.box
         [ Box.padding [ Padding.vertical Constants.zero ]
-        , Box.border [ Border.all [ Border.thickness 0 ] ]
+        , Box.border [ Border.all [ Border.thickness (px 0) ] ]
         , Box.typography [ Typography.character [ Character.size (px 10) ] ]
         , Box.background [ Elegant.color Color.transparent ]
+        , Box.padding [ Padding.horizontal Constants.small ]
         ]
     ]
-        |> compose
 
 
-counter : a -> Node Msg
+counter : a -> FlexItem Msg
 counter model =
-    node [ style [ Display.block [] ] ]
+    flexItem [ style [ Attributes.block [] ] ]
         [ flex
             [ style
-                [ Attributes.flexContainerProperties
-                    [ Display.alignCenter
+                [ Attributes.block []
+                , Attributes.flexContainerProperties
+                    [ Display.align Display.stretch
                     ]
                 , Attributes.box
-                    [ Box.border [ Border.all [ Elegant.color Color.gray ] ] ]
+                    [ Box.border [ Border.full Color.gray ]
+                    ]
                 ]
             ]
-            [ inputText
-                [ style
-                    [ Attributes.box
-                        [ Box.padding [ Padding.all Constants.zero ]
-                        , Box.typography [ Typography.character [ Character.size (px 20) ] ]
-                        , Box.border [ Border.all [ Border.thickness 0 ] ]
+            [ flexItem []
+                [ inputText
+                    [ style
+                        [ Attributes.block [ Display.dimensions [ Display.height (percent 100) ] ]
+                        , Attributes.box
+                            [ Box.padding [ Padding.all Constants.zero ]
+                            , Box.typography [ Typography.character [ Character.size (px 20) ] ]
+                            , Box.border [ Border.all [ Border.thickness (px 0) ] ]
+                            , Box.padding [ Padding.left Constants.small ]
+                            ]
+                        ]
+                    , onInput Change
+                    , value (model |> toString)
+                    ]
+                ]
+            , flexItem []
+                [ flex
+                    [ style
+                        [ Attributes.block []
+                        , Attributes.flexContainerProperties [ Display.direction Display.column ]
                         ]
                     ]
-                , onInput Change
-                , value (model |> toString)
-                ]
-            , flex
-                [ style
-                    [ Attributes.flexContainerProperties [ Display.column ]
+                    [ flexItem [] [ button [ onClick Add, style buttonStyle ] [ text "+" ] ]
+                    , flexItem [] [ button [ onClick Substract, style buttonStyle ] [ text "-" ] ]
                     ]
-                ]
-                [ button [ onClick Add, style [ buttonStyle ] ] [ text "+" ]
-                , button [ onClick Substract, style [ buttonStyle ] ] [ text "-" ]
                 ]
             ]
         ]
@@ -69,7 +77,7 @@ view model =
         [ style
             [ Attributes.block [ Display.dimensions [ Display.height (vh 100) ] ]
             , Attributes.flexContainerProperties
-                [ Display.alignCenter
+                [ Display.align Display.center
                 , Display.justifyContent Display.justifyContentCenter
                 ]
             ]

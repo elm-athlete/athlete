@@ -45,12 +45,12 @@ left default =
 
 horizontal : a -> Modifiers a -> Modifier (Surrounded a)
 horizontal default modifiers =
-    top default modifiers >> bottom default modifiers
+    left default modifiers >> right default modifiers
 
 
 vertical : a -> Modifiers a -> Modifier (Surrounded a)
 vertical default modifiers =
-    left default modifiers >> right default modifiers
+    top default modifiers >> bottom default modifiers
 
 
 all : a -> Modifiers a -> Modifier (Surrounded a)

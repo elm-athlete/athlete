@@ -289,7 +289,7 @@ backgroundToCouples background =
 
 backgroundColorToCouple : Color -> ( String, String )
 backgroundColorToCouple color =
-    ( "background-color", Color.Convert.colorToCssRgb color )
+    ( "background-color", Color.Convert.colorToCssRgba color )
 
 
 backgroundImagesToCouple : List BackgroundImage -> List ( String, String )
