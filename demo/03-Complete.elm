@@ -37,8 +37,8 @@ buttonStyle color =
 
 
 exampleGridContent content =
-    [ div [ style [ paddingBottom medium ] ]
-        [ div [ style [ Elements.border Color.black, padding large, textCenter ] ]
+    [ node [ style [ paddingBottom medium ] ]
+        [ node [ style [ Elements.border Color.black, padding large, textCenter ] ]
             [ text content
             ]
         ]
@@ -56,7 +56,7 @@ customCounter title min max step val msg =
             ]
                 |> compose
     in
-        div [ style [ textCenter ] ]
+        node [ style [ textCenter ] ]
             [ h3 [ style [ fontSize (Px 14), uppercase ] ] [ text title ]
             , inputRange
                 [ style [ Elegant.displayInlineBlock ]
@@ -107,7 +107,7 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
                 ]
             ]
             [ text "Alignment" ]
-        , div
+        , node
             [ style
                 [ Elegant.width (Px 400)
                 , marginAuto
@@ -116,7 +116,7 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
                 ]
             ]
             [ text "I'm centered with auto margins and a width of 400px" ]
-        , div
+        , node
             [ style
                 [ Elegant.width (Px 600)
                 , marginAuto
@@ -125,25 +125,25 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
                 ]
             ]
             [ text "I'm centered with auto margins and a width of 600px" ]
-        , div
+        , node
             [ style
                 [ textCenter
                 ]
             ]
             [ text "I'm centered" ]
-        , div
+        , node
             [ style
                 [ textRight
                 ]
             ]
             [ text "I'm right aligned" ]
-        , div
+        , node
             [ style
                 [ textLeft
                 ]
             ]
             [ text "I'm left aligned" ]
-        , div
+        , node
             [ style
                 [ backgroundColor (Color.rgb 40 160 240)
                 , textColor (Color.rgb (255 - 40) (255 - 160) (255 - 240))
@@ -151,7 +151,7 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
                 ]
             ]
             [ text "I'm colored" ]
-        , div
+        , node
             [ style
                 [ border black
                 , borderWidth 3
@@ -164,30 +164,30 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
                 ]
             ]
             [ text "Flex" ]
-        , div [ style [ displayFlex, spaceBetween ] ]
-            [ div [ style [ padding medium ] ] [ text "Some" ]
-            , div [ style [ padding medium ] ] [ text "Flex" ]
-            , div [ style [ padding medium ] ] [ text "Elements" ]
-            , div [ style [ padding medium ] ] [ text "With" ]
-            , div [ style [ padding medium ] ] [ text "Space" ]
-            , div [ style [ padding medium ] ] [ text "Between" ]
+        , node [ style [ displayFlex, spaceBetween ] ]
+            [ node [ style [ padding medium ] ] [ text "Some" ]
+            , node [ style [ padding medium ] ] [ text "Flex" ]
+            , node [ style [ padding medium ] ] [ text "Elements" ]
+            , node [ style [ padding medium ] ] [ text "With" ]
+            , node [ style [ padding medium ] ] [ text "Space" ]
+            , node [ style [ padding medium ] ] [ text "Between" ]
             ]
-        , div [ style [ displayFlex, spaceAround ] ]
-            [ div [ style [ padding medium ] ] [ text "Some" ]
-            , div [ style [ padding medium ] ] [ text "Flex" ]
-            , div [ style [ padding medium ] ] [ text "Elements" ]
-            , div [ style [ padding medium ] ] [ text "With" ]
-            , div [ style [ padding medium ] ] [ text "Space" ]
-            , div [ style [ padding medium ] ] [ text "Around" ]
+        , node [ style [ displayFlex, spaceAround ] ]
+            [ node [ style [ padding medium ] ] [ text "Some" ]
+            , node [ style [ padding medium ] ] [ text "Flex" ]
+            , node [ style [ padding medium ] ] [ text "Elements" ]
+            , node [ style [ padding medium ] ] [ text "With" ]
+            , node [ style [ padding medium ] ] [ text "Space" ]
+            , node [ style [ padding medium ] ] [ text "Around" ]
             ]
-        , div [ style [ displayFlex, spaceBetween, alignItemsCenter ] ]
-            [ div [ style [ padding medium ] ] [ text "Some" ]
-            , div [ style [ padding medium ] ] [ text "Flex" ]
-            , div [ style [ padding medium ] ] [ text "Elements" ]
-            , div [ style [ padding medium ] ] [ text "With" ]
-            , div [ style [ padding medium ] ] [ text "Space" ]
-            , div [ style [ padding medium ] ] [ text "Between" ]
-            , div [ style [ padding medium, flex 1, textRight ] ] [ text "And one element taking the rest of the place" ]
+        , node [ style [ displayFlex, spaceBetween, alignItemsCenter ] ]
+            [ node [ style [ padding medium ] ] [ text "Some" ]
+            , node [ style [ padding medium ] ] [ text "Flex" ]
+            , node [ style [ padding medium ] ] [ text "Elements" ]
+            , node [ style [ padding medium ] ] [ text "With" ]
+            , node [ style [ padding medium ] ] [ text "Space" ]
+            , node [ style [ padding medium ] ] [ text "Between" ]
+            , node [ style [ padding medium, flex 1, textRight ] ] [ text "And one element taking the rest of the place" ]
             ]
         , h1 []
             [ text "I am h1" ]
@@ -201,35 +201,35 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
             [ text "I am h5" ]
         , h6 []
             [ text "I am h6" ]
-        , div [ style [ h1S ] ]
+        , node [ style [ h1S ] ]
             [ text "I am h1 styled" ]
-        , div [ style [ h2S ] ]
+        , node [ style [ h2S ] ]
             [ text "I am h2 styled" ]
-        , div [ style [ h3S ] ]
+        , node [ style [ h3S ] ]
             [ text "I am h3 styled" ]
-        , div [ style [ h4S ] ]
+        , node [ style [ h4S ] ]
             [ text "I am h4 styled" ]
-        , div [ style [ h5S ] ]
+        , node [ style [ h5S ] ]
             [ text "I am h5 styled" ]
-        , div [ style [ h6S ] ]
+        , node [ style [ h6S ] ]
             [ text "I am h6 styled" ]
-        , div [ style [ textCenter, padding medium, displayInlineBlock, Elegant.round, strong, uppercase, border black, padding medium ] ]
+        , node [ style [ textCenter, padding medium, displayInlineBlock, Elegant.round, strong, uppercase, border black, padding medium ] ]
             [ text "I am round, strong and uppercase" ]
         , inputColor [ style [ Elegant.displayBlock ], value color, onInput ChangeColor ]
         , BodyBuilder.button
             [ buttonStyle color, hoverStyle [ textColor Color.blue ] ]
             [ text "Push me" ]
         , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_" ]
-        , div []
+        , node []
             [ inputCheckbox [ style [ Elegant.displayInlineBlock ], checked (bootstrapState && bodybuilderState), onCheck ChangeBoth ]
             , span [] [ text "I like Both" ]
             ]
-        , div [ style [ paddingLeft large ] ]
-            [ div []
+        , node [ style [ paddingLeft large ] ]
+            [ node []
                 [ inputCheckbox [ style [ Elegant.displayInlineBlock ], checked bootstrapState, onCheck ChangeBootstrapState ]
                 , span [] [ text "I like Bootstrap" ]
                 ]
-            , div []
+            , node []
                 [ inputCheckbox [ style [ Elegant.displayInlineBlock ], checked bodybuilderState, onCheck ChangeBodyBuilderState ]
                 , span [] [ text "I like BodyBuilder" ]
                 ]

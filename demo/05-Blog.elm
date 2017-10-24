@@ -101,76 +101,6 @@ titleView blogpost =
         [ text blogpost.title ]
 
 
-
--- titleView : Blogpost -> Node Msg
--- titleView blogpost =
---     button
---         [ Events.onClick <| HistoryMsgWrapper <| BlogpostShow blogpost.id
---         , style
---             [ Elegant.cursorPointer
---             , Elegant.borderNone
---             , borderBottom gray
---             , Elegant.outlineNone
---             , Elegant.textLeft
---             , Elegant.fontFamilyInherit
---             , Elegant.fontSize Elegant.zeta
---             , Elegant.padding Elegant.large
---             , Elegant.backgroundColor Color.white
---             , Elegant.fullWidth
---             ]
---         , focusStyle [ Elegant.backgroundColor <| Color.grayscale 0.05 ]
---         ]
---         [ text blogpost.title ]
---
--- header : Node Msg
--- header =
---     div [ style [ Elegant.positionFixed, Elegant.fullWidth, Elegant.backgroundColor (Color.rgba 255 255 255 0.9) ] ]
---         [ div [ style [ Elegant.displayFlex, Elegant.flexDirectionRow, Elegant.fullWidth ] ]
---             [ div
---                 [ onClick <| StandardHistoryWrapper Back
---                 , style
---                     [ Elegant.textColor Color.black
---                     , Elegant.padding Elegant.medium
---                     , Elegant.cursorPointer
---                     , Elegant.fontSize (Px 12)
---                     , Elegant.whiteSpaceNoWrap
---                     , Elegant.overflowHidden
---                     , Elegant.width (Percent 30)
---                     , Elegant.textOverflowEllipsis
---                     ]
---                 ]
---                 [ text "← BACK"
---                 ]
---             , div
---                 [ onClick <| StandardHistoryWrapper Back
---                 , style
---                     [ Elegant.textColor Color.black
---                     , Elegant.padding Elegant.medium
---                     , Elegant.cursorPointer
---                     , Elegant.fontSize (Px 12)
---                     , Elegant.textCenter
---                     , Elegant.width (Percent 40)
---                     ]
---                 ]
---                 [ text "TRAAAVEL"
---                 ]
---             , div
---                 [ onClick <| StandardHistoryWrapper Back
---                 , style
---                     [ Elegant.textColor Color.black
---                     , Elegant.padding Elegant.medium
---                     , Elegant.cursorPointer
---                     , Elegant.fontSize (Px 12)
---                     , Elegant.textCenter
---                     , Elegant.width (Percent 30)
---                     ]
---                 ]
---                 [ text ""
---                 ]
---             ]
---         ]
-
-
 showView : { b | maybeBlogpost : Maybe Blogpost } -> Node Msg
 showView data =
     case data.maybeBlogpost of
@@ -191,7 +121,8 @@ showView data =
 blogpostView : Blogpost -> Node msg
 blogpostView blogpost =
     node []
-        [ node
+        [ img "" blogpost.image [ style [ Attributes.block [ Display.dimensions [ Display.fullWidth ] ] ] ]
+        , node
             [ style
                 [ Attributes.block []
                 , Attributes.box [ Box.padding [ Padding.horizontal Constants.medium ] ]
@@ -206,23 +137,6 @@ textToHtml =
     (>>)
         (String.split "\n")
         (List.foldr (\e accu -> [ text e, br ] ++ accu) [])
-
-
-
--- blogpostBodyView : { b | maybeBlogpost : Maybe Blogpost } -> Node msg
--- blogpostBodyView data =
---     case data.maybeBlogpost of
---         Nothing ->
---             text ""
---
---         Just blogpost ->
---             node []
---                 ([ img ""
---                     blogpost.image
---                     [ style [ Elegant.fullWidth ] ]
---                  , node [] (textToHtml blogpost.content)
---                  ]
---                 )
 
 
 standardCellStyle =
