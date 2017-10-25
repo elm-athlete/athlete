@@ -35,6 +35,7 @@ module Display
         , dimensions
         , width
         , height
+        , square
         , minHeight
         , maxHeight
         , fullWidth
@@ -133,6 +134,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs dimensions
 @docs width
 @docs height
+@docs square
 @docs fullWidth
 @docs minHeight
 @docs maxHeight
@@ -532,6 +534,12 @@ width value ( x, y ) =
 height : SizeUnit -> Modifier Dimensions
 height value ( x, y ) =
     ( x, y |> setDimension (Just value) )
+
+
+{-| -}
+square : SizeUnit -> Modifier Dimensions
+square value =
+    height value << width value
 
 
 {-| -}

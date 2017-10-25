@@ -163,10 +163,11 @@ insetToStringList inset =
 
 boxShadowToString : BoxShadow -> String
 boxShadowToString { inset, offset, spreadRadius, color, blurRadius } =
-    [ offsetToStringList offset
-    , blurAndSpreadRadiusToStringList blurRadius spreadRadius
-    , maybeColorToStringList color
-    , insetToStringList inset
-    ]
+    ([ offsetToStringList offset
+     , blurAndSpreadRadiusToStringList blurRadius spreadRadius
+     , maybeColorToStringList color
+     , insetToStringList inset
+     ]
         |> List.concat
         |> String.join " "
+    )

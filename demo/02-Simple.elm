@@ -38,7 +38,7 @@ view model =
                             [ Character.size (px (theFontSize + 5)) ]
                         ]
                     ]
-                    |> Attributes.hover
+                    |> Attributes.pseudoClass "hover"
                 ]
             ]
             [ Builder.text "Go Hover Me ! My style is set in my node, so it's parametrizable, but the result is a good old css node (look at the dom Luke)" ]

@@ -3,6 +3,7 @@ module Box
         ( Box
         , default
         , Visibility
+        , appearanceNone
         , hidden
         , visible
         , background
@@ -34,6 +35,7 @@ It contains only modifiers, and they can be found in the respective modules.
 
 # Modifiers
 
+@docs appearanceNone
 @docs background
 @docs border
 @docs boxShadow
@@ -88,7 +90,8 @@ in respective modules.
 
 -}
 type alias Box =
-    { background : Maybe Background.Background
+    { appearance : Maybe String
+    , background : Maybe Background.Background
     , border : Maybe (Surrounded Border.Border)
     , boxShadow : Maybe BoxShadow.BoxShadow
     , corner : Maybe Corner.Corner
@@ -109,6 +112,7 @@ type alias Box =
 default : Box
 default =
     Box
+        Nothing
         Nothing
         Nothing
         Nothing
@@ -215,6 +219,13 @@ zIndex =
     setMaybeValue setZIndex
 
 
+{-| Accepts an Int for the `zIndex` and modifies the Box accordingly.
+-}
+appearanceNone : Modifier Box
+appearanceNone box =
+    { box | appearance = Just "none" }
+
+
 {-| Compiles a `Box` to the corresponding CSS list of tuples.
 Compiles only the defined styles, ignoring the `Nothing` fields.
 -}
@@ -233,8 +244,17 @@ boxToCouples box =
     , unwrapToCouples .margin Margin.marginToCouples
     , unwrapToCouples .padding Padding.paddingToCouples
     , unwrapToCouples .position Position.positionToCouples
+    , unwrapToCouples .appearance appearance
     ]
         |> List.concatMap (callOn box)
+
+
+appearance : a -> List ( String, a )
+appearance e =
+    [ ( "-webkit-appearance", e )
+    , ( "appearance", e )
+    , ( "-moz-appearance", e )
+    ]
 
 
 {-| Defines the visibility of an element. It can be either visible or hidden.

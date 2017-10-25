@@ -42,7 +42,7 @@ program =
 
 node : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
 node =
-    common
+    commonNode
         BodyBuilder.Attributes.defaultNodeAttributes
         "bb-node"
         identity
@@ -54,7 +54,7 @@ node =
 
 flex : Modifiers (FlexContainerAttributes msg) -> List (FlexItem msg) -> Node msg
 flex =
-    common
+    commonNode
         BodyBuilder.Attributes.defaultFlexContainerAttributes
         "bb-flex"
         (List.map extractNodeInFlexItem)
@@ -72,7 +72,7 @@ extractNodeInFlexItem (FlexItem item) =
 flexItem : Modifiers (FlexItemAttributes msg) -> List (Node msg) -> FlexItem msg
 flexItem modifiers =
     FlexItem
-        << common
+        << commonNode
             BodyBuilder.Attributes.defaultFlexItemAttributes
             "bb-flex-item"
             identity
@@ -85,7 +85,7 @@ flexItem modifiers =
 
 button : Modifiers (ButtonAttributes msg) -> List (Node msg) -> Node msg
 button =
-    common
+    commonNode
         BodyBuilder.Attributes.defaultButtonAttributes
         "button"
         identity
@@ -98,38 +98,45 @@ button =
 {-| -}
 inputText : Modifiers (InputTextAttributes msg) -> Node msg
 inputText =
-    flip
-        (common
-            BodyBuilder.Attributes.defaultInputTextAttributes
-            "input"
-            identity
-            nothingAttributes
-            nothingAttributes
-            .block
-            BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
-        )
-        []
+    commonChildlessNode
+        BodyBuilder.Attributes.defaultInputTextAttributes
+        "input"
+        identity
+        nothingAttributes
+        nothingAttributes
+        .block
+        BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
+
+
+{-| -}
+inputRange : Modifiers (InputRangeAttributes msg) -> Node msg
+inputRange =
+    commonChildlessNode
+        BodyBuilder.Attributes.defaultInputRangeAttributes
+        "input"
+        identity
+        nothingAttributes
+        nothingAttributes
+        .block
+        BodyBuilder.Attributes.inputRangeAttributesToHtmlAttributes
 
 
 {-| -}
 inputNumber : Modifiers (InputNumberAttributes msg) -> Node msg
 inputNumber =
-    flip
-        (common
-            BodyBuilder.Attributes.defaultInputNumberAttributes
-            "input"
-            identity
-            nothingAttributes
-            nothingAttributes
-            .block
-            BodyBuilder.Attributes.inputNumberAttributesToHtmlAttributes
-        )
-        []
+    commonChildlessNode
+        BodyBuilder.Attributes.defaultInputNumberAttributes
+        "input"
+        identity
+        nothingAttributes
+        nothingAttributes
+        .block
+        BodyBuilder.Attributes.inputNumberAttributesToHtmlAttributes
 
 
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 heading tag =
-    common
+    commonNode
         BodyBuilder.Attributes.defaultHeadingAttributes
         tag
         identity
@@ -178,7 +185,7 @@ p =
 -- Internals
 
 
-common :
+commonNode :
     VisibleAttributes a
     -> String
     -> (b -> List (Node msg))
@@ -189,7 +196,7 @@ common :
     -> Modifiers (VisibleAttributes a)
     -> b
     -> Node msg
-common defaultAttributes nodeName childrenModifiers getFlexContainerProperties getFlexItemProperties getBlockProperties attributesToHtmlAttributes modifiers children =
+commonNode defaultAttributes nodeName childrenModifiers getFlexContainerProperties getFlexItemProperties getBlockProperties attributesToHtmlAttributes modifiers children =
     computeBlock
         nodeName
         getFlexContainerProperties
@@ -199,6 +206,30 @@ common defaultAttributes nodeName childrenModifiers getFlexContainerProperties g
         attributesToHtmlAttributes
         modifiers
         (childrenModifiers children)
+
+
+commonChildlessNode :
+    VisibleAttributes a
+    -> String
+    -> (List b -> List (Node msg))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector )))
+    -> (VisibleAttributes a -> List (Html.Attribute msg))
+    -> Modifiers (VisibleAttributes a)
+    -> Node msg
+commonChildlessNode defaultAttributes nodeName childrenModifiers getFlexContainerProperties getFlexItemProperties getBlockProperties attributesToHtmlAttributes =
+    flip
+        (commonNode
+            defaultAttributes
+            nodeName
+            childrenModifiers
+            getFlexContainerProperties
+            getFlexItemProperties
+            getBlockProperties
+            attributesToHtmlAttributes
+        )
+        []
 
 
 nothingAttributes : b -> Maybe a
