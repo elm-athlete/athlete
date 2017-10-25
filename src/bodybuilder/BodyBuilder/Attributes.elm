@@ -11,6 +11,7 @@ import BodyBuilder.Setters exposing (..)
 import BodyBuilder.Events exposing (..)
 import Function
 import Json.Decode exposing (Decoder)
+import Flex
 
 
 type alias StyleSelector =
@@ -196,11 +197,11 @@ type alias UniversalContainer a =
 
 
 type alias FlexContainerProperties a =
-    { a | flexContainerProperties : List ( Modifiers Display.FlexContainerDetails, StyleSelector ) }
+    { a | flexContainerProperties : List ( Modifiers Flex.FlexContainerDetails, StyleSelector ) }
 
 
 type alias FlexItemProperties a =
-    { a | flexItemProperties : List ( Modifiers Display.FlexItemDetails, StyleSelector ) }
+    { a | flexItemProperties : List ( Modifiers Flex.FlexItemDetails, StyleSelector ) }
 
 
 {-| -}
@@ -487,12 +488,12 @@ blockProperties =
     waitForStyleSelector setBlock
 
 
-flexContainerProperties : Modifiers Display.FlexContainerDetails -> StyleModifier (FlexContainerAttributes msg)
+flexContainerProperties : Modifiers Flex.FlexContainerDetails -> StyleModifier (FlexContainerAttributes msg)
 flexContainerProperties =
     waitForStyleSelector setFlexContainerProperties
 
 
-flexItemProperties : Modifiers Display.FlexItemDetails -> StyleModifier (FlexItemAttributes msg)
+flexItemProperties : Modifiers Flex.FlexItemDetails -> StyleModifier (FlexItemAttributes msg)
 flexItemProperties =
     waitForStyleSelector setFlexItemProperties
 

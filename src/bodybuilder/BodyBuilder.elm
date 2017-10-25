@@ -6,7 +6,7 @@ import Elegant
 import BodyBuilder.Attributes exposing (..)
 import Function
 import Helpers.Shared exposing (..)
-import Display exposing (FlexContainerDetails)
+import Flex exposing (FlexContainerDetails)
 import Display
 import BodyBuilder.Convert
 
@@ -576,7 +576,7 @@ p =
 computeBlock :
     String
     -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector ))
-    -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector ))
+    -> Maybe (List ( Modifiers Flex.FlexItemDetails, StyleSelector ))
     -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector ))
     -> VisibleAttributes a
     -> (VisibleAttributes a -> List (Html.Attribute msg))

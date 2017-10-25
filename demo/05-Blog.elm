@@ -18,6 +18,7 @@ import Elegant exposing (SizeUnit, px, pt, percent, vh)
 import Color
 import Finders exposing (..)
 import Display
+import Dimensions
 import Box
 import Cursor
 import Border
@@ -168,7 +169,7 @@ blogpostsIndex : List Blogpost -> Node Msg
 blogpostsIndex blogposts =
     node
         [ style
-            [ Attributes.block [ Display.dimensions [ Display.height (vh 100) ] ]
+            [ Attributes.block [ Display.dimensions [ Dimensions.height (vh 100) ] ]
             , Attributes.box [ Box.background [ Elegant.color gray ] ]
             ]
         ]

@@ -13,8 +13,6 @@ module Display
         , flexItem
         , flexChildContainer
         , BlockDetails
-        , FlexContainerDetails
-        , FlexItemDetails
         , ListStyleType
         , listStyleNone
         , listStyleDisc
@@ -26,46 +24,15 @@ module Display
         , alignment
         , alignCenter
         , right
-        , cnter
+        , center
         , left
         , justify
         , overflow
         , TextOverflow
         , textOverflowEllipsis
         , dimensions
-        , width
-        , height
-        , square
-        , minHeight
-        , maxHeight
-        , fullWidth
-        , FlexDirection
-        , direction
-        , column
-        , row
-        , FlexWrap
-        , wrap
-        , noWrap
-        , Align
-        , align
-        , baseline
-        , center
-        , flexStart
-        , flexEnd
-        , inherit
-        , initial
-        , stretch
-        , JustifyContent
-        , justifyContent
-        , spaceBetween
-        , spaceAround
-        , justifyContentCenter
-        , grow
-        , shrink
-        , basisAuto
-        , basis
-        , alignSelf
         , displayBoxToCouples
+        , fullWidth
         )
 
 {-| Display contains everything about an element rendering. It is the basis of
@@ -80,15 +47,9 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs OutsideDisplay
 @docs InsideDisplay
 @docs BlockDetails
-@docs FlexContainerDetails
-@docs FlexItemDetails
 @docs ListStyleType
 @docs Alignment
 @docs TextOverflow
-@docs FlexDirection
-@docs FlexWrap
-@docs Align
-@docs JustifyContent
 
 
 # Displays
@@ -120,7 +81,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs alignment
 @docs alignCenter
 @docs right
-@docs cnter
+@docs center
 @docs left
 @docs justify
 
@@ -132,54 +93,9 @@ every style, for every element. Each element can be block, inline, flow or flex.
 
 ## Dimensions
 @docs dimensions
-@docs width
-@docs height
-@docs square
 @docs fullWidth
-@docs minHeight
-@docs maxHeight
 
 
-## FlexDirection
-
-@docs direction
-@docs column
-@docs row
-
-
-## FlexWrap
-
-@docs wrap
-@docs noWrap
-
-
-## AlignItems / AlignSelf
-
-@docs align
-@docs baseline
-@docs center
-@docs flexStart
-@docs flexEnd
-@docs inherit
-@docs initial
-@docs stretch
-
-
-## JustifyContent
-
-@docs justifyContent
-@docs spaceBetween
-@docs spaceAround
-@docs justifyContentCenter
-
-
-## Flex
-
-@docs grow
-@docs shrink
-@docs basisAuto
-@docs basis
-@docs alignSelf
 
 
 # Compilation
@@ -189,12 +105,13 @@ every style, for every element. Each element can be block, inline, flow or flex.
 
 -}
 
-import Either exposing (Either(..))
 import Helpers.Css
 import Box
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 import Display.Overflow as Overflow
+import Dimensions
+import Flex
 
 
 {-| Represents a box and contains all the style inside.
@@ -228,7 +145,7 @@ Can be inline, block, or flex-item.
 type OutsideDisplay
     = Inline
     | Block (Maybe BlockDetails)
-    | FlexItem (Maybe FlexItemDetails) (Maybe BlockDetails)
+    | FlexItem (Maybe Flex.FlexItemDetails) (Maybe BlockDetails)
 
 
 {-| Represents the style from inside a display.
@@ -236,7 +153,7 @@ Can be flow, or flex (and containing flex details).
 -}
 type InsideDisplay
     = Flow
-    | FlexContainer (Maybe FlexContainerDetails)
+    | FlexContainer (Maybe Flex.FlexContainerDetails)
 
 
 {-| -}
@@ -301,11 +218,11 @@ node behaving like an inline element, contained nodes will behave like flex chil
     Display.inlineFlexContainer [] []
 
 -}
-inlineFlexContainer : Modifiers FlexContainerDetails -> Modifiers Box.Box -> DisplayBox
+inlineFlexContainer : Modifiers Flex.FlexContainerDetails -> Modifiers Box.Box -> DisplayBox
 inlineFlexContainer flexContainerDetailsModifiers =
     displayBox
         Inline
-        (FlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
+        (FlexContainer (modifiedElementOrNothing Flex.defaultFlexContainerDetails flexContainerDetailsModifiers))
 
 
 {-| The display blockflex container :
@@ -314,9 +231,9 @@ node behaving like an block element, contained nodes will behave like flex child
     Display.blockFlexContainer [] [] []
 
 -}
-flexContainer : Modifiers FlexContainerDetails -> InsideDisplay
+flexContainer : Modifiers Flex.FlexContainerDetails -> InsideDisplay
 flexContainer flexContainerDetailsModifiers =
-    FlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers)
+    FlexContainer (modifiedElementOrNothing Flex.defaultFlexContainerDetails flexContainerDetailsModifiers)
 
 
 {-| The display flexitemdetails container :
@@ -325,10 +242,10 @@ node behaving like an flex child (not being a flex father himself)
     Display.flexChild [] []
 
 -}
-flexItem : Modifiers FlexItemDetails -> Modifiers BlockDetails -> OutsideDisplay
+flexItem : Modifiers Flex.FlexItemDetails -> Modifiers BlockDetails -> OutsideDisplay
 flexItem flexItemDetailsModifiers blockDetailsModifiers =
     FlexItem
-        (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers)
+        (modifiedElementOrNothing Flex.defaultFlexItemDetails flexItemDetailsModifiers)
         (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers)
 
 
@@ -338,14 +255,14 @@ node behaving like an flex child being a flex father himself.
     Display.flexChildContainer [] [] []
 
 -}
-flexChildContainer : Modifiers FlexContainerDetails -> Modifiers FlexItemDetails -> Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
+flexChildContainer : Modifiers Flex.FlexContainerDetails -> Modifiers Flex.FlexItemDetails -> Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
 flexChildContainer flexContainerDetailsModifiers flexItemDetailsModifiers blockDetailsModifiers =
     displayBox
         (FlexItem
-            (modifiedElementOrNothing defaultFlexItemDetails flexItemDetailsModifiers)
+            (modifiedElementOrNothing Flex.defaultFlexItemDetails flexItemDetailsModifiers)
             (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers)
         )
-        (FlexContainer (modifiedElementOrNothing defaultFlexContainerDetails flexContainerDetailsModifiers))
+        (FlexContainer (modifiedElementOrNothing Flex.defaultFlexContainerDetails flexContainerDetailsModifiers))
 
 
 {-| Contains all styles which can be applied to a block.
@@ -356,7 +273,7 @@ type alias BlockDetails =
     , alignment : Maybe Alignment
     , overflow : Maybe Overflow.FullOverflow
     , textOverflow : Maybe TextOverflow
-    , dimensions : Maybe Dimensions
+    , dimensions : Maybe Dimensions.Dimensions
     }
 
 
@@ -440,6 +357,13 @@ alignment =
     setAlignment << Just
 
 
+{-| Accepts dimensions modifiers and modifies the block accordingly.
+-}
+dimensions : Modifiers Dimensions.Dimensions -> Modifier BlockDetails
+dimensions =
+    getModifyAndSet .dimensions setDimensionsIn Dimensions.defaultDimensions
+
+
 {-| Defines the alignment as center.
 -}
 alignCenter : Modifier BlockDetails
@@ -456,8 +380,8 @@ right =
 
 {-| Defines the alignment as center.
 -}
-cnter : Alignment
-cnter =
+center : Alignment
+center =
     AlignmentCenter
 
 
@@ -494,295 +418,6 @@ type TextOverflow
 textOverflowEllipsis : Modifier BlockDetails
 textOverflowEllipsis =
     setTextOverflow <| Just TextOverflowEllipsis
-
-
-type alias Dimensions =
-    ( DimensionAxis, DimensionAxis )
-
-
-defaultDimensions : ( DimensionAxis, DimensionAxis )
-defaultDimensions =
-    ( defaultDimensionAxis, defaultDimensionAxis )
-
-
-type alias DimensionAxis =
-    { min : Maybe SizeUnit
-    , dimension : Maybe SizeUnit
-    , max : Maybe SizeUnit
-    }
-
-
-defaultDimensionAxis : DimensionAxis
-defaultDimensionAxis =
-    DimensionAxis Nothing Nothing Nothing
-
-
-{-| Accepts dimensions modifiers and modifies the block accordingly.
--}
-dimensions : Modifiers Dimensions -> Modifier BlockDetails
-dimensions =
-    getModifyAndSet .dimensions setDimensionsIn defaultDimensions
-
-
-{-| -}
-width : SizeUnit -> Modifier Dimensions
-width value ( x, y ) =
-    ( x |> setDimension (Just value), y )
-
-
-{-| -}
-height : SizeUnit -> Modifier Dimensions
-height value ( x, y ) =
-    ( x, y |> setDimension (Just value) )
-
-
-{-| -}
-square : SizeUnit -> Modifier Dimensions
-square value =
-    height value << width value
-
-
-{-| -}
-minHeight : SizeUnit -> Modifier Dimensions
-minHeight value ( x, y ) =
-    ( x, y |> setMin (Just value) )
-
-
-{-| -}
-maxHeight : SizeUnit -> Modifier Dimensions
-maxHeight value ( x, y ) =
-    ( x, y |> setMax (Just value) )
-
-
-{-| put a fullWidth dimensions
--}
-fullWidth : Modifier BlockDetails
-fullWidth =
-    dimensions [ width (Percent 100) ]
-
-
-{-| Contains all style which can be applied on a flex container.
-This contains flex-direction, flex-wrap, align-items and justify-content.
--}
-type alias FlexContainerDetails =
-    { direction : Maybe FlexDirection
-    , wrap : Maybe FlexWrap
-    , align : Maybe Align
-    , justifyContent : Maybe JustifyContent
-    }
-
-
-defaultFlexContainerDetails : FlexContainerDetails
-defaultFlexContainerDetails =
-    FlexContainerDetails Nothing Nothing Nothing Nothing
-
-
-{-| Represents a flex direction.
-Can be column or row.
--}
-type FlexDirection
-    = FlexDirectionColumn
-    | FlexDirectionRow
-
-
-{-| Accepts a flex-direction and modifies the flex container accordingly.
--}
-direction : FlexDirection -> Modifier FlexContainerDetails
-direction =
-    setDirection << Just
-
-
-{-| Defines the flex direction column.
--}
-column : FlexDirection
-column =
-    FlexDirectionColumn
-
-
-{-| Defines the flex direction row.
--}
-row : FlexDirection
-row =
-    FlexDirectionRow
-
-
-{-| Represents a flex wrap.
-Can be wrap or no-wrap.
--}
-type FlexWrap
-    = FlexWrapWrap
-    | FlexWrapNoWrap
-
-
-{-| Modifies the flex-wrap to wrap.
--}
-wrap : Modifier FlexContainerDetails
-wrap =
-    setWrap <| Just FlexWrapWrap
-
-
-{-| Modifies the flex-wrap to no-wrap.
--}
-noWrap : Modifier FlexContainerDetails
-noWrap =
-    setWrap <| Just FlexWrapNoWrap
-
-
-{-| Represents the alignment in flex.
-Can be baseline, center, flex-start, flex-end, inherit, initial or stretch.
--}
-type Align
-    = AlignBaseline
-    | AlignCenter
-    | AlignFlexStart
-    | AlignFlexEnd
-    | AlignInherit
-    | AlignInitial
-    | AlignStretch
-
-
-{-| Accepts an Align, and modifies the flex container accordingly.
--}
-align : Align -> Modifier FlexContainerDetails
-align =
-    setAlign << Just
-
-
-{-| Generates a baseline alignment.
--}
-baseline : Align
-baseline =
-    AlignBaseline
-
-
-{-| Generates a center alignment.
--}
-center : Align
-center =
-    AlignCenter
-
-
-{-| Generates a flex-start alignment.
--}
-flexStart : Align
-flexStart =
-    AlignFlexStart
-
-
-{-| Generates a flex-end alignment.
--}
-flexEnd : Align
-flexEnd =
-    AlignFlexEnd
-
-
-{-| Generates a inherit alignment.
--}
-inherit : Align
-inherit =
-    AlignInherit
-
-
-{-| Generates a initial alignment.
--}
-initial : Align
-initial =
-    AlignInitial
-
-
-{-| Generates a stretch alignment.
--}
-stretch : Align
-stretch =
-    AlignStretch
-
-
-{-| Represents the value of justify-content.
-Can be space-between, space-around or center.
--}
-type JustifyContent
-    = JustifyContentSpaceBetween
-    | JustifyContentSpaceAround
-    | JustifyContentCenter
-
-
-{-| Accepts a justify-content and modifies the flex container accordingly.
--}
-justifyContent : JustifyContent -> Modifier FlexContainerDetails
-justifyContent =
-    setJustifyContent << Just
-
-
-{-| Defines the justify-content space-between.
--}
-spaceBetween : JustifyContent
-spaceBetween =
-    JustifyContentSpaceBetween
-
-
-{-| Defines the justify-content space-around.
--}
-spaceAround : JustifyContent
-spaceAround =
-    JustifyContentSpaceAround
-
-
-{-| Defines the justify-content center.
--}
-justifyContentCenter : JustifyContent
-justifyContentCenter =
-    JustifyContentCenter
-
-
-{-| Contains all style which can be used on a flex item.
-This contains flex-grow, flex-shrink, flex-basis and align-self.
--}
-type alias FlexItemDetails =
-    { grow : Maybe Int
-    , shrink : Maybe Int
-    , basis : Maybe (Either SizeUnit Auto)
-    , alignSelf : Maybe Align
-    }
-
-
-defaultFlexItemDetails : FlexItemDetails
-defaultFlexItemDetails =
-    FlexItemDetails Nothing Nothing Nothing Nothing
-
-
-{-| Accepts an int and sets the flex-grow accordingly.
--}
-grow : Int -> Modifier FlexItemDetails
-grow =
-    setGrow << Just
-
-
-{-| Accepts an int and sets the flex-shrink accordingly.
--}
-shrink : Int -> Modifier FlexItemDetails
-shrink =
-    setShrink << Just
-
-
-{-| Sets the flex-basis as auto.
--}
-basisAuto : Modifier FlexItemDetails
-basisAuto =
-    setBasis <| Just <| Right Auto
-
-
-{-| Accepts a size and sets the flex-basis accordingly.
--}
-basis : SizeUnit -> Modifier FlexItemDetails
-basis =
-    setBasis << Just << Left
-
-
-{-| Accepts an align and modifies the flex item accordingly.
--}
-alignSelf : Align -> Modifier FlexItemDetails
-alignSelf =
-    setAlignSelf << Just
 
 
 {-| Compiles a DisplayBox to the corresponding CSS list of tuples.
@@ -825,7 +460,7 @@ outsideDisplayToCouples outsideDisplay =
             ( "block", unwrapEmptyList blockDetailsToCouples blockDetails )
 
         FlexItem flexItemDetails blockDetails ->
-            ( "block", List.append (unwrapEmptyList flexItemDetailsToCouples flexItemDetails) (unwrapEmptyList blockDetailsToCouples blockDetails) )
+            ( "block", List.append (unwrapEmptyList Flex.flexItemDetailsToCouples flexItemDetails) (unwrapEmptyList blockDetailsToCouples blockDetails) )
 
 
 insideDisplayToCouples : InsideDisplay -> ( String, List ( String, String ) )
@@ -835,7 +470,7 @@ insideDisplayToCouples insideDisplay =
             ( "flow", [] )
 
         FlexContainer flexContainerDetails ->
-            ( "flex", unwrapEmptyList flexContainerDetailsToCouples flexContainerDetails )
+            ( "flex", unwrapEmptyList Flex.flexContainerDetailsToCouples flexContainerDetails )
 
 
 blockDetailsToCouples : BlockDetails -> List ( String, String )
@@ -844,83 +479,16 @@ blockDetailsToCouples blockDetails =
     , unwrapToCouple .alignment textAlignToCouple
     , unwrapToCouples .overflow overflowToCouples
     , unwrapToCouple .textOverflow textOverflowToCouple
-    , unwrapToCouples .dimensions dimensionsToCouples
+    , unwrapToCouples .dimensions Dimensions.dimensionsToCouples
     ]
         |> List.concatMap (callOn blockDetails)
 
 
-flexItemDetailsToCouples : FlexItemDetails -> List ( String, String )
-flexItemDetailsToCouples flexContainerDetails =
-    [ unwrapToCouple .grow growToCouple
-    , unwrapToCouple .shrink shrinkToCouple
-    , unwrapToCouple .basis basisToCouple
-    , unwrapToCouple .alignSelf alignSelfToCouple
-    ]
-        |> List.concatMap (callOn flexContainerDetails)
-
-
-flexContainerDetailsToCouples : FlexContainerDetails -> List ( String, String )
-flexContainerDetailsToCouples flexContainerDetails =
-    [ unwrapToCouple .direction directionToCouple
-    , unwrapToCouple .wrap flexWrapToCouple
-    , unwrapToCouple .align alignItemsToCouple
-    , unwrapToCouple .justifyContent justifyContentToCouple
-    ]
-        |> List.concatMap (callOn flexContainerDetails)
-
-
-directionToCouple : FlexDirection -> ( String, String )
-directionToCouple =
-    (,) "flex-direction" << directionToString
-
-
-directionToString : FlexDirection -> String
-directionToString direction =
-    case direction of
-        FlexDirectionColumn ->
-            "column"
-
-        FlexDirectionRow ->
-            "row"
-
-
-growToCouple : Int -> ( String, String )
-growToCouple =
-    (,) "flex-grow" << toString
-
-
-shrinkToCouple : Int -> ( String, String )
-shrinkToCouple =
-    (,) "flex-shrink" << toString
-
-
-basisToCouple : Either SizeUnit Auto -> ( String, String )
-basisToCouple =
-    (,) "flex-basis" << basisToString
-
-
-basisToString : Either SizeUnit Auto -> String
-basisToString autoSizeUnitEither =
-    case autoSizeUnitEither of
-        Left su ->
-            sizeUnitToString su
-
-        Right _ ->
-            "auto"
-
-
-dimensionsToCouples : Dimensions -> List ( String, String )
-dimensionsToCouples size =
-    [ ( "width", Tuple.first >> .dimension )
-    , ( "min-width", Tuple.first >> .min )
-    , ( "max-width", Tuple.first >> .max )
-    , ( "height", Tuple.second >> .dimension )
-    , ( "max-height", Tuple.second >> .max )
-    , ( "min-height", Tuple.second >> .min )
-    ]
-        |> List.map (Tuple.mapSecond (callOn size))
-        |> keepJustValues
-        |> List.map (Tuple.mapSecond sizeUnitToString)
+{-|
+-}
+fullWidth : Modifier BlockDetails
+fullWidth =
+    dimensions [ Dimensions.width (Percent 100) ]
 
 
 toLegacyDisplayCss : String -> String
@@ -940,41 +508,6 @@ toLegacyDisplayCss str =
 
         str ->
             str
-
-
-alignItemsToCouple : Align -> ( String, String )
-alignItemsToCouple =
-    (,) "align-items" << alignToString
-
-
-alignSelfToCouple : Align -> ( String, String )
-alignSelfToCouple =
-    (,) "align-self" << alignToString
-
-
-alignToString : Align -> String
-alignToString align =
-    case align of
-        AlignBaseline ->
-            "baseline"
-
-        AlignCenter ->
-            "center"
-
-        AlignFlexStart ->
-            "flex-start"
-
-        AlignFlexEnd ->
-            "flex-end"
-
-        AlignInherit ->
-            "flex-end"
-
-        AlignInitial ->
-            "initial"
-
-        AlignStretch ->
-            "stretch"
 
 
 listStyleTypeToCouple : ListStyleType -> ( String, String )
@@ -1002,24 +535,6 @@ listStyleTypeToString val =
 
         ListStyleTypeGeorgian ->
             "georgian"
-
-
-justifyContentToCouple : JustifyContent -> ( String, String )
-justifyContentToCouple =
-    (,) "justify-content" << justifyContentToString
-
-
-justifyContentToString : JustifyContent -> String
-justifyContentToString val =
-    case val of
-        JustifyContentSpaceBetween ->
-            "space-between"
-
-        JustifyContentSpaceAround ->
-            "space-around"
-
-        JustifyContentCenter ->
-            "center"
 
 
 textAlignToCouple : Alignment -> ( String, String )
@@ -1076,33 +591,3 @@ overflowToString val =
 
         Overflow.OverflowVisible ->
             "visible"
-
-
-flexWrapToCouple : FlexWrap -> ( String, String )
-flexWrapToCouple =
-    (,) "flex-wrap" << flexWrapToString
-
-
-flexWrapToString : FlexWrap -> String
-flexWrapToString val =
-    case val of
-        FlexWrapWrap ->
-            "wrap"
-
-        FlexWrapNoWrap ->
-            "nowrap"
-
-
-flexDirectionToCouple : FlexDirection -> ( String, String )
-flexDirectionToCouple =
-    (,) "flex-direction" << flexDirectionToString
-
-
-flexDirectionToString : FlexDirection -> String
-flexDirectionToString val =
-    case val of
-        FlexDirectionColumn ->
-            "column"
-
-        FlexDirectionRow ->
-            "row"
