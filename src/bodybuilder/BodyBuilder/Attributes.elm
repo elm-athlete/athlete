@@ -12,6 +12,7 @@ import BodyBuilder.Events exposing (..)
 import Function
 import Json.Decode exposing (Decoder)
 import Flex
+import BodyBuilder.Shared as Shared
 
 
 type alias StyleSelector =
@@ -98,11 +99,6 @@ type alias MaxAttribute a =
 {-| -}
 type alias MinAttribute a =
     { a | min : Maybe Int }
-
-
-{-| -}
-type alias OptionsAttribute a =
-    { a | options : List { value : String, label : String } }
 
 
 {-| -}
@@ -254,7 +250,7 @@ type alias InputRangeAttributes msg =
 
 {-| -}
 type alias SelectAttributes msg =
-    MaybeBlockContainer (StringValue (OptionsAttribute (FlowAttributes msg)))
+    MaybeBlockContainer (StringValue (FlowAttributes msg))
 
 
 {-| TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute {})))
@@ -336,7 +332,12 @@ type alias InputHiddenAttributes =
 
 
 type alias LabelAttributes msg =
-    PositionAttribute (FlowAttributes msg)
+    MaybeBlockContainer (PositionAttribute (FlowAttributes msg))
+
+
+label : List (Html msg) -> { c | label : Maybe (Shared.Label msg) } -> { c | label : Maybe (Shared.Label msg) }
+label content record =
+    { record | label = Just (Shared.label <| \input -> Html.label [] (input :: content)) }
 
 
 {-| This code should be simplified with the later, but it's very faster without the function calls
@@ -352,6 +353,7 @@ type alias InputVisibleAttributes msg a =
         , onEvent : Maybe ( String, Decoder msg )
         , onBlurEvent : Maybe msg
         , onFocusEvent : Maybe msg
+        , label : Maybe (Shared.Label msg)
     }
 
 
@@ -368,6 +370,7 @@ type alias InputStringValueAttributes msg a =
         , onBlurEvent : Maybe msg
         , onFocusEvent : Maybe msg
         , value : Maybe String
+        , label : Maybe (Shared.Label msg)
     }
 
 
@@ -384,6 +387,7 @@ type alias InputRadioAttributes msg =
     , onFocusEvent : Maybe msg
     , value : Maybe String
     , block : Maybe (List ( Modifiers Display.BlockDetails, StyleSelector ))
+    , label : Maybe (Shared.Label msg)
     }
 
 
@@ -403,7 +407,7 @@ type alias InputTextAttributes msg =
 
 {-| -}
 type alias InputSubmitAttributes msg =
-    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg (TypeContainer {})))
+    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg (TypeContainer { label : Maybe (Shared.Label msg) })))
 
 
 {-| -}
@@ -896,6 +900,7 @@ defaultInputTextAttributes =
     { universal = defaultUniversalAttributes
     , box = []
     , block = Nothing
+    , label = Nothing
     , name = Nothing
     , type_ = "text"
     , value = Nothing
@@ -945,6 +950,7 @@ defaultInputNumberAttributes : InputNumberAttributes msg
 defaultInputNumberAttributes =
     { universal = defaultUniversalAttributes
     , box = []
+    , label = Nothing
     , name = Nothing
     , type_ = "number"
     , value = Nothing
@@ -976,6 +982,7 @@ defaultInputColorAttributes : InputColorAttributes msg
 defaultInputColorAttributes =
     { universal = defaultUniversalAttributes
     , box = []
+    , label = Nothing
     , block = Nothing
     , name = Nothing
     , type_ = "color"
@@ -1004,6 +1011,7 @@ checked val attrs =
 defaultInputCheckboxAttributes : InputCheckboxAttributes msg
 defaultInputCheckboxAttributes =
     { name = Nothing
+    , label = Nothing
     , type_ = "checkbox"
     , value = Nothing
     , checked = False
@@ -1029,6 +1037,7 @@ inputCheckboxAttributesToHtmlAttributes attributes =
 defaultInputFileAttributes : InputFileAttributes msg
 defaultInputFileAttributes =
     { name = Nothing
+    , label = Nothing
     , type_ = "file"
     , universal = defaultUniversalAttributes
     , box = []
@@ -1048,6 +1057,7 @@ inputFileAttributesToHtmlAttributes =
 defaultInputPasswordAttributes : InputPasswordAttributes msg
 defaultInputPasswordAttributes =
     { name = Nothing
+    , label = Nothing
     , type_ = "password"
     , value = Nothing
     , universal = defaultUniversalAttributes
@@ -1072,6 +1082,7 @@ inputPasswordAttributesToHtmlAttributes =
 defaultInputRadioAttributes : InputRadioAttributes msg
 defaultInputRadioAttributes =
     { name = Nothing
+    , label = Nothing
     , type_ = "radio"
     , value = Nothing
     , universal = defaultUniversalAttributes
@@ -1094,6 +1105,7 @@ inputRadioAttributesToHtmlAttributes attributes =
 defaultInputRangeAttributes : InputRangeAttributes msg
 defaultInputRangeAttributes =
     { universal = defaultUniversalAttributes
+    , label = Nothing
     , box = []
     , name = Nothing
     , type_ = "range"
@@ -1119,6 +1131,7 @@ inputRangeAttributesToHtmlAttributes =
 defaultInputSubmitAttributes : InputSubmitAttributes msg
 defaultInputSubmitAttributes =
     { type_ = "submit"
+    , label = Nothing
     , universal = defaultUniversalAttributes
     , box = []
     , block = Nothing
@@ -1146,6 +1159,7 @@ inputSubmitAttributesToHtmlAttributes attributes =
 defaultInputUrlAttributes : InputUrlAttributes msg
 defaultInputUrlAttributes =
     { name = Nothing
+    , label = Nothing
     , value = Nothing
     , type_ = "url"
     , universal = defaultUniversalAttributes
@@ -1170,7 +1184,6 @@ inputUrlAttributesToHtmlAttributes =
 defaultSelectAttributes : SelectAttributes msg
 defaultSelectAttributes =
     { value = Nothing
-    , options = []
     , universal = defaultUniversalAttributes
     , box = []
     , block = Nothing

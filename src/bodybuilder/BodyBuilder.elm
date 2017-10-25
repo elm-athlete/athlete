@@ -9,6 +9,7 @@ import Helpers.Shared exposing (..)
 import Flex exposing (FlexContainerDetails)
 import Display
 import BodyBuilder.Convert
+import BodyBuilder.Shared as Shared
 
 
 type alias Node msg =
@@ -19,8 +20,18 @@ type FlexItem msg
     = FlexItem (Node msg)
 
 
+extractNodeInFlexItem : FlexItem msg -> Node msg
+extractNodeInFlexItem (FlexItem item) =
+    item
+
+
 type Option msg
     = Option (Html msg)
+
+
+extractOption : Option msg -> Html msg
+extractOption (Option option) =
+    option
 
 
 text : String -> Node msg
@@ -62,11 +73,6 @@ flex =
         nothingAttributes
         .block
         BodyBuilder.Attributes.flexContainerAttributesToHtmlAttributes
-
-
-extractNodeInFlexItem : FlexItem msg -> Node msg
-extractNodeInFlexItem (FlexItem item) =
-    item
 
 
 flexItem : Modifiers (FlexItemAttributes msg) -> List (Node msg) -> FlexItem msg
@@ -136,16 +142,14 @@ inputHidden modifiers =
 {-| -}
 inputText : Modifiers (InputTextAttributes msg) -> Node msg
 inputText =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputTextAttributes
         BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
 
 
 inputPassword : Modifiers (InputPasswordAttributes msg) -> Node msg
 inputPassword =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputPasswordAttributes
         BodyBuilder.Attributes.inputPasswordAttributesToHtmlAttributes
 
@@ -153,8 +157,7 @@ inputPassword =
 {-| -}
 inputRange : Modifiers (InputRangeAttributes msg) -> Node msg
 inputRange =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputRangeAttributes
         BodyBuilder.Attributes.inputRangeAttributesToHtmlAttributes
 
@@ -162,56 +165,49 @@ inputRange =
 {-| -}
 inputNumber : Modifiers (InputNumberAttributes msg) -> Node msg
 inputNumber =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputNumberAttributes
         BodyBuilder.Attributes.inputNumberAttributesToHtmlAttributes
 
 
 inputRadio : Modifiers (InputRadioAttributes msg) -> Node msg
 inputRadio =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputRadioAttributes
         BodyBuilder.Attributes.inputRadioAttributesToHtmlAttributes
 
 
 inputCheckbox : Modifiers (InputCheckboxAttributes msg) -> Node msg
 inputCheckbox =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputCheckboxAttributes
         BodyBuilder.Attributes.inputCheckboxAttributesToHtmlAttributes
 
 
 inputSubmit : Modifiers (InputSubmitAttributes msg) -> Node msg
 inputSubmit =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputSubmitAttributes
         BodyBuilder.Attributes.inputSubmitAttributesToHtmlAttributes
 
 
 inputUrl : Modifiers (InputUrlAttributes msg) -> Node msg
 inputUrl =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputUrlAttributes
         BodyBuilder.Attributes.inputUrlAttributesToHtmlAttributes
 
 
 inputColor : Modifiers (InputColorAttributes msg) -> Node msg
 inputColor =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputColorAttributes
         BodyBuilder.Attributes.inputColorAttributesToHtmlAttributes
 
 
 inputFile : Modifiers (InputFileAttributes msg) -> Node msg
 inputFile =
-    commonBlockFlexlessChildlessNode
-        "input"
+    inputAndLabel
         BodyBuilder.Attributes.defaultInputFileAttributes
         BodyBuilder.Attributes.inputFileAttributesToHtmlAttributes
 
@@ -239,11 +235,6 @@ select =
 option : String -> String -> Option msg
 option value content =
     Option <| Html.option [ Html.Attributes.value value ] [ Html.text content ]
-
-
-extractOption : Option msg -> Html msg
-extractOption (Option option) =
-    option
 
 
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
@@ -384,6 +375,39 @@ nothingAttributes _ =
     Nothing
 
 
+inputAndLabel :
+    MaybeBlockContainer (VisibleAttributes { a | label : Maybe (Shared.Label msg) })
+    -> (MaybeBlockContainer (VisibleAttributes { a | label : Maybe (Shared.Label msg) }) -> List (Html.Attribute msg))
+    -> Modifiers (MaybeBlockContainer (VisibleAttributes { a | label : Maybe (Shared.Label msg) }))
+    -> Html msg
+inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
+    let
+        attributes =
+            (Function.compose modifiers)
+                defaultAttributes
+
+        computedInput =
+            Html.input
+                (BodyBuilder.Convert.toElegantStyle
+                    Nothing
+                    Nothing
+                    attributes.block
+                    attributes.box
+                    |> List.map Elegant.styleToCss
+                    |> String.join " "
+                    |> Html.Attributes.class
+                    |> flip (::) (attributesToHtmlAttributes attributes)
+                )
+                []
+    in
+        case attributes.label of
+            Nothing ->
+                computedInput
+
+            Just label ->
+                (Shared.extractLabel label) computedInput
+
+
 computeBlock :
     String
     -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
@@ -394,10 +418,10 @@ computeBlock :
     -> Modifiers (VisibleAttributes a)
     -> List (Html msg)
     -> Html msg
-computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttributes attributesToHtmlAttributes visibleModifiers content =
+computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttributes attributesToHtmlAttributes modifiers content =
     let
         attributes =
-            (Function.compose visibleModifiers)
+            (Function.compose modifiers)
                 defaultAttributes
     in
         Html.node tag
