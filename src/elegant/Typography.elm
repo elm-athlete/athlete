@@ -20,6 +20,7 @@ module Typography
         , lineHeight
         , typographyToCouples
         , fontSize
+        , bold
         )
 
 {-| Typography contains everything about fonts and characters rendering.
@@ -81,6 +82,7 @@ module Typography
 # Shortcuts
 
 @docs fontSize
+@docs bold
 
 
 # Compilation
@@ -291,6 +293,12 @@ typographyToCouples typography =
 fontSize : SizeUnit -> Modifier Typography
 fontSize size =
     character [ Character.size size ]
+
+
+{-| -}
+bold : Modifier Typography
+bold =
+    character [ Character.weight 900 ]
 
 
 

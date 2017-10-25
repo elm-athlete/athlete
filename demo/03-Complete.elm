@@ -1,25 +1,20 @@
 module Demo exposing (..)
 
-import Color exposing (..)
-import Color.Manipulate as Color
 import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
+import Color exposing (..)
+import Color.Manipulate as Color
 import Function exposing (..)
-import Elegant exposing (SizeUnit, px, pt, percent, vh)
-import Padding
+import Elegant exposing (SizeUnit, px, pt, percent, vh, Modifier, Modifiers)
 import Constants
 import Elegant
-import Display
-import Dimensions
 import Box
-import Cursor
-import Border
-import Outline
 import Typography
-import Typography.Character as Character
 import Block
 import Style
+import Display
+import Flex
 
 
 type Msg
@@ -43,14 +38,20 @@ type alias Model =
     }
 
 
+boxStyle : Modifiers Box.Box -> Modifier (BoxContainer a)
 boxStyle a =
     style [ Style.box a ]
 
 
+blockStyle : Modifiers Display.BlockDetails -> Modifier (MaybeBlockContainer a)
 blockStyle a =
     style [ Style.block a ]
 
 
+buttonStyle :
+    Color
+    -> MaybeBlockContainer { a | box : List ( Modifiers Box.Box, StyleSelector ) }
+    -> MaybeBlockContainer { a | box : List ( Modifiers Box.Box, StyleSelector ) }
 buttonStyle color =
     [ style
         [ Style.box
@@ -65,6 +66,8 @@ buttonStyle color =
             , Box.shadowCenteredBlurry (px 1) Color.black
             ]
             |> Style.focus
+        , Style.box [ Box.textColor Color.blue ]
+            |> Style.hover
         , Style.block
             [ Block.overflowHidden ]
         ]
@@ -72,6 +75,7 @@ buttonStyle color =
         |> compose
 
 
+exampleGridContent : String -> List (Node msg)
 exampleGridContent content =
     [ node
         [ boxStyle
@@ -80,7 +84,7 @@ exampleGridContent content =
         [ node
             [ style
                 [ Style.box
-                    [ Box.coloredBorder Color.black
+                    [ Box.borderColor Color.black
                     , Box.paddingAll Constants.large
                     ]
                 , Style.block
@@ -92,6 +96,7 @@ exampleGridContent content =
     ]
 
 
+customCounter : String -> Int -> Int -> Int -> Int -> (Int -> msg) -> Node msg
 customCounter title min max step val msg =
     node
         [ blockStyle [ Block.alignCenter ] ]
@@ -105,12 +110,12 @@ customCounter title min max step val msg =
             ]
             [ text title ]
         , inputRange
-            [ style [ blockStyle [] ]
+            [ blockStyle []
             , Attributes.value val
-            , Events.onInput msg
             , Attributes.min min
             , Attributes.max max
             , Attributes.step step
+            , Events.onInput msg
             ]
         , node
             [ boxStyle [ Box.paddingHorizontal Constants.tiny ] ]
@@ -120,7 +125,7 @@ customCounter title min max step val msg =
                 [ Style.block [ Block.alignCenter ]
                 , Style.box
                     [ Box.cornerRadius 4
-                    , Box.coloredBorder (Color.rgba 149 152 154 0.23)
+                    , Box.borderColor (Color.rgba 149 152 154 0.23)
                     , Box.paddingVertical (px 15)
                     , Box.paddingHorizontal (px 10)
                     ]
@@ -148,144 +153,224 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
         ]
         [ h1
             [ style
-                [ paddingBottom tiny
-                , textCenter
-                , fontFamily
-                    (FontFamilyCustom
-                        [ SystemFont "cursive" ]
-                    )
+                [ Style.blockProperties [ Block.alignCenter ]
+                , Style.box
+                    [ Box.paddingBottom Constants.tiny
+                    , Box.systemFont "cursive"
+                    ]
                 ]
             ]
             [ text "Elegant" ]
         , h2
-            [ style
-                [ paddingBottom tiny
-                ]
-            ]
+            [ boxStyle [ Box.paddingBottom Constants.tiny ] ]
             [ text "Alignment" ]
         , node
             [ style
-                [ Elegant.width (Px 400)
-                , marginAuto
-                , border black
-                , padding medium
+                [ Style.block [ Block.width (px 400) ]
+                , Style.box
+                    [ Box.marginAuto
+                    , Box.borderColor Color.black
+                    , Box.paddingAll Constants.medium
+                    ]
                 ]
             ]
             [ text "I'm centered with auto margins and a width of 400px" ]
         , node
             [ style
-                [ Elegant.width (Px 600)
-                , marginAuto
-                , border black
-                , padding medium
+                [ Style.block [ Block.width (px 600) ]
+                , Style.box
+                    [ Box.marginAuto
+                    , Box.borderColor black
+                    , Box.paddingAll Constants.medium
+                    ]
                 ]
             ]
             [ text "I'm centered with auto margins and a width of 600px" ]
         , node
-            [ style
-                [ textCenter
-                ]
-            ]
+            [ blockStyle [ Block.alignCenter ] ]
             [ text "I'm centered" ]
         , node
-            [ style
-                [ textRight
-                ]
-            ]
+            [ blockStyle [ Block.alignRight ] ]
             [ text "I'm right aligned" ]
         , node
-            [ style
-                [ textLeft
-                ]
-            ]
+            [ blockStyle [ Block.alignLeft ] ]
             [ text "I'm left aligned" ]
         , node
             [ style
-                [ backgroundColor (Color.rgb 40 160 240)
-                , textColor (Color.rgb (255 - 40) (255 - 160) (255 - 240))
-                , padding medium
+                [ Style.box
+                    [ Box.backgroundColor (Color.rgb 40 160 240)
+                    , Box.textColor (Color.rgb (255 - 40) (255 - 160) (255 - 240))
+                    , Box.paddingAll Constants.medium
+                    ]
+                , Style.block []
                 ]
             ]
             [ text "I'm colored" ]
         , node
             [ style
-                [ border black
-                , borderWidth 3
+                [ Style.box
+                    [ Box.borderColor black
+                    , Box.borderWidth 3
+                    , Box.borderSolid
+                    ]
+                , Style.block []
                 ]
             ]
             [ text "I have a big black border" ]
         , h2
-            [ style
-                [ box [ Box.padding [ Padding.bottom Constants.tiny ] ]
-                ]
-            ]
+            [ boxStyle [ Box.paddingBottom Constants.tiny ] ]
             [ text "Flex" ]
-
-        -- , flex [ style [ spaceBetween ] ]
-        --     [ flexItem [ style [ padding medium ] ] [ text "Some" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Flex" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Elements" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "With" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Space" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Between" ]
-        --     ]
-        -- , flex [ style [ spaceAround ] ]
-        --     [ flexItem [ style [ padding medium ] ] [ text "Some" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Flex" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Elements" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "With" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Space" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Around" ]
-        --     ]
-        -- , flex [ style [ spaceBetween, alignItemsCenter ] ]
-        --     [ flexItem [ style [ padding medium ] ] [ text "Some" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Flex" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Elements" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "With" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Space" ]
-        --     , flexItem [ style [ padding medium ] ] [ text "Between" ]
-        --     , flexItem [ style [ padding medium, flex 1, textRight ] ] [ text "And one element taking the rest of the place" ]
-        --     ]
-        , h1 []
-            [ text "I am h1" ]
-        , h2 []
-            [ text "I am h2" ]
-        , h3 []
-            [ text "I am h3" ]
-        , h4 []
-            [ text "I am h4" ]
-        , h5 []
-            [ text "I am h5" ]
-        , h6 []
-            [ text "I am h6" ]
-        , node [ style [ textCenter, padding medium, displayInlineBlock, Elegant.round, strong, uppercase, border black, padding medium ] ]
+        , flex
+            [ style [ Style.flexContainerProperties [ Flex.justifyContent Flex.spaceBetween ], Style.block [] ] ]
+            [ flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Some" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Flex" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Elements" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "With" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Space" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Between" ]
+            ]
+        , flex
+            [ style [ Style.flexContainerProperties [ Flex.justifyContent Flex.spaceAround ], Style.block [] ] ]
+            [ flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Some" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Flex" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Elements" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "With" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Space" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Around" ]
+            ]
+        , flex
+            [ style
+                [ Style.flexContainerProperties
+                    [ Flex.justifyContent Flex.spaceBetween
+                    , Flex.align Flex.center
+                    ]
+                , Style.block []
+                ]
+            ]
+            [ flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Some" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Flex" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Elements" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "With" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Space" ]
+            , flexItem [ boxStyle [ Box.paddingAll Constants.medium ] ] [ text "Between" ]
+            , flexItem
+                [ style
+                    [ Style.box [ Box.paddingAll Constants.medium ]
+                    , Style.flexItemProperties [ Flex.grow 1 ]
+                    , Style.block [ Block.alignRight ]
+                    ]
+                ]
+                [ text "And one element taking the rest of the place" ]
+            ]
+        , h1 [] [ text "I am h1" ]
+        , h2 [] [ text "I am h2" ]
+        , h3 [] [ text "I am h3" ]
+        , h4 [] [ text "I am h4" ]
+        , h5 [] [ text "I am h5" ]
+        , h6 [] [ text "I am h6" ]
+        , node
+            [ style
+                [ Style.box
+                    [ Box.paddingAll Constants.medium
+                    , Box.cornerRound
+                    , Box.typography [ Typography.uppercase, Typography.bold ]
+                    , Box.borderColor black
+                    , Box.borderWidth 1
+                    , Box.borderSolid
+                    ]
+                , Style.block
+                    [ Block.alignCenter ]
+                ]
+            ]
             [ text "I am round, strong and uppercase" ]
-        , inputColor [ style [ Elegant.displayBlock ], value color, onInput ChangeColor ]
-        , BodyBuilder.button
-            [ buttonStyle color, hoverStyle [ textColor Color.blue ] ]
+        , inputColor
+            [ blockStyle []
+            , value color
+            , Events.onInput ChangeColor
+            ]
+        , button
+            [ buttonStyle color ]
             [ text "Push me" ]
-        , inputText [ style [ Elegant.displayBlock ], name "inputText", value "inputText_" ]
-        , node []
-            [ inputCheckbox [ style [ Elegant.displayInlineBlock ], checked (bootstrapState && bodybuilderState), onCheck ChangeBoth ]
-            , span [] [ text "I like Both" ]
+        , inputText
+            [ blockStyle []
+            , name "inputText"
+            , value "inputText_"
             ]
-        , node [ style [ paddingLeft large ] ]
-            [ node []
-                [ inputCheckbox [ style [ Elegant.displayInlineBlock ], checked bootstrapState, onCheck ChangeBootstrapState ]
-                , span [] [ text "I like Bootstrap" ]
+        , flex
+            [ blockStyle [] ]
+            [ flexItem []
+                [ inputCheckbox
+                    [ blockStyle []
+                    , Attributes.checked (bootstrapState && bodybuilderState)
+                    , Events.onCheck ChangeBoth
+                    ]
                 ]
-            , node []
-                [ inputCheckbox [ style [ Elegant.displayInlineBlock ], checked bodybuilderState, onCheck ChangeBodyBuilderState ]
-                , span [] [ text "I like BodyBuilder" ]
+            , flexItem []
+                [ node [] [ text "I like Both" ] ]
+            ]
+        , node
+            [ style
+                [ Style.box [ Box.paddingLeft Constants.large ]
+                , Style.block []
                 ]
             ]
-        , inputFile [ style [ Attributes.block [] ] ]
-        , inputPassword [ style [ Attributes.block [] ], value "" ]
-        , inputRadio [ style [ Attributes.block [] ], value "Test" ]
-        , inputUrl [ style [ Elegant.displayBlock ], name "inputUrl" ]
+            [ flex [ blockStyle [] ]
+                [ flexItem []
+                    [ inputCheckbox
+                        [ blockStyle []
+                        , Attributes.checked bootstrapState
+                        , Events.onCheck ChangeBootstrapState
+                        ]
+                    ]
+                , flexItem []
+                    [ node [] [ text "I like Bootstrap" ] ]
+                ]
+            , flex [ blockStyle [] ]
+                [ flexItem []
+                    [ inputCheckbox
+                        [ blockStyle []
+                        , Attributes.checked bodybuilderState
+                        , Events.onCheck ChangeBodyBuilderState
+                        ]
+                    ]
+                , flexItem []
+                    [ node [] [ text "I like BodyBuilder" ] ]
+                ]
+            ]
+        , inputFile
+            [ blockStyle [] ]
+        , inputPassword
+            [ blockStyle []
+            , value ""
+            ]
+        , inputRadio
+            [ blockStyle []
+            , value "Test"
+            ]
+        , inputUrl
+            [ blockStyle []
+            , name "inputUrl"
+            ]
         , textarea []
-        , inputSubmit [ style [ Elegant.displayBlock ], value "Submit Form" ]
-        , h2 [ style [ paddingVertical (Px 75), fontSize (Px 64), textCenter, uppercase, bold ] ] [ text "Parametrable grid" ]
+        , inputSubmit
+            [ blockStyle []
+            , value "Submit Form"
+            ]
+        , h2
+            [ style
+                [ Style.box
+                    [ Box.paddingVertical (px 75)
+                    , Box.typography
+                        [ Typography.uppercase
+                        , Typography.fontSize (px 64)
+                        , Typography.bold
+                        ]
+                    ]
+                , Style.blockProperties
+                    [ Block.alignCenter ]
+                ]
+            ]
+            [ text "Parametrable grid" ]
 
         -- , grid (Px 26)
         --     [ (col 3 1)

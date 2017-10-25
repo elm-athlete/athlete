@@ -16,6 +16,16 @@ alignCenter =
     Display.alignment Display.center
 
 
+alignRight : Modifier Display.BlockDetails
+alignRight =
+    Display.alignment Display.right
+
+
+alignLeft : Modifier Display.BlockDetails
+alignLeft =
+    Display.alignment Display.left
+
+
 maxWidth : SizeUnit -> Modifier Display.BlockDetails
 maxWidth size =
     Display.dimensions [ Dimensions.maxWidth size ]

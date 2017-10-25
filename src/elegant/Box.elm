@@ -25,14 +25,21 @@ module Box
         , cornerRound
         , cornerRadius
         , borderNone
+        , borderColor
+        , borderWidth
+        , borderSolid
         , paddingAll
         , paddingHorizontal
         , paddingVertical
+        , paddingTop
+        , paddingRight
         , paddingBottom
+        , paddingLeft
         , shadowCenteredBlurry
-        , coloredBorder
         , marginAuto
         , fontFamilySansSerif
+        , systemFont
+        , textColor
         )
 
 {-| Handles all modifications for the box. You don't need to instanciate one,
@@ -71,14 +78,21 @@ It contains only modifiers, and they can be found in the respective modules.
 @docs cornerRound
 @docs cornerRadius
 @docs borderNone
+@docs borderColor
+@docs borderWidth
+@docs borderSolid
 @docs paddingAll
 @docs paddingHorizontal
 @docs paddingVertical
+@docs paddingTop
+@docs paddingRight
 @docs paddingBottom
+@docs paddingLeft
 @docs shadowCenteredBlurry
-@docs coloredBorder
 @docs marginAuto
 @docs fontFamilySansSerif
+@docs systemFont
+@docs textColor
 
 
 # Values
@@ -331,15 +345,33 @@ cornerRound =
 
 
 {-| -}
-cornerRadius : SizeUnit -> Modifier Box
+cornerRadius : Int -> Modifier Box
 cornerRadius size =
-    corner [ Corner.circular Corner.all size ]
+    corner [ Corner.circular Corner.all (Px size) ]
 
 
 {-| -}
 borderNone : Modifier Box
 borderNone =
     border [ Border.all [ Border.none ] ]
+
+
+{-| -}
+borderWidth : Int -> Modifier Box
+borderWidth size =
+    border [ Border.all [ Border.thickness (Px size) ] ]
+
+
+{-| -}
+borderSolid : Modifier Box
+borderSolid =
+    border [ Border.all [ Border.solid ] ]
+
+
+{-| -}
+borderColor : Color -> Modifier Box
+borderColor color =
+    border [ Border.all [ setColor (Just color) ] ]
 
 
 {-| -}
@@ -361,9 +393,27 @@ paddingVertical size =
 
 
 {-| -}
+paddingTop : SizeUnit -> Modifier Box
+paddingTop size =
+    padding [ Padding.top size ]
+
+
+{-| -}
+paddingRight : SizeUnit -> Modifier Box
+paddingRight size =
+    padding [ Padding.right size ]
+
+
+{-| -}
 paddingBottom : SizeUnit -> Modifier Box
 paddingBottom size =
     padding [ Padding.bottom size ]
+
+
+{-| -}
+paddingLeft : SizeUnit -> Modifier Box
+paddingLeft size =
+    padding [ Padding.left size ]
 
 
 {-| -}
@@ -376,12 +426,6 @@ shadowCenteredBlurry size color =
 
 
 {-| -}
-coloredBorder : Color -> Modifier Box
-coloredBorder color =
-    border [ Border.all [ setColor (Just color) ] ]
-
-
-{-| -}
 marginAuto : Modifier Box
 marginAuto =
     margin [ Margin.all Margin.auto ]
@@ -391,6 +435,18 @@ marginAuto =
 fontFamilySansSerif : Modifier Box
 fontFamilySansSerif =
     typography [ Typography.character [ Character.fontFamilySansSerif ] ]
+
+
+{-| -}
+systemFont : String -> Modifier Box
+systemFont font =
+    typography [ Typography.character [ Character.fontFamily [ Character.systemFont font ] ] ]
+
+
+{-| -}
+textColor : Color -> Modifier Box
+textColor color =
+    typography [ setColor (Just color) ]
 
 
 

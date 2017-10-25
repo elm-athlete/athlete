@@ -2,15 +2,14 @@ module BodyBuilder exposing (..)
 
 import Html exposing (Html)
 import Html.Attributes
-import Elegant
 import BodyBuilder.Attributes exposing (..)
-import Function
-import Helpers.Shared exposing (..)
-import Flex exposing (FlexContainerDetails)
-import Display
 import BodyBuilder.Convert
 import BodyBuilder.Shared as Shared
-import Style exposing (..)
+import Helpers.Shared exposing (..)
+import Elegant
+import Function
+import Flex exposing (FlexContainerDetails)
+import Display
 
 type alias Node msg =
     Html msg
