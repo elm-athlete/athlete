@@ -1,7 +1,6 @@
 module Elegant.Convert exposing (..)
 
 import Helpers.Css
-import List.Extra
 import Maybe.Extra exposing ((?))
 import Helpers.Style exposing (..)
 import Display

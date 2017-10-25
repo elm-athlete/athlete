@@ -300,7 +300,7 @@ type alias ButtonAttributes msg =
 
 {-| -}
 type alias AAttributes msg =
-    TargetAttribute (HrefAttribute (FlowAttributes msg))
+    MaybeBlockContainer (TargetAttribute (HrefAttribute (FlowAttributes msg)))
 
 
 {-| -}
@@ -310,17 +310,17 @@ type alias TextareaAttributes msg =
 
 {-| -}
 type alias ImgAttributes msg =
-    HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (FlowAttributes msg))))
+    MaybeBlockContainer (HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (FlowAttributes msg)))))
 
 
 {-| -}
 type alias AudioAttributes msg =
-    SrcAttribute (FlowAttributes msg)
+    MaybeBlockContainer (SrcAttribute (FlowAttributes msg))
 
 
 {-| -}
 type alias ProgressAttributes msg =
-    FlowAttributes msg
+    MaybeBlockContainer (FlowAttributes msg)
 
 
 type alias ScriptAttributes msg =
@@ -705,6 +705,7 @@ defaultAAttributes =
     { href = Nothing
     , target = Nothing
     , box = []
+    , block = Nothing
     , universal = defaultUniversalAttributes
     , onMouseEvents = Nothing
     , onEvent = Nothing
@@ -768,6 +769,7 @@ defaultImgAttributes alt src =
     , alt = alt
     , universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , onMouseEvents = Nothing
     , width = Nothing
     , height = Nothing
@@ -796,6 +798,7 @@ defaultAudioAttributes : AudioAttributes msg
 defaultAudioAttributes =
     { universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , onMouseEvents = Nothing
     , src = ""
     , onEvent = Nothing
@@ -813,6 +816,7 @@ defaultProgressAttributes : ProgressAttributes msg
 defaultProgressAttributes =
     { universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
