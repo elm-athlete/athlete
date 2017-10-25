@@ -129,10 +129,6 @@ inputHidden modifiers =
         []
 
 
-
--- commonInputNode=
-
-
 {-| -}
 inputText : Modifiers (InputTextAttributes msg) -> Node msg
 inputText =
@@ -142,9 +138,12 @@ inputText =
         BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
 
 
-
--- inputPassword
--- InputPasswordAttributes
+inputPassword : Modifiers (InputPasswordAttributes msg) -> Node msg
+inputPassword =
+    commonBlockFlexlessChildlessNode
+        "input"
+        BodyBuilder.Attributes.defaultInputPasswordAttributes
+        BodyBuilder.Attributes.inputPasswordAttributesToHtmlAttributes
 
 
 {-| -}
@@ -165,13 +164,55 @@ inputNumber =
         BodyBuilder.Attributes.inputNumberAttributesToHtmlAttributes
 
 
+inputRadio : Modifiers (InputRadioAttributes msg) -> Node msg
+inputRadio =
+    commonBlockFlexlessChildlessNode
+        "input"
+        BodyBuilder.Attributes.defaultInputRadioAttributes
+        BodyBuilder.Attributes.inputRadioAttributesToHtmlAttributes
 
--- InputRadioAttributes
--- InputCheckboxAttributes
--- InputSubmitAttributes
--- InputUrlAttributes
--- InputColorAttributes
--- InputFileAttributes
+
+inputCheckbox : Modifiers (InputCheckboxAttributes msg) -> Node msg
+inputCheckbox =
+    commonBlockFlexlessChildlessNode
+        "input"
+        BodyBuilder.Attributes.defaultInputCheckboxAttributes
+        BodyBuilder.Attributes.inputCheckboxAttributesToHtmlAttributes
+
+
+inputSubmit : Modifiers (InputSubmitAttributes msg) -> Node msg
+inputSubmit =
+    commonBlockFlexlessChildlessNode
+        "input"
+        BodyBuilder.Attributes.defaultInputSubmitAttributes
+        BodyBuilder.Attributes.inputSubmitAttributesToHtmlAttributes
+
+
+inputUrl : Modifiers (InputUrlAttributes msg) -> Node msg
+inputUrl =
+    commonBlockFlexlessChildlessNode
+        "input"
+        BodyBuilder.Attributes.defaultInputUrlAttributes
+        BodyBuilder.Attributes.inputUrlAttributesToHtmlAttributes
+
+
+inputColor : Modifiers (InputColorAttributes msg) -> Node msg
+inputColor =
+    commonBlockFlexlessChildlessNode
+        "input"
+        BodyBuilder.Attributes.defaultInputColorAttributes
+        BodyBuilder.Attributes.inputColorAttributesToHtmlAttributes
+
+
+inputFile : Modifiers (InputFileAttributes msg) -> Node msg
+inputFile =
+    commonBlockFlexlessChildlessNode
+        "input"
+        BodyBuilder.Attributes.defaultInputFileAttributes
+        BodyBuilder.Attributes.inputFileAttributesToHtmlAttributes
+
+
+
 -- TextareaAttributes
 -- SelectAttributes
 

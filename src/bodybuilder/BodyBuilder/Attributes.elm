@@ -257,8 +257,7 @@ type alias SelectAttributes msg =
     StringValue (OptionsAttribute (FlowAttributes msg))
 
 
-{-|
-TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute {})))
+{-| TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute {})))
 -}
 type alias UniversalAttributes =
     { title : Maybe String
@@ -340,9 +339,8 @@ type alias LabelAttributes msg =
     PositionAttribute (FlowAttributes msg)
 
 
-{-|
-  This code should be simplified with the later, but it's very faster without the function calls
-  VisibleAttributesAndEvents msg (InputAttributes a)
+{-| This code should be simplified with the later, but it's very faster without the function calls
+VisibleAttributesAndEvents msg (InputAttributes a)
 -}
 type alias InputVisibleAttributes msg a =
     { a
@@ -357,8 +355,7 @@ type alias InputVisibleAttributes msg a =
     }
 
 
-{-|
-  StringValue (InputVisibleAttributes msg a)
+{-| StringValue (InputVisibleAttributes msg a)
 -}
 type alias InputStringValueAttributes msg a =
     { a
@@ -374,8 +371,7 @@ type alias InputStringValueAttributes msg a =
     }
 
 
-{-|
-  InputStringValueAttributes msg {}
+{-| InputStringValueAttributes msg {}
 -}
 type alias InputRadioAttributes msg =
     { name : Maybe String
@@ -387,12 +383,13 @@ type alias InputRadioAttributes msg =
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , value : Maybe String
+    , block : Maybe (List ( Modifiers Display.BlockDetails, StyleSelector ))
     }
 
 
 {-| -}
 type alias InputCheckboxAttributes msg =
-    CheckedContainer (OnCheckEvent msg (InputStringValueAttributes msg {}))
+    MaybeBlockContainer (CheckedContainer (OnCheckEvent msg (InputStringValueAttributes msg {})))
 
 
 {-| -}
@@ -421,12 +418,12 @@ type alias InputNumberAttributes msg =
 
 {-| -}
 type alias InputColorAttributes msg =
-    OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {}))
+    MaybeBlockContainer (OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {})))
 
 
 {-| -}
 type alias InputFileAttributes msg =
-    InputVisibleAttributes msg {}
+    MaybeBlockContainer (InputVisibleAttributes msg {})
 
 
 {-| -}
@@ -978,6 +975,7 @@ defaultInputColorAttributes : InputColorAttributes msg
 defaultInputColorAttributes =
     { universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , name = Nothing
     , type_ = "color"
     , value = Nothing
@@ -1010,6 +1008,7 @@ defaultInputCheckboxAttributes =
     , checked = False
     , universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , onMouseEvents = Nothing
     , onCheckEvent = Nothing
     , onEvent = Nothing
@@ -1032,6 +1031,7 @@ defaultInputFileAttributes =
     , type_ = "file"
     , universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing
@@ -1079,6 +1079,7 @@ defaultInputRadioAttributes =
     , onEvent = Nothing
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
+    , block = Nothing
     }
 
 
