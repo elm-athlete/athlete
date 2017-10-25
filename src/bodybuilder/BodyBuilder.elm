@@ -42,21 +42,17 @@ program =
 
 node : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
 node =
-    commonNode
-        BodyBuilder.Attributes.defaultNodeAttributes
+    commonBlockFlexlessNode
         "bb-node"
-        identity
-        nothingAttributes
-        nothingAttributes
-        .block
+        BodyBuilder.Attributes.defaultNodeAttributes
         BodyBuilder.Attributes.nodeAttributesToHtmlAttributes
 
 
 flex : Modifiers (FlexContainerAttributes msg) -> List (FlexItem msg) -> Node msg
 flex =
     commonNode
-        BodyBuilder.Attributes.defaultFlexContainerAttributes
         "bb-flex"
+        BodyBuilder.Attributes.defaultFlexContainerAttributes
         (List.map extractNodeInFlexItem)
         (.flexContainerProperties >> Just)
         nothingAttributes
@@ -73,8 +69,8 @@ flexItem : Modifiers (FlexItemAttributes msg) -> List (Node msg) -> FlexItem msg
 flexItem modifiers =
     FlexItem
         << commonNode
-            BodyBuilder.Attributes.defaultFlexItemAttributes
             "bb-flex-item"
+            BodyBuilder.Attributes.defaultFlexItemAttributes
             identity
             nothingAttributes
             (.flexItemProperties >> Just)
@@ -83,62 +79,108 @@ flexItem modifiers =
             modifiers
 
 
+a : Modifiers (AAttributes msg) -> List (Node msg) -> Node msg
+a =
+    commonBlockFlexlessNode
+        "a"
+        BodyBuilder.Attributes.defaultAAttributes
+        BodyBuilder.Attributes.aAttributesToHtmlAttributes
+
+
+img : String -> String -> Modifiers (ImgAttributes msg) -> Node msg
+img alt src =
+    commonBlockFlexlessChildlessNode
+        "img"
+        (BodyBuilder.Attributes.defaultImgAttributes alt src)
+        BodyBuilder.Attributes.imgAttributesToHtmlAttributes
+
+
+audio : Modifiers (AudioAttributes msg) -> Node msg
+audio =
+    commonBlockFlexlessChildlessNode
+        "audio"
+        BodyBuilder.Attributes.defaultAudioAttributes
+        BodyBuilder.Attributes.audioAttributesToHtmlAttributes
+
+
+progress : Modifiers (ProgressAttributes msg) -> Node msg
+progress =
+    commonBlockFlexlessChildlessNode
+        "progress"
+        BodyBuilder.Attributes.defaultProgressAttributes
+        BodyBuilder.Attributes.progressAttributesToHtmlAttributes
+
+
 button : Modifiers (ButtonAttributes msg) -> List (Node msg) -> Node msg
 button =
-    commonNode
-        BodyBuilder.Attributes.defaultButtonAttributes
+    commonBlockFlexlessNode
         "button"
-        identity
-        nothingAttributes
-        nothingAttributes
-        .block
+        BodyBuilder.Attributes.defaultButtonAttributes
         BodyBuilder.Attributes.buttonAttributesToHtmlAttributes
+
+
+inputHidden : Modifiers InputHiddenAttributes -> Node msg
+inputHidden modifiers =
+    Html.input
+        (BodyBuilder.Attributes.defaultInputHiddenAttributes
+            |> Function.compose modifiers
+            |> BodyBuilder.Attributes.inputHiddenAttributesToHtmlAttributes
+        )
+        []
+
+
+
+-- commonInputNode=
 
 
 {-| -}
 inputText : Modifiers (InputTextAttributes msg) -> Node msg
 inputText =
-    commonChildlessNode
-        BodyBuilder.Attributes.defaultInputTextAttributes
+    commonBlockFlexlessChildlessNode
         "input"
-        identity
-        nothingAttributes
-        nothingAttributes
-        .block
+        BodyBuilder.Attributes.defaultInputTextAttributes
         BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
+
+
+
+-- inputPassword
+-- InputPasswordAttributes
 
 
 {-| -}
 inputRange : Modifiers (InputRangeAttributes msg) -> Node msg
 inputRange =
-    commonChildlessNode
-        BodyBuilder.Attributes.defaultInputRangeAttributes
+    commonBlockFlexlessChildlessNode
         "input"
-        identity
-        nothingAttributes
-        nothingAttributes
-        .block
+        BodyBuilder.Attributes.defaultInputRangeAttributes
         BodyBuilder.Attributes.inputRangeAttributesToHtmlAttributes
 
 
 {-| -}
 inputNumber : Modifiers (InputNumberAttributes msg) -> Node msg
 inputNumber =
-    commonChildlessNode
-        BodyBuilder.Attributes.defaultInputNumberAttributes
+    commonBlockFlexlessChildlessNode
         "input"
-        identity
-        nothingAttributes
-        nothingAttributes
-        .block
+        BodyBuilder.Attributes.defaultInputNumberAttributes
         BodyBuilder.Attributes.inputNumberAttributesToHtmlAttributes
+
+
+
+-- InputRadioAttributes
+-- InputCheckboxAttributes
+-- InputSubmitAttributes
+-- InputUrlAttributes
+-- InputColorAttributes
+-- InputFileAttributes
+-- TextareaAttributes
+-- SelectAttributes
 
 
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 heading tag =
     commonNode
-        BodyBuilder.Attributes.defaultHeadingAttributes
         tag
+        BodyBuilder.Attributes.defaultHeadingAttributes
         identity
         nothingAttributes
         nothingAttributes
@@ -186,8 +228,8 @@ p =
 
 
 commonNode :
-    VisibleAttributes a
-    -> String
+    String
+    -> VisibleAttributes a
     -> (b -> List (Node msg))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector )))
@@ -196,7 +238,7 @@ commonNode :
     -> Modifiers (VisibleAttributes a)
     -> b
     -> Node msg
-commonNode defaultAttributes nodeName childrenModifiers getFlexContainerProperties getFlexItemProperties getBlockProperties attributesToHtmlAttributes modifiers children =
+commonNode nodeName defaultAttributes childrenModifiers getFlexContainerProperties getFlexItemProperties getBlockProperties attributesToHtmlAttributes modifiers children =
     computeBlock
         nodeName
         getFlexContainerProperties
@@ -209,8 +251,8 @@ commonNode defaultAttributes nodeName childrenModifiers getFlexContainerProperti
 
 
 commonChildlessNode :
-    VisibleAttributes a
-    -> String
+    String
+    -> VisibleAttributes a
     -> (List b -> List (Node msg))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector )))
@@ -218,11 +260,11 @@ commonChildlessNode :
     -> (VisibleAttributes a -> List (Html.Attribute msg))
     -> Modifiers (VisibleAttributes a)
     -> Node msg
-commonChildlessNode defaultAttributes nodeName childrenModifiers getFlexContainerProperties getFlexItemProperties getBlockProperties attributesToHtmlAttributes =
+commonChildlessNode nodeName defaultAttributes childrenModifiers getFlexContainerProperties getFlexItemProperties getBlockProperties attributesToHtmlAttributes =
     flip
         (commonNode
-            defaultAttributes
             nodeName
+            defaultAttributes
             childrenModifiers
             getFlexContainerProperties
             getFlexItemProperties
@@ -230,6 +272,41 @@ commonChildlessNode defaultAttributes nodeName childrenModifiers getFlexContaine
             attributesToHtmlAttributes
         )
         []
+
+
+commonBlockFlexlessNode :
+    String
+    -> VisibleAttributes (MaybeBlockContainer a)
+    -> (VisibleAttributes (MaybeBlockContainer a) -> List (Html.Attribute msg))
+    -> Modifiers (VisibleAttributes (MaybeBlockContainer a))
+    -> List (Node msg)
+    -> Node msg
+commonBlockFlexlessNode tag defaultAttributes convertAttributes =
+    commonNode
+        tag
+        defaultAttributes
+        identity
+        nothingAttributes
+        nothingAttributes
+        .block
+        convertAttributes
+
+
+commonBlockFlexlessChildlessNode :
+    String
+    -> VisibleAttributes (MaybeBlockContainer a)
+    -> (VisibleAttributes (MaybeBlockContainer a) -> List (Html.Attribute msg))
+    -> Modifiers (VisibleAttributes (MaybeBlockContainer a))
+    -> Node msg
+commonBlockFlexlessChildlessNode tag defaultAttributes convertAttributes =
+    commonChildlessNode
+        tag
+        defaultAttributes
+        identity
+        nothingAttributes
+        nothingAttributes
+        .block
+        convertAttributes
 
 
 nothingAttributes : b -> Maybe a
