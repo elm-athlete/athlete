@@ -10,7 +10,7 @@ import Flex exposing (FlexContainerDetails)
 import Display
 import BodyBuilder.Convert
 import BodyBuilder.Shared as Shared
-
+import Style exposing (..)
 
 type alias Node msg =
     Html msg

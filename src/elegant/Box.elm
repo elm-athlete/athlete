@@ -20,6 +20,19 @@ module Box
         , visibility
         , zIndex
         , boxToCouples
+        , outlineNone
+        , backgroundColor
+        , cornerRound
+        , cornerRadius
+        , borderNone
+        , paddingAll
+        , paddingHorizontal
+        , paddingVertical
+        , paddingBottom
+        , shadowCenteredBlurry
+        , coloredBorder
+        , marginAuto
+        , fontFamilySansSerif
         )
 
 {-| Handles all modifications for the box. You don't need to instanciate one,
@@ -50,14 +63,23 @@ It contains only modifiers, and they can be found in the respective modules.
 @docs visibility
 @docs zIndex
 
+
 # Shortcuts
 
 @docs outlineNone
 @docs backgroundColor
 @docs cornerRound
+@docs cornerRadius
 @docs borderNone
 @docs paddingAll
-@docs overflowHidden
+@docs paddingHorizontal
+@docs paddingVertical
+@docs paddingBottom
+@docs shadowCenteredBlurry
+@docs coloredBorder
+@docs marginAuto
+@docs fontFamilySansSerif
+
 
 # Values
 
@@ -72,9 +94,11 @@ It contains only modifiers, and they can be found in the respective modules.
 
 -}
 
+import Color exposing (Color)
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 import Typography
+import Typography.Character as Character
 import Padding
 import Border
 import Corner
@@ -282,6 +306,91 @@ hidden =
 visible : Visibility
 visible =
     VisibilityVisible
+
+
+
+-- Shortcuts
+
+
+{-| -}
+outlineNone : Modifier Box
+outlineNone =
+    outline [ Outline.none ]
+
+
+{-| -}
+backgroundColor : Color -> Modifier Box
+backgroundColor color =
+    background [ setColor (Just color) ]
+
+
+{-| -}
+cornerRound : Modifier Box
+cornerRound =
+    corner [ Corner.circular Corner.all (Px 300) ]
+
+
+{-| -}
+cornerRadius : SizeUnit -> Modifier Box
+cornerRadius size =
+    corner [ Corner.circular Corner.all size ]
+
+
+{-| -}
+borderNone : Modifier Box
+borderNone =
+    border [ Border.all [ Border.none ] ]
+
+
+{-| -}
+paddingAll : SizeUnit -> Modifier Box
+paddingAll size =
+    padding [ Padding.all size ]
+
+
+{-| -}
+paddingHorizontal : SizeUnit -> Modifier Box
+paddingHorizontal size =
+    padding [ Padding.horizontal size ]
+
+
+{-| -}
+paddingVertical : SizeUnit -> Modifier Box
+paddingVertical size =
+    padding [ Padding.vertical size ]
+
+
+{-| -}
+paddingBottom : SizeUnit -> Modifier Box
+paddingBottom size =
+    padding [ Padding.bottom size ]
+
+
+{-| -}
+shadowCenteredBlurry : SizeUnit -> Color -> Modifier Box
+shadowCenteredBlurry size color =
+    boxShadow
+        [ setColor (Just color)
+        , BoxShadow.blurRadius size
+        ]
+
+
+{-| -}
+coloredBorder : Color -> Modifier Box
+coloredBorder color =
+    border [ Border.all [ setColor (Just color) ] ]
+
+
+{-| -}
+marginAuto : Modifier Box
+marginAuto =
+    margin [ Margin.all Margin.auto ]
+
+
+{-| -}
+fontFamilySansSerif : Modifier Box
+fontFamilySansSerif =
+    typography [ Typography.character [ Character.fontFamilySansSerif ] ]
 
 
 

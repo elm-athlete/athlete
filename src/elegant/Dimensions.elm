@@ -4,6 +4,8 @@ module Dimensions
         , width
         , height
         , square
+        , minWidth
+        , maxWidth
         , minHeight
         , maxHeight
         , defaultDimensions
@@ -14,6 +16,8 @@ module Dimensions
 @docs width
 @docs height
 @docs square
+@docs minWidth
+@docs maxWidth
 @docs minHeight
 @docs maxHeight
 @docs Dimensions
@@ -25,8 +29,7 @@ import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 
 
-{-|
-  The type behind the handling of (max-|min-|)width and (max-|min-|)height
+{-| The type behind the handling of (max-|min-|)width and (max-|min-|)height
 -}
 type alias Dimensions =
     ( DimensionAxis, DimensionAxis )
@@ -39,8 +42,7 @@ type alias DimensionAxis =
     }
 
 
-{-|
--}
+{-| -}
 defaultDimensions : ( DimensionAxis, DimensionAxis )
 defaultDimensions =
     ( defaultDimensionAxis, defaultDimensionAxis )
@@ -70,6 +72,18 @@ square value =
 
 
 {-| -}
+minWidth : SizeUnit -> Modifier Dimensions
+minWidth value ( x, y ) =
+    ( x |> setMin (Just value), y )
+
+
+{-| -}
+maxWidth : SizeUnit -> Modifier Dimensions
+maxWidth value ( x, y ) =
+    ( x |> setMax (Just value), y )
+
+
+{-| -}
 minHeight : SizeUnit -> Modifier Dimensions
 minHeight value ( x, y ) =
     ( x, y |> setMin (Just value) )
@@ -81,8 +95,7 @@ maxHeight value ( x, y ) =
     ( x, y |> setMax (Just value) )
 
 
-{-|
--}
+{-| -}
 dimensionsToCouples : Dimensions -> List ( String, String )
 dimensionsToCouples size =
     [ ( "width", Tuple.first >> .dimension )

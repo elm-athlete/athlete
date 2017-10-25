@@ -14,7 +14,6 @@ module Display
         , listStyleGeorgian
         , Alignment
         , alignment
-        , alignCenter
         , right
         , center
         , left
@@ -43,7 +42,6 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs TextOverflow
 
 
-
 # Modifiers
 
 
@@ -60,7 +58,6 @@ every style, for every element. Each element can be block, inline, flow or flex.
 ## Alignment
 
 @docs alignment
-@docs alignCenter
 @docs right
 @docs center
 @docs left
@@ -75,8 +72,6 @@ every style, for every element. Each element can be block, inline, flow or flex.
 ## Dimensions
 @docs dimensions
 @docs fullWidth
-
-
 
 
 # Compilation
@@ -236,13 +231,6 @@ dimensions =
     getModifyAndSet .dimensions setDimensionsIn Dimensions.defaultDimensions
 
 
-{-| Defines the alignment as center.
--}
-alignCenter : Modifier BlockDetails
-alignCenter =
-    alignment AlignmentCenter
-
-
 {-| Defines the alignment as right.
 -}
 right : Alignment
@@ -356,8 +344,7 @@ blockDetailsToCouples blockDetails =
         |> List.concatMap (callOn blockDetails)
 
 
-{-|
--}
+{-| -}
 fullWidth : Modifier BlockDetails
 fullWidth =
     dimensions [ Dimensions.width (Percent 100) ]

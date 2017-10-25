@@ -4,6 +4,7 @@ import Color exposing (..)
 import Color.Manipulate as Color
 import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
+import BodyBuilder.Events as Events
 import Function exposing (..)
 import Elegant exposing (SizeUnit, px, pt, percent, vh)
 import Padding
@@ -17,6 +18,8 @@ import Border
 import Outline
 import Typography
 import Typography.Character as Character
+import Block
+import Style
 
 
 type Msg
@@ -41,93 +44,106 @@ type alias Model =
 
 
 boxStyle a =
-    style [ box a ]
+    style [ Style.box a ]
 
 
 blockStyle a =
-    style [ block a ]
+    style [ Style.block a ]
 
 
 buttonStyle color =
     [ style
-        [ box
+        [ Style.box
             [ Box.outlineNone
             , Box.backgroundColor color
             , Box.cornerRound
             , Box.borderNone
             , Box.paddingAll Constants.medium
             ]
-        , box
+        , Style.box
             [ Box.backgroundColor (Color.saturate 0.5 color)
-            , Box.shadowCenteredBlurry (Px 1) Color.black
+            , Box.shadowCenteredBlurry (px 1) Color.black
             ]
-            |> focus
-        , block
-            [ Block.overflowHidden
-            ]
+            |> Style.focus
+        , Style.block
+            [ Block.overflowHidden ]
         ]
     ]
         |> compose
 
 
 exampleGridContent content =
-    [ node [ boxStyle [ paddingBottom medium ] ]
+    [ node
+        [ boxStyle
+            [ Box.paddingBottom Constants.medium ]
+        ]
         [ node
             [ style
-                [ box
+                [ Style.box
                     [ Box.coloredBorder Color.black
                     , Box.paddingAll Constants.large
                     ]
-                , block
-                    [ Block.alignCenter
-                    ]
+                , Style.block
+                    [ Block.alignCenter ]
                 ]
             ]
-            [ text content
-            ]
+            [ text content ]
         ]
     ]
 
 
 customCounter title min max step val msg =
-    node [ style [ textCenter ] ]
-        [ h3 [ style [ fontSize (Px 14), uppercase ] ] [ text title ]
+    node
+        [ blockStyle [ Block.alignCenter ] ]
+        [ h3
+            [ boxStyle
+                [ Box.typography
+                    [ Typography.fontSize (px 14)
+                    , Typography.uppercase
+                    ]
+                ]
+            ]
+            [ text title ]
         , inputRange
-            [ style [ Attributes.block ]
+            [ style [ blockStyle [] ]
             , Attributes.value val
-            , Attributes.onInput msg
+            , Events.onInput msg
             , Attributes.min min
             , Attributes.max max
             , Attributes.step step
             ]
-        , span [ style [ paddingHorizontal tiny ] ] []
+        , node
+            [ boxStyle [ Box.paddingHorizontal Constants.tiny ] ]
+            []
         , inputNumber
             [ style
-                [ Attributes.block [ Block.alignCenter ]
-                , Attributes.box
-                    [ Box.borderRadius 4
+                [ Style.block [ Block.alignCenter ]
+                , Style.box
+                    [ Box.cornerRadius 4
                     , Box.coloredBorder (Color.rgba 149 152 154 0.23)
-                    , Box.paddingVertical (Px 15)
-                    , Box.paddingHorizontal (Px 10)
+                    , Box.paddingVertical (px 15)
+                    , Box.paddingHorizontal (px 10)
                     ]
-                , textCenter
                 ]
-            , customNumberFieldParameters
+
+            -- , customNumberFieldParameters
             ]
         ]
 
 
-view :
-    Model
-    -> BodyBuilder.Node Msg
+view : Model -> Node Msg
 view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstrapState } =
-    div
+    node
         [ style
-            [ maxWidth (Percent 100)
-            , Elegant.width (Px 1024)
-            , marginAuto
-            , padding medium
-            , Elegant.fontFamilySansSerif
+            [ Style.block
+                [ Block.maxWidth (percent 100)
+                , Block.width (px 1024)
+                ]
+            , Style.box
+                [ Box.marginAuto
+                , Box.paddingAll Constants.medium
+                , Box.fontFamilySansSerif
+                ]
             ]
         ]
         [ h1
