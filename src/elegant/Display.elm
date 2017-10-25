@@ -4,14 +4,6 @@ module Display
         , OutsideDisplay(..)
         , InsideDisplay(..)
         , Contents
-        , displayBox
-        , none
-        , block
-        , inline
-        , inlineFlexContainer
-        , flexContainer
-        , flexItem
-        , flexChildContainer
         , BlockDetails
         , ListStyleType
         , listStyleNone
@@ -43,7 +35,6 @@ every style, for every element. Each element can be block, inline, flow or flex.
 
 @docs DisplayBox
 @docs Contents
-@docs displayBox
 @docs OutsideDisplay
 @docs InsideDisplay
 @docs BlockDetails
@@ -51,16 +42,6 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs Alignment
 @docs TextOverflow
 
-
-# Displays
-
-@docs none
-@docs block
-@docs inline
-@docs inlineFlexContainer
-@docs flexContainer
-@docs flexItem
-@docs flexChildContainer
 
 
 # Modifiers
@@ -154,115 +135,6 @@ Can be flow, or flex (and containing flex details).
 type InsideDisplay
     = Flow
     | FlexContainer (Maybe Flex.FlexContainerDetails)
-
-
-{-| -}
-displayBox : OutsideDisplay -> InsideDisplay -> Modifiers Box.Box -> DisplayBox
-displayBox outsideDisplay insideDisplay =
-    ContentsWrapper
-        << Contents outsideDisplay insideDisplay
-        << modifiedElementOrNothing Box.default
-
-
-{-| displayNone
-The "display none" <display box> is useful to simply don't show
-the element in the browser, it is on top of the hierarchy, because
-applying any text or box style to a "display none" element doesn't
-mean anything.
-
-    Display.none
-
--}
-none : DisplayBox
-none =
-    None
-
-
-{-| The display Block
-node behaving like a block element
-children behaving like inside a flow element => considered block from children
-
-    Display.block
-        [ dimensions [ width (px 30) ] ]
-        [ Box.padding (px 30) ]
-
--}
-block : Modifiers BlockDetails -> OutsideDisplay
-block blockDetailsModifiers =
-    (Block (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
-
-
-
--- displayBox
---     (Block (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers))
---     Flow
-
-
-{-| The display inline
-node behaving like an inline element
-
-    Display.inline
-        [ Box.background [ Elegant.color Color.blue ] ]
-
--}
-inline : Modifiers Box.Box -> DisplayBox
-inline =
-    displayBox
-        Inline
-        Flow
-
-
-{-| The display inline-flex container :
-node behaving like an inline element, contained nodes will behave like flex children
-
-    Display.inlineFlexContainer [] []
-
--}
-inlineFlexContainer : Modifiers Flex.FlexContainerDetails -> Modifiers Box.Box -> DisplayBox
-inlineFlexContainer flexContainerDetailsModifiers =
-    displayBox
-        Inline
-        (FlexContainer (modifiedElementOrNothing Flex.defaultFlexContainerDetails flexContainerDetailsModifiers))
-
-
-{-| The display blockflex container :
-node behaving like an block element, contained nodes will behave like flex children
-
-    Display.blockFlexContainer [] [] []
-
--}
-flexContainer : Modifiers Flex.FlexContainerDetails -> InsideDisplay
-flexContainer flexContainerDetailsModifiers =
-    FlexContainer (modifiedElementOrNothing Flex.defaultFlexContainerDetails flexContainerDetailsModifiers)
-
-
-{-| The display flexitemdetails container :
-node behaving like an flex child (not being a flex father himself)
-
-    Display.flexChild [] []
-
--}
-flexItem : Modifiers Flex.FlexItemDetails -> Modifiers BlockDetails -> OutsideDisplay
-flexItem flexItemDetailsModifiers blockDetailsModifiers =
-    FlexItem
-        (modifiedElementOrNothing Flex.defaultFlexItemDetails flexItemDetailsModifiers)
-        (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers)
-
-
-{-| The display flexchildcontainer container :
-node behaving like an flex child being a flex father himself.
-
-    Display.flexChildContainer [] [] []
-
--}
-flexChildContainer : Modifiers Flex.FlexContainerDetails -> Modifiers Flex.FlexItemDetails -> Modifiers BlockDetails -> Modifiers Box.Box -> DisplayBox
-flexChildContainer flexContainerDetailsModifiers flexItemDetailsModifiers blockDetailsModifiers =
-    displayBox
-        (FlexItem
-            (modifiedElementOrNothing Flex.defaultFlexItemDetails flexItemDetailsModifiers)
-            (modifiedElementOrNothing defaultBlockDetails blockDetailsModifiers)
-        )
-        (FlexContainer (modifiedElementOrNothing Flex.defaultFlexContainerDetails flexContainerDetailsModifiers))
 
 
 {-| Contains all styles which can be applied to a block.
