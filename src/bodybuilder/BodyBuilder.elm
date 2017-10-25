@@ -6,7 +6,7 @@ import Elegant
 import BodyBuilder.Attributes exposing (..)
 import Function
 import Helpers.Shared exposing (..)
-import Display exposing (FlexContainerDetails)
+import Flex exposing (FlexContainerDetails)
 import Display
 import BodyBuilder.Convert
 
@@ -232,7 +232,7 @@ commonNode :
     -> VisibleAttributes a
     -> (b -> List (Node msg))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
-    -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexItemDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector )))
     -> (VisibleAttributes a -> List (Html.Attribute msg))
     -> Modifiers (VisibleAttributes a)
@@ -255,7 +255,7 @@ commonChildlessNode :
     -> VisibleAttributes a
     -> (List b -> List (Node msg))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
-    -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexItemDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector )))
     -> (VisibleAttributes a -> List (Html.Attribute msg))
     -> Modifiers (VisibleAttributes a)
@@ -317,7 +317,7 @@ nothingAttributes _ =
 computeBlock :
     String
     -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
-    -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.FlexItemDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexItemDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector )))
     -> VisibleAttributes a
     -> (VisibleAttributes a -> List (Html.Attribute msg))

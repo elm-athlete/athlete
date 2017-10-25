@@ -20,6 +20,7 @@ import Background
 import Position
 import Display
 import Display.Overflow
+import Dimensions
 
 
 main : Html msg
@@ -36,8 +37,8 @@ mainStyle =
             , Display.Overflow.overflowY Display.Overflow.visible
             ]
         , Display.dimensions
-            [ Display.width (px 30)
-            , Display.height (px 40)
+            [ Dimensions.width (px 30)
+            , Dimensions.height (px 40)
             ]
         , Display.textOverflowEllipsis
         , Display.alignment Display.left

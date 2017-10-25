@@ -4,6 +4,8 @@ import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events exposing (..)
 import Display
+import Dimensions
+import Flex
 import Box
 import Constants
 import Border
@@ -16,7 +18,7 @@ import Typography.Character as Character
 
 
 buttonStyle =
-    [ Attributes.block [ Display.dimensions [ Display.height (percent 100) ] ]
+    [ Attributes.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
     , Attributes.box
         [ Box.padding [ Padding.vertical Constants.zero ]
         , Box.border [ Border.all [ Border.thickness (px 0) ] ]
@@ -30,9 +32,9 @@ buttonStyle =
 counter model =
     flex
         [ style
-            [ Attributes.block [ Display.dimensions [ Display.minHeight (px 50) ] ]
+            [ Attributes.block [ Display.dimensions [ Dimensions.minHeight (px 50) ] ]
             , Attributes.flexContainerProperties
-                [ Display.align Display.stretch
+                [ Flex.align Flex.stretch
                 ]
             , Attributes.box
                 [ Box.border [ Border.full Color.gray ]
@@ -42,7 +44,7 @@ counter model =
         [ flexItem []
             [ inputText
                 [ style
-                    [ Attributes.block [ Display.dimensions [ Display.height (percent 100) ] ]
+                    [ Attributes.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
                     , Attributes.box
                         [ Box.padding [ Padding.all Constants.zero ]
                         , Box.typography [ Typography.character [ Character.size (px 20) ] ]
@@ -57,12 +59,12 @@ counter model =
         , flexItem []
             [ flex
                 [ style
-                    [ Attributes.block [ Display.dimensions [ Display.height (percent 100) ] ]
-                    , Attributes.flexContainerProperties [ Display.direction Display.column, Display.align Display.stretch ]
+                    [ Attributes.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
+                    , Attributes.flexContainerProperties [ Flex.direction Flex.column, Flex.align Flex.stretch ]
                     ]
                 ]
-                [ flexItem [ style [ Attributes.flexItemProperties [ Display.basis (percent 100) ] ] ] [ button [ onClick Add, style buttonStyle ] [ text "+" ] ]
-                , flexItem [ style [ Attributes.flexItemProperties [ Display.basis (percent 100) ] ] ] [ button [ onClick Substract, style buttonStyle ] [ text "-" ] ]
+                [ flexItem [ style [ Attributes.flexItemProperties [ Flex.basis (percent 100) ] ] ] [ button [ onClick Add, style buttonStyle ] [ text "+" ] ]
+                , flexItem [ style [ Attributes.flexItemProperties [ Flex.basis (percent 100) ] ] ] [ button [ onClick Substract, style buttonStyle ] [ text "-" ] ]
                 ]
             ]
         ]
@@ -72,10 +74,10 @@ windowCentered : Node msg -> Node msg
 windowCentered content =
     Builder.flex
         [ style
-            [ Attributes.block [ Display.dimensions [ Display.height (vh 100) ] ]
+            [ Attributes.block [ Display.dimensions [ Dimensions.height (vh 100) ] ]
             , Attributes.flexContainerProperties
-                [ Display.align Display.center
-                , Display.justifyContent Display.justifyContentCenter
+                [ Flex.align Flex.center
+                , Flex.justifyContent Flex.justifyContentCenter
                 ]
             ]
         ]

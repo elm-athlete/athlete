@@ -4,6 +4,7 @@ import Elegant exposing (..)
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes
 import Function
+import Dimensions
 
 
 -- import Function exposing (..)
@@ -24,7 +25,7 @@ stickyView sectionStyle sectionName elements =
         [ node
             [ BodyBuilder.Attributes.style
                 [ BodyBuilder.Attributes.block
-                    [ Display.dimensions [ Display.width (percent 100) ] ]
+                    [ Display.dimensions [ Dimensions.width (percent 100) ] ]
                 , BodyBuilder.Attributes.box
                     [ Box.position <|
                         Position.sticky [ Position.top (px 0) ]

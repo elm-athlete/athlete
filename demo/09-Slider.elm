@@ -103,6 +103,7 @@ import Color
 import Elegant exposing (px)
 import Padding
 import Constants
+import Dimensions
 
 
 theFontSize : number
@@ -144,7 +145,7 @@ view model =
                         ]
                         |> Attributes.pseudoClass ":-webkit-slider-runnable-track"
                     , block
-                        [ Display.dimensions [ Display.square (px 50) ]
+                        [ Display.dimensions [ Dimensions.square (px 50) ]
                         ]
                         |> Attributes.pseudoClass ":-webkit-slider-thumb"
                     ]

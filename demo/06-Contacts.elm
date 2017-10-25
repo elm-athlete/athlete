@@ -30,6 +30,7 @@ import Finders exposing (..)
 import Dict exposing (Dict)
 import Dict.Extra as Dict
 import Display
+import Dimensions
 import Box
 import Cursor
 import Border
@@ -41,6 +42,7 @@ import Padding
 import Display.Overflow as Overflow
 import Position
 import Function
+import Flex
 
 
 type Route
@@ -137,7 +139,7 @@ navItemGroup width alignment content =
         [ Events.onClick <| StandardHistoryWrapper Back
         , Attributes.style
             [ Attributes.flexItemProperties
-                [ Display.basis (percent width) ]
+                [ Flex.basis (percent width) ]
             , Attributes.block
                 [ Display.overflow [ Overflow.overflowXY Overflow.hidden ]
                 , Display.textOverflowEllipsis
@@ -161,7 +163,7 @@ header =
         [ BodyBuilder.flex
             [ Attributes.style
                 [ Attributes.flexContainerProperties
-                    [ Display.direction Display.row ]
+                    [ Flex.direction Flex.row ]
                 , Attributes.block []
                 , Attributes.box
                     [ Box.position <| Position.sticky []
@@ -170,7 +172,7 @@ header =
                 ]
             ]
             [ navItemGroup 30 Display.left "← BACK"
-            , navItemGroup 40 Display.cnter "POKEMON"
+            , navItemGroup 40 Display.center "POKEMON"
             , navItemGroup 30 Display.right ""
             ]
         ]
@@ -184,9 +186,9 @@ showView bodyFun data =
     flex
         [ Attributes.style
             [ Attributes.flexContainerProperties
-                [ Display.direction Display.column ]
+                [ Flex.direction Flex.column ]
             , Attributes.block
-                [ Display.dimensions [ Display.height (vh 100) ] ]
+                [ Display.dimensions [ Dimensions.height (vh 100) ] ]
             , Attributes.box
                 [ Box.background [ Elegant.color Color.white ] ]
             ]
@@ -195,7 +197,7 @@ showView bodyFun data =
         , BodyBuilder.flexItem
             [ Attributes.style
                 [ Attributes.flexItemProperties
-                    [ Display.shrink 1000000 ]
+                    [ Flex.shrink 1000000 ]
                 , Attributes.block
                     []
 
@@ -217,13 +219,13 @@ fullFlexCenter content =
           Attributes.style
             [ Attributes.block
                 [ Display.dimensions
-                    [ Display.width (percent 100)
-                    , Display.height (vh 100)
+                    [ Dimensions.width (percent 100)
+                    , Dimensions.height (vh 100)
                     ]
                 ]
             , Attributes.flexContainerProperties
-                [ Display.align Display.center
-                , Display.justifyContent Display.justifyContentCenter
+                [ Flex.align Flex.center
+                , Flex.justifyContent Flex.justifyContentCenter
                 ]
             ]
         ]
@@ -283,7 +285,7 @@ contactsIndex contacts =
         [ Attributes.style
             [ Attributes.block
                 [ Display.dimensions
-                    [ Display.height (vh 100), Display.width (percent 100) ]
+                    [ Dimensions.height (vh 100), Dimensions.width (percent 100) ]
                 , Display.overflow [ Overflow.overflowY Overflow.scroll ]
                 ]
             , Attributes.box

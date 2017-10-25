@@ -58,6 +58,8 @@ import Padding
 import Cursor
 import Typography.Character
 import Color
+import Flex
+import Dimensions
 
 
 type Easing
@@ -367,7 +369,7 @@ pageView insidePageView_ transition data page =
     node
         [ Attributes.style
             [ Attributes.block
-                [ Display.dimensions [ Display.width (percent 100) ] ]
+                [ Display.dimensions [ Dimensions.width (percent 100) ] ]
             , Attributes.box
                 [ Box.boxShadow
                     [ BoxShadow.standard (px 1) (Color.rgba 1 1 1 0.5) ( px 2, px 2 )
@@ -386,8 +388,8 @@ pageWithHeader : Node msg -> Node msg -> Node msg
 pageWithHeader header page =
     flex
         [ style
-            [ Attributes.flexContainerProperties [ Display.direction Display.column ]
-            , Attributes.block [ Display.dimensions [ Display.height (Elegant.vh 100) ] ]
+            [ Attributes.flexContainerProperties [ Flex.direction Flex.column ]
+            , Attributes.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100) ] ]
             , Attributes.box [ Box.background [ Elegant.color Color.white ] ]
             ]
         ]
@@ -429,7 +431,7 @@ historyView insidePageView_ history data =
             Nothing ->
                 overflowHiddenContainer []
                     [ flexItem
-                        [ Attributes.style [ Attributes.flexItemProperties [ Display.basis (percent 100) ] ] ]
+                        [ Attributes.style [ Attributes.flexItemProperties [ Flex.basis (percent 100) ] ] ]
                         [ pageView insidePageView_ Nothing data history.current ]
                     ]
 
@@ -440,14 +442,14 @@ historyView insidePageView_ history data =
                             [ flexItem
                                 [ style
                                     [ Attributes.block []
-                                    , Attributes.flexItemProperties [ Display.basis (percent 100) ]
+                                    , Attributes.flexItemProperties [ Flex.basis (percent 100) ]
                                     ]
                                 ]
                                 (List.map (pageView insidePageView_ history.transition data) (history |> beforeTransition))
                             , flexItem
                                 [ style
-                                    [ Attributes.block [ Display.dimensions [ Display.width (percent 100) ] ]
-                                    , Attributes.flexItemProperties [ Display.basis (percent 100) ]
+                                    [ Attributes.block [ Display.dimensions [ Dimensions.width (percent 100) ] ]
+                                    , Attributes.flexItemProperties [ Flex.basis (percent 100) ]
                                     , Attributes.box
                                         [ Box.position <|
                                             Position.absolute <|
@@ -464,7 +466,7 @@ historyView insidePageView_ history data =
                         overflowHiddenContainer
                             [ style
                                 [ Attributes.block
-                                    [ Display.dimensions [ Display.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
+                                    [ Display.dimensions [ Dimensions.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
                                 , Attributes.box
                                     [ Box.position
                                         (Position.relative
@@ -477,7 +479,7 @@ historyView insidePageView_ history data =
                                 (BodyBuilder.flexItem
                                     [ Attributes.style
                                         [ Attributes.flexItemProperties
-                                            [ Display.basis (percent 100)
+                                            [ Flex.basis (percent 100)
                                             ]
                                         ]
                                     ]
@@ -544,7 +546,7 @@ initHistoryAndData route data =
 
 headerButtonStyle width align =
     Attributes.style
-        [ Attributes.flexItemProperties [ Display.basis width ]
+        [ Attributes.flexItemProperties [ Flex.basis width ]
         , Attributes.block
             [ Display.overflow
                 [ Overflow.overflowXY Overflow.hidden ]
@@ -582,7 +584,7 @@ headerElement { left, center, right } =
     node
         [ style
             [ Attributes.block
-                [ Display.dimensions [ Display.width <| percent 100 ] ]
+                [ Display.dimensions [ Dimensions.width <| percent 100 ] ]
             , Attributes.box
                 [ Box.position <| Position.sticky []
                 , Box.background [ Elegant.color Color.white ]
@@ -591,8 +593,8 @@ headerElement { left, center, right } =
         ]
         [ flex
             [ style
-                [ Attributes.block [ Display.dimensions [ Display.width (percent 100) ] ]
-                , Attributes.flexContainerProperties [ Display.direction Display.row ]
+                [ Attributes.block [ Display.dimensions [ Dimensions.width (percent 100) ] ]
+                , Attributes.flexContainerProperties [ Flex.direction Flex.row ]
                 ]
             ]
             [ flexItem [ headerButtonStyleLeft ] [ left ]

@@ -10,11 +10,12 @@ import List.Extra
 import Dict exposing (Dict)
 import Maybe.Extra
 import Function
+import Flex
 
 
 type alias StyleComponents =
-    { flexContainer : Maybe Display.FlexContainerDetails
-    , flexItem : Maybe Display.FlexItemDetails
+    { flexContainer : Maybe Flex.FlexContainerDetails
+    , flexItem : Maybe Flex.FlexItemDetails
     , block : Maybe Display.BlockDetails
     , box : Maybe Box.Box
     }
@@ -26,8 +27,8 @@ defaultStyleComponents =
 
 
 toElegantStyle :
-    Maybe (List ( Modifiers Display.FlexContainerDetails, Attributes.StyleSelector ))
-    -> Maybe (List ( Modifiers Display.FlexItemDetails, Attributes.StyleSelector ))
+    Maybe (List ( Modifiers Flex.FlexContainerDetails, Attributes.StyleSelector ))
+    -> Maybe (List ( Modifiers Flex.FlexItemDetails, Attributes.StyleSelector ))
     -> Maybe (List ( Modifiers Display.BlockDetails, Attributes.StyleSelector ))
     -> List ( Modifiers Box.Box, Attributes.StyleSelector )
     -> List Elegant.Style
@@ -37,14 +38,14 @@ toElegantStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
             flexModifiers
                 |> Maybe.map
                     (groupByStyleSelectorAndCompute
-                        (Display.FlexContainerDetails Nothing Nothing Nothing Nothing)
+                        (Flex.FlexContainerDetails Nothing Nothing Nothing Nothing)
                     )
 
         computedFlexItemDetails =
             flexItemModifiers
                 |> Maybe.map
                     (groupByStyleSelectorAndCompute
-                        (Display.FlexItemDetails Nothing Nothing Nothing Nothing)
+                        (Flex.FlexItemDetails Nothing Nothing Nothing Nothing)
                     )
 
         computedBlockDetails =
@@ -97,8 +98,8 @@ mergeModifiersAndSwap styles =
 
 
 separatedComponentsToElegantStyle :
-    Maybe (List ( Attributes.StyleSelector, Display.FlexContainerDetails ))
-    -> Maybe (List ( Attributes.StyleSelector, Display.FlexItemDetails ))
+    Maybe (List ( Attributes.StyleSelector, Flex.FlexContainerDetails ))
+    -> Maybe (List ( Attributes.StyleSelector, Flex.FlexItemDetails ))
     -> Maybe (List ( Attributes.StyleSelector, Display.BlockDetails ))
     -> List ( Attributes.StyleSelector, Box.Box )
     -> List Elegant.Style
@@ -187,7 +188,7 @@ componentsToParameteredDisplayBox isFlex ( { media }, { flexContainer, flexItem,
 
 
 computeOutsideDisplay :
-    Maybe Display.FlexItemDetails
+    Maybe Flex.FlexItemDetails
     -> Maybe Display.BlockDetails
     -> Display.OutsideDisplay
 computeOutsideDisplay flexItem block =
@@ -205,8 +206,8 @@ computeOutsideDisplay flexItem block =
 
 
 computeInsideDisplay :
-    Maybe Display.FlexItemDetails
-    -> Maybe Display.FlexContainerDetails
+    Maybe Flex.FlexItemDetails
+    -> Maybe Flex.FlexContainerDetails
     -> Bool
     -> Display.InsideDisplay
 computeInsideDisplay flexItem flexContainer isFlex =

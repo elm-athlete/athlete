@@ -19,6 +19,8 @@
         "Outline",
         "Padding",
         "Position",
+        "Dimensions",
+        "Flex",
         "Typography",
         "Typography.Character"
     ],
