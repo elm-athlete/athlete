@@ -9,14 +9,13 @@ I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
+import BodyBuilder.Events as Events
+import Finders exposing (..)
+import Elegant exposing (SizeUnit, px, pt, percent, vh)
 import Padding
 import Constants
 import Elegant
-import BodyBuilder.Events as Events
 import Color
-import Elegant exposing (SizeUnit, px, pt, percent, vh)
-import Color
-import Finders exposing (..)
 import Display
 import Dimensions
 import Box

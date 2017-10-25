@@ -50,6 +50,14 @@ It contains only modifiers, and they can be found in the respective modules.
 @docs visibility
 @docs zIndex
 
+# Shortcuts
+
+@docs outlineNone
+@docs backgroundColor
+@docs cornerRound
+@docs borderNone
+@docs paddingAll
+@docs overflowHidden
 
 # Values
 
