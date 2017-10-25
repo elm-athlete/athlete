@@ -4,7 +4,7 @@ var _elm_bodybuilder$elegant$Native_BodyBuilder = (function() {
 
   // fetchStyle : String -> Maybe (String)
   function fetchClassesNames(key) {
-    return fetch(classesNamesCache, key)
+    return storeFetch(classesNamesCache, key)
   }
 
   // addStyle : String -> String -> String
@@ -14,7 +14,7 @@ var _elm_bodybuilder$elegant$Native_BodyBuilder = (function() {
 
   // fetchStyle : String -> Maybe (String)
   function fetchDisplayStyle(key) {
-    return fetch(displayStyleCache, key)
+    return storeFetch(displayStyleCache, key)
   }
 
   // addStyle : String -> String -> String

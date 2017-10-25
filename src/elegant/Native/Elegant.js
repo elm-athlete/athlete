@@ -1,4 +1,4 @@
-function fetch(cacheStore, key) {
+function storeFetch(cacheStore, key) {
   const value = cacheStore.get(key)
   if (value !== undefined && value !== null) {
     return {
@@ -33,7 +33,7 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
 
   // fetchStyle : String -> Maybe (List String)
   function fetchStyles(key) {
-    return fetch(stylesCache, key)
+    return storeFetch(stylesCache, key)
   }
 
 
@@ -44,7 +44,7 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
 
 
   function fetchAtomicClass(key) {
-    return fetch(atomicClassCache, key)
+    return storeFetch(atomicClassCache, key)
   }
 
   // addAtomicClass : String -> String -> String
