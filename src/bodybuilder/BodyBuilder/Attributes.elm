@@ -254,7 +254,7 @@ type alias InputRangeAttributes msg =
 
 {-| -}
 type alias SelectAttributes msg =
-    StringValue (OptionsAttribute (FlowAttributes msg))
+    MaybeBlockContainer (StringValue (OptionsAttribute (FlowAttributes msg)))
 
 
 {-| TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute {})))
@@ -304,7 +304,7 @@ type alias AAttributes msg =
 
 {-| -}
 type alias TextareaAttributes msg =
-    OnStringInputEvent msg (NameAttribute (StringValue (FlowAttributes msg)))
+    MaybeBlockContainer (OnStringInputEvent msg (NameAttribute (StringValue (FlowAttributes msg))))
 
 
 {-| -}
@@ -731,6 +731,7 @@ defaultTextareaAttributes =
     , name = Nothing
     , universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , onMouseEvents = Nothing
     , onInputEvent = Nothing
     , fromStringInput = identity
@@ -1172,6 +1173,7 @@ defaultSelectAttributes =
     , options = []
     , universal = defaultUniversalAttributes
     , box = []
+    , block = Nothing
     , onMouseEvents = Nothing
     , onEvent = Nothing
     , onBlurEvent = Nothing

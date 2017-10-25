@@ -19,6 +19,10 @@ type FlexItem msg
     = FlexItem (Node msg)
 
 
+type Option msg
+    = Option (Html msg)
+
+
 text : String -> Node msg
 text =
     Html.text
@@ -212,9 +216,34 @@ inputFile =
         BodyBuilder.Attributes.inputFileAttributesToHtmlAttributes
 
 
+textarea : Modifiers (TextareaAttributes msg) -> Node msg
+textarea =
+    commonBlockFlexlessChildlessNode
+        "textarea"
+        BodyBuilder.Attributes.defaultTextareaAttributes
+        BodyBuilder.Attributes.textareaAttributesToHtmlAttributes
 
--- TextareaAttributes
--- SelectAttributes
+
+select : Modifiers (SelectAttributes msg) -> List (Option msg) -> Node msg
+select =
+    commonNode
+        "select"
+        BodyBuilder.Attributes.defaultSelectAttributes
+        (List.map extractOption)
+        nothingAttributes
+        nothingAttributes
+        .block
+        BodyBuilder.Attributes.selectAttributesToHtmlAttributes
+
+
+option : String -> String -> Option msg
+option value content =
+    Option <| Html.option [ Html.Attributes.value value ] [ Html.text content ]
+
+
+extractOption : Option msg -> Html msg
+extractOption (Option option) =
+    option
 
 
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
