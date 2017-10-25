@@ -122,7 +122,7 @@ showView data =
 blogpostView : Blogpost -> Node msg
 blogpostView blogpost =
     node []
-        [ img "" blogpost.image [ style [ Attributes.block [ Display.dimensions [ Display.fullWidth ] ] ] ]
+        [ img "" blogpost.image [ style [ Attributes.block [ Display.fullWidth ] ] ]
         , node
             [ style
                 [ Attributes.block []
