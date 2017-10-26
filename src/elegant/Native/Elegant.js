@@ -52,7 +52,6 @@ var _elm_bodybuilder$elegant$Native_Elegant = (function() {
     if (!insertedClasses.has(atomicClassComputed)) {
       insertedClasses.add(atomicClassComputed)
       css.insertRule(atomicClassComputed)
-      console.log(atomicClassComputed)
     }
     return setValAndReturnValue(atomicClassCache, key, className)
   }

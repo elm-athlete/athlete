@@ -229,7 +229,7 @@ spaceEvenly =
 
 placement : Int -> GridItemSize -> Modifier GridItemCoordinate
 placement value itemSize gridItemCoordinate =
-    { gridItemCoordinate | placement = Just ( value, itemSize ) }
+    { gridItemCoordinate | placement = Just ( value + 1, itemSize ) }
 
 
 {-| -}
@@ -390,7 +390,7 @@ placementToString ( beginning, itemSize ) =
                 "-1"
 
             Span val ->
-                toString val
+                "span " ++ (toString val)
 
 
 alignSelfToCouple : String -> Align -> ( String, String )

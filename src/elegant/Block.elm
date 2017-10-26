@@ -30,6 +30,10 @@ maxWidth : SizeUnit -> Modifier Display.BlockDetails
 maxWidth size =
     Display.dimensions [ Dimensions.maxWidth size ]
 
+height : SizeUnit -> Modifier Display.BlockDetails
+height size =
+    Display.dimensions [ Dimensions.height size ]
+
 
 width : SizeUnit -> Modifier Display.BlockDetails
 width size =
