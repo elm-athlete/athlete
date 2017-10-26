@@ -84,6 +84,7 @@ type Repeatable
     = Simple ValType
     | Minmax ValType ValType
     | FitContent ValType
+    | Repeat RepeatOption (List SizeUnit)
 
 
 simple : ValType -> Repeatable
@@ -101,29 +102,28 @@ fitContent =
     FitContent
 
 
-type Template
+type RepeatOption
     = RepeatAutoFill
     | RepeatAutoFit
-    | NoRepeat
 
 
-autofill : Template
+autofill : RepeatOption
 autofill =
     RepeatAutoFill
 
 
-autofit : Template
+autofit : RepeatOption
 autofit =
     RepeatAutoFit
 
 
-noRepeat : Template
-noRepeat =
-    NoRepeat
+repeat : RepeatOption -> List SizeUnit -> Repeatable
+repeat =
+    Repeat
 
 
 type GridTemplate
-    = TemplateWrapper Template (List Repeatable)
+    = TemplateWrapper (List Repeatable)
 
 
 type alias GridContainerCoordinate =
@@ -187,9 +187,9 @@ vertical modifiers gridItemDetails =
     { gridItemDetails | y = modifiedElementOrNothing (GridItemCoordinate Nothing Nothing) modifiers }
 
 
-template : Template -> List Repeatable -> Modifier GridContainerCoordinate
-template temp repeatable gridContainerCoordinate =
-    { gridContainerCoordinate | template = Just (TemplateWrapper temp repeatable) }
+template : List Repeatable -> Modifier GridContainerCoordinate
+template repeatable gridContainerCoordinate =
+    { gridContainerCoordinate | template = Just (TemplateWrapper repeatable) }
 
 
 gap : SizeUnit -> Modifier GridContainerCoordinate
@@ -233,14 +233,166 @@ placement value itemSize gridItemCoordinate =
 
 
 {-| -}
-gridItemDetailsToCouples : GridItemDetails -> List ( String, String )
-gridItemDetailsToCouples gridContainerDetails =
-    []
+gridContainerDetailsToCouples : GridContainerDetails -> List ( String, String )
+gridContainerDetailsToCouples gridContainerDetails =
+    [ unwrapToCouples .x (gridContainerCoordinateToCouples "column" "align")
+    , unwrapToCouples .y (gridContainerCoordinateToCouples "row" "justify")
+    ]
         |> List.concatMap (callOn gridContainerDetails)
+
+
+gridContainerCoordinateToCouples : String -> String -> GridContainerCoordinate -> List ( String, String )
+gridContainerCoordinateToCouples columnRow alignJustify gridContainerCoordinate =
+    [ unwrapToCouple .gutter (gutterToCouple columnRow)
+    , unwrapToCouple .align (alignToCouple alignJustify)
+    , unwrapToCouple .alignItems (alignItemsToCouple alignJustify)
+    , unwrapToCouple .template (templateToCouple columnRow)
+    ]
+        |> List.concatMap (callOn gridContainerCoordinate)
+
+
+gutterToCouple : String -> SizeUnit -> ( String, String )
+gutterToCouple columnRow =
+    (,) ("grid-" ++ columnRow ++ "-gap") << sizeUnitToString
+
+
+alignToCouple : String -> Align -> ( String, String )
+alignToCouple alignJustify =
+    (,) (alignJustify ++ "-content") << alignToString
+
+
+alignToString : Align -> String
+alignToString align =
+    case align of
+        Start ->
+            "start"
+
+        Center ->
+            "center"
+
+        Stretch ->
+            "stretch"
+
+        End ->
+            "end"
+
+
+alignItemsToCouple : String -> AlignItems -> ( String, String )
+alignItemsToCouple alignJustify alignItems =
+    ( alignJustify ++ "-items"
+    , case alignItems of
+        AlignWrapper align ->
+            alignToString align
+
+        Space spacing ->
+            spacingToString spacing
+    )
+
+
+spacingToString : Spacing -> String
+spacingToString spacing =
+    case spacing of
+        Around ->
+            "space-around"
+
+        Between ->
+            "space-between"
+
+        Evenly ->
+            "space-evenly"
+
+
+templateToCouple : String -> GridTemplate -> ( String, String )
+templateToCouple columnRow (TemplateWrapper repeatable) =
+    ( "grid-template-" ++ columnRow ++ "s"
+    , repeatable
+        |> List.map repeatableToString
+        |> String.join " "
+    )
+
+
+repeatableToString : Repeatable -> String
+repeatableToString repeatable =
+    case repeatable of
+        Simple valType ->
+            valTypeToString valType
+
+        Minmax val1 val2 ->
+            "minmax(" ++ valTypeToString val1 ++ ", " ++ valTypeToString val2 ++ ")"
+
+        FitContent valType ->
+            "fit-content(" ++ valTypeToString valType ++ ")"
+
+        Repeat repeatOption sizes ->
+            "repeat(" ++ repeatOptionToString repeatOption ++ (List.map sizeUnitToString sizes |> String.join " ") ++ ")"
+
+
+repeatOptionToString : RepeatOption -> String
+repeatOptionToString repeatOption =
+    case repeatOption of
+        RepeatAutoFill ->
+            "auto-fill, "
+
+        RepeatAutoFit ->
+            "auto-fit, "
+
+
+valTypeToString : ValType -> String
+valTypeToString valType =
+    case valType of
+        Auto ->
+            "auto"
+
+        SizeUnitVal val ->
+            sizeUnitToString val
+
+        Fr val ->
+            toString val ++ "fr"
+
+        Vw val ->
+            toString val ++ "vw"
+
+        MinContent ->
+            "min-content"
+
+        MaxContent ->
+            "max-content"
 
 
 {-| -}
-gridContainerDetailsToCouples : GridContainerDetails -> List ( String, String )
-gridContainerDetailsToCouples gridContainerDetails =
-    []
-        |> List.concatMap (callOn gridContainerDetails)
+gridItemDetailsToCouples : GridItemDetails -> List ( String, String )
+gridItemDetailsToCouples gridItemDetails =
+    [ unwrapToCouples .x (gridItemCoordinateToCouples "column" "align")
+    , unwrapToCouples .y (gridItemCoordinateToCouples "row" "justify")
+    ]
+        |> List.concatMap (callOn gridItemDetails)
+
+
+gridItemCoordinateToCouples : String -> String -> GridItemCoordinate -> List ( String, String )
+gridItemCoordinateToCouples columnRow alignJustify gridItemCoordinate =
+    [ unwrapToCouple .placement (placementToCouple columnRow)
+    , unwrapToCouple .align (alignSelfToCouple alignJustify)
+    ]
+        |> List.concatMap (callOn gridItemCoordinate)
+
+
+placementToCouple : String -> ( Int, GridItemSize ) -> ( String, String )
+placementToCouple columnRow placement =
+    ( "grid-" ++ columnRow, placementToString placement )
+
+
+placementToString : ( Int, GridItemSize ) -> String
+placementToString ( beginning, itemSize ) =
+    toString beginning
+        ++ " / "
+        ++ case itemSize of
+            UntilEndOfCoordinate ->
+                "-1"
+
+            Span val ->
+                toString val
+
+
+alignSelfToCouple : String -> Align -> ( String, String )
+alignSelfToCouple alignJustify alignSelf =
+    ( alignJustify ++ "-self", alignToString alignSelf )
