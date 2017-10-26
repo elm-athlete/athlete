@@ -10,6 +10,8 @@ import Elegant
 import Function
 import Flex exposing (FlexContainerDetails)
 import Display
+import Grid
+
 
 type alias Node msg =
     Html msg
@@ -21,6 +23,15 @@ type FlexItem msg
 
 extractNodeInFlexItem : FlexItem msg -> Node msg
 extractNodeInFlexItem (FlexItem item) =
+    item
+
+
+type GridItem msg
+    = GridItem (Node msg)
+
+
+extractNodeInGridItem : GridItem msg -> Node msg
+extractNodeInGridItem (GridItem item) =
     item
 
 
@@ -70,6 +81,8 @@ flex =
         (List.map extractNodeInFlexItem)
         (.flexContainerProperties >> Just)
         nothingAttributes
+        nothingAttributes
+        nothingAttributes
         .block
         BodyBuilder.Attributes.flexContainerAttributesToHtmlAttributes
 
@@ -83,6 +96,8 @@ flexItem modifiers =
             identity
             nothingAttributes
             (.flexItemProperties >> Just)
+            nothingAttributes
+            nothingAttributes
             .block
             BodyBuilder.Attributes.flexItemAttributesToHtmlAttributes
             modifiers
@@ -94,6 +109,8 @@ grid =
         "bb-grid"
         BodyBuilder.Attributes.defaultGridContainerAttributes
         (List.map extractNodeInGridItem)
+        nothingAttributes
+        nothingAttributes
         (.gridContainerProperties >> Just)
         nothingAttributes
         .block
@@ -107,6 +124,8 @@ gridItem modifiers =
             "bb-grid-item"
             BodyBuilder.Attributes.defaultGridItemAttributes
             identity
+            nothingAttributes
+            nothingAttributes
             nothingAttributes
             (.gridItemProperties >> Just)
             .block
@@ -253,6 +272,8 @@ select =
         (List.map extractOption)
         nothingAttributes
         nothingAttributes
+        nothingAttributes
+        nothingAttributes
         .block
         BodyBuilder.Attributes.selectAttributesToHtmlAttributes
 
@@ -268,6 +289,8 @@ heading tag =
         tag
         BodyBuilder.Attributes.defaultHeadingAttributes
         identity
+        nothingAttributes
+        nothingAttributes
         nothingAttributes
         nothingAttributes
         (.block >> Just)
@@ -317,18 +340,22 @@ commonNode :
     String
     -> VisibleAttributes a
     -> (b -> List (Node msg))
-    -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexContainerDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexItemDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Grid.GridContainerDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Grid.GridItemDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector )))
     -> (VisibleAttributes a -> List (Html.Attribute msg))
     -> Modifiers (VisibleAttributes a)
     -> b
     -> Node msg
-commonNode nodeName defaultAttributes childrenModifiers getFlexContainerProperties getFlexItemProperties getBlockProperties attributesToHtmlAttributes modifiers children =
+commonNode nodeName defaultAttributes childrenModifiers getFlexContainerProperties getFlexItemProperties getGridContainerProperties getGridItemProperties getBlockProperties attributesToHtmlAttributes modifiers children =
     computeBlock
         nodeName
         getFlexContainerProperties
         getFlexItemProperties
+        getGridContainerProperties
+        getGridItemProperties
         getBlockProperties
         defaultAttributes
         attributesToHtmlAttributes
@@ -340,13 +367,15 @@ commonChildlessNode :
     String
     -> VisibleAttributes a
     -> (List b -> List (Node msg))
-    -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexContainerDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexItemDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Grid.GridContainerDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Grid.GridItemDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector )))
     -> (VisibleAttributes a -> List (Html.Attribute msg))
     -> Modifiers (VisibleAttributes a)
     -> Node msg
-commonChildlessNode nodeName defaultAttributes childrenModifiers getFlexContainerProperties getFlexItemProperties getBlockProperties attributesToHtmlAttributes =
+commonChildlessNode nodeName defaultAttributes childrenModifiers getFlexContainerProperties getFlexItemProperties getGridContainerProperties getGridItemProperties getBlockProperties attributesToHtmlAttributes =
     flip
         (commonNode
             nodeName
@@ -354,6 +383,8 @@ commonChildlessNode nodeName defaultAttributes childrenModifiers getFlexContaine
             childrenModifiers
             getFlexContainerProperties
             getFlexItemProperties
+            getGridContainerProperties
+            getGridItemProperties
             getBlockProperties
             attributesToHtmlAttributes
         )
@@ -374,6 +405,8 @@ commonBlockFlexlessNode tag defaultAttributes convertAttributes =
         identity
         nothingAttributes
         nothingAttributes
+        nothingAttributes
+        nothingAttributes
         .block
         convertAttributes
 
@@ -389,6 +422,8 @@ commonBlockFlexlessChildlessNode tag defaultAttributes convertAttributes =
         tag
         defaultAttributes
         identity
+        nothingAttributes
+        nothingAttributes
         nothingAttributes
         nothingAttributes
         .block
@@ -435,15 +470,17 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
 
 computeBlock :
     String
-    -> (VisibleAttributes a -> Maybe (List ( Modifiers FlexContainerDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexContainerDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexItemDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Grid.GridContainerDetails, StyleSelector )))
+    -> (VisibleAttributes a -> Maybe (List ( Modifiers Grid.GridItemDetails, StyleSelector )))
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Display.BlockDetails, StyleSelector )))
     -> VisibleAttributes a
     -> (VisibleAttributes a -> List (Html.Attribute msg))
     -> Modifiers (VisibleAttributes a)
     -> List (Html msg)
     -> Html msg
-computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttributes attributesToHtmlAttributes modifiers content =
+computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers blockModifiers defaultAttributes attributesToHtmlAttributes modifiers content =
     let
         attributes =
             (Function.compose modifiers)
@@ -453,6 +490,8 @@ computeBlock tag flexModifiers flexItemModifiers blockModifiers defaultAttribute
             (BodyBuilder.Convert.toElegantStyle
                 (flexModifiers attributes)
                 (flexItemModifiers attributes)
+                (gridModifiers attributes)
+                (gridItemModifiers attributes)
                 (blockModifiers attributes)
                 attributes.box
                 |> List.map Elegant.styleToCss

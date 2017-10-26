@@ -6,6 +6,7 @@ import Helpers.Shared exposing (..)
 import Box
 import Display
 import Flex
+import Grid
 
 
 box : Modifiers Box.Box -> StyleModifier (BoxContainer a)
@@ -31,6 +32,16 @@ flexContainerProperties =
 flexItemProperties : Modifiers Flex.FlexItemDetails -> StyleModifier (FlexItemAttributes msg)
 flexItemProperties =
     waitForStyleSelector setFlexItemProperties
+
+
+gridContainerProperties : Modifiers Grid.GridContainerDetails -> StyleModifier (GridContainerAttributes msg)
+gridContainerProperties =
+    waitForStyleSelector setGridContainerProperties
+
+
+gridItemProperties : Modifiers Grid.GridItemDetails -> StyleModifier (GridItemAttributes msg)
+gridItemProperties =
+    waitForStyleSelector setGridItemProperties
 
 
 waitForStyleSelector : (( a, StyleSelector ) -> b -> b) -> a -> StyleModifier b

@@ -1,30 +1,39 @@
-module Grid
-    exposing
-        ( GridContainerDetails
-        , GridItemDetails
-          -- , Align
-          -- , align
-          -- , JustifyContent
-          -- , justifyContent
-          -- , spaceBetween
-          -- , spaceAround
-          -- , justifyContentCenter
-          -- , grow
-          -- , shrink
-          -- , basisAuto
-          -- , basis
-          -- , alignSelf
-        , gridItemDetailsToCouples
-        , gridContainerDetailsToCouples
-        , defaultGridContainerDetails
-        , defaultGridItemDetails
-        )
+module Grid exposing (..)
 
 import Helpers.Shared exposing (..)
 
 
+type GridAlignment
+    = SpaceAround
+    | AlignAuto
+
+
+type alias GridContainerCoordinate =
+    { gutter : Maybe SizeUnit
+    , align : Maybe GridAlignment
+    , template : GridTemplate
+    }
+
+
+type alias GridContainerDetails =
+    { x : Maybe GridContainerCoordinate
+    , y : Maybe GridContainerCoordinate
+    }
+
+
+defaultGridContainerDetails : Maybe GridContainerCoordinate -> Maybe GridContainerCoordinate -> GridContainerDetails
 defaultGridContainerDetails =
     GridContainerDetails
+
+
+type alias GridItemDetails =
+    {}
+    -- GridItemStyle
+
+
+defaultGridItemDetails : {}
+defaultGridItemDetails =
+    {}
 
 
 
@@ -176,16 +185,6 @@ defaultGridContainerDetails =
 --     JustifyContentCenter
 --
 --
-
-
-{-| Contains all style which can be used on a flex item.
-This contains flex-grow, flex-shrink, flex-basis and align-self.
--}
-type alias GridItemDetails =
-    GridItemStyle
-
-
-
 --
 --
 -- {-| Accepts an int and sets the flex-grow accordingly.
@@ -251,21 +250,14 @@ type alias GridItemDetails =
 --
 
 
-{-|
--}
+{-| -}
 gridItemDetailsToCouples : GridItemDetails -> List ( String, String )
 gridItemDetailsToCouples gridContainerDetails =
     []
         |> List.concatMap (callOn gridContainerDetails)
 
 
-
---
---
-
-
-{-|
--}
+{-| -}
 gridContainerDetailsToCouples : GridContainerDetails -> List ( String, String )
 gridContainerDetailsToCouples gridContainerDetails =
     []
@@ -352,27 +344,6 @@ type GridTemplate
 --     Fr
 --
 --
-
-
-type GridAlignment
-    = SpaceAround
-    | AlignAuto
-
-
-type alias GridContainerCoordinate =
-    { gutter : Maybe SizeUnit
-    , align : Maybe GridAlignment
-    , template : GridTemplate
-    }
-
-
-type alias GridContainerDetails =
-    { x : GridContainerCoordinate
-    , y : GridContainerCoordinate
-    }
-
-
-
 --
 --
 --
@@ -437,13 +408,6 @@ type alias GridItemStyle =
 --     {}
 --
 --
-
-
-defaultGridItemDetails =
-    {}
-
-
-
 --
 --
 -- gridItemDetailsToString gridItemDetails =

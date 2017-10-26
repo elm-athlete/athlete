@@ -11,11 +11,14 @@ import Dict exposing (Dict)
 import Maybe.Extra
 import Function
 import Flex
+import Grid
 
 
 type alias StyleComponents =
     { flexContainer : Maybe Flex.FlexContainerDetails
     , flexItem : Maybe Flex.FlexItemDetails
+    , gridContainer : Maybe Grid.GridContainerDetails
+    , gridItem : Maybe Grid.GridItemDetails
     , block : Maybe Display.BlockDetails
     , box : Maybe Box.Box
     }
@@ -23,16 +26,18 @@ type alias StyleComponents =
 
 defaultStyleComponents : StyleComponents
 defaultStyleComponents =
-    StyleComponents Nothing Nothing Nothing Nothing
+    StyleComponents Nothing Nothing Nothing Nothing Nothing Nothing
 
 
 toElegantStyle :
     Maybe (List ( Modifiers Flex.FlexContainerDetails, Attributes.StyleSelector ))
     -> Maybe (List ( Modifiers Flex.FlexItemDetails, Attributes.StyleSelector ))
+    -> Maybe (List ( Modifiers Grid.GridContainerDetails, Attributes.StyleSelector ))
+    -> Maybe (List ( Modifiers Grid.GridItemDetails, Attributes.StyleSelector ))
     -> Maybe (List ( Modifiers Display.BlockDetails, Attributes.StyleSelector ))
     -> List ( Modifiers Box.Box, Attributes.StyleSelector )
     -> List Elegant.Style
-toElegantStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
+toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers blockModifiers boxModifiers =
     let
         computedFlexContainerDetails =
             flexModifiers
@@ -48,6 +53,20 @@ toElegantStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
                         (Flex.FlexItemDetails Nothing Nothing Nothing Nothing)
                     )
 
+        computedGridContainerDetails =
+            gridModifiers
+                |> Maybe.map
+                    (groupByStyleSelectorAndCompute
+                        (Grid.GridContainerDetails Nothing Nothing)
+                    )
+
+        computedGridItemDetails =
+            gridItemModifiers
+                |> Maybe.map
+                    (groupByStyleSelectorAndCompute
+                        Grid.GridItemDetails
+                    )
+
         computedBlockDetails =
             blockModifiers
                 |> Maybe.map
@@ -61,6 +80,8 @@ toElegantStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
         key =
             ( computedFlexContainerDetails
             , computedFlexItemDetails
+            , computedGridContainerDetails
+            , computedGridItemDetails
             , computedBlockDetails
             , computedBoxDetails
             )
@@ -71,6 +92,8 @@ toElegantStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
                 (separatedComponentsToElegantStyle
                     computedFlexContainerDetails
                     computedFlexItemDetails
+                    computedGridContainerDetails
+                    computedGridItemDetails
                     computedBlockDetails
                     computedBoxDetails
                     |> Native.BodyBuilder.addDisplayStyle key
@@ -100,18 +123,22 @@ mergeModifiersAndSwap styles =
 separatedComponentsToElegantStyle :
     Maybe (List ( Attributes.StyleSelector, Flex.FlexContainerDetails ))
     -> Maybe (List ( Attributes.StyleSelector, Flex.FlexItemDetails ))
+    -> Maybe (List ( Attributes.StyleSelector, Grid.GridContainerDetails ))
+    -> Maybe (List ( Attributes.StyleSelector, Grid.GridItemDetails ))
     -> Maybe (List ( Attributes.StyleSelector, Display.BlockDetails ))
     -> List ( Attributes.StyleSelector, Box.Box )
     -> List Elegant.Style
-separatedComponentsToElegantStyle flexModifiers flexItemModifiers blockModifiers boxModifiers =
+separatedComponentsToElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers blockModifiers boxModifiers =
     Dict.empty
         |> insertStyleComponents flexModifiers setFlexContainer
         |> insertStyleComponents flexItemModifiers setFlexItem
+        |> insertStyleComponents gridModifiers setGridContainer
+        |> insertStyleComponents gridItemModifiers setGridItem
         |> insertStyleComponents blockModifiers setMediaBlock
         |> insertStyleComponents (Just boxModifiers) setMediaBox
         |> Dict.values
         |> List.Extra.groupWhile samePseudoClass
-        |> List.map (componentsToElegantStyle (Maybe.Extra.isJust flexModifiers))
+        |> List.map (componentsToElegantStyle (Maybe.Extra.isJust flexModifiers) (Maybe.Extra.isJust gridModifiers))
 
 
 insertStyleComponents :
@@ -155,9 +182,10 @@ samePseudoClass x y =
 
 componentsToElegantStyle :
     Bool
+    -> Bool
     -> List ( Attributes.StyleSelector, StyleComponents )
     -> Elegant.Style
-componentsToElegantStyle isFlex components =
+componentsToElegantStyle isFlex isGrid components =
     let
         suffix =
             components
@@ -165,7 +193,7 @@ componentsToElegantStyle isFlex components =
                 |> Maybe.Extra.unwrap Nothing (Tuple.first >> .pseudoClass)
 
         computedDisplay =
-            List.map (componentsToParameteredDisplayBox isFlex) components
+            List.map (componentsToParameteredDisplayBox isFlex isGrid) components
     in
         computedDisplay
             |> List.Extra.find noMediaQueries
@@ -176,55 +204,77 @@ componentsToElegantStyle isFlex components =
 
 componentsToParameteredDisplayBox :
     Bool
+    -> Bool
     -> ( Attributes.StyleSelector, StyleComponents )
     -> ( Maybe Attributes.MediaQuery, Display.DisplayBox )
-componentsToParameteredDisplayBox isFlex ( { media }, { flexContainer, flexItem, block, box } ) =
+componentsToParameteredDisplayBox isFlex isGrid ( { media }, { flexContainer, flexItem, gridContainer, gridItem, block, box } ) =
     box
         |> Display.Contents
-            (computeOutsideDisplay flexItem block)
-            (computeInsideDisplay flexItem flexContainer isFlex)
+            (computeOutsideDisplay flexItem gridItem block)
+            (computeInsideDisplay flexItem flexContainer gridItem gridContainer isFlex isGrid)
         |> Display.ContentsWrapper
         |> (,) media
 
 
 computeOutsideDisplay :
     Maybe Flex.FlexItemDetails
+    -> Maybe Grid.GridItemDetails
     -> Maybe Display.BlockDetails
     -> Display.OutsideDisplay
-computeOutsideDisplay flexItem block =
+computeOutsideDisplay flexItem gridItem block =
     case flexItem of
         Just modifiers ->
             Display.FlexItem (Just modifiers) block
 
         Nothing ->
-            case block of
+            case gridItem of
                 Just modifiers ->
-                    Display.Block (Just modifiers)
+                    Display.GridItem (Just modifiers) block
 
                 Nothing ->
-                    Display.Inline
+                    case block of
+                        Just modifiers ->
+                            Display.Block (Just modifiers)
+
+                        Nothing ->
+                            Display.Inline
 
 
 computeInsideDisplay :
     Maybe Flex.FlexItemDetails
     -> Maybe Flex.FlexContainerDetails
+    -> Maybe Grid.GridItemDetails
+    -> Maybe Grid.GridContainerDetails
+    -> Bool
     -> Bool
     -> Display.InsideDisplay
-computeInsideDisplay flexItem flexContainer isFlex =
+computeInsideDisplay flexItem flexContainer gridItem gridContainer isFlex isGrid =
     case flexItem of
         Just _ ->
             Display.Flow
 
         Nothing ->
-            case flexContainer of
-                Just modifiers ->
-                    Display.FlexContainer (Just modifiers)
+            case gridItem of
+                Just _ ->
+                    Display.Flow
 
                 Nothing ->
-                    if isFlex then
-                        Display.FlexContainer Nothing
-                    else
-                        Display.Flow
+                    case flexContainer of
+                        Just modifiers ->
+                            Display.FlexContainer (Just modifiers)
+
+                        Nothing ->
+                            case gridContainer of
+                                Just modifiers ->
+                                    Display.GridContainer (Just modifiers)
+
+                                Nothing ->
+                                    if isFlex then
+                                        Display.FlexContainer Nothing
+                                    else if isGrid then
+                                        Display.GridContainer Nothing
+                                    else
+                                        Display.Flow
 
 
 noMediaQueries : ( Maybe a, b ) -> Bool

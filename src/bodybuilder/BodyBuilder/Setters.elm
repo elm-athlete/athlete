@@ -59,6 +59,26 @@ setFlexItemPropertiesIn ({ flexItemProperties } as record) flexItemAttribute =
     { record | flexItemProperties = flexItemAttribute :: flexItemProperties }
 
 
+setGridContainerProperties : c -> { b | gridContainerProperties : List c } -> { b | gridContainerProperties : List c }
+setGridContainerProperties =
+    flip setGridContainerPropertiesIn
+
+
+setGridContainerPropertiesIn : { b | gridContainerProperties : List c } -> c -> { b | gridContainerProperties : List c }
+setGridContainerPropertiesIn ({ gridContainerProperties } as record) gridContainerAttribute =
+    { record | gridContainerProperties = gridContainerAttribute :: gridContainerProperties }
+
+
+setGridItemProperties : c -> { b | gridItemProperties : List c } -> { b | gridItemProperties : List c }
+setGridItemProperties =
+    flip setGridItemPropertiesIn
+
+
+setGridItemPropertiesIn : { b | gridItemProperties : List c } -> c -> { b | gridItemProperties : List c }
+setGridItemPropertiesIn ({ gridItemProperties } as record) gridItemAttribute =
+    { record | gridItemProperties = gridItemAttribute :: gridItemProperties }
+
+
 setStyleIn : { a | style : b } -> b -> { a | style : b }
 setStyleIn record styleAttribute =
     { record | style = styleAttribute }
@@ -117,6 +137,16 @@ setFlexContainer modifiers ({ flexContainer } as record) =
 setFlexItem : a -> { b | flexItem : Maybe a } -> { b | flexItem : Maybe a }
 setFlexItem modifiers ({ flexItem } as record) =
     { record | flexItem = Just modifiers }
+
+
+setGridContainer : a -> { b | gridContainer : Maybe a } -> { b | gridContainer : Maybe a }
+setGridContainer modifiers ({ gridContainer } as record) =
+    { record | gridContainer = Just modifiers }
+
+
+setGridItem : a -> { b | gridItem : Maybe a } -> { b | gridItem : Maybe a }
+setGridItem modifiers ({ gridItem } as record) =
+    { record | gridItem = Just modifiers }
 
 
 setMediaBlock : a -> { b | block : Maybe a } -> { b | block : Maybe a }

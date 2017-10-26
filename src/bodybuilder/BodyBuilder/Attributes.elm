@@ -12,6 +12,7 @@ import Function
 import Json.Decode exposing (Decoder)
 import Flex
 import BodyBuilder.Shared as Shared
+import Grid
 
 
 type alias StyleSelector =
@@ -170,6 +171,14 @@ type alias FlexItemProperties a =
     { a | flexItemProperties : List ( Modifiers Flex.FlexItemDetails, StyleSelector ) }
 
 
+type alias GridContainerProperties a =
+    { a | gridContainerProperties : List ( Modifiers Grid.GridContainerDetails, StyleSelector ) }
+
+
+type alias GridItemProperties a =
+    { a | gridItemProperties : List ( Modifiers Grid.GridItemDetails, StyleSelector ) }
+
+
 {-| -}
 type Position
     = Before
@@ -248,6 +257,14 @@ type alias FlexContainerAttributes msg =
 
 type alias FlexItemAttributes msg =
     FlexItemProperties (NodeAttributes msg)
+
+
+type alias GridContainerAttributes msg =
+    GridContainerProperties (NodeAttributes msg)
+
+
+type alias GridItemAttributes msg =
+    GridItemProperties (NodeAttributes msg)
 
 
 type alias HeadingAttributes msg =
@@ -544,6 +561,19 @@ defaultFlexContainerAttributes =
     }
 
 
+defaultGridContainerAttributes : GridContainerAttributes msg
+defaultGridContainerAttributes =
+    { onBlurEvent = Nothing
+    , onEvent = Nothing
+    , onFocusEvent = Nothing
+    , onMouseEvents = Nothing
+    , box = []
+    , universal = defaultUniversalAttributes
+    , block = Nothing
+    , gridContainerProperties = []
+    }
+
+
 defaultHeadingAttributes : HeadingAttributes msg
 defaultHeadingAttributes =
     { onBlurEvent = Nothing
@@ -569,6 +599,19 @@ defaultFlexItemAttributes =
     }
 
 
+defaultGridItemAttributes : GridItemAttributes msg
+defaultGridItemAttributes =
+    { onBlurEvent = Nothing
+    , onEvent = Nothing
+    , onFocusEvent = Nothing
+    , onMouseEvents = Nothing
+    , box = []
+    , block = Nothing
+    , universal = defaultUniversalAttributes
+    , gridItemProperties = []
+    }
+
+
 nodeAttributesToHtmlAttributes : NodeAttributes msg -> List (Html.Attribute msg)
 nodeAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
@@ -581,6 +624,16 @@ flexContainerAttributesToHtmlAttributes =
 
 flexItemAttributesToHtmlAttributes : FlexItemAttributes msg -> List (Html.Attribute msg)
 flexItemAttributesToHtmlAttributes =
+    visibleAttributesToHtmlAttributes
+
+
+gridContainerAttributesToHtmlAttributes : GridContainerAttributes msg -> List (Html.Attribute msg)
+gridContainerAttributesToHtmlAttributes =
+    visibleAttributesToHtmlAttributes
+
+
+gridItemAttributesToHtmlAttributes : GridItemAttributes msg -> List (Html.Attribute msg)
+gridItemAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
 
 

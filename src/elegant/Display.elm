@@ -130,6 +130,7 @@ type OutsideDisplay
     = Inline
     | Block (Maybe BlockDetails)
     | FlexItem (Maybe Flex.FlexItemDetails) (Maybe BlockDetails)
+    | GridItem (Maybe Grid.GridItemDetails) (Maybe BlockDetails)
 
 
 {-| Represents the style from inside a display.
