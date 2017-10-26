@@ -43,6 +43,7 @@ import Display.Overflow as Overflow
 import Position
 import Function
 import Flex
+import Style
 
 
 type Route
@@ -98,11 +99,11 @@ titleView contact =
     BodyBuilder.button
         [ Events.onClick <| HistoryMsgWrapper <| ContactShow contact.id
         , Attributes.style
-            [ Attributes.block
+            [ Style.block
                 [ Display.alignment Display.left
                 , Display.fullWidth
                 ]
-            , Attributes.box
+            , Style.box
                 [ Box.cursor Cursor.pointer
                 , Box.border
                     [ Border.all [ Border.none ]
@@ -118,8 +119,8 @@ titleView contact =
                 , Box.padding [ Padding.all Constants.large ]
                 , Box.background [ Elegant.color Color.white ]
                 ]
-            , Attributes.box [ Box.background [ Elegant.color <| Color.grayscale 0.05 ] ]
-                |> Attributes.hover
+            , Style.box [ Box.background [ Elegant.color <| Color.grayscale 0.05 ] ]
+                |> Style.hover
             ]
         ]
         [ text contact.name ]
@@ -138,14 +139,14 @@ navItemGroup width alignment content =
     BodyBuilder.flexItem
         [ Events.onClick <| StandardHistoryWrapper Back
         , Attributes.style
-            [ Attributes.flexItemProperties
+            [ Style.flexItemProperties
                 [ Flex.basis (percent width) ]
-            , Attributes.block
+            , Style.block
                 [ Display.overflow [ Overflow.overflowXY Overflow.hidden ]
                 , Display.textOverflowEllipsis
                 , Display.alignment alignment
                 ]
-            , Attributes.box
+            , Style.box
                 [ commonButtonStyleBox |> Function.compose
                 , Box.typography
                     [ Elegant.color Color.black
@@ -162,10 +163,10 @@ header =
     BodyBuilder.flexItem []
         [ BodyBuilder.flex
             [ Attributes.style
-                [ Attributes.flexContainerProperties
+                [ Style.flexContainerProperties
                     [ Flex.direction Flex.row ]
-                , Attributes.block []
-                , Attributes.box
+                , Style.block []
+                , Style.box
                     [ Box.position <| Position.sticky []
                     , Box.background [ Elegant.color <| Color.rgba 255 255 255 0.9 ]
                     ]
@@ -185,20 +186,20 @@ showView :
 showView bodyFun data =
     flex
         [ Attributes.style
-            [ Attributes.flexContainerProperties
+            [ Style.flexContainerProperties
                 [ Flex.direction Flex.column ]
-            , Attributes.block
+            , Style.block
                 [ Display.dimensions [ Dimensions.height (vh 100) ] ]
-            , Attributes.box
+            , Style.box
                 [ Box.background [ Elegant.color Color.white ] ]
             ]
         ]
         [ header
         , BodyBuilder.flexItem
             [ Attributes.style
-                [ Attributes.flexItemProperties
+                [ Style.flexItemProperties
                     [ Flex.shrink 1000000 ]
-                , Attributes.block
+                , Style.block
                     []
 
                 -- [ Elegant.overflowYScroll
@@ -217,13 +218,13 @@ fullFlexCenter content =
     flex
         [ -- style [ pageCenter ]
           Attributes.style
-            [ Attributes.block
+            [ Style.block
                 [ Display.dimensions
                     [ Dimensions.width (percent 100)
                     , Dimensions.height (vh 100)
                     ]
                 ]
-            , Attributes.flexContainerProperties
+            , Style.flexContainerProperties
                 [ Flex.align Flex.center
                 , Flex.justifyContent Flex.justifyContentCenter
                 ]
@@ -283,12 +284,12 @@ contactsIndex : List Contact -> Node Msg
 contactsIndex contacts =
     node
         [ Attributes.style
-            [ Attributes.block
+            [ Style.block
                 [ Display.dimensions
                     [ Dimensions.height (vh 100), Dimensions.width (percent 100) ]
                 , Display.overflow [ Overflow.overflowY Overflow.scroll ]
                 ]
-            , Attributes.box
+            , Style.box
                 [ backgroundColor gray
                 ]
             ]
@@ -319,8 +320,8 @@ view : Model -> Node Msg
 view { history, data } =
     node
         [ Attributes.style
-            [ Attributes.block []
-            , Attributes.box
+            [ Style.block []
+            , Style.box
                 [ Box.typography
                     [ Typography.character
                         [ Character.fontFamilySansSerif

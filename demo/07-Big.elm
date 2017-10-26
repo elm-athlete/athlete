@@ -1,7 +1,6 @@
 module Main exposing (..)
 
 import Html exposing (Html)
-import Html.Attributes
 import Elegant exposing (px)
 import BodyBuilder exposing (node, text)
 import BodyBuilder.Attributes as Attributes
@@ -21,6 +20,7 @@ import Position
 import Display
 import Display.Overflow
 import Dimensions
+import Style
 
 
 main : Html msg
@@ -31,7 +31,7 @@ main =
 
 
 mainStyle =
-    [ Attributes.block
+    [ Style.block
         [ Display.overflow
             [ Display.Overflow.overflowX Display.Overflow.hidden
             , Display.Overflow.overflowY Display.Overflow.visible
@@ -44,7 +44,7 @@ mainStyle =
         , Display.alignment Display.left
         , Display.listStyleCircle
         ]
-    , Attributes.box
+    , Style.box
         [ Box.typography
             [ Elegant.color Color.blue
             , Typography.character

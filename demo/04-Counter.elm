@@ -15,11 +15,12 @@ import Padding
 import Color
 import Color.Extra as Color
 import Typography.Character as Character
+import Style
 
 
 buttonStyle =
-    [ Attributes.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
-    , Attributes.box
+    [ Style.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
+    , Style.box
         [ Box.padding [ Padding.vertical Constants.zero ]
         , Box.border [ Border.all [ Border.thickness (px 0) ] ]
         , Box.typography [ Typography.character [ Character.size (px 10) ] ]
@@ -32,11 +33,11 @@ buttonStyle =
 counter model =
     flex
         [ style
-            [ Attributes.block [ Display.dimensions [ Dimensions.minHeight (px 50) ] ]
-            , Attributes.flexContainerProperties
+            [ Style.block [ Display.dimensions [ Dimensions.minHeight (px 50) ] ]
+            , Style.flexContainerProperties
                 [ Flex.align Flex.stretch
                 ]
-            , Attributes.box
+            , Style.box
                 [ Box.border [ Border.full Color.gray ]
                 ]
             ]
@@ -44,8 +45,8 @@ counter model =
         [ flexItem []
             [ inputText
                 [ style
-                    [ Attributes.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
-                    , Attributes.box
+                    [ Style.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
+                    , Style.box
                         [ Box.padding [ Padding.all Constants.zero ]
                         , Box.typography [ Typography.character [ Character.size (px 20) ] ]
                         , Box.border [ Border.all [ Border.thickness (px 0) ] ]
@@ -59,12 +60,12 @@ counter model =
         , flexItem []
             [ flex
                 [ style
-                    [ Attributes.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
-                    , Attributes.flexContainerProperties [ Flex.direction Flex.column, Flex.align Flex.stretch ]
+                    [ Style.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
+                    , Style.flexContainerProperties [ Flex.direction Flex.column, Flex.align Flex.stretch ]
                     ]
                 ]
-                [ flexItem [ style [ Attributes.flexItemProperties [ Flex.basis (percent 100) ] ] ] [ button [ onClick Add, style buttonStyle ] [ text "+" ] ]
-                , flexItem [ style [ Attributes.flexItemProperties [ Flex.basis (percent 100) ] ] ] [ button [ onClick Substract, style buttonStyle ] [ text "-" ] ]
+                [ flexItem [ style [ Style.flexItemProperties [ Flex.basis (percent 100) ] ] ] [ button [ onClick Add, style buttonStyle ] [ text "+" ] ]
+                , flexItem [ style [ Style.flexItemProperties [ Flex.basis (percent 100) ] ] ] [ button [ onClick Substract, style buttonStyle ] [ text "-" ] ]
                 ]
             ]
         ]
@@ -74,14 +75,14 @@ windowCentered : Node msg -> Node msg
 windowCentered content =
     Builder.flex
         [ style
-            [ Attributes.block [ Display.dimensions [ Dimensions.height (vh 100) ] ]
-            , Attributes.flexContainerProperties
+            [ Style.block [ Display.dimensions [ Dimensions.height (vh 100) ] ]
+            , Style.flexContainerProperties
                 [ Flex.align Flex.center
                 , Flex.justifyContent Flex.justifyContentCenter
                 ]
             ]
         ]
-        [ flexItem [ style [ Attributes.block [] ] ] [ content ] ]
+        [ flexItem [ style [ Style.block [] ] ] [ content ] ]
 
 
 view : a -> Node Msg

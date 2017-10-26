@@ -2,7 +2,8 @@ module BodyBuilder.Elements exposing (..)
 
 import Elegant exposing (..)
 import BodyBuilder exposing (..)
-import BodyBuilder.Attributes
+import BodyBuilder.Attributes as Attributes
+import Style
 import Function
 import Dimensions
 
@@ -23,10 +24,10 @@ stickyView :
 stickyView sectionStyle sectionName elements =
     node []
         [ node
-            [ BodyBuilder.Attributes.style
-                [ BodyBuilder.Attributes.block
+            [ Attributes.style
+                [ Style.block
                     [ Display.dimensions [ Dimensions.width (percent 100) ] ]
-                , BodyBuilder.Attributes.box
+                , Style.box
                     [ Box.position <|
                         Position.sticky [ Position.top (px 0) ]
                     , sectionStyle |> Function.compose

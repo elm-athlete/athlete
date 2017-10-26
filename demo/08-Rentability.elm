@@ -34,6 +34,7 @@ import Task
 import Date
 import Date exposing (Month(..))
 import Date.Extra as Date
+import Style
 
 
 type alias Persisted a =
@@ -125,11 +126,11 @@ gray =
 
 standardCellStyle =
     style
-        [ Attributes.block
+        [ Style.block
             [ Display.alignment Display.left
             , Display.fullWidth
             ]
-        , Attributes.box
+        , Style.box
             [ Box.cursor Cursor.pointer
             , Box.border
                 [ Border.all [ Border.none ]
@@ -168,7 +169,7 @@ titleViewWithDelete appartment =
         [ flex
             []
             [ flexItem [ BodyBuilder.Events.onClick <| DestroyAppartment appartment.id ] [ text "⛔" ]
-            , flexItem [ style [ Attributes.box [ Box.padding [ Padding.left Constants.medium ] ] ] ]
+            , flexItem [ style [ Style.box [ Box.padding [ Padding.left Constants.medium ] ] ] ]
                 [ text appartment.attributes.title ]
             ]
         ]
@@ -255,8 +256,8 @@ minSalary model =
 
 pad =
     style
-        [ Attributes.block []
-        , Attributes.box [ Box.padding [ Padding.all Constants.medium ] ]
+        [ Style.block []
+        , Style.box [ Box.padding [ Padding.all Constants.medium ] ]
         ]
 
 
@@ -284,7 +285,7 @@ appartmentEditBodyView ({ attributes } as appartment) =
     node []
         [ result "Renta standard en % : " (renta attributes.collocs)
         , node [ pad ]
-            [ node [ style [ Attributes.block [] ] ]
+            [ node [ style [ Style.block [] ] ]
                 [ text
                     ("Loyer mensuel "
                         ++ (if attributes.collocs > 1 then
@@ -300,14 +301,14 @@ appartmentEditBodyView ({ attributes } as appartment) =
                 ]
             ]
         , node [ pad ]
-            [ node [ style [ Attributes.block [] ] ] [ text "Nombre de locataires" ]
+            [ node [ style [ Style.block [] ] ] [ text "Nombre de locataires" ]
             , inputNumber
                 [ Attributes.value (attributes.collocs)
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateCollocs)
                 ]
             ]
         , node [ pad ]
-            [ node [ style [ Attributes.block [] ] ] [ text "Travaux" ]
+            [ node [ style [ Style.block [] ] ] [ text "Travaux" ]
             , inputNumber
                 [ Attributes.value (attributes.works)
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateWorks)
@@ -369,7 +370,7 @@ textToHtml =
 appartmentBodyView : Appartment -> Node msg
 appartmentBodyView appartment =
     node
-        [ style [ Attributes.block [], Attributes.box [ Box.padding [ Padding.horizontal Constants.medium ] ] ] ]
+        [ style [ Style.block [], Style.box [ Box.padding [ Padding.horizontal Constants.medium ] ] ] ]
         ([ node [] (textToHtml appartment.attributes.details)
          ]
         )
@@ -379,8 +380,8 @@ title : String -> Node msg
 title content =
     node
         [ style
-            [ Attributes.block []
-            , Attributes.box [ Box.padding [ Padding.all (Elegant.px 12) ] ]
+            [ Style.block []
+            , Style.box [ Box.padding [ Padding.all (Elegant.px 12) ] ]
             ]
         ]
         [ text content ]
@@ -395,7 +396,7 @@ appartmentsIndex appartments =
             , right = Router.headerButton (HistoryMsgWrapper AppartmentNewMsg) "new"
             }
         )
-        (node [ style [ Attributes.block [], Attributes.box [ backgroundColor gray ] ] ]
+        (node [ style [ Style.block [], Style.box [ backgroundColor gray ] ] ]
             (appartments |> List.map titleView)
         )
 
@@ -409,7 +410,7 @@ appartmentsIndexEdit appartments =
             , right = text ""
             }
         )
-        (node [ style [ Attributes.block [], Attributes.box [ backgroundColor gray ] ] ]
+        (node [ style [ Style.block [], Style.box [ backgroundColor gray ] ] ]
             (appartments |> List.map titleViewWithDelete)
         )
 
@@ -470,8 +471,8 @@ view : Model -> Node Msg
 view { history, data } =
     node
         [ style
-            [ Attributes.block []
-            , Attributes.box
+            [ Style.block []
+            , Style.box
                 [ Box.typography
                     [ Typography.character
                         [ Character.fontFamilySansSerif

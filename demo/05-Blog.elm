@@ -24,6 +24,7 @@ import Border
 import Outline
 import Typography
 import Typography.Character as Character
+import Style
 import Date exposing (Month(..))
 import Date.Extra as Date
 import Router
@@ -121,11 +122,11 @@ showView data =
 blogpostView : Blogpost -> Node msg
 blogpostView blogpost =
     node []
-        [ img "" blogpost.image [ style [ Attributes.block [ Display.fullWidth ] ] ]
+        [ img "" blogpost.image [ style [ Style.block [ Display.fullWidth ] ] ]
         , node
             [ style
-                [ Attributes.block []
-                , Attributes.box [ Box.padding [ Padding.horizontal Constants.medium ] ]
+                [ Style.block []
+                , Style.box [ Box.padding [ Padding.horizontal Constants.medium ] ]
                 ]
             ]
             (textToHtml blogpost.content)
@@ -141,11 +142,11 @@ textToHtml =
 
 standardCellStyle =
     style
-        [ Attributes.block
+        [ Style.block
             [ Display.alignment Display.left
             , Display.fullWidth
             ]
-        , Attributes.box
+        , Style.box
             [ Box.cursor Cursor.pointer
             , Box.border
                 [ Border.all [ Border.none ]
@@ -168,8 +169,8 @@ blogpostsIndex : List Blogpost -> Node Msg
 blogpostsIndex blogposts =
     node
         [ style
-            [ Attributes.block [ Display.dimensions [ Dimensions.height (vh 100) ] ]
-            , Attributes.box [ Box.background [ Elegant.color gray ] ]
+            [ Style.block [ Display.dimensions [ Dimensions.height (vh 100) ] ]
+            , Style.box [ Box.background [ Elegant.color gray ] ]
             ]
         ]
         (blogposts |> List.map titleView)
@@ -198,8 +199,8 @@ view : Model -> Node Msg
 view { history, data } =
     node
         [ style
-            [ Attributes.block []
-            , Attributes.box
+            [ Style.block []
+            , Style.box
                 [ Box.typography
                     [ Typography.character
                         [ Character.fontFamilySansSerif

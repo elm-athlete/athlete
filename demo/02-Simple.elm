@@ -7,6 +7,8 @@ import Display
 import Box
 import Typography
 import Typography.Character as Character
+import Style
+import Block
 
 
 theFontSize : number
@@ -18,27 +20,27 @@ view : a -> Node msg
 view model =
     Builder.node
         [ Attributes.style
-            [ Attributes.block
-                [ Display.alignCenter ]
+            [ Style.block
+                [ Block.alignCenter ]
             ]
         ]
         [ Builder.h1 []
             [ Builder.text "I'm Elegantly styled by css" ]
         , Builder.p
             [ Attributes.style
-                [ Attributes.box
+                [ Style.box
                     [ Box.typography
                         [ Typography.character
                             [ Character.size (px theFontSize) ]
                         ]
                     ]
-                , Attributes.box
+                , Style.box
                     [ Box.typography
                         [ Typography.character
                             [ Character.size (px (theFontSize + 5)) ]
                         ]
                     ]
-                    |> Attributes.pseudoClass "hover"
+                    |> Style.pseudoClass "hover"
                 ]
             ]
             [ Builder.text "Go Hover Me ! My style is set in my node, so it's parametrizable, but the result is a good old css node (look at the dom Luke)" ]

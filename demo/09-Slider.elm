@@ -95,15 +95,17 @@
 module Slider exposing (..)
 
 import BodyBuilder as Builder exposing (Node)
-import BodyBuilder.Attributes as Attributes exposing (style, block, box)
+import BodyBuilder.Attributes as Attributes exposing (style)
 import Display
 import Box
+import Block
 import Border
 import Color
 import Elegant exposing (px)
 import Padding
 import Constants
 import Dimensions
+import Style exposing (box, block)
 
 
 theFontSize : number
@@ -115,10 +117,10 @@ view : a -> Node msg
 view model =
     Builder.node
         [ Attributes.style
-            [ Attributes.block
-                [ Display.alignCenter
+            [ Style.block
+                [ Block.alignCenter
                 ]
-            , Attributes.box
+            , Style.box
                 [ Box.padding [ Padding.all Constants.medium ]
                 ]
             ]
@@ -137,17 +139,17 @@ view model =
                         , Box.appearanceNone
                         , Box.border [ Border.all [ Border.none ] ]
                         ]
-                        |> Attributes.pseudoClass ":-webkit-slider-thumb"
+                        |> Style.pseudoClass ":-webkit-slider-thumb"
                     , box
                         [ Box.border [ Border.full (Color.black) ]
                         , Box.background [ Elegant.color (Color.red) ]
                         , Box.border [ Border.all [ Border.none ] ]
                         ]
-                        |> Attributes.pseudoClass ":-webkit-slider-runnable-track"
+                        |> Style.pseudoClass ":-webkit-slider-runnable-track"
                     , block
                         [ Display.dimensions [ Dimensions.square (px 50) ]
                         ]
-                        |> Attributes.pseudoClass ":-webkit-slider-thumb"
+                        |> Style.pseudoClass ":-webkit-slider-thumb"
                     ]
                 ]
             ]
