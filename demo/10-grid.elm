@@ -4,18 +4,10 @@ import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
 import Style
 import Grid
+import Elegant exposing (px)
 
 
--- import Display
--- import Box
--- import Border
--- import Color
--- import Elegant exposing (px)
--- import Padding
--- import Constants
--- import Dimensions
-
-
+example : Node msg
 example =
     Builder.grid
         [ Attributes.style
