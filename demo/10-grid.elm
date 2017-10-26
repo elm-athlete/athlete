@@ -10,7 +10,8 @@ import Box
 import Block
 import Dimensions
 
-item (x, y) (width, height) =
+
+item ( x, y ) ( width, height ) =
     Builder.gridItem
         [ Attributes.style
             [ Style.gridItemProperties
@@ -32,7 +33,7 @@ example : Node msg
 example =
     Builder.grid
         [ Attributes.style
-            [ Style.block [Block.height (percent 100)]
+            [ Style.block [ Block.height (percent 100) ]
             , Style.gridContainerProperties
                 [ Grid.columns
                     [ Grid.template
@@ -58,10 +59,10 @@ example =
             , Style.box [ Box.backgroundColor Color.lightPurple ]
             ]
         ]
-        [ item (0,0) (2, 1) [Builder.text "1"]
-        , item (2,0) (1, 2) [Builder.text "2"]
-        , item (1,2) (2, 1) [Builder.text "3"]
-        , item (0,1) (1, 2) [Builder.text "4"]
+        [ item ( 0, 0 ) ( 2, 1 ) [ Builder.text "1" ]
+        , item ( 2, 0 ) ( 1, 2 ) [ Builder.text "2" ]
+        , item ( 1, 2 ) ( 2, 1 ) [ Builder.text "3" ]
+        , item ( 0, 1 ) ( 1, 2 ) [ Builder.text "4" ]
         ]
 
 
