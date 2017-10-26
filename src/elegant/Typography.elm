@@ -19,6 +19,8 @@ module Typography
         , lineHeightNormal
         , lineHeight
         , typographyToCouples
+        , fontSize
+        , bold
         )
 
 {-| Typography contains everything about fonts and characters rendering.
@@ -75,6 +77,12 @@ module Typography
 
 @docs lineHeightNormal
 @docs lineHeight
+
+
+# Shortcuts
+
+@docs fontSize
+@docs bold
 
 
 # Compilation
@@ -275,6 +283,22 @@ typographyToCouples typography =
                     .character
                     Character.characterToCouples
             )
+
+
+
+-- Shortcuts
+
+
+{-| -}
+fontSize : SizeUnit -> Modifier Typography
+fontSize size =
+    character [ Character.size size ]
+
+
+{-| -}
+bold : Modifier Typography
+bold =
+    character [ Character.weight 900 ]
 
 
 

@@ -7,7 +7,6 @@ import Color.Convert
 import Box
 import Display exposing (BlockDetails)
 import Helpers.Shared exposing (..)
-import BodyBuilder.Setters exposing (..)
 import BodyBuilder.Events exposing (..)
 import Function
 import Json.Decode exposing (Decoder)
@@ -32,44 +31,15 @@ type MediaQuery
     | Between Int Int
 
 
-media : MediaQuery -> StyleModifier a -> StyleModifier a
-media mediaQuery fun =
-    setMedia mediaQuery >> fun
+type alias StyleModifier a =
+    StyleSelector -> Modifier a
 
 
-setMedia : MediaQuery -> Modifier StyleSelector
-setMedia mediaQuery styleSelector =
-    { styleSelector | media = Just mediaQuery }
-
-
-greater : Int -> MediaQuery
-greater =
-    Greater
-
-
-lesser : Int -> MediaQuery
-lesser =
-    Lesser
-
-
-between : Int -> Int -> MediaQuery
-between =
-    Between
-
-
-pseudoClass : String -> StyleModifier a -> StyleModifier a
-pseudoClass class fun =
-    setPseudoClass class >> fun
-
-
-setPseudoClass : String -> Modifier StyleSelector
-setPseudoClass class styleSelector =
-    { styleSelector | pseudoClass = Just class }
-
-
-hover : StyleModifier a -> StyleModifier a
-hover =
-    pseudoClass "hover"
+style : List (StyleModifier a) -> Modifier a
+style styles =
+    styles
+        |> List.map (callOn defaultStyleSelector)
+        |> Function.compose
 
 
 type alias ValueAttribute b a =
@@ -461,47 +431,6 @@ setValueInUniversal setter val ({ universal } as attrs) =
     universal
         |> setter val
         |> setUniversalIn attrs
-
-
-type alias StyleModifier a =
-    StyleSelector -> Modifier a
-
-
-style : List (StyleModifier a) -> Modifier a
-style styles =
-    styles
-        |> List.map (callOn defaultStyleSelector)
-        |> Function.compose
-
-
-box : Modifiers Box.Box -> StyleModifier (BoxContainer a)
-box =
-    waitForStyleSelector setBox
-
-
-block : Modifiers BlockDetails -> StyleModifier (MaybeBlockContainer a)
-block =
-    waitForStyleSelector setMaybeBlock
-
-
-blockProperties : Modifiers BlockDetails -> StyleModifier (BlockContainer a)
-blockProperties =
-    waitForStyleSelector setBlock
-
-
-flexContainerProperties : Modifiers Flex.FlexContainerDetails -> StyleModifier (FlexContainerAttributes msg)
-flexContainerProperties =
-    waitForStyleSelector setFlexContainerProperties
-
-
-flexItemProperties : Modifiers Flex.FlexItemDetails -> StyleModifier (FlexItemAttributes msg)
-flexItemProperties =
-    waitForStyleSelector setFlexItemProperties
-
-
-waitForStyleSelector : (( a, StyleSelector ) -> b -> b) -> a -> StyleModifier b
-waitForStyleSelector setter val selector =
-    setter ( val, selector )
 
 
 title : String -> Modifier { a | universal : UniversalAttributes }
