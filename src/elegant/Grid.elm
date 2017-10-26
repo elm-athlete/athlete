@@ -10,6 +10,26 @@ type Align
     | Stretch
 
 
+start : Align
+start =
+    Start
+
+
+center : Align
+center =
+    Center
+
+
+end : Align
+end =
+    End
+
+
+stretch : Align
+stretch =
+    Stretch
+
+
 type Spacing
     = Around
     | Between
@@ -30,27 +50,87 @@ type ValType
     | Auto
 
 
+sizeUnitVal : SizeUnit -> ValType
+sizeUnitVal =
+    SizeUnitVal
+
+
+fractionOfAvailableSpace : Int -> ValType
+fractionOfAvailableSpace =
+    Fr
+
+
+viewWidth : Int -> ValType
+viewWidth =
+    Vw
+
+
+minContent : ValType
+minContent =
+    MinContent
+
+
+maxContent : ValType
+maxContent =
+    MaxContent
+
+
+auto : ValType
+auto =
+    Auto
+
+
 type Repeatable
     = Simple ValType
     | Minmax ValType ValType
     | FitContent ValType
+    | Repeat RepeatOption (List SizeUnit)
 
 
-type Template
+simple : ValType -> Repeatable
+simple =
+    Simple
+
+
+minmax : ValType -> ValType -> Repeatable
+minmax =
+    Minmax
+
+
+fitContent : ValType -> Repeatable
+fitContent =
+    FitContent
+
+
+type RepeatOption
     = RepeatAutoFill
     | RepeatAutoFit
-    | NoRepeat
+
+
+autofill : RepeatOption
+autofill =
+    RepeatAutoFill
+
+
+autofit : RepeatOption
+autofit =
+    RepeatAutoFit
+
+
+repeat : RepeatOption -> List SizeUnit -> Repeatable
+repeat =
+    Repeat
 
 
 type GridTemplate
-    = TemplateWrapper Template (List Repeatable)
+    = TemplateWrapper (List Repeatable)
 
 
 type alias GridContainerCoordinate =
     { gutter : Maybe SizeUnit
     , align : Maybe Align
     , alignItems : Maybe AlignItems
-    , template : GridTemplate
+    , template : Maybe GridTemplate
     }
 
 
@@ -59,8 +139,18 @@ type GridItemSize
     | Span Int
 
 
+untilEndOfCoordinate : GridItemSize
+untilEndOfCoordinate =
+    UntilEndOfCoordinate
+
+
+span : Int -> GridItemSize
+span =
+    Span
+
+
 type alias GridItemCoordinate =
-    { placement : ( Int, GridItemSize )
+    { placement : Maybe ( Int, GridItemSize )
     , align : Maybe Align
     }
 
@@ -77,379 +167,232 @@ type alias GridItemDetails =
     }
 
 
-defaultGridContainerDetails : Maybe GridContainerCoordinate -> Maybe GridContainerCoordinate -> GridContainerDetails
-defaultGridContainerDetails =
-    GridContainerDetails
+columns : Modifiers GridContainerCoordinate -> Modifier GridContainerDetails
+columns modifiers gridContainerDetails =
+    { gridContainerDetails | x = modifiedElementOrNothing (GridContainerCoordinate Nothing Nothing Nothing Nothing) modifiers }
 
 
-
--- GridItemStyle
-
-
-defaultGridItemDetails : {}
-defaultGridItemDetails =
-    {}
+rows : Modifiers GridContainerCoordinate -> Modifier GridContainerDetails
+rows modifiers gridContainerDetails =
+    { gridContainerDetails | y = modifiedElementOrNothing (GridContainerCoordinate Nothing Nothing Nothing Nothing) modifiers }
 
 
-
--- {-| Flex handles everything related to the flex element.
---
---
--- @docs GridContainerDetails
--- @docs GridItemDetails
--- @docs FlexDirection
--- @docs FlexWrap
--- @docs Align
--- @docs JustifyContent
---
---
--- ## FlexWrap
---
--- @docs wrap
--- @docs noWrap
---
---
--- ## AlignItems / AlignSelf
---
--- @docs align
--- @docs baseline
--- @docs center
--- @docs flexStart
--- @docs flexEnd
--- @docs inherit
--- @docs initial
--- @docs stretch
---
---
--- ## JustifyContent
---
--- @docs justifyContent
--- @docs spaceBetween
--- @docs spaceAround
--- @docs justifyContentCenter
---
---
--- ## Grid
--- @docs defaultGridContainerDetails
--- @docs defaultGridItemDetails
--- @docs gridContainerDetailsToCouples
--- @docs gridItemDetailsToCouples
--- -}
---
--- import Either exposing (Either(..))
--- import Helpers.Shared exposing (..)
---
---
--- -- import Helpers.Vector exposing (..)
---
--- import Elegant.Setters exposing (..)
---
---
--- {-| Represents the alignment in grid.
--- Can be start, center, end and stretch
--- -}
---
---
--- type Axe
---     = Horizontal
---     | Vertical
---
---
--- type ElementType
---     = Children
---     | Self
---
---
---
---
---
--- -- align : Align -> Axe -> Modifier a
--- -- align alignValue axe  details =
--- --   let
--- --     details =
--- --     newAlignment =
--- --     (case Axe of
--- --       Horizontal -> {alignement | alignX = alignValue}
--- --   in
--- --     {details | alignment = }
--- --
--- -- {-| Accepts an Align, and modifies the flex container accordingly.
--- -- -}
--- -- alignHorizontal : Align -> Modifier GridContainerDetails
--- -- alignHorizontal =
--- --     setAlign << Just
--- --
--- --
--- -- {-| Accepts an Align, and modifies the flex container accordingly.
--- -- -}
--- -- alignVertical : Align -> Modifier GridContainerDetails
--- -- alignVertical =
--- --     setAlign << Just
--- --
--- --
---
---
--- {-| Represents the value of justify-content.
--- Can be space-between, space-around or center.
--- -}
--- type JustifyContent
---     = JustifyContentSpaceBetween
---     | JustifyContentSpaceAround
---     | JustifyContentCenter
---
---
--- {-| Accepts a justify-content and modifies the flex container accordingly.
--- -}
--- justifyContent : JustifyContent -> Modifier GridContainerDetails
--- justifyContent =
---     setJustifyContent << Just
---
---
--- {-| Defines the justify-content space-between.
--- -}
--- spaceBetween : JustifyContent
--- spaceBetween =
---     JustifyContentSpaceBetween
---
---
--- {-| Defines the justify-content space-around.
--- -}
--- spaceAround : JustifyContent
--- spaceAround =
---     JustifyContentSpaceAround
---
---
--- {-| Defines the justify-content center.
--- -}
--- justifyContentCenter : JustifyContent
--- justifyContentCenter =
---     JustifyContentCenter
---
---
---
---
--- {-| Accepts an int and sets the flex-grow accordingly.
--- -}
--- grow : Int -> Modifier GridItemDetails
--- grow =
---     setGrow << Just
---
---
--- {-| Accepts an int and sets the flex-shrink accordingly.
--- -}
--- shrink : Int -> Modifier GridItemDetails
--- shrink =
---     setShrink << Just
---
---
--- {-| Sets the flex-basis as auto.
--- -}
--- basisAuto : Modifier GridItemDetails
--- basisAuto =
---     setBasis <| Just <| Right Auto
---
---
--- {-| Accepts a size and sets the flex-basis accordingly.
--- -}
--- basis : SizeUnit -> Modifier GridItemDetails
--- basis =
---     setBasis << Just << Left
---
---
--- {-| Accepts an align and modifies the flex item accordingly.
--- -}
--- alignSelf : Align -> Modifier GridItemDetails
--- alignSelf =
---     setAlignSelf << Just
---
---
--- alignItemsToCouple : Align -> ( String, String )
--- alignItemsToCouple =
---     (,) "align-items" << alignToString
---
---
--- alignSelfToCouple : Align -> ( String, String )
--- alignSelfToCouple =
---     (,) "align-self" << alignToString
---
---
--- alignToString : Align -> String
--- alignToString align =
---     case align of
---         Start ->
---             "start"
---
---         Center ->
---             "center"
---
---         End ->
---             "end"
---
---         Stretch ->
---             "stretch"
---
---
+horizontal : Modifiers GridItemCoordinate -> Modifier GridItemDetails
+horizontal modifiers gridItemDetails =
+    { gridItemDetails | x = modifiedElementOrNothing (GridItemCoordinate Nothing Nothing) modifiers }
 
 
-{-| -}
-gridItemDetailsToCouples : GridItemDetails -> List ( String, String )
-gridItemDetailsToCouples gridContainerDetails =
-    []
-        |> List.concatMap (callOn gridContainerDetails)
+vertical : Modifiers GridItemCoordinate -> Modifier GridItemDetails
+vertical modifiers gridItemDetails =
+    { gridItemDetails | y = modifiedElementOrNothing (GridItemCoordinate Nothing Nothing) modifiers }
+
+
+template : List Repeatable -> Modifier GridContainerCoordinate
+template repeatable gridContainerCoordinate =
+    { gridContainerCoordinate | template = Just (TemplateWrapper repeatable) }
+
+
+gap : SizeUnit -> Modifier GridContainerCoordinate
+gap value gridContainerCoordinate =
+    { gridContainerCoordinate | gutter = Just value }
+
+
+align : Align -> Modifier { a | align : Maybe Align }
+align value gridContainerCoordinate =
+    { gridContainerCoordinate | align = Just value }
+
+
+alignItems : AlignItems -> Modifier GridContainerCoordinate
+alignItems value gridContainerCoordinate =
+    { gridContainerCoordinate | alignItems = Just value }
+
+
+alignWrapper : Align -> AlignItems
+alignWrapper =
+    AlignWrapper
+
+
+spaceAround : AlignItems
+spaceAround =
+    Space Around
+
+
+spaceBetween : AlignItems
+spaceBetween =
+    Space Between
+
+
+spaceEvenly : AlignItems
+spaceEvenly =
+    Space Evenly
+
+
+placement : Int -> GridItemSize -> Modifier GridItemCoordinate
+placement value itemSize gridItemCoordinate =
+    { gridItemCoordinate | placement = Just ( value + 1, itemSize ) }
 
 
 {-| -}
 gridContainerDetailsToCouples : GridContainerDetails -> List ( String, String )
 gridContainerDetailsToCouples gridContainerDetails =
-    []
+    [ unwrapToCouples .x (gridContainerCoordinateToCouples "column" "align")
+    , unwrapToCouples .y (gridContainerCoordinateToCouples "row" "justify")
+    ]
         |> List.concatMap (callOn gridContainerDetails)
 
 
+gridContainerCoordinateToCouples : String -> String -> GridContainerCoordinate -> List ( String, String )
+gridContainerCoordinateToCouples columnRow alignJustify gridContainerCoordinate =
+    [ unwrapToCouple .gutter (gutterToCouple columnRow)
+    , unwrapToCouple .align (alignToCouple alignJustify)
+    , unwrapToCouple .alignItems (alignItemsToCouple alignJustify)
+    , unwrapToCouple .template (templateToCouple columnRow)
+    ]
+        |> List.concatMap (callOn gridContainerCoordinate)
 
---
--- justifyContentToCouple : JustifyContent -> ( String, String )
--- justifyContentToCouple =
---     (,) "justify-content" << justifyContentToString
---
---
--- justifyContentToString : JustifyContent -> String
--- justifyContentToString val =
---     case val of
---         JustifyContentSpaceBetween ->
---             "space-between"
---
---         JustifyContentSpaceAround ->
---             "space-around"
---
---         JustifyContentCenter ->
---             "center"
---
---
---
--- --
--- -- grid-template-columns: repeat(auto-fit, 300px);
--- -- grid-template-columns: repeat(auto-fill, 10px 50% min-content max-content auto minmax(100px, 1fr) minmax(100px, max-content) fit-content(200px) fit-content(40%))
--- --
--- --
--- -- grid-template-columns: repeat(auto-fit, [px 300]);
--- -- grid-template-columns: repeat(auto-fill, [px 10, percent 50, MinContent, MaxContent, Auto, Minmax (px 100) (fr 1), Minmax (px 100) MaxContent, FitContent (px 200), FitContent (Percent 40)]
---
---
---
---
--- noRepeat =
---     NoRepeat
---
---
--- simple =
---     Simple
---
---
--- sizeUnitVal =
---     SizeUnitVal
---
---
--- noRepeatGridTemplate =
---     gridTemplate noRepeat
---
---
--- fractionOfAvailableSpace =
---     Fr
---
---
---
---
---
---
--- myGrid : GridContainerDetails
--- myGrid =
---     { x =
---         { gutter = Just (Px 2)
---         , align = Just SpaceAround
---         , template =
---             noRepeatGridTemplate
---                 [ simple (fractionOfAvailableSpace 1)
---                 , simple (sizeUnitVal (Px 200))
---                 ]
---         }
---     , y =
---         { gutter = Just (Px 20)
---         , align = Just AlignAuto
---         , template =
---             noRepeatGridTemplate
---                 [ simple (sizeUnitVal (Px 100))
---                 , simple (sizeUnitVal (Px 50))
---                 ]
---         }
---     }
---
---
---
---
--- gridItemStyle : GridItemStyle -> GridItemStyle
--- gridItemStyle ( ( x, y ), ( width, height ) ) =
---     ( ( x, y )
---     , ( width, height )
---     )
---
---
--- exampleGridItemStyle : GridItemStyle
--- exampleGridItemStyle =
---     gridItemStyle
---         ( ( 0, 0 )
---         , ( UntilEndOfCoordinate, Span 2 )
---         )
---
---
--- defaultGridContainerDetails =
---     {}
---
---
--- flexGridDetailsModifiers =
---     {}
---
---
---
---
--- gridItemDetailsToString gridItemDetails =
---     []
---
---
--- gridContainerDetailsToString gridContainerDetails =
---     []
---
---
--- xyCoordinatesFromTemplate : GridTemplate -> GridContainerCoordinate
--- xyCoordinatesFromTemplate template =
---     defaultTemplate template template
---
---
--- defaultTemplate t1 t2 =
---     ( defaultCoordinate t1, defaultCoordinate t2 )
---
---
--- defaultCoordinate template =
---     GridContainerCoordinate Nothing Nothing template
---
---
--- rowCoordinate =
---     { gutter = Px 2
---     , align = Center
---     , template = two
---     }
---
---
--- two : GridTemplate
--- two =
---     noRepeatGridTemplate
---         [ simple
---         , simple
---         ]
---
---
--- columnCoordinate : GridContainerCoordinate
--- columnCoordinate =
---     { gutter = Px 20
---     , align = Auto
---     , template = two
---     }
+
+gutterToCouple : String -> SizeUnit -> ( String, String )
+gutterToCouple columnRow =
+    (,) ("grid-" ++ columnRow ++ "-gap") << sizeUnitToString
+
+
+alignToCouple : String -> Align -> ( String, String )
+alignToCouple alignJustify =
+    (,) (alignJustify ++ "-content") << alignToString
+
+
+alignToString : Align -> String
+alignToString align =
+    case align of
+        Start ->
+            "start"
+
+        Center ->
+            "center"
+
+        Stretch ->
+            "stretch"
+
+        End ->
+            "end"
+
+
+alignItemsToCouple : String -> AlignItems -> ( String, String )
+alignItemsToCouple alignJustify alignItems =
+    ( alignJustify ++ "-items"
+    , case alignItems of
+        AlignWrapper align ->
+            alignToString align
+
+        Space spacing ->
+            spacingToString spacing
+    )
+
+
+spacingToString : Spacing -> String
+spacingToString spacing =
+    case spacing of
+        Around ->
+            "space-around"
+
+        Between ->
+            "space-between"
+
+        Evenly ->
+            "space-evenly"
+
+
+templateToCouple : String -> GridTemplate -> ( String, String )
+templateToCouple columnRow (TemplateWrapper repeatable) =
+    ( "grid-template-" ++ columnRow ++ "s"
+    , repeatable
+        |> List.map repeatableToString
+        |> String.join " "
+    )
+
+
+repeatableToString : Repeatable -> String
+repeatableToString repeatable =
+    case repeatable of
+        Simple valType ->
+            valTypeToString valType
+
+        Minmax val1 val2 ->
+            "minmax(" ++ valTypeToString val1 ++ ", " ++ valTypeToString val2 ++ ")"
+
+        FitContent valType ->
+            "fit-content(" ++ valTypeToString valType ++ ")"
+
+        Repeat repeatOption sizes ->
+            "repeat(" ++ repeatOptionToString repeatOption ++ (List.map sizeUnitToString sizes |> String.join " ") ++ ")"
+
+
+repeatOptionToString : RepeatOption -> String
+repeatOptionToString repeatOption =
+    case repeatOption of
+        RepeatAutoFill ->
+            "auto-fill, "
+
+        RepeatAutoFit ->
+            "auto-fit, "
+
+
+valTypeToString : ValType -> String
+valTypeToString valType =
+    case valType of
+        Auto ->
+            "auto"
+
+        SizeUnitVal val ->
+            sizeUnitToString val
+
+        Fr val ->
+            toString val ++ "fr"
+
+        Vw val ->
+            toString val ++ "vw"
+
+        MinContent ->
+            "min-content"
+
+        MaxContent ->
+            "max-content"
+
+
+{-| -}
+gridItemDetailsToCouples : GridItemDetails -> List ( String, String )
+gridItemDetailsToCouples gridItemDetails =
+    [ unwrapToCouples .x (gridItemCoordinateToCouples "column" "align")
+    , unwrapToCouples .y (gridItemCoordinateToCouples "row" "justify")
+    ]
+        |> List.concatMap (callOn gridItemDetails)
+
+
+gridItemCoordinateToCouples : String -> String -> GridItemCoordinate -> List ( String, String )
+gridItemCoordinateToCouples columnRow alignJustify gridItemCoordinate =
+    [ unwrapToCouple .placement (placementToCouple columnRow)
+    , unwrapToCouple .align (alignSelfToCouple alignJustify)
+    ]
+        |> List.concatMap (callOn gridItemCoordinate)
+
+
+placementToCouple : String -> ( Int, GridItemSize ) -> ( String, String )
+placementToCouple columnRow placement =
+    ( "grid-" ++ columnRow, placementToString placement )
+
+
+placementToString : ( Int, GridItemSize ) -> String
+placementToString ( beginning, itemSize ) =
+    toString beginning
+        ++ " / "
+        ++ case itemSize of
+            UntilEndOfCoordinate ->
+                "-1"
+
+            Span val ->
+                "span " ++ (toString val)
+
+
+alignSelfToCouple : String -> Align -> ( String, String )
+alignSelfToCouple alignJustify alignSelf =
+    ( alignJustify ++ "-self", alignToString alignSelf )
