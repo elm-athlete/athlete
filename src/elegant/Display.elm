@@ -93,6 +93,7 @@ import Elegant.Setters exposing (..)
 import Display.Overflow as Overflow
 import Dimensions
 import Flex
+import Grid
 
 
 {-| Represents a box and contains all the style inside.
@@ -110,6 +111,13 @@ CSS.
 type DisplayBox
     = None
     | ContentsWrapper Contents
+
+
+displayBox : OutsideDisplay -> InsideDisplay -> Modifiers Box.Box -> DisplayBox
+displayBox outsideDisplay insideDisplay =
+    ContentsWrapper
+        << Contents outsideDisplay insideDisplay
+        << modifiedElementOrNothing Box.default
 
 
 {-| -}
@@ -135,6 +143,7 @@ Can be flow, or flex (and containing flex details).
 type InsideDisplay
     = Flow
     | FlexContainer (Maybe Flex.FlexContainerDetails)
+    | GridContainer (Maybe Grid.GridContainerDetails)
 
 
 {-| Contains all styles which can be applied to a block.
@@ -306,6 +315,20 @@ displayBoxToCouples val =
                 ++ (maybeBox |> Maybe.map Box.boxToCouples |> Maybe.withDefault [])
 
 
+{-| Compiles a DisplayBox to the corresponding CSS list of tuples.
+Handles only defined styles, ignoring `Nothing` fields.
+-}
+extractDisplayBoxCouples : DisplayBox -> List ( String, String )
+extractDisplayBoxCouples val =
+    case val of
+        None ->
+            [ ( "display", "none" ) ]
+
+        ContentsWrapper { outsideDisplay, insideDisplay, maybeBox } ->
+            outsideInsideDisplayToCouples outsideDisplay insideDisplay
+                ++ (maybeBox |> Maybe.map Box.boxToCouples |> Maybe.withDefault [])
+
+
 
 -- Internals
 
@@ -334,6 +357,9 @@ outsideDisplayToCouples outsideDisplay =
         FlexItem flexItemDetails blockDetails ->
             ( "block", List.append (unwrapEmptyList Flex.flexItemDetailsToCouples flexItemDetails) (unwrapEmptyList blockDetailsToCouples blockDetails) )
 
+        GridItem gridItemDetails blockDetails ->
+            ( "block", List.append (unwrapEmptyList Grid.gridItemDetailsToCouples gridItemDetails) (unwrapEmptyList blockDetailsToCouples blockDetails) )
+
 
 insideDisplayToCouples : InsideDisplay -> ( String, List ( String, String ) )
 insideDisplayToCouples insideDisplay =
@@ -343,6 +369,9 @@ insideDisplayToCouples insideDisplay =
 
         FlexContainer flexContainerDetails ->
             ( "flex", unwrapEmptyList Flex.flexContainerDetailsToCouples flexContainerDetails )
+
+        GridContainer gridContainerDetails ->
+            ( "grid", unwrapEmptyList Grid.gridContainerDetailsToCouples gridContainerDetails )
 
 
 blockDetailsToCouples : BlockDetails -> List ( String, String )
@@ -369,14 +398,20 @@ toLegacyDisplayCss str =
         "inline flow" ->
             "inline"
 
-        "inline flex" ->
-            "inline-flex"
-
         "block flow" ->
             "block"
 
+        "inline flex" ->
+            "inline-flex"
+
         "block flex" ->
             "flex"
+
+        "inline grid" ->
+            "inline-grid"
+
+        "block grid" ->
+            "grid"
 
         str ->
             str
