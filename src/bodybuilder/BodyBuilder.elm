@@ -451,6 +451,8 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                 (BodyBuilder.Convert.toElegantStyle
                     Nothing
                     Nothing
+                    Nothing
+                    Nothing
                     attributes.block
                     attributes.box
                     |> List.map Elegant.styleToCss

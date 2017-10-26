@@ -64,7 +64,7 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
             gridItemModifiers
                 |> Maybe.map
                     (groupByStyleSelectorAndCompute
-                        Grid.GridItemDetails
+                        (Grid.GridItemDetails Nothing Nothing)
                     )
 
         computedBlockDetails =

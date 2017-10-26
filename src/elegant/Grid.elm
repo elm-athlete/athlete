@@ -3,15 +3,65 @@ module Grid exposing (..)
 import Helpers.Shared exposing (..)
 
 
-type GridAlignment
-    = SpaceAround
-    | AlignAuto
+type Align
+    = Start
+    | Center
+    | End
+    | Stretch
+
+
+type Spacing
+    = Around
+    | Between
+    | Evenly
+
+
+type AlignItems
+    = AlignWrapper Align
+    | Space Spacing
+
+
+type ValType
+    = SizeUnitVal SizeUnit
+    | Fr Int
+    | Vw Int
+    | MinContent
+    | MaxContent
+    | Auto
+
+
+type Repeatable
+    = Simple ValType
+    | Minmax ValType ValType
+    | FitContent ValType
+
+
+type Template
+    = RepeatAutoFill
+    | RepeatAutoFit
+    | NoRepeat
+
+
+type GridTemplate
+    = TemplateWrapper Template (List Repeatable)
 
 
 type alias GridContainerCoordinate =
     { gutter : Maybe SizeUnit
-    , align : Maybe GridAlignment
+    , align : Maybe Align
+    , alignItems : Maybe AlignItems
     , template : GridTemplate
+    }
+
+
+type GridItemSize
+    = UntilEndOfCoordinate
+    | Span Int
+
+
+type alias GridItemCoordinate =
+    { placement : ( Int, GridItemSize )
+    , align : Maybe Align
     }
 
 
@@ -21,14 +71,19 @@ type alias GridContainerDetails =
     }
 
 
+type alias GridItemDetails =
+    { x : Maybe GridItemCoordinate
+    , y : Maybe GridItemCoordinate
+    }
+
+
 defaultGridContainerDetails : Maybe GridContainerCoordinate -> Maybe GridContainerCoordinate -> GridContainerDetails
 defaultGridContainerDetails =
     GridContainerDetails
 
 
-type alias GridItemDetails =
-    {}
-    -- GridItemStyle
+
+-- GridItemStyle
 
 
 defaultGridItemDetails : {}
@@ -93,11 +148,6 @@ defaultGridItemDetails =
 -- {-| Represents the alignment in grid.
 -- Can be start, center, end and stretch
 -- -}
--- type Align
---     = Start
---     | Center
---     | End
---     | Stretch
 --
 --
 -- type Axe
@@ -110,15 +160,6 @@ defaultGridItemDetails =
 --     | Self
 --
 --
--- type Spacing
---     = Around
---     | Between
---     | Evenly
---
---
--- type ContentAlign
---     = AlignWrapper Align
---     | Space Spacing
 --
 --
 --
@@ -294,34 +335,6 @@ gridContainerDetailsToCouples gridContainerDetails =
 -- -- grid-template-columns: repeat(auto-fill, [px 10, percent 50, MinContent, MaxContent, Auto, Minmax (px 100) (fr 1), Minmax (px 100) MaxContent, FitContent (px 200), FitContent (Percent 40)]
 --
 --
-
-
-type ValType
-    = SizeUnitVal SizeUnit
-    | Fr Int
-    | Vw Int
-    | MinContent
-    | MaxContent
-    | SizeAuto
-
-
-type Repeatable
-    = Simple ValType
-    | Minmax ValType ValType
-    | FitContent ValType
-
-
-type Template
-    = RepeatAutoFill
-    | RepeatAutoFit
-    | NoRepeat
-
-
-type GridTemplate
-    = TemplateWrapper Template (List Repeatable)
-
-
-
 --
 --
 -- noRepeat =
@@ -371,18 +384,6 @@ type GridTemplate
 --     }
 --
 --
-
-
-type GridItemSize
-    = UntilEndOfCoordinate
-    | Span Int
-
-
-type alias GridItemStyle =
-    ( ( Int, Int ), ( GridItemSize, GridItemSize ) )
-
-
-
 --
 --
 -- gridItemStyle : GridItemStyle -> GridItemStyle
