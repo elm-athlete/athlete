@@ -79,8 +79,6 @@ addScreenWidthToClassName =
    them. Otherwise, it compiles the styles, and inserts them into the cache, for
    later use.
 -}
-
-
 -- stylesToCss : List Style -> List String
 -- stylesToCss styles =
 --     styles

@@ -1,4 +1,57 @@
-module Elegant exposing (..)
+module Elegant
+    exposing
+        ( Modifier
+        , Modifiers
+        , SizeUnit
+        , Style
+        , classes
+        , color
+        , em
+        , emptyStyle
+        , inlineStyle
+        , opposite
+        , percent
+        , pt
+        , px
+        , rem
+        , screenWidthBetween
+        , screenWidthGE
+        , screenWidthLE
+        , setSuffix
+        , style
+        , styleToCss
+        , toCommonStyle
+        , toInlineStyles
+        , vh
+        , withScreenWidth
+        )
+
+{-|
+@docs Modifier
+@docs Modifiers
+@docs SizeUnit
+@docs Style
+@docs classes
+@docs color
+@docs em
+@docs emptyStyle
+@docs inlineStyle
+@docs opposite
+@docs percent
+@docs pt
+@docs px
+@docs rem
+@docs screenWidthBetween
+@docs screenWidthGE
+@docs screenWidthLE
+@docs setSuffix
+@docs style
+@docs styleToCss
+@docs toCommonStyle
+@docs toInlineStyles
+@docs vh
+@docs withScreenWidth
+-}
 
 import Html exposing (Html)
 import Html.Attributes
@@ -16,10 +69,12 @@ type Style
     = Style CommonStyle.Style
 
 
+{-| -}
 type alias Modifiers a =
     Helpers.Shared.Modifiers a
 
 
+{-| -}
 type alias Modifier a =
     Helpers.Shared.Modifier a
 
@@ -33,6 +88,7 @@ style display =
         , suffix = Nothing
         }
 
+
 {-| -}
 emptyStyle : Style
 emptyStyle =
@@ -42,6 +98,8 @@ emptyStyle =
         , suffix = Nothing
         }
 
+
+{-| -}
 setSuffix : String -> Style -> Style
 setSuffix value (Style style) =
     style
@@ -49,6 +107,7 @@ setSuffix value (Style style) =
         |> Style
 
 
+{-| -}
 withScreenWidth : List CommonStyle.ScreenWidth -> Modifier Style
 withScreenWidth screenWidth (Style style) =
     style
@@ -136,6 +195,7 @@ classes (Style style) =
         |> String.join " "
 
 
+
 -- stylesToCss : List Style -> List String
 -- stylesToCss styles =
 --     styles
@@ -143,6 +203,7 @@ classes (Style style) =
 --         |> Elegant.Convert.stylesToCss
 
 
+{-| -}
 styleToCss : Style -> String
 styleToCss (Style style) =
     let
@@ -160,6 +221,7 @@ styleToCss (Style style) =
                 classesNames
 
 
+{-| -}
 toCommonStyle : Style -> CommonStyle.Style
 toCommonStyle (Style style) =
     style
@@ -169,35 +231,42 @@ toCommonStyle (Style style) =
 -- Alias
 
 
+{-| -}
 type alias SizeUnit =
     Helpers.Shared.SizeUnit
 
 
+{-| -}
 px : Int -> SizeUnit
 px =
     Px
 
 
+{-| -}
 pt : Int -> SizeUnit
 pt =
     Pt
 
 
+{-| -}
 percent : Float -> SizeUnit
 percent =
     Percent
 
 
+{-| -}
 vh : Float -> SizeUnit
 vh =
     Vh
 
 
+{-| -}
 em : Float -> SizeUnit
 em =
     Em
 
 
+{-| -}
 rem : Float -> SizeUnit
 rem =
     Rem

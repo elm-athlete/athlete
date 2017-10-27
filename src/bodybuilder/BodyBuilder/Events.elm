@@ -33,6 +33,41 @@ module BodyBuilder.Events
         , onEventToHtmlAttributes
         )
 
+{-|
+
+@docs OnMouseEvents
+@docs OnMouseEventsInside
+@docs onClick
+@docs onDoubleClick
+@docs onMouseUp
+@docs onMouseOut
+@docs onMouseOver
+@docs onMouseDown
+@docs onMouseLeave
+@docs onMouseEnter
+@docs mouseEventsToHtmlAttributes
+@docs OnStringInputEvent
+@docs OnIntInputEvent
+@docs OnColorInputEvent
+@docs onInput
+@docs inputEventToHtmlEvent
+@docs OnCheckEvent
+@docs onCheck
+@docs checkEventToHtmlEvent
+@docs OnSubmitEvent
+@docs onSubmit
+@docs submitEventToHtmlEvent
+@docs OnFocusEvent
+@docs onFocus
+@docs focusEventToHtmlAttributes
+@docs OnBlurEvent
+@docs onBlur
+@docs onBlurEventToHtmlAttributes
+@docs OnEvent
+@docs on
+@docs onEventToHtmlAttributes
+-}
+
 import Html
 import Html.Events
 import Json.Decode exposing (Decoder)
@@ -110,6 +145,7 @@ onMouseEnter val =
     withDefaultOnMouse (setOnMouseEnter val)
 
 
+{-| -}
 mouseEventsToHtmlAttributes : OnMouseEventsInside msg -> List (Html.Attribute msg)
 mouseEventsToHtmlAttributes events =
     [ unwrapEmptyList (Html.Events.onClick >> List.singleton) << .click
@@ -129,6 +165,7 @@ type alias OnMouseEvents msg a =
     { a | onMouseEvents : Maybe (OnMouseEventsInside msg) }
 
 
+{-| -}
 type alias OnMouseEventsInside msg =
     { click : Maybe msg
     , doubleClick : Maybe msg
@@ -194,6 +231,7 @@ onInput val attrs =
     { attrs | onInputEvent = Just val }
 
 
+{-| -}
 inputEventToHtmlEvent : ( Maybe (a -> msg), String -> a ) -> List (Html.Attribute msg)
 inputEventToHtmlEvent ( onInputEvent, fromStringInput ) =
     case onInputEvent of
@@ -210,6 +248,7 @@ onCheck val attrs =
     { attrs | onCheckEvent = Just val }
 
 
+{-| -}
 checkEventToHtmlEvent : OnCheckEvent msg a -> List (Html.Attribute msg)
 checkEventToHtmlEvent =
     unwrapMaybeAttribute Html.Events.onCheck << .onCheckEvent
@@ -221,6 +260,7 @@ onSubmit val attrs =
     { attrs | onSubmitEvent = Just val }
 
 
+{-| -}
 submitEventToHtmlEvent : OnSubmitEvent msg a -> List (Html.Attribute msg)
 submitEventToHtmlEvent =
     unwrapMaybeAttribute Html.Events.onSubmit << .onSubmitEvent
@@ -232,6 +272,7 @@ onFocus val attrs =
     { attrs | onFocusEvent = Just val }
 
 
+{-| -}
 focusEventToHtmlAttributes : msg -> List (Html.Attribute msg)
 focusEventToHtmlAttributes =
     Html.Events.onFocus >> List.singleton
@@ -243,6 +284,7 @@ onBlur val attrs =
     { attrs | onBlurEvent = Just val }
 
 
+{-| -}
 onBlurEventToHtmlAttributes : msg -> List (Html.Attribute msg)
 onBlurEventToHtmlAttributes =
     Html.Events.onBlur >> List.singleton
@@ -254,6 +296,7 @@ on event decoder attrs =
     { attrs | onEvent = Just ( event, decoder ) }
 
 
+{-| -}
 onEventToHtmlAttributes : ( String, Decoder msg ) -> List (Html.Attribute msg)
 onEventToHtmlAttributes ( event, decoder ) =
     [ Html.Events.on event decoder ]
