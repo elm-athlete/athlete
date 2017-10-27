@@ -332,6 +332,16 @@ p =
     heading "p"
 
 
+div : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+div =
+    heading "div"
+
+
+span : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
+span =
+    node
+
+
 
 -- Internals
 
