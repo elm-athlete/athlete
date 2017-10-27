@@ -65,12 +65,22 @@ program =
     Html.program
 
 
-node : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
-node =
+inlineNode : String -> Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
+inlineNode tagName =
     commonBlockFlexlessNode
-        "bb-node"
+        tagName
         BodyBuilder.Attributes.defaultNodeAttributes
         BodyBuilder.Attributes.nodeAttributesToHtmlAttributes
+
+
+node : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
+node =
+    inlineNode "bb-node"
+
+
+span : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
+span =
+    inlineNode "span"
 
 
 flex : Modifiers (FlexContainerAttributes msg) -> List (FlexItem msg) -> Node msg
@@ -332,14 +342,52 @@ p =
     heading "p"
 
 
-div : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
+type alias BlockAttributes msg =
+    HeadingAttributes msg
+
+
+block :
+    String
+    -> Modifiers (HeadingAttributes msg)
+    -> List (Node msg)
+    -> Node msg
+block =
+    heading
+
+
+div : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
 div =
-    heading "div"
+    block "div"
 
 
-span : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
-span =
-    node
+section : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
+section =
+    block "section"
+
+
+nav : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
+nav =
+    block "nav"
+
+
+article : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
+article =
+    block "article"
+
+
+aside : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
+aside =
+    block "aside"
+
+
+footer : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
+footer =
+    block "footer"
+
+
+header : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
+header =
+    block "header"
 
 
 
