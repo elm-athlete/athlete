@@ -1,4 +1,4 @@
-module Grid2 exposing (..)
+module TheGrid exposing (..)
 
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
@@ -8,9 +8,9 @@ import Style
 import Grid
 import Box
 import Block
-import Dimensions
 
 
+item : ( Int, Int ) -> ( Int, Int ) -> List (Node msg) -> Builder.GridItem msg
 item ( x, y ) ( width, height ) =
     Builder.gridItem
         [ Attributes.style
