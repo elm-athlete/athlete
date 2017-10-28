@@ -1,5 +1,69 @@
 module BodyBuilder exposing (..)
 
+{-|
+@docs Node
+@docs FlexItem
+@docs extractNodeInFlexItem
+@docs GridItem
+@docs extractNodeInGridItem
+@docs Option
+@docs extractOption
+@docs text
+@docs br
+@docs program
+@docs inlineNode
+@docs node
+@docs span
+@docs flex
+@docs flexItem
+@docs grid
+@docs gridItem
+@docs a
+@docs img
+@docs audio
+@docs progress
+@docs button
+@docs inputHidden
+@docs inputText
+@docs inputPassword
+@docs inputRange
+@docs inputNumber
+@docs inputRadio
+@docs inputCheckbox
+@docs inputSubmit
+@docs inputUrl
+@docs inputColor
+@docs inputFile
+@docs textarea
+@docs select
+@docs option
+@docs heading
+@docs h1
+@docs h2
+@docs h3
+@docs h4
+@docs h5
+@docs h6
+@docs p
+@docs BlockAttributes
+@docs block
+@docs block
+@docs div
+@docs section
+@docs nav
+@docs article
+@docs aside
+@docs footer
+@docs header
+@docs commonNode
+@docs commonChildlessNode
+@docs commonBlockFlexlessNode
+@docs commonBlockFlexlessChildlessNode
+@docs nothingAttributes
+@docs inputAndLabel
+@docs computeBlock
+-}
+
 import Html exposing (Html)
 import Html.Attributes
 import BodyBuilder.Attributes exposing (..)
@@ -13,47 +77,57 @@ import Display
 import Grid
 
 
+{-| -}
 type alias Node msg =
     Html msg
 
 
+{-| -}
 type FlexItem msg
     = FlexItem (Node msg)
 
 
+{-| -}
 extractNodeInFlexItem : FlexItem msg -> Node msg
 extractNodeInFlexItem (FlexItem item) =
     item
 
 
+{-| -}
 type GridItem msg
     = GridItem (Node msg)
 
 
+{-| -}
 extractNodeInGridItem : GridItem msg -> Node msg
 extractNodeInGridItem (GridItem item) =
     item
 
 
+{-| -}
 type Option msg
     = Option (Html msg)
 
 
+{-| -}
 extractOption : Option msg -> Html msg
 extractOption (Option option) =
     option
 
 
+{-| -}
 text : String -> Node msg
 text =
     Html.text
 
 
+{-| -}
 br : Node msg
 br =
     Html.br [] []
 
 
+{-| -}
 program :
     { init : ( model, Cmd msg )
     , subscriptions : model -> Sub msg
@@ -65,6 +139,7 @@ program =
     Html.program
 
 
+{-| -}
 inlineNode : String -> Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
 inlineNode tagName =
     commonBlockFlexlessNode
@@ -73,16 +148,19 @@ inlineNode tagName =
         BodyBuilder.Attributes.nodeAttributesToHtmlAttributes
 
 
+{-| -}
 node : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
 node =
     inlineNode "bb-node"
 
 
+{-| -}
 span : Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
 span =
     inlineNode "span"
 
 
+{-| -}
 flex : Modifiers (FlexContainerAttributes msg) -> List (FlexItem msg) -> Node msg
 flex =
     commonNode
@@ -97,6 +175,7 @@ flex =
         BodyBuilder.Attributes.flexContainerAttributesToHtmlAttributes
 
 
+{-| -}
 flexItem : Modifiers (FlexItemAttributes msg) -> List (Node msg) -> FlexItem msg
 flexItem modifiers =
     FlexItem
@@ -113,6 +192,7 @@ flexItem modifiers =
             modifiers
 
 
+{-| -}
 grid : Modifiers (GridContainerAttributes msg) -> List (GridItem msg) -> Node msg
 grid =
     commonNode
@@ -127,6 +207,7 @@ grid =
         BodyBuilder.Attributes.gridContainerAttributesToHtmlAttributes
 
 
+{-| -}
 gridItem : Modifiers (GridItemAttributes msg) -> List (Node msg) -> GridItem msg
 gridItem modifiers =
     GridItem
@@ -143,6 +224,7 @@ gridItem modifiers =
             modifiers
 
 
+{-| -}
 a : Modifiers (AAttributes msg) -> List (Node msg) -> Node msg
 a =
     commonBlockFlexlessNode
@@ -151,6 +233,7 @@ a =
         BodyBuilder.Attributes.aAttributesToHtmlAttributes
 
 
+{-| -}
 img : String -> String -> Modifiers (ImgAttributes msg) -> Node msg
 img alt src =
     commonBlockFlexlessChildlessNode
@@ -159,6 +242,7 @@ img alt src =
         BodyBuilder.Attributes.imgAttributesToHtmlAttributes
 
 
+{-| -}
 audio : Modifiers (AudioAttributes msg) -> Node msg
 audio =
     commonBlockFlexlessChildlessNode
@@ -167,6 +251,7 @@ audio =
         BodyBuilder.Attributes.audioAttributesToHtmlAttributes
 
 
+{-| -}
 progress : Modifiers (ProgressAttributes msg) -> Node msg
 progress =
     commonBlockFlexlessChildlessNode
@@ -175,6 +260,7 @@ progress =
         BodyBuilder.Attributes.progressAttributesToHtmlAttributes
 
 
+{-| -}
 button : Modifiers (ButtonAttributes msg) -> List (Node msg) -> Node msg
 button =
     commonBlockFlexlessNode
@@ -183,6 +269,7 @@ button =
         BodyBuilder.Attributes.buttonAttributesToHtmlAttributes
 
 
+{-| -}
 inputHidden : Modifiers InputHiddenAttributes -> Node msg
 inputHidden modifiers =
     Html.input
@@ -201,6 +288,7 @@ inputText =
         BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
 
 
+{-| -}
 inputPassword : Modifiers (InputPasswordAttributes msg) -> Node msg
 inputPassword =
     inputAndLabel
@@ -224,6 +312,7 @@ inputNumber =
         BodyBuilder.Attributes.inputNumberAttributesToHtmlAttributes
 
 
+{-| -}
 inputRadio : Modifiers (InputRadioAttributes msg) -> Node msg
 inputRadio =
     inputAndLabel
@@ -231,6 +320,7 @@ inputRadio =
         BodyBuilder.Attributes.inputRadioAttributesToHtmlAttributes
 
 
+{-| -}
 inputCheckbox : Modifiers (InputCheckboxAttributes msg) -> Node msg
 inputCheckbox =
     inputAndLabel
@@ -238,6 +328,7 @@ inputCheckbox =
         BodyBuilder.Attributes.inputCheckboxAttributesToHtmlAttributes
 
 
+{-| -}
 inputSubmit : Modifiers (InputSubmitAttributes msg) -> Node msg
 inputSubmit =
     inputAndLabel
@@ -245,6 +336,7 @@ inputSubmit =
         BodyBuilder.Attributes.inputSubmitAttributesToHtmlAttributes
 
 
+{-| -}
 inputUrl : Modifiers (InputUrlAttributes msg) -> Node msg
 inputUrl =
     inputAndLabel
@@ -252,6 +344,7 @@ inputUrl =
         BodyBuilder.Attributes.inputUrlAttributesToHtmlAttributes
 
 
+{-| -}
 inputColor : Modifiers (InputColorAttributes msg) -> Node msg
 inputColor =
     inputAndLabel
@@ -259,6 +352,7 @@ inputColor =
         BodyBuilder.Attributes.inputColorAttributesToHtmlAttributes
 
 
+{-| -}
 inputFile : Modifiers (InputFileAttributes msg) -> Node msg
 inputFile =
     inputAndLabel
@@ -266,6 +360,7 @@ inputFile =
         BodyBuilder.Attributes.inputFileAttributesToHtmlAttributes
 
 
+{-| -}
 textarea : Modifiers (TextareaAttributes msg) -> Node msg
 textarea =
     commonBlockFlexlessChildlessNode
@@ -274,6 +369,7 @@ textarea =
         BodyBuilder.Attributes.textareaAttributesToHtmlAttributes
 
 
+{-| -}
 select : Modifiers (SelectAttributes msg) -> List (Option msg) -> Node msg
 select =
     commonNode
@@ -288,11 +384,13 @@ select =
         BodyBuilder.Attributes.selectAttributesToHtmlAttributes
 
 
+{-| -}
 option : String -> String -> Option msg
 option value content =
     Option <| Html.option [ Html.Attributes.value value ] [ Html.text content ]
 
 
+{-| -}
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 heading tag =
     commonNode
@@ -307,45 +405,54 @@ heading tag =
         BodyBuilder.Attributes.headingAttributesToHtmlAttributes
 
 
+{-| -}
 h1 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h1 =
     heading "h1"
 
 
+{-| -}
 h2 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h2 =
     heading "h2"
 
 
+{-| -}
 h3 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h3 =
     heading "h3"
 
 
+{-| -}
 h4 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h4 =
     heading "h4"
 
 
+{-| -}
 h5 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h5 =
     heading "h5"
 
 
+{-| -}
 h6 : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 h6 =
     heading "h6"
 
 
+{-| -}
 p : Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
 p =
     heading "p"
 
 
+{-| -}
 type alias BlockAttributes msg =
     HeadingAttributes msg
 
 
+{-| -}
 block :
     String
     -> Modifiers (HeadingAttributes msg)
@@ -355,36 +462,43 @@ block =
     heading
 
 
+{-| -}
 div : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
 div =
     block "div"
 
 
+{-| -}
 section : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
 section =
     block "section"
 
 
+{-| -}
 nav : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
 nav =
     block "nav"
 
 
+{-| -}
 article : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
 article =
     block "article"
 
 
+{-| -}
 aside : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
 aside =
     block "aside"
 
 
+{-| -}
 footer : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
 footer =
     block "footer"
 
 
+{-| -}
 header : Modifiers (BlockAttributes msg) -> List (Node msg) -> Node msg
 header =
     block "header"
@@ -394,6 +508,7 @@ header =
 -- Internals
 
 
+{-| -}
 commonNode :
     String
     -> VisibleAttributes a
@@ -421,6 +536,7 @@ commonNode nodeName defaultAttributes childrenModifiers getFlexContainerProperti
         (childrenModifiers children)
 
 
+{-| -}
 commonChildlessNode :
     String
     -> VisibleAttributes a
@@ -449,6 +565,7 @@ commonChildlessNode nodeName defaultAttributes childrenModifiers getFlexContaine
         []
 
 
+{-| -}
 commonBlockFlexlessNode :
     String
     -> VisibleAttributes (MaybeBlockContainer a)
@@ -469,6 +586,7 @@ commonBlockFlexlessNode tag defaultAttributes convertAttributes =
         convertAttributes
 
 
+{-| -}
 commonBlockFlexlessChildlessNode :
     String
     -> VisibleAttributes (MaybeBlockContainer a)
@@ -488,11 +606,13 @@ commonBlockFlexlessChildlessNode tag defaultAttributes convertAttributes =
         convertAttributes
 
 
+{-| -}
 nothingAttributes : b -> Maybe a
 nothingAttributes _ =
     Nothing
 
 
+{-| -}
 inputAndLabel :
     MaybeBlockContainer (VisibleAttributes { a | label : Maybe (Shared.Label msg) })
     -> (MaybeBlockContainer (VisibleAttributes { a | label : Maybe (Shared.Label msg) }) -> List (Html.Attribute msg))
@@ -528,6 +648,7 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                 (Shared.extractLabel label) computedInput
 
 
+{-| -}
 computeBlock :
     String
     -> (VisibleAttributes a -> Maybe (List ( Modifiers Flex.FlexContainerDetails, StyleSelector )))
