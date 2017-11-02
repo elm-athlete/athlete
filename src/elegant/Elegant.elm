@@ -4,6 +4,8 @@ module Elegant
         , Modifiers
         , SizeUnit
         , Style
+        , CommonStyle
+        , commonStyle
         , classes
         , color
         , em
@@ -19,6 +21,7 @@ module Elegant
         , screenWidthLE
         , setSuffix
         , style
+        , commonStyleToCss
         , styleToCss
         , toCommonStyle
         , toInlineStyles
@@ -67,6 +70,19 @@ import Native.BodyBuilder
 -}
 type Style
     = Style CommonStyle.Style
+
+
+type alias CommonStyle =
+    CommonStyle.Style
+
+
+commonStyle :
+    Maybe DisplayBox
+    -> List CommonStyle.ScreenWidth
+    -> Maybe String
+    -> CommonStyle.Style
+commonStyle =
+    CommonStyle.Style
 
 
 {-| -}
@@ -203,9 +219,8 @@ classes (Style style) =
 --         |> Elegant.Convert.stylesToCss
 
 
-{-| -}
-styleToCss : Style -> String
-styleToCss (Style style) =
+commonStyleToCss : CommonStyle -> String
+commonStyleToCss style =
     let
         styleHash =
             toString style
@@ -219,6 +234,12 @@ styleToCss (Style style) =
 
             Just classesNames ->
                 classesNames
+
+
+{-| -}
+styleToCss : Style -> String
+styleToCss (Style style) =
+    commonStyleToCss style
 
 
 {-| -}

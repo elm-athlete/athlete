@@ -8,14 +8,9 @@ import Elegant exposing (px, vh, percent, Modifiers)
 import Style
 import Grid
 import Box
-import Function
 import Background
-
-
--- import Shadow
-
+import Display
 import Block
-import Html
 
 
 item :
@@ -133,7 +128,7 @@ contentViewEl selectedId { tree, id } =
     case tree of
         Block block ->
             block.constructor
-                (block.attributes ++ selectOrSelected id selectedId)
+                ([ Attributes.class [ Elegant.commonStyleToCss block.attributes.style ] ] ++ selectOrSelected id selectedId)
                 (List.map (contentViewEl selectedId) block.children)
 
         Text content ->
@@ -219,16 +214,25 @@ getColorFromTree : Tree Msg -> Color.Color
 getColorFromTree tree =
     case tree of
         Block heading ->
-            Attributes.defaultHeadingAttributes
-                |> (Function.compose heading.attributes)
-                |> .box
-                |> extractModifiersWithoutStyleSelector
-                |> Function.compose
-                |> callOn Box.default
-                |> .background
-                |> Maybe.withDefault Background.default
-                |> .color
-                |> Maybe.withDefault Color.black
+            case
+                heading.attributes.style
+                    |> .display
+            of
+                Nothing ->
+                    Color.black
+
+                Just display ->
+                    case display of
+                        Display.None ->
+                            Color.black
+
+                        Display.ContentsWrapper contents ->
+                            contents.maybeBox
+                                |> Maybe.withDefault Box.default
+                                |> .background
+                                |> Maybe.withDefault Background.default
+                                |> .color
+                                |> Maybe.withDefault Color.black
 
         Text content ->
             Color.black
@@ -278,8 +282,21 @@ defaultP newId =
         Block
             { tag = "p"
             , constructor = Builder.p
-            , attributes = []
-            , children = []
+            , attributes =
+                { style =
+                    Elegant.commonStyle
+                        (Just
+                            (Display.ContentsWrapper
+                                { outsideDisplay = Display.Block Nothing
+                                , insideDisplay = Display.Flow
+                                , maybeBox = Nothing
+                                }
+                            )
+                        )
+                        []
+                        Nothing
+                }
+            , children = [ { id = newId, tree = Text "foo" } ]
             }
     }
 
@@ -291,7 +308,20 @@ defaultDiv newId =
         Block
             { tag = "div"
             , constructor = Builder.div
-            , attributes = []
+            , attributes =
+                { style =
+                    Elegant.commonStyle
+                        (Just
+                            (Display.ContentsWrapper
+                                { outsideDisplay = Display.Block Nothing
+                                , insideDisplay = Display.Flow
+                                , maybeBox = Nothing
+                                }
+                            )
+                        )
+                        []
+                        Nothing
+                }
             , children = []
             }
     }
@@ -304,7 +334,20 @@ defaultH1 newId =
         Block
             { tag = "h1"
             , constructor = Builder.h1
-            , attributes = []
+            , attributes =
+                { style =
+                    Elegant.commonStyle
+                        (Just
+                            (Display.ContentsWrapper
+                                { outsideDisplay = Display.Block Nothing
+                                , insideDisplay = Display.Flow
+                                , maybeBox = Nothing
+                                }
+                            )
+                        )
+                        []
+                        Nothing
+                }
             , children = []
             }
     }
@@ -362,11 +405,53 @@ changeOnlyCurrentElementColor color selectedId ({ id, tree } as element) =
 changeColor : Color.Color -> Tree msg -> Tree msg
 changeColor color tree =
     case tree of
-        Block heading ->
-            Block { heading | attributes = (Attributes.style [ Style.box [ Box.backgroundColor color ] ]) :: heading.attributes }
+        Block ({ attributes } as heading) ->
+            Block
+                { heading
+                    | attributes =
+                        { style =
+                            attributes.style
+                                |> changeColorOfStyle color
+                        }
+                }
 
         Text content ->
             tree
+
+
+changeColorOfStyle : Color.Color -> Elegant.CommonStyle -> Elegant.CommonStyle
+changeColorOfStyle color ({ display } as style) =
+    case display of
+        Nothing ->
+            Elegant.commonStyle (Just Display.None) [] Nothing
+
+        Just displayyy ->
+            case displayyy of
+                Display.None ->
+                    Elegant.commonStyle (Just Display.None) [] Nothing
+
+                Display.ContentsWrapper ({ maybeBox } as contents) ->
+                    let
+                        newBox =
+                            case maybeBox of
+                                Nothing ->
+                                    let
+                                        defaultBox =
+                                            Box.default
+
+                                        defaultBackground =
+                                            Background.default
+                                    in
+                                        { defaultBox | background = Just { defaultBackground | color = Just color } }
+
+                                Just box ->
+                                    let
+                                        background =
+                                            Maybe.withDefault Background.default box.background
+                                    in
+                                        { box | background = Just { background | color = Just color } }
+                    in
+                        { style | display = Just (Display.ContentsWrapper { contents | maybeBox = Just newBox }) }
 
 
 changeBoxColorOfCurrentElement : Color.Color -> Model -> Model
@@ -384,7 +469,7 @@ type Tree msg
     = Block
         { tag : String
         , constructor : Modifiers (Attributes.BlockAttributes msg) -> List (Node msg) -> Node msg
-        , attributes : Modifiers (Attributes.BlockAttributes msg)
+        , attributes : { style : Elegant.CommonStyle }
         , children : List (Element msg)
         }
     | Text String
