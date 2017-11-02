@@ -353,7 +353,7 @@ type alias GridItemAttributes msg =
 -- BlockContainer (FlowAttributes msg)
 
 
-type alias HeadingAttributes msg =
+type alias BlockAttributes msg =
     { block : List ( Modifiers BlockDetails, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
     , onEvent : Maybe ( String, Decoder msg )
@@ -362,6 +362,10 @@ type alias HeadingAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     }
+
+
+type alias HeadingAttributes msg =
+    BlockAttributes msg
 
 
 

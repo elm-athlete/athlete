@@ -15,6 +15,7 @@ import Background
 -- import Shadow
 
 import Block
+import Html
 
 
 item :
@@ -102,10 +103,10 @@ selectOrSelected id selectedId =
 contentViewEl : Int -> Element Msg -> Node Msg
 contentViewEl selectedId { tree, id } =
     case tree of
-        Heading heading ->
-            heading.constructor
-                (heading.attributes ++ selectOrSelected id selectedId)
-                (List.map (contentViewEl selectedId) heading.children)
+        Block block ->
+            block.constructor
+                (block.attributes ++ selectOrSelected id selectedId)
+                (List.map (contentViewEl selectedId) block.children)
 
         Text content ->
             Builder.text content
@@ -126,7 +127,7 @@ foldElement fun accu ({ tree } as element) =
             foldChildren fun
     in
         case tree of
-            Heading { children } ->
+            Block { children } ->
                 List.foldr folder value children
 
             Text content ->
@@ -150,7 +151,7 @@ getByIdHelp id element =
         [ element ]
     else
         case element.tree of
-            Heading { children } ->
+            Block { children } ->
                 List.concatMap (getByIdHelp id) children
 
             Text content ->
@@ -189,7 +190,7 @@ inspectorView model =
 getColorFromTree : Tree Msg -> Color.Color
 getColorFromTree tree =
     case tree of
-        Heading heading ->
+        Block heading ->
             Attributes.defaultHeadingAttributes
                 |> (Function.compose heading.attributes)
                 |> .box
@@ -230,43 +231,60 @@ displayTreeView : Int -> Element msg -> Node Msg
 displayTreeView selectedId { id, tree } =
     Builder.div [] <|
         case tree of
-            Heading heading ->
-                Builder.div (selectOrSelected id selectedId) [ Builder.text heading.tag ]
-                    :: (List.map (displayTreeView selectedId) heading.children)
-
             Text content ->
                 [ Builder.div (selectOrSelected id selectedId) [ Builder.text "text" ] ]
 
+            Block content ->
+                [ Builder.div
+                    ([ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ])
+                    ((Builder.div (selectOrSelected id selectedId) [ Builder.text content.tag ])
+                        :: (List.map (displayTreeView selectedId) content.children)
+                    )
+                ]
 
-defaultP : Int -> Element Msg -> Element Msg
-defaultP newId content =
+
+defaultP : Int -> Element Msg
+defaultP newId =
     { id = newId
     , tree =
-        Heading
+        Block
             { tag = "p"
             , constructor = Builder.p
             , attributes = []
-            , children = [ content ]
+            , children = []
             }
     }
 
 
-defaultH1 : Int -> Element Msg -> Element Msg
-defaultH1 newId content =
+defaultDiv : Int -> Element Msg
+defaultDiv newId =
     { id = newId
     , tree =
-        Heading
-            { tag = "p"
+        Block
+            { tag = "div"
+            , constructor = Builder.div
+            , attributes = []
+            , children = []
+            }
+    }
+
+
+defaultH1 : Int -> Element Msg
+defaultH1 newId =
+    { id = newId
+    , tree =
+        Block
+            { tag = "h1"
             , constructor = Builder.h1
             , attributes = []
-            , children = [ content ]
+            , children = []
             }
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { element = defaultP 1 { id = 2, tree = Text "Foo" }, selectedId = 1 }, Cmd.none )
+    ( { element = defaultDiv 1, selectedId = 1, autoIncrement = 2 }, Cmd.none )
 
 
 view : Model -> Node Msg
@@ -288,10 +306,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         CreateP ->
-            ( model |> createP, Cmd.none )
+            ( putElementAsChildIntoModel model defaultP, Cmd.none )
 
         CreateH1 ->
-            ( model |> createH1, Cmd.none )
+            ( putElementAsChildIntoModel model defaultH1, Cmd.none )
 
         SelectEl id ->
             ( model |> selectEl id, Cmd.none )
@@ -306,8 +324,8 @@ changeOnlyCurrentElementColor color selectedId ({ id, tree } as element) =
         { element | tree = changeColor color tree }
     else
         case tree of
-            Heading heading ->
-                { element | tree = Heading { heading | children = List.map (changeOnlyCurrentElementColor color selectedId) heading.children } }
+            Block heading ->
+                { element | tree = Block { heading | children = List.map (changeOnlyCurrentElementColor color selectedId) heading.children } }
 
             Text content ->
                 element
@@ -316,8 +334,8 @@ changeOnlyCurrentElementColor color selectedId ({ id, tree } as element) =
 changeColor : Color.Color -> Tree msg -> Tree msg
 changeColor color tree =
     case tree of
-        Heading heading ->
-            Heading { heading | attributes = (Attributes.style [ Style.box [ Box.backgroundColor color ] ]) :: heading.attributes }
+        Block heading ->
+            Block { heading | attributes = (Attributes.style [ Style.box [ Box.backgroundColor color ] ]) :: heading.attributes }
 
         Text content ->
             tree
@@ -335,10 +353,10 @@ type alias Element msg =
 
 
 type Tree msg
-    = Heading
+    = Block
         { tag : String
-        , constructor : Modifiers (Attributes.HeadingAttributes msg) -> List (Node msg) -> Node msg
-        , attributes : Modifiers (Attributes.HeadingAttributes msg)
+        , constructor : Modifiers (Attributes.BlockAttributes msg) -> List (Node msg) -> Node msg
+        , attributes : Modifiers (Attributes.BlockAttributes msg)
         , children : List (Element msg)
         }
     | Text String
@@ -359,6 +377,7 @@ type Tree msg
 type alias Model =
     { element : Element Msg
     , selectedId : Int
+    , autoIncrement : Int
     }
 
 
@@ -399,14 +418,45 @@ type Msg
 --         }
 
 
-createH1 : Model -> Model
-createH1 model =
-    { model | element = defaultH1 12 model.element }
+addChildToTree : Element msg -> Tree msg -> Tree msg
+addChildToTree child parent =
+    case parent of
+        Block block ->
+            Block { block | children = block.children ++ [ child ] }
+
+        _ ->
+            parent
 
 
-createP : Model -> Model
-createP model =
-    { model | element = defaultP 34 model.element }
+addChildToElement : Element msg -> Element msg -> Element msg
+addChildToElement parent child =
+    { parent | tree = parent.tree |> addChildToTree child }
+
+
+putElementAsChildIntoSelectedElement : Int -> Element msg -> Element msg -> Element msg
+putElementAsChildIntoSelectedElement selectedId child parent =
+    if parent.id == selectedId then
+        { parent | tree = addChildToTree child parent.tree }
+    else
+        { parent | tree = addChildToChildren parent.tree (putElementAsChildIntoSelectedElement selectedId child) }
+
+
+addChildToChildren : Tree msg -> (Element msg -> Element msg) -> Tree msg
+addChildToChildren tree elementModifier =
+    case tree of
+        Block block ->
+            Block { block | children = List.map elementModifier block.children }
+
+        _ ->
+            tree
+
+
+putElementAsChildIntoModel : Model -> (Int -> Element Msg) -> Model
+putElementAsChildIntoModel ({ selectedId, element, autoIncrement } as model) childCreator =
+    { model
+        | element = putElementAsChildIntoSelectedElement selectedId (childCreator autoIncrement) element
+        , autoIncrement = autoIncrement + 1
+    }
 
 
 main : Program Never Model Msg
