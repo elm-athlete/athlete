@@ -8,31 +8,7 @@
         "src/bodybuilder"
     ],
     "exposed-modules": [
-      "Background",
-      "Block",
-      "BodyBuilder",
-      "BodyBuilder.Attributes",
-      "BodyBuilder.Events",
-      "Border",
-      "Box",
-      "BoxShadow",
-      "Constants",
-      "Corner",
-      "Cursor",
-      "Dimensions",
-      "Display",
-      "Display.Overflow",
-      "Elegant",
-      "Flex",
-      "Grid",
-      "Margin",
-      "Outline",
-      "Padding",
-      "Position",
-      "Router",
-      "Style",
-      "Typography",
-      "Typography.Character"
+
     ],
     "dependencies": {
         "Fresheyeball/elm-tuple-extra": "3.0.0 <= v < 4.0.0",

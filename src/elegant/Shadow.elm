@@ -1,6 +1,6 @@
-module BoxShadow
+module Shadow
     exposing
-        ( BoxShadow
+        ( Shadow
         , default
         , inset
         , spreadRadius
@@ -11,12 +11,12 @@ module BoxShadow
         , boxShadowToCouple
         )
 
-{-| BoxShadow contains everything about boxShadow.
+{-| Shadow contains everything about boxShadow.
 
 
 # Types
 
-@docs BoxShadow
+@docs Shadow
 
 
 # Default box shadow
@@ -24,7 +24,7 @@ module BoxShadow
 @docs default
 
 
-# BoxShadow modifiers
+# Shadow modifiers
 
 @docs inset
 @docs blurRadius
@@ -47,18 +47,18 @@ import Elegant.Setters exposing (..)
 import Elegant.Helpers as Helpers
 
 
-{-| The BoxShadow record contains everything about box shadow.
+{-| The Shadow record contains everything about box shadow.
 You probably won't use it as is, but instead using `Elegant.boxShadow`
-which automatically generate an empty `BoxShadow` record. You
+which automatically generate an empty `Shadow` record. You
 can then use modifiers. I.E.
 
     Elegant.boxShadow
-        [ BoxShadow.inset True
-        , BoxShadow.spreadRadius (px 30)
+        [ Shadow.inset True
+        , Shadow.spreadRadius (px 30)
         ]
 
 -}
-type alias BoxShadow =
+type alias Shadow =
     { inset : Bool
     , spreadRadius : Maybe SizeUnit
     , blurRadius : Maybe SizeUnit
@@ -67,45 +67,45 @@ type alias BoxShadow =
     }
 
 
-{-| Generate an empty `BoxShadow` record, with every field equal to Nothing except inset (to `False`) and offset (to `( 0, 0 )`).
+{-| Generate an empty `Shadow` record, with every field equal to Nothing except inset (to `False`) and offset (to `( 0, 0 )`).
 You are free to use it as you wish, but it is instanciated automatically by `Elegant.boxShadow`.
 -}
-default : BoxShadow
+default : Shadow
 default =
-    BoxShadow False Nothing Nothing Nothing ( Px 0, Px 0 )
+    Shadow False Nothing Nothing Nothing ( Px 0, Px 0 )
 
 
-{-| Set the inset of the BoxShadow.
+{-| Set the inset of the Shadow.
 -}
-inset : Bool -> Modifier BoxShadow
+inset : Bool -> Modifier Shadow
 inset =
     setInset
 
 
-{-| Set the spreadRadius of the BoxShadow.
+{-| Set the spreadRadius of the Shadow.
 -}
-spreadRadius : SizeUnit -> Modifier BoxShadow
+spreadRadius : SizeUnit -> Modifier Shadow
 spreadRadius =
     setSpreadRadius << Just
 
 
-{-| Set the blurRadius of the BoxShadow.
+{-| Set the blurRadius of the Shadow.
 -}
-blurRadius : SizeUnit -> Modifier BoxShadow
+blurRadius : SizeUnit -> Modifier Shadow
 blurRadius =
     setBlurRadius << Just
 
 
-{-| Set the offset of the BoxShadow.
+{-| Set the offset of the Shadow.
 -}
-offset : ( SizeUnit, SizeUnit ) -> Modifier BoxShadow
+offset : ( SizeUnit, SizeUnit ) -> Modifier Shadow
 offset =
     setOffset
 
 
 {-| Defines a standard boxShadow.
 -}
-standard : SizeUnit -> Color -> ( SizeUnit, SizeUnit ) -> Modifier BoxShadow
+standard : SizeUnit -> Color -> ( SizeUnit, SizeUnit ) -> Modifier Shadow
 standard size color offset =
     blurRadius size
         >> setColor (Just color)
@@ -114,16 +114,16 @@ standard size color offset =
 
 {-| Creates a plain boxShadow.
 -}
-plain : ( SizeUnit, SizeUnit ) -> Color -> Modifier BoxShadow
+plain : ( SizeUnit, SizeUnit ) -> Color -> Modifier Shadow
 plain offset color =
     setOffset offset
         >> setColor (Just color)
 
 
-{-| Compiles a `BoxShadow` record to the corresponding CSS tuple.
+{-| Compiles a `Shadow` record to the corresponding CSS tuple.
 Compiles only parts which are defined, ignoring `Nothing` fields.
 -}
-boxShadowToCouple : BoxShadow -> ( String, String )
+boxShadowToCouple : Shadow -> ( String, String )
 boxShadowToCouple boxShadow =
     ( "box-shadow", boxShadowToString boxShadow )
 
@@ -161,7 +161,7 @@ insetToStringList inset =
         []
 
 
-boxShadowToString : BoxShadow -> String
+boxShadowToString : Shadow -> String
 boxShadowToString { inset, offset, spreadRadius, color, blurRadius } =
     ([ offsetToStringList offset
      , blurAndSpreadRadiusToStringList blurRadius spreadRadius

@@ -43,6 +43,11 @@ style styles =
         |> Function.compose
 
 
+rawStyle : a -> { c | style : b } -> { c | style : Maybe a }
+rawStyle theStyle attrs =
+    { attrs | style = Just theStyle }
+
+
 type alias ValueAttribute b a =
     { a | value : Maybe b }
 
@@ -185,8 +190,13 @@ type Position
     | After
 
 
+{-| Computed : BoxContainer (UniversalContainer a)
+-}
 type alias VisibleAttributes a =
-    BoxContainer (UniversalContainer a)
+    { a
+        | box : List ( Modifiers Box.Box, StyleSelector )
+        , universal : UniversalAttributes
+    }
 
 
 {-| -}
@@ -227,9 +237,18 @@ type alias InputRangeAttributes msg =
     InputNumberAttributes msg
 
 
-{-| -}
+{-| Computed : -- MaybeBlockContainer (StringValue (FlowAttributes msg))
+-}
 type alias SelectAttributes msg =
-    MaybeBlockContainer (StringValue (FlowAttributes msg))
+    { block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    , value : Maybe String
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    }
 
 
 {-| TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute {})))
@@ -244,87 +263,289 @@ type alias UniversalAttributes =
 
 {-| -}
 type alias FlowAttributes msg =
-    VisibleAttributesAndEvents msg {}
+    { onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    }
 
 
+{-| Computed :         MaybeBlockContainer (FlowAttributes msg)
+-}
 type alias NodeAttributes msg =
-    MaybeBlockContainer (FlowAttributes msg)
+    { onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
+
+
+
+-- FlexContainerProperties (NodeAttributes msg)
 
 
 type alias FlexContainerAttributes msg =
-    FlexContainerProperties (NodeAttributes msg)
+    { flexContainerProperties : List ( Modifiers Flex.FlexContainerDetails, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
+
+
+
+-- FlexItemProperties (NodeAttributes msg)
 
 
 type alias FlexItemAttributes msg =
-    FlexItemProperties (NodeAttributes msg)
+    { flexItemProperties : List ( Modifiers Flex.FlexItemDetails, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
+
+
+
+-- GridContainerProperties (NodeAttributes msg)
 
 
 type alias GridContainerAttributes msg =
-    GridContainerProperties (NodeAttributes msg)
+    { gridContainerProperties : List ( Modifiers Grid.GridContainerDetails, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
+
+
+
+-- GridItemProperties (NodeAttributes msg)
 
 
 type alias GridItemAttributes msg =
-    GridItemProperties (NodeAttributes msg)
+    { gridItemProperties : List ( Modifiers Grid.GridItemDetails, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
+
+
+
+-- BlockContainer (FlowAttributes msg)
 
 
 type alias HeadingAttributes msg =
-    BlockContainer (FlowAttributes msg)
+    { block : List ( Modifiers BlockDetails, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    }
+
+
+
+-- MaybeBlockContainer (DisabledAttribute (VisibleAttributesAndEvents msg a))
 
 
 {-| -}
 type alias ButtonAttributesBase msg a =
-    MaybeBlockContainer (DisabledAttribute (VisibleAttributesAndEvents msg a))
+    { a
+        | disabled : Bool
+        , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+        , onMouseEvents : Maybe (OnMouseEventsInside msg)
+        , onEvent : Maybe ( String, Decoder msg )
+        , onBlurEvent : Maybe msg
+        , onFocusEvent : Maybe msg
+        , box : List ( Modifiers Box.Box, StyleSelector )
+        , universal : UniversalAttributes
+    }
+
+
+
+-- ButtonAttributesBase msg {}
 
 
 type alias ButtonAttributes msg =
-    ButtonAttributesBase msg {}
+    { disabled : Bool
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    }
+
+
+
+-- MaybeBlockContainer (TargetAttribute (HrefAttribute (FlowAttributes msg)))
 
 
 {-| -}
 type alias AAttributes msg =
-    MaybeBlockContainer (TargetAttribute (HrefAttribute (FlowAttributes msg)))
+    { onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , href : Maybe String
+    , target : Maybe String
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
 
 
 {-| -}
+
+
+
+-- MaybeBlockContainer (OnStringInputEvent msg (NameAttribute (StringValue (FlowAttributes msg))))
+
+
 type alias TextareaAttributes msg =
-    MaybeBlockContainer (OnStringInputEvent msg (NameAttribute (StringValue (FlowAttributes msg))))
+    { onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , value : Maybe String
+    , onInputEvent : Maybe (String -> msg)
+    , fromStringInput : String -> String
+    , name : Maybe String
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
 
 
 {-| -}
+
+
+
+-- MaybeBlockContainer (HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (FlowAttributes msg)))))
+
+
 type alias ImgAttributes msg =
-    MaybeBlockContainer (HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (FlowAttributes msg)))))
+    { onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , src : String
+    , alt : String
+    , width : Maybe Int
+    , height : Maybe Int
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
 
 
 {-| -}
+
+
+
+-- MaybeBlockContainer (SrcAttribute (FlowAttributes msg))
+
+
 type alias AudioAttributes msg =
-    MaybeBlockContainer (SrcAttribute (FlowAttributes msg))
+    { onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , src : String
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
 
 
 {-| -}
+
+
+
+-- MaybeBlockContainer (FlowAttributes msg)
+
+
 type alias ProgressAttributes msg =
-    MaybeBlockContainer (FlowAttributes msg)
+    { onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
+
+
+
+-- DataAttribute (SrcAttribute (FlowAttributes msg))
 
 
 type alias ScriptAttributes msg =
-    DataAttribute (SrcAttribute (FlowAttributes msg))
+    { onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , src : String
+    , data : List ( String, String )
+    }
+
+
+
+-- NameAttribute (TypeContainer a)
 
 
 type alias InputAttributes a =
-    NameAttribute (TypeContainer a)
+    { a | type_ : String, name : Maybe String }
 
 
 {-| -}
+
+
+
+-- UniversalContainer (TypeContainer (InputAttributes (StringValue {})))
+
+
 type alias InputHiddenAttributes =
-    UniversalContainer (TypeContainer (InputAttributes (StringValue {})))
+    { name : Maybe String, type_ : String, value : Maybe String, universal : UniversalAttributes }
+
+
+
+-- MaybeBlockContainer (PositionAttribute (FlowAttributes msg))
 
 
 type alias LabelAttributes msg =
-    MaybeBlockContainer (PositionAttribute (FlowAttributes msg))
-
-
-label : List (Html msg) -> { c | label : Maybe (Shared.Label msg) } -> { c | label : Maybe (Shared.Label msg) }
-label content record =
-    { record | label = Just (Shared.label <| \input -> Html.label [] (input :: content)) }
+    { onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , position : Position
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
 
 
 {-| This code should be simplified with the later, but it's very faster without the function calls
@@ -344,21 +565,23 @@ type alias InputVisibleAttributes msg a =
     }
 
 
-{-| StringValue (InputVisibleAttributes msg a)
--}
-type alias InputStringValueAttributes msg a =
-    { a
-        | name : Maybe String
-        , type_ : String
-        , universal : UniversalAttributes
-        , box : List ( Modifiers Box.Box, StyleSelector )
-        , onMouseEvents : Maybe (OnMouseEventsInside msg)
-        , onEvent : Maybe ( String, Decoder msg )
-        , onBlurEvent : Maybe msg
-        , onFocusEvent : Maybe msg
-        , value : Maybe String
-        , label : Maybe (Shared.Label msg)
-    }
+
+-- {-| StringValue (InputVisibleAttributes msg a)
+-- -}
+-- type alias InputStringValueAttributes msg a =
+--     { a
+--         | name : Maybe String
+--         , type_ : String
+--         , universal : UniversalAttributes
+--         , box : List ( Modifiers Box.Box, StyleSelector )
+--         , onMouseEvents : Maybe (OnMouseEventsInside msg)
+--         , onEvent : Maybe ( String, Decoder msg )
+--         , onBlurEvent : Maybe msg
+--         , onFocusEvent : Maybe msg
+--         , value : Maybe String
+--         , label : Maybe (Shared.Label msg)
+--     }
+--
 
 
 {-| InputStringValueAttributes msg {}
@@ -379,22 +602,71 @@ type alias InputRadioAttributes msg =
 
 
 {-| -}
+
+
+
+-- MaybeBlockContainer (CheckedContainer (OnCheckEvent msg (InputStringValueAttributes msg {})))
+
+
 type alias InputCheckboxAttributes msg =
-    MaybeBlockContainer (CheckedContainer (OnCheckEvent msg (InputStringValueAttributes msg {})))
+    { name : Maybe String
+    , type_ : String
+    , universal : UniversalAttributes
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , value : Maybe String
+    , label : Maybe (Shared.Label msg)
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    , checked : Bool
+    , onCheckEvent : Maybe (Bool -> msg)
+    }
 
 
 {-| -}
-type alias InputTextAttributesBase msg a =
-    MaybeBlockContainer (AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a))))
+
+
+
+-- MaybeBlockContainer (AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a))))
+-- type alias InputTextAttributesBase msg a =
+-- InputTextAttributesBase msg {}
 
 
 type alias InputTextAttributes msg =
-    InputTextAttributesBase msg {}
+    { name : Maybe String
+    , type_ : String
+    , universal : UniversalAttributes
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , value : Maybe String
+    , label : Maybe (Shared.Label msg)
+    , placeholder : Maybe String
+    , autocomplete : Bool
+    , onInputEvent : Maybe (String -> msg)
+    , fromStringInput : String -> String
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
 
 
 {-| -}
+
+
+
+-- ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg (TypeContainer { label : Maybe (Shared.Label msg) })))
+
+
 type alias InputSubmitAttributes msg =
-    ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg (TypeContainer { label : Maybe (Shared.Label msg) })))
+    OnSubmitEvent msg
+        (ButtonAttributesBase msg
+            { label : Maybe (Shared.Label msg)
+            , type_ : String
+            }
+        )
 
 
 {-| -}
@@ -403,18 +675,85 @@ type alias InputUrlAttributes msg =
 
 
 {-| -}
+
+
+
+-- MaybeBlockContainer (StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {}))))))
+
+
 type alias InputNumberAttributes msg =
-    MaybeBlockContainer (StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {}))))))
+    MaybeBlockContainer
+        (StepAttribute
+            (MaxAttribute
+                (MinAttribute
+                    (OnIntInputEvent msg
+                        (IntValue
+                            { name : Maybe String
+                            , type_ : String
+                            , universal : UniversalAttributes
+                            , box : List ( Modifiers Box.Box, StyleSelector )
+                            , onMouseEvents : Maybe (OnMouseEventsInside msg)
+                            , onEvent : Maybe ( String, Decoder msg )
+                            , onBlurEvent : Maybe msg
+                            , onFocusEvent : Maybe msg
+                            , label : Maybe (Shared.Label msg)
+                            }
+                        )
+                    )
+                )
+            )
+        )
 
 
 {-| -}
+
+
+
+-- MaybeBlockContainer (OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {})))
+
+
 type alias InputColorAttributes msg =
-    MaybeBlockContainer (OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {})))
+    MaybeBlockContainer
+        (OnColorInputEvent msg
+            (ColorValue
+                { name : Maybe String
+                , type_ : String
+                , universal : UniversalAttributes
+                , box : List ( Modifiers Box.Box, StyleSelector )
+                , onMouseEvents : Maybe (OnMouseEventsInside msg)
+                , onEvent : Maybe ( String, Decoder msg )
+                , onBlurEvent : Maybe msg
+                , onFocusEvent : Maybe msg
+                , label : Maybe (Shared.Label msg)
+                }
+            )
+        )
 
 
 {-| -}
+
+
+
+-- MaybeBlockContainer (InputVisibleAttributes msg {})
+
+
 type alias InputFileAttributes msg =
-    MaybeBlockContainer (InputVisibleAttributes msg {})
+    MaybeBlockContainer
+        { name : Maybe String
+        , type_ : String
+        , universal : UniversalAttributes
+        , box : List ( Modifiers Box.Box, StyleSelector )
+        , onMouseEvents : Maybe (OnMouseEventsInside msg)
+        , onEvent : Maybe ( String, Decoder msg )
+        , onBlurEvent : Maybe msg
+        , onFocusEvent : Maybe msg
+        , label : Maybe (Shared.Label msg)
+        }
+
+
+label : List (Html msg) -> { c | label : Maybe (Shared.Label msg) } -> { c | label : Maybe (Shared.Label msg) }
+label content record =
+    { record | label = Just (Shared.label <| \input -> Html.label [] (input :: content)) }
 
 
 {-| -}
@@ -980,7 +1319,7 @@ defaultInputColorAttributes =
 
 inputColorAttributesToHtmlAttributes : InputColorAttributes msg -> List (Html.Attribute msg)
 inputColorAttributesToHtmlAttributes attributes =
-    unwrapMaybeAttribute Html.Attributes.value (Maybe.map Color.Convert.colorToCssRgba <| attributes.value)
+    unwrapMaybeAttribute Html.Attributes.value (Maybe.map Color.Convert.colorToHex <| attributes.value)
         |> List.append (inputVisibleToHtmlAttributes attributes)
         |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
 
@@ -1123,7 +1462,6 @@ defaultInputSubmitAttributes =
     , onEvent = Nothing
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
-    , value = Nothing
     }
 
 
@@ -1131,7 +1469,6 @@ inputSubmitAttributesToHtmlAttributes : InputSubmitAttributes msg -> List (Html.
 inputSubmitAttributesToHtmlAttributes attributes =
     List.concat
         [ submitEventToHtmlEvent attributes
-        , unwrapMaybeAttribute Html.Attributes.value attributes.value
         , Html.Attributes.disabled attributes.disabled
             :: Html.Attributes.type_ attributes.type_
             :: visibleAttributesToHtmlAttributes attributes

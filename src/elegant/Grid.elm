@@ -49,6 +49,7 @@ module Grid
         , viewWidth
         , GridItemDetails
         , GridContainerDetails
+        , GridItemSize
         )
 
 {-|

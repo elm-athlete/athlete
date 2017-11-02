@@ -51,7 +51,7 @@ import Time exposing (Time)
 import Display
 import Display.Overflow as Overflow
 import Box
-import BoxShadow
+import Shadow
 import Position
 import Typography
 import Padding
@@ -374,7 +374,7 @@ pageView insidePageView_ transition data page =
                 [ Display.dimensions [ Dimensions.width (percent 100) ] ]
             , Style.box
                 [ Box.boxShadow
-                    [ BoxShadow.standard (px 1) (Color.rgba 1 1 1 0.5) ( px 2, px 2 )
+                    [ Shadow.standard (px 1) (Color.rgba 1 1 1 0.5) ( px 2, px 2 )
                     ]
                 ]
             ]

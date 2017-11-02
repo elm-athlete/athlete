@@ -121,14 +121,14 @@ setBottomRightIn =
     flip setBottomRight
 
 
-setBoxShadow : c -> { b | boxShadow : a } -> { b | boxShadow : c }
-setBoxShadow v o =
+setShadow : c -> { b | boxShadow : a } -> { b | boxShadow : c }
+setShadow v o =
     { o | boxShadow = v }
 
 
-setBoxShadowIn : { b | boxShadow : a } -> c -> { b | boxShadow : c }
-setBoxShadowIn =
-    flip setBoxShadow
+setShadowIn : { b | boxShadow : a } -> c -> { b | boxShadow : c }
+setShadowIn =
+    flip setShadow
 
 
 setCapitalization : c -> { b | capitalization : a } -> { b | capitalization : c }

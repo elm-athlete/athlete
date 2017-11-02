@@ -138,7 +138,7 @@ separatedComponentsToElegantStyle flexModifiers flexItemModifiers gridModifiers 
         |> insertStyleComponents (Just boxModifiers) setMediaBox
         |> Dict.values
         |> List.Extra.groupWhile samePseudoClass
-        |> List.map (componentsToElegantStyle (Maybe.Extra.isJust flexModifiers) (Maybe.Extra.isJust gridModifiers))
+        |> List.map (componentsToElegantStyle (Maybe.Extra.isJust blockModifiers) (Maybe.Extra.isJust flexModifiers) (Maybe.Extra.isJust gridModifiers))
 
 
 insertStyleComponents :
@@ -183,9 +183,10 @@ samePseudoClass x y =
 componentsToElegantStyle :
     Bool
     -> Bool
+    -> Bool
     -> List ( Attributes.StyleSelector, StyleComponents )
     -> Elegant.Style
-componentsToElegantStyle isFlex isGrid components =
+componentsToElegantStyle isBlock isFlex isGrid components =
     let
         suffix =
             components
@@ -193,7 +194,7 @@ componentsToElegantStyle isFlex isGrid components =
                 |> Maybe.Extra.unwrap Nothing (Tuple.first >> .pseudoClass)
 
         computedDisplay =
-            List.map (componentsToParameteredDisplayBox isFlex isGrid) components
+            List.map (componentsToParameteredDisplayBox isBlock isFlex isGrid) components
     in
         computedDisplay
             |> List.Extra.find noMediaQueries
@@ -205,12 +206,13 @@ componentsToElegantStyle isFlex isGrid components =
 componentsToParameteredDisplayBox :
     Bool
     -> Bool
+    -> Bool
     -> ( Attributes.StyleSelector, StyleComponents )
     -> ( Maybe Attributes.MediaQuery, Display.DisplayBox )
-componentsToParameteredDisplayBox isFlex isGrid ( { media }, { flexContainer, flexItem, gridContainer, gridItem, block, box } ) =
+componentsToParameteredDisplayBox isBlock isFlex isGrid ( { media }, { flexContainer, flexItem, gridContainer, gridItem, block, box } ) =
     box
         |> Display.Contents
-            (computeOutsideDisplay flexItem gridItem block)
+            (computeOutsideDisplay flexItem gridItem block isBlock)
             (computeInsideDisplay flexItem flexContainer gridItem gridContainer isFlex isGrid)
         |> Display.ContentsWrapper
         |> (,) media
@@ -220,8 +222,9 @@ computeOutsideDisplay :
     Maybe Flex.FlexItemDetails
     -> Maybe Grid.GridItemDetails
     -> Maybe Display.BlockDetails
+    -> Bool
     -> Display.OutsideDisplay
-computeOutsideDisplay flexItem gridItem block =
+computeOutsideDisplay flexItem gridItem block isBlock =
     case flexItem of
         Just modifiers ->
             Display.FlexItem (Just modifiers) block
@@ -237,7 +240,10 @@ computeOutsideDisplay flexItem gridItem block =
                             Display.Block (Just modifiers)
 
                         Nothing ->
-                            Display.Inline
+                            if isBlock then
+                                Display.Block Nothing
+                            else
+                                Display.Inline
 
 
 computeInsideDisplay :

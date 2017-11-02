@@ -9,6 +9,7 @@ module Box
         , background
         , border
         , boxShadow
+        , shadow
         , corner
         , cursor
         , margin
@@ -59,6 +60,7 @@ It contains only modifiers, and they can be found in the respective modules.
 @docs background
 @docs border
 @docs boxShadow
+@docs shadow
 @docs corner
 @docs cursor
 @docs margin
@@ -118,7 +120,7 @@ import Border
 import Corner
 import Margin
 import Outline
-import BoxShadow
+import Shadow
 import Cursor
 import Surrounded exposing (Surrounded)
 import Background
@@ -139,7 +141,7 @@ type alias Box =
     { appearance : Maybe String
     , background : Maybe Background.Background
     , border : Maybe (Surrounded Border.Border)
-    , boxShadow : Maybe BoxShadow.BoxShadow
+    , boxShadow : Maybe Shadow.Shadow
     , corner : Maybe Corner.Corner
     , cursor : Maybe Cursor.Cursor
     , margin : Maybe (Surrounded Margin.Margin)
@@ -195,11 +197,18 @@ border =
     getModifyAndSet .border setBorderIn Surrounded.default
 
 
-{-| Accepts a list of modifiers for the `BoxShadow` and modifies the Box accordingly.
+{-| Accepts a list of modifiers for the `Shadow` and modifies the Box accordingly.
 -}
-boxShadow : Modifiers BoxShadow.BoxShadow -> Modifier Box
+boxShadow : Modifiers Shadow.Shadow -> Modifier Box
 boxShadow =
-    getModifyAndSet .boxShadow setBoxShadowIn BoxShadow.default
+    getModifyAndSet .boxShadow setShadowIn Shadow.default
+
+
+{-| Alias of boxShadow
+-}
+shadow : Modifiers Shadow.Shadow -> Modifier Box
+shadow =
+    boxShadow
 
 
 {-| Accepts a list of modifiers for the `Corner` and modifies the Box accordingly.
@@ -281,7 +290,7 @@ boxToCouples box =
     , unwrapToCouple .opacity opacityToCouple
     , unwrapToCouple .zIndex zIndexToCouple
     , unwrapToCouple .cursor Cursor.cursorToCouple
-    , unwrapToCouple .boxShadow BoxShadow.boxShadowToCouple
+    , unwrapToCouple .boxShadow Shadow.boxShadowToCouple
     , unwrapToCouples .background Background.backgroundToCouples
     , unwrapToCouples .typography Typography.typographyToCouples
     , unwrapToCouples .border Border.borderToCouples
@@ -421,7 +430,7 @@ shadowCenteredBlurry : SizeUnit -> Color -> Modifier Box
 shadowCenteredBlurry size color =
     boxShadow
         [ setColor (Just color)
-        , BoxShadow.blurRadius size
+        , Shadow.blurRadius size
         ]
 
 
