@@ -109,6 +109,10 @@ creationView model =
         Builder.div [] (insidePossibilities |> List.map (\( msg, str ) -> Builder.button [ Events.onClick msg ] [ Builder.text str ]))
 
 
+type alias Style =
+    { backgroundColor : Color.Color }
+
+
 contentView : Model -> Node Msg
 contentView { element, selectedId } =
     Builder.div []
@@ -264,7 +268,12 @@ displayTreeView selectedId { id, tree } =
     Builder.div [] <|
         case tree of
             Text content ->
-                [ Builder.div (selectOrSelected id selectedId) [ Builder.text "text" ] ]
+                [ Builder.div
+                    ((selectOrSelected id selectedId)
+                        ++ [ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ]
+                    )
+                    [ Builder.text "text" ]
+                ]
 
             Block content ->
                 [ Builder.div
@@ -350,6 +359,13 @@ defaultH1 newId =
                 }
             , children = []
             }
+    }
+
+
+defaultText : String -> Int -> Element msg
+defaultText content newId =
+    { id = newId
+    , tree = Text content
     }
 
 
@@ -475,18 +491,6 @@ type Tree msg
     | Text String
 
 
-
--- | InputText
---     { tag : Modifiers (Attributes.InputTextAttributes msg) -> Node msg
---     , attributes : Modifiers (Attributes.InputTextAttributes msg)
---     }
--- | Vanilla
---     { tag : Modifiers (Attributes.NodeAttributes msg) -> Node msg
---     , attributes : Modifiers (Attributes.NodeAttributes msg)
---     , children : List (Element msg)
---     }
-
-
 type alias Model =
     { element : Element Msg
     , selectedId : Int
@@ -494,41 +498,11 @@ type alias Model =
     }
 
 
-
---
---
--- type GridParams =
---
---
--- type HtmlElement =
-
-
 type Msg
     = CreateP
     | CreateH1
     | SelectEl Int
     | ChangeBoxColor Color.Color
-
-
-
--- createP :
---     { b
---         | elements :
---             List
---     }
---     ->
---         { b
---             | elements :
---                 List
---                     { attributes : List (Helpers.Shared.Modifier a)
---                     , children : List (Node msg)
---                     , id : Int
---                     , tag :
---                         Helpers.Shared.Modifiers (Attributes.HeadingAttributes msg1)
---                         -> List (Node msg1)
---                         -> Node msg1
---                     }
---         }
 
 
 addChildToTree : Element msg -> Tree msg -> Tree msg
