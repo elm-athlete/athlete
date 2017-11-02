@@ -72,18 +72,46 @@ wysiwyg model =
             ]
         ]
         [ item ( 0, 0 ) ( Grid.span 2, Grid.untilEndOfCoordinate ) [ contentView model ]
-        , item ( 2, 0 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ creationView ]
+        , item ( 2, 0 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ creationView model ]
         , item ( 2, 1 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ inspectorView model ]
         , item ( 2, 2 ) ( Grid.untilEndOfCoordinate, Grid.untilEndOfCoordinate ) [ treeView model ]
         ]
 
 
-creationView : Node Msg
-creationView =
-    Builder.div []
-        [ Builder.button [ Events.onClick CreateP ] [ Builder.text "p" ]
-        , Builder.button [ Events.onClick CreateH1 ] [ Builder.text "h1" ]
-        ]
+creationView : Model -> Node Msg
+creationView model =
+    let
+        selectedElement : Maybe (Element Msg)
+        selectedElement =
+            getById model.selectedId model.element
+
+        insidePossibilities =
+            case selectedElement of
+                Nothing ->
+                    []
+
+                Just selectedEl ->
+                    case selectedEl.tree of
+                        Block a ->
+                            case a.tag of
+                                "div" ->
+                                    [ ( CreateP, "p" )
+                                    , ( CreateH1, "h1" )
+                                    ]
+
+                                "p" ->
+                                    []
+
+                                "h1" ->
+                                    []
+
+                                _ ->
+                                    []
+
+                        _ ->
+                            []
+    in
+        Builder.div [] (insidePossibilities |> List.map (\( msg, str ) -> Builder.button [ Events.onClick msg ] [ Builder.text str ]))
 
 
 contentView : Model -> Node Msg
