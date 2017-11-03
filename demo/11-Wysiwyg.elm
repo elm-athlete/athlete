@@ -11,6 +11,7 @@ import Box
 import Background
 import Display
 import Block
+import Either exposing (Either(..))
 
 
 item :
@@ -44,21 +45,20 @@ wysiwyg model =
             , Style.gridContainerProperties
                 [ Grid.columns
                     [ Grid.template
-                        [ Grid.simple (Grid.fractionOfAvailableSpace 1)
-                        , Grid.simple (Grid.fractionOfAvailableSpace 1)
+                        [ Grid.simple (Grid.fractionOfAvailableSpace 2)
                         , Grid.simple (Grid.fractionOfAvailableSpace 1)
                         ]
-                    , Grid.gap (px 30)
+                    , Grid.gap (px 12)
                     , Grid.align Grid.stretch
                     , Grid.alignItems (Grid.alignWrapper Grid.center)
                     ]
                 , Grid.rows
                     [ Grid.template
-                        [ Grid.simple (Grid.fractionOfAvailableSpace 1)
+                        [ Grid.simple (Grid.sizeUnitVal (px 36))
                         , Grid.simple (Grid.fractionOfAvailableSpace 1)
                         , Grid.simple (Grid.fractionOfAvailableSpace 1)
                         ]
-                    , Grid.gap (px 30)
+                    , Grid.gap (px 12)
                     , Grid.align Grid.stretch
                     , Grid.alignItems (Grid.alignWrapper Grid.center)
                     ]
@@ -66,10 +66,10 @@ wysiwyg model =
             , Style.box [ Box.backgroundColor Color.white ]
             ]
         ]
-        [ item ( 0, 0 ) ( Grid.span 2, Grid.untilEndOfCoordinate ) [ contentView model ]
-        , item ( 2, 0 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ creationView model ]
-        , item ( 2, 1 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ inspectorView model ]
-        , item ( 2, 2 ) ( Grid.untilEndOfCoordinate, Grid.untilEndOfCoordinate ) [ treeView model ]
+        [ item ( 0, 0 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ creationView model ]
+        , item ( 0, 1 ) ( Grid.span 1, Grid.untilEndOfCoordinate ) [ contentView model ]
+        , item ( 1, 1 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ inspectorView model ]
+        , item ( 1, 2 ) ( Grid.untilEndOfCoordinate, Grid.untilEndOfCoordinate ) [ treeView model ]
         ]
 
 
@@ -87,24 +87,30 @@ creationView model =
 
                 Just selectedEl ->
                     case selectedEl.tree of
-                        Block a ->
-                            case a.tag of
-                                "div" ->
-                                    [ ( CreateP, "p" )
-                                    , ( CreateH1, "h1" )
-                                    ]
+                        Right gridElement ->
+                            []
 
-                                "p" ->
-                                    []
+                        Left tree ->
+                            case tree of
+                                Block a ->
+                                    case a.tag of
+                                        "div" ->
+                                            [ ( CreateP, "p" )
+                                            , ( CreateH1, "h1" )
+                                            , ( CreateGrid, "grid" )
+                                            ]
 
-                                "h1" ->
-                                    []
+                                        "p" ->
+                                            []
+
+                                        "h1" ->
+                                            []
+
+                                        _ ->
+                                            []
 
                                 _ ->
                                     []
-
-                        _ ->
-                            []
     in
         Builder.div [] (insidePossibilities |> List.map (\( msg, str ) -> Builder.button [ Events.onClick msg ] [ Builder.text str ]))
 
@@ -127,16 +133,39 @@ selectOrSelected id selectedId =
         [ Events.onClick (SelectEl id) ]
 
 
+contentViewGridItem : Int -> Element Msg -> List (Builder.GridItem Msg)
+contentViewGridItem selectedId { tree, id } =
+    case tree of
+        Left treeType ->
+            []
+
+        Right (GridItemIntern gridItem) ->
+            [ Builder.gridItem
+                ([ Attributes.class [ Elegant.commonStyleToCss gridItem.attributes.style ] ] ++ selectOrSelected id selectedId)
+                (List.map (contentViewEl selectedId) gridItem.children)
+            ]
+
+
 contentViewEl : Int -> Element Msg -> Node Msg
 contentViewEl selectedId { tree, id } =
     case tree of
-        Block block ->
-            block.constructor
-                ([ Attributes.class [ Elegant.commonStyleToCss block.attributes.style ] ] ++ selectOrSelected id selectedId)
-                (List.map (contentViewEl selectedId) block.children)
+        Left treeType ->
+            case treeType of
+                Grid grid ->
+                    Builder.grid
+                        ([ Attributes.class [ Elegant.commonStyleToCss grid.attributes.style ] ] ++ selectOrSelected id selectedId)
+                        (List.concatMap (contentViewGridItem selectedId) grid.children)
 
-        Text content ->
-            Builder.text content
+                Block block ->
+                    block.constructor
+                        ([ Attributes.class [ Elegant.commonStyleToCss block.attributes.style ] ] ++ selectOrSelected id selectedId)
+                        (List.map (contentViewEl selectedId) block.children)
+
+                Text content ->
+                    Builder.text content
+
+        Right gridItem ->
+            Builder.text ""
 
 
 callOn : a -> (a -> b) -> b
@@ -144,26 +173,30 @@ callOn var fun =
     fun var
 
 
-foldElement : (Tree msg -> accumulator -> accumulator) -> accumulator -> Element msg -> accumulator
-foldElement fun accu ({ tree } as element) =
-    let
-        value =
-            fun tree accu
 
-        folder =
-            foldChildren fun
-    in
-        case tree of
-            Block { children } ->
-                List.foldr folder value children
-
-            Text content ->
-                value
-
-
-foldChildren : (Tree msg -> accumulator -> accumulator) -> Element msg -> accumulator -> accumulator
-foldChildren fun element acc =
-    foldElement fun acc element
+-- foldElement : (Tree msg -> accumulator -> accumulator) -> accumulator -> Element msg -> accumulator
+-- foldElement fun accu ({ tree } as element) =
+--     let
+--         value =
+--             fun tree accu
+--
+--         folder =
+--             foldChildren fun
+--     in
+--         case tree of
+--             Block { children } ->
+--                 List.foldr folder value children
+--
+--             Grid { children } ->
+--                 List.foldr folder value children
+--
+--             Text content ->
+--                 value
+--
+--
+-- foldChildren : (Tree msg -> accumulator -> accumulator) -> Element msg -> accumulator -> accumulator
+-- foldChildren fun element acc =
+--     foldElement fun acc element
 
 
 getById : Int -> Element msg -> Maybe (Element msg)
@@ -178,11 +211,16 @@ getByIdHelp id element =
         [ element ]
     else
         case element.tree of
-            Block { children } ->
-                List.concatMap (getByIdHelp id) children
+            Left treeType ->
+                case treeType of
+                    Block { children } ->
+                        List.concatMap (getByIdHelp id) children
 
-            Text content ->
-                []
+                    Text content ->
+                        []
+
+            Right (GridItemIntern gridItem) ->
+                List.concatMap (getByIdHelp id) gridItem.children
 
 
 inspectorView : Model -> Node Msg
@@ -214,32 +252,34 @@ inspectorView model =
                         ]
 
 
-getColorFromTree : Tree Msg -> Color.Color
+getColorFromTree : Either (Tree Msg) (GridItem Msg) -> Color.Color
 getColorFromTree tree =
     case tree of
-        Block heading ->
-            case
-                heading.attributes.style
-                    |> .display
-            of
-                Nothing ->
-                    Color.black
-
-                Just display ->
-                    case display of
-                        Display.None ->
+        Left treeType ->
+            case treeType of
+                Block heading ->
+                    case
+                        heading.attributes.style
+                            |> .display
+                    of
+                        Nothing ->
                             Color.black
 
-                        Display.ContentsWrapper contents ->
-                            contents.maybeBox
-                                |> Maybe.withDefault Box.default
-                                |> .background
-                                |> Maybe.withDefault Background.default
-                                |> .color
-                                |> Maybe.withDefault Color.black
+                        Just display ->
+                            case display of
+                                Display.None ->
+                                    Color.black
 
-        Text content ->
-            Color.black
+                                Display.ContentsWrapper contents ->
+                                    contents.maybeBox
+                                        |> Maybe.withDefault Box.default
+                                        |> .background
+                                        |> Maybe.withDefault Background.default
+                                        |> .color
+                                        |> Maybe.withDefault Color.black
+
+                Text content ->
+                    Color.black
 
 
 extractModifiersWithoutStyleSelector : List ( List a, Attributes.StyleSelector ) -> List a
@@ -267,46 +307,50 @@ displayTreeView : Int -> Element msg -> Node Msg
 displayTreeView selectedId { id, tree } =
     Builder.div [] <|
         case tree of
-            Text content ->
-                [ Builder.div
-                    ((selectOrSelected id selectedId)
-                        ++ [ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ]
-                    )
-                    [ Builder.text "text" ]
-                ]
+            Left treeType ->
+                case treeType of
+                    Text content ->
+                        [ Builder.div [ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ]
+                            [ Builder.div (selectOrSelected id selectedId) [ Builder.text "text" ] ]
+                        ]
 
-            Block content ->
-                [ Builder.div
-                    ([ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ])
-                    ((Builder.div (selectOrSelected id selectedId) [ Builder.text content.tag ])
-                        :: (List.map (displayTreeView selectedId) content.children)
-                    )
-                ]
+                    Block content ->
+                        [ Builder.div
+                            ([ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ])
+                            ((Builder.div (selectOrSelected id selectedId) [ Builder.text content.tag ])
+                                :: (List.map (displayTreeView selectedId) content.children)
+                            )
+                        ]
 
 
 defaultP : Int -> Element Msg
 defaultP newId =
     { id = newId
     , tree =
-        Block
-            { tag = "p"
-            , constructor = Builder.p
-            , attributes =
-                { style =
-                    Elegant.commonStyle
-                        (Just
-                            (Display.ContentsWrapper
-                                { outsideDisplay = Display.Block Nothing
-                                , insideDisplay = Display.Flow
-                                , maybeBox = Nothing
-                                }
-                            )
-                        )
-                        []
-                        Nothing
+        Left <|
+            Block
+                { tag = "p"
+                , constructor = Builder.p
+                , attributes = blockAttributes
+                , children = [ { id = newId, tree = Left <| Text "foo" } ]
                 }
-            , children = [ { id = newId, tree = Text "foo" } ]
-            }
+    }
+
+
+blockAttributes : { style : Elegant.CommonStyle }
+blockAttributes =
+    { style =
+        Elegant.commonStyle
+            (Just
+                (Display.ContentsWrapper
+                    { outsideDisplay = Display.Block Nothing
+                    , insideDisplay = Display.Flow
+                    , maybeBox = Nothing
+                    }
+                )
+            )
+            []
+            Nothing
     }
 
 
@@ -314,25 +358,13 @@ defaultDiv : Int -> Element Msg
 defaultDiv newId =
     { id = newId
     , tree =
-        Block
-            { tag = "div"
-            , constructor = Builder.div
-            , attributes =
-                { style =
-                    Elegant.commonStyle
-                        (Just
-                            (Display.ContentsWrapper
-                                { outsideDisplay = Display.Block Nothing
-                                , insideDisplay = Display.Flow
-                                , maybeBox = Nothing
-                                }
-                            )
-                        )
-                        []
-                        Nothing
+        Left <|
+            Block
+                { tag = "div"
+                , constructor = Builder.div
+                , attributes = blockAttributes
+                , children = []
                 }
-            , children = []
-            }
     }
 
 
@@ -340,32 +372,47 @@ defaultH1 : Int -> Element Msg
 defaultH1 newId =
     { id = newId
     , tree =
-        Block
-            { tag = "h1"
-            , constructor = Builder.h1
-            , attributes =
-                { style =
-                    Elegant.commonStyle
-                        (Just
-                            (Display.ContentsWrapper
-                                { outsideDisplay = Display.Block Nothing
-                                , insideDisplay = Display.Flow
-                                , maybeBox = Nothing
-                                }
-                            )
-                        )
-                        []
-                        Nothing
+        Left <|
+            Block
+                { tag = "h1"
+                , constructor = Builder.h1
+                , attributes = blockAttributes
+                , children = []
                 }
-            , children = []
-            }
+    }
+
+
+defaultGrid : Int -> Element Msg
+defaultGrid newId =
+    { id = newId
+    , tree =
+        Left <|
+            Grid
+                { attributes =
+                    { style =
+                        Elegant.commonStyle
+                            (Just
+                                (Display.ContentsWrapper
+                                    { outsideDisplay = Display.Inline
+                                    , insideDisplay = Display.GridContainer Nothing
+                                    , maybeBox = Nothing
+                                    }
+                                )
+                            )
+                            []
+                            Nothing
+                    }
+                , children = []
+                }
     }
 
 
 defaultText : String -> Int -> Element msg
 defaultText content newId =
     { id = newId
-    , tree = Text content
+    , tree =
+        Left <|
+            Text content
     }
 
 
@@ -398,6 +445,9 @@ update msg model =
         CreateH1 ->
             ( putElementAsChildIntoModel model defaultH1, Cmd.none )
 
+        CreateGrid ->
+            ( putElementAsChildIntoModel model defaultGrid, Cmd.none )
+
         SelectEl id ->
             ( model |> selectEl id, Cmd.none )
 
@@ -411,28 +461,33 @@ changeOnlyCurrentElementColor color selectedId ({ id, tree } as element) =
         { element | tree = changeColor color tree }
     else
         case tree of
-            Block heading ->
-                { element | tree = Block { heading | children = List.map (changeOnlyCurrentElementColor color selectedId) heading.children } }
+            Left treeType ->
+                case treeType of
+                    Block heading ->
+                        { element | tree = Left <| Block { heading | children = List.map (changeOnlyCurrentElementColor color selectedId) heading.children } }
 
-            Text content ->
-                element
+                    Text content ->
+                        element
 
 
-changeColor : Color.Color -> Tree msg -> Tree msg
+changeColor : Color.Color -> Either (Tree msg) (GridItem msg) -> Either (Tree msg) (GridItem msg)
 changeColor color tree =
     case tree of
-        Block ({ attributes } as heading) ->
-            Block
-                { heading
-                    | attributes =
-                        { style =
-                            attributes.style
-                                |> changeColorOfStyle color
-                        }
-                }
+        Left treeType ->
+            case treeType of
+                Block ({ attributes } as heading) ->
+                    Left <|
+                        Block
+                            { heading
+                                | attributes =
+                                    { style =
+                                        attributes.style
+                                            |> changeColorOfStyle color
+                                    }
+                            }
 
-        Text content ->
-            tree
+                Text content ->
+                    tree
 
 
 changeColorOfStyle : Color.Color -> Elegant.CommonStyle -> Elegant.CommonStyle
@@ -477,8 +532,15 @@ changeBoxColorOfCurrentElement color ({ element, selectedId } as model) =
 
 type alias Element msg =
     { id : Int
-    , tree : Tree msg
+    , tree : Either (Tree msg) (GridItem msg)
     }
+
+
+type GridItem msg
+    = GridItemIntern
+        { attributes : { style : Elegant.CommonStyle }
+        , children : List (Element msg)
+        }
 
 
 type Tree msg
@@ -486,6 +548,10 @@ type Tree msg
         { tag : String
         , constructor : Modifiers (Attributes.BlockAttributes msg) -> List (Node msg) -> Node msg
         , attributes : { style : Elegant.CommonStyle }
+        , children : List (Element msg)
+        }
+    | Grid
+        { attributes : { style : Elegant.CommonStyle }
         , children : List (Element msg)
         }
     | Text String
@@ -501,18 +567,21 @@ type alias Model =
 type Msg
     = CreateP
     | CreateH1
+    | CreateGrid
     | SelectEl Int
     | ChangeBoxColor Color.Color
 
 
-addChildToTree : Element msg -> Tree msg -> Tree msg
+addChildToTree : Element msg -> Either (Tree msg) (GridItem msg) -> Either (Tree msg) (GridItem msg)
 addChildToTree child parent =
     case parent of
-        Block block ->
-            Block { block | children = block.children ++ [ child ] }
+        Left treeType ->
+            case treeType of
+                Block block ->
+                    Left <| Block { block | children = block.children ++ [ child ] }
 
-        _ ->
-            parent
+                _ ->
+                    parent
 
 
 addChildToElement : Element msg -> Element msg -> Element msg
@@ -528,14 +597,16 @@ putElementAsChildIntoSelectedElement selectedId child parent =
         { parent | tree = addChildToChildren parent.tree (putElementAsChildIntoSelectedElement selectedId child) }
 
 
-addChildToChildren : Tree msg -> (Element msg -> Element msg) -> Tree msg
+addChildToChildren : Either (Tree msg) (GridItem msg) -> (Element msg -> Element msg) -> Either (Tree msg) (GridItem msg)
 addChildToChildren tree elementModifier =
     case tree of
-        Block block ->
-            Block { block | children = List.map elementModifier block.children }
+        Left treeType ->
+            case treeType of
+                Block block ->
+                    Left <| Block { block | children = List.map elementModifier block.children }
 
-        _ ->
-            tree
+                _ ->
+                    tree
 
 
 putElementAsChildIntoModel : Model -> (Int -> Element Msg) -> Model
