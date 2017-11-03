@@ -1,8 +1,8 @@
 module View exposing (..)
 
 import Types exposing (..)
-import BodyBuilder as Builder exposing (Node)
-import BodyBuilder.Attributes as Attributes
+import BodyBuilder as B exposing (Node)
+import BodyBuilder.Attributes as A
 import BodyBuilder.Events as Events
 import Elegant exposing (Modifiers, px, percent)
 import Either exposing (Either(..))
@@ -17,8 +17,8 @@ import Background
 
 view : Model -> Node Msg
 view model =
-    Builder.grid
-        [ Attributes.style
+    B.grid
+        [ A.style
             [ Style.block [ Block.height (percent 100) ]
             , Style.gridContainerProperties
                 [ Grid.columns
@@ -55,10 +55,10 @@ item :
     ( Int, Int )
     -> ( Grid.GridItemSize, Grid.GridItemSize )
     -> List (Node msg)
-    -> Builder.GridItem msg
+    -> B.GridItem msg
 item ( x, y ) ( width, height ) =
-    Builder.gridItem
-        [ Attributes.style
+    B.gridItem
+        [ A.style
             [ Style.gridItemProperties
                 [ Grid.horizontal
                     [ Grid.placement x (width)
@@ -113,20 +113,20 @@ creationView model =
                                 _ ->
                                     []
     in
-        Builder.flex
-            [ Attributes.style
+        B.flex
+            [ A.style
                 [ Style.block [ Block.height (percent 100) ]
                 ]
             ]
             (insidePossibilities
                 |> List.map
                     (\( msg, str ) ->
-                        Builder.flexItem []
-                            [ Builder.button
-                                [ Attributes.style [ Style.block [ Block.height (percent 100) ] ]
+                        B.flexItem []
+                            [ B.button
+                                [ A.style [ Style.block [ Block.height (percent 100) ] ]
                                 , Events.onClick msg
                                 ]
-                                [ Builder.text str ]
+                                [ B.text str ]
                             ]
                     )
             )
@@ -134,27 +134,27 @@ creationView model =
 
 contentView : Model -> Node Msg
 contentView { element, selectedId } =
-    Builder.div []
+    B.div []
         [ contentViewEl selectedId element ]
 
 
-selectOrSelected : Int -> Int -> Modifiers (Attributes.VisibleAttributesAndEvents Msg a)
+selectOrSelected : Int -> Int -> Modifiers (A.VisibleAttributesAndEvents Msg a)
 selectOrSelected id selectedId =
     if id == selectedId then
-        [ Attributes.style [ Style.box [ Box.backgroundColor (Color.rgba 180 180 240 0.4) ] ] ]
+        [ A.style [ Style.box [ Box.backgroundColor (Color.rgba 180 180 240 0.4) ] ] ]
     else
         [ Events.onClick (SelectEl id) ]
 
 
-contentViewGridItem : Int -> Element Msg -> List (Builder.GridItem Msg)
+contentViewGridItem : Int -> Element Msg -> List (B.GridItem Msg)
 contentViewGridItem selectedId { tree, id } =
     case tree of
         Left treeType ->
             []
 
         Right (GridItem gridItem) ->
-            [ Builder.gridItem
-                ([ Attributes.class [ Elegant.commonStyleToCss gridItem.attributes.style ] ] ++ selectOrSelected id selectedId)
+            [ B.gridItem
+                ([ A.class [ Elegant.commonStyleToCss gridItem.attributes.style ] ] ++ selectOrSelected id selectedId)
                 (List.map (contentViewEl selectedId) gridItem.children)
             ]
 
@@ -165,20 +165,52 @@ contentViewEl selectedId { tree, id } =
         Left treeType ->
             case treeType of
                 Grid grid ->
-                    Builder.grid
-                        ([ Attributes.class [ Elegant.commonStyleToCss grid.attributes.style ] ] ++ selectOrSelected id selectedId)
+                    B.grid
+                        ([ A.class [ Elegant.commonStyleToCss grid.attributes.style ] ] ++ selectOrSelected id selectedId)
                         (List.concatMap (contentViewGridItem selectedId) grid.children)
 
                 Block block ->
                     block.constructor
-                        ([ Attributes.class [ Elegant.commonStyleToCss block.attributes.style ] ] ++ selectOrSelected id selectedId)
+                        ([ A.class [ Elegant.commonStyleToCss block.attributes.style ] ] ++ selectOrSelected id selectedId)
                         (List.map (contentViewEl selectedId) block.children)
 
                 Text content ->
-                    Builder.text content
+                    B.text content
 
         Right gridItem ->
-            Builder.text ""
+            B.text ""
+
+
+gridEditor : Either (Tree Msg) (GridItem Msg) -> Node Msg
+gridEditor item =
+    case item of
+        Right _ ->
+            B.text ""
+
+        Left tree ->
+            case tree of
+                Grid grid ->
+                    B.div []
+                        [ B.h1 [] [ B.text "Grid" ]
+                        , B.grid
+                            [ A.style
+                                [ Style.box [ Box.backgroundColor Color.red ]
+                                , Style.gridContainerProperties
+                                    [ Grid.columns
+                                        [ Grid.template
+                                            ([ Grid.simple (Grid.sizeUnitVal (px 12)) ]
+                                                ++ [ Grid.simple (Grid.sizeUnitVal (px 50)) ]
+                                                ++ [ Grid.simple (Grid.sizeUnitVal (px 60)) ]
+                                            )
+                                        ]
+                                    ]
+                                ]
+                            ]
+                            []
+                        ]
+
+                _ ->
+                    B.text ""
 
 
 inspectorView : Model -> Node Msg
@@ -191,7 +223,7 @@ inspectorView model =
     in
         case selectedElement of
             Nothing ->
-                Builder.div [] [ Builder.text "Nothing" ]
+                B.div [] [ B.text "Nothing" ]
 
             Just { id, tree } ->
                 let
@@ -199,21 +231,22 @@ inspectorView model =
                     color =
                         getColorFromTree tree
                 in
-                    Builder.div []
-                        [ Builder.h1 [] [ Builder.text "Inspector" ]
-                        , Builder.div []
-                            [ Builder.text "Box Attributes" ]
-                        , Builder.div []
-                            [ Builder.text "Box color" ]
-                        , Builder.div []
-                            [ Builder.inputColor [ Events.onInput ChangeBoxColor, Attributes.value color ] ]
+                    B.div []
+                        [ B.h1 [] [ B.text "Inspector" ]
+                        , B.div []
+                            [ B.text "Box Attributes" ]
+                        , B.div []
+                            [ B.text "Box color" ]
+                        , B.div []
+                            [ B.inputColor [ Events.onInput ChangeBoxColor, A.value color ] ]
+                        , gridEditor tree
                         ]
 
 
 treeView : Model -> Node Msg
 treeView { selectedId, element } =
-    Builder.div []
-        [ Builder.h1 [] [ Builder.text "Tree view" ]
+    B.div []
+        [ B.h1 [] [ B.text "Tree view" ]
         , displayTreeView selectedId element
         ]
 
@@ -221,20 +254,20 @@ treeView { selectedId, element } =
 treeViewElement : Int -> Int -> String -> List (Element msg) -> List (Node Msg)
 treeViewElement id selectedId tag =
     List.map (displayTreeView selectedId)
-        >> (::) (Builder.div (selectOrSelected id selectedId) [ Builder.text tag ])
-        >> Builder.div [ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ]
+        >> (::) (B.div (selectOrSelected id selectedId) [ B.text tag ])
+        >> B.div [ A.style [ Style.box [ Box.paddingLeft (px 12) ] ] ]
         >> List.singleton
 
 
 displayTreeView : Int -> Element msg -> Node Msg
 displayTreeView selectedId { id, tree } =
-    Builder.div [] <|
+    B.div [] <|
         case tree of
             Left treeType ->
                 case treeType of
                     Text content ->
-                        [ Builder.div [ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ]
-                            [ Builder.div (selectOrSelected id selectedId) [ Builder.text "text" ] ]
+                        [ B.div [ A.style [ Style.box [ Box.paddingLeft (px 12) ] ] ]
+                            [ B.div (selectOrSelected id selectedId) [ B.text "text" ] ]
                         ]
 
                     Block content ->
