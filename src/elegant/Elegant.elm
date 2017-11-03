@@ -6,6 +6,7 @@ module Elegant
         , Style
         , CommonStyle
         , commonStyle
+        , commonStyleToStyle
         , classes
         , color
         , em
@@ -29,8 +30,7 @@ module Elegant
         , withScreenWidth
         )
 
-{-|
-@docs Modifier
+{-| @docs Modifier
 @docs Modifiers
 @docs SizeUnit
 @docs Style
@@ -83,6 +83,11 @@ commonStyle :
     -> CommonStyle.Style
 commonStyle =
     CommonStyle.Style
+
+
+commonStyleToStyle : CommonStyle -> Style
+commonStyleToStyle =
+    Style
 
 
 {-| -}

@@ -4,22 +4,23 @@ import Types exposing (..)
 import BodyBuilder as B exposing (Node)
 import BodyBuilder.Attributes as A
 import BodyBuilder.Events as Events
-import Elegant exposing (Modifiers, px, percent)
+import Elegant exposing (Modifier, Modifiers, px, percent)
 import Either exposing (Either(..))
 import Color exposing (Color)
-import Style
+import Style as S
 import Display
 import Box
 import Block
 import Grid
+import Flex
 
 
 view : Model -> Node Msg
 view model =
     B.grid
         [ A.style
-            [ Style.block [ Block.height (percent 100) ]
-            , Style.gridContainerProperties
+            [ S.block [ Block.height (percent 100) ]
+            , S.gridContainerProperties
                 [ Grid.columns
                     [ Grid.template
                         [ Grid.simple (Grid.fractionOfAvailableSpace 2)
@@ -40,7 +41,7 @@ view model =
                     , Grid.alignItems (Grid.alignWrapper Grid.center)
                     ]
                 ]
-            , Style.box [ Box.backgroundColor Color.white ]
+            , S.box [ Box.backgroundColor Color.white ]
             ]
         ]
         [ item ( 0, 0 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ creationView model ]
@@ -58,17 +59,17 @@ item :
 item ( x, y ) ( width, height ) =
     B.gridItem
         [ A.style
-            [ Style.gridItemProperties
+            [ S.gridItemProperties
                 [ Grid.horizontal
-                    [ Grid.placement x (width)
+                    [ Grid.placement x width
                     , Grid.align Grid.stretch
                     ]
                 , Grid.vertical
-                    [ Grid.placement y (height)
+                    [ Grid.placement y height
                     , Grid.align Grid.stretch
                     ]
                 ]
-            , Style.box [ Box.backgroundColor (Color.rgba 0 0 0 0.1) ]
+            , S.box [ Box.backgroundColor (Color.rgba 0 0 0 0.1) ]
             ]
         ]
 
@@ -114,7 +115,7 @@ creationView model =
     in
         B.flex
             [ A.style
-                [ Style.block [ Block.height (percent 100) ]
+                [ S.block [ Block.height (percent 100) ]
                 ]
             ]
             (insidePossibilities
@@ -122,7 +123,7 @@ creationView model =
                     (\( msg, str ) ->
                         B.flexItem []
                             [ B.button
-                                [ A.style [ Style.block [ Block.height (percent 100) ] ]
+                                [ A.style [ S.block [ Block.height (percent 100) ] ]
                                 , Events.onClick msg
                                 ]
                                 [ B.text str ]
@@ -140,7 +141,7 @@ contentView { element, selectedId } =
 selectOrSelected : Int -> Int -> Modifiers (A.VisibleAttributesAndEvents Msg a)
 selectOrSelected id selectedId =
     if id == selectedId then
-        [ A.style [ Style.box [ Box.backgroundColor (Color.rgba 180 180 240 0.4) ] ] ]
+        [ A.style [ S.box [ Box.backgroundColor (Color.rgba 180 180 240 0.4) ] ] ]
     else
         [ Events.onClick (SelectEl id) ]
 
@@ -215,15 +216,14 @@ extractGridContainerDetailsFromStyle style =
 -- }
 
 
-extractTemplateLengthFromGridContainer :
+extractTemplateFromGridContainer :
     (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate)
     -> Grid.GridContainerDetails
-    -> Maybe Int
-extractTemplateLengthFromGridContainer getter gridContainer =
+    -> Maybe (List Grid.Repeatable)
+extractTemplateFromGridContainer getter gridContainer =
     gridContainer
         |> getter
         |> Maybe.andThen .template
-        |> Maybe.map (List.length)
 
 
 extractGridGapFromGridContainer :
@@ -244,12 +244,12 @@ extractGridGapFromStyle getter =
     extractGridContainerDetailsFromStyle >> Maybe.andThen (extractGridGapFromGridContainer getter)
 
 
-extractGridTemplateLengthFromStyle :
+extractGridTemplateFromStyle :
     (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate)
     -> Elegant.CommonStyle
-    -> Maybe Int
-extractGridTemplateLengthFromStyle getter =
-    extractGridContainerDetailsFromStyle >> Maybe.andThen (extractTemplateLengthFromGridContainer getter)
+    -> Maybe (List Grid.Repeatable)
+extractGridTemplateFromStyle getter =
+    extractGridContainerDetailsFromStyle >> Maybe.andThen (extractTemplateFromGridContainer getter)
 
 
 extractColorFromStyle : Elegant.CommonStyle -> Maybe Color
@@ -269,55 +269,96 @@ extractColorFromStyle style =
                         |> Maybe.andThen .color
 
 
-gridEditor : Either (Tree Msg) (GridItem Msg) -> Node Msg
-gridEditor item =
-    case item of
-        Right _ ->
-            B.text ""
+gridEditor :
+    { attributes : { style : Elegant.CommonStyle }, children : List (Element Msg) }
+    -> Node Msg
+gridEditor ({ attributes, children } as grid) =
+    let
+        xTemplate =
+            extractGridTemplateFromStyle .x attributes.style |> Maybe.withDefault []
 
-        Left tree ->
-            case tree of
-                Grid grid ->
-                    B.div []
-                        [ B.h1 [] [ B.text "Grid" ]
-                        , B.grid
-                            [ A.style
-                                [ Style.box [ Box.backgroundColor Color.red ]
-                                , Style.gridContainerProperties
-                                    [ Grid.columns <|
-                                        case extractGridTemplateLengthFromStyle .x grid.attributes.style of
-                                            Nothing ->
-                                                []
-
-                                            Just number ->
-                                                [ Grid.template
-                                                    ([ Grid.simple (Grid.sizeUnitVal (px 12)) ]
-                                                        ++ (List.repeat number (Grid.simple (Grid.sizeUnitVal (px 50))))
-                                                        ++ [ Grid.simple (Grid.sizeUnitVal (px 60)) ]
-                                                    )
-                                                , Grid.gap (Maybe.withDefault (px 0) (extractGridGapFromStyle .x grid.attributes.style))
-                                                ]
-                                    , Grid.rows <|
-                                        case extractGridTemplateLengthFromStyle .y grid.attributes.style of
-                                            Nothing ->
-                                                []
-
-                                            Just number ->
-                                                [ Grid.template
-                                                    ([ Grid.simple (Grid.sizeUnitVal (px 12)) ]
-                                                        ++ (List.repeat number (Grid.simple (Grid.sizeUnitVal (px 50))))
-                                                        ++ [ Grid.simple (Grid.sizeUnitVal (px 60)) ]
-                                                    )
-                                                , Grid.gap (Maybe.withDefault (px 0) (extractGridGapFromStyle .y grid.attributes.style))
-                                                ]
-                                    ]
-                                ]
+        yTemplate =
+            extractGridTemplateFromStyle .y attributes.style |> Maybe.withDefault []
+    in
+        B.grid
+            [ A.style
+                [ S.gridContainerProperties
+                    [ Grid.columns
+                        [ Grid.template
+                            [ Grid.simple (Grid.sizeUnitVal (px 50))
+                            , Grid.simple (Grid.fractionOfAvailableSpace 1)
+                            , Grid.simple (Grid.sizeUnitVal (px 50))
                             ]
-                            []
+                        , Grid.gap (px 10)
                         ]
+                    , Grid.rows
+                        [ Grid.template
+                            [ Grid.simple (Grid.sizeUnitVal (px 50))
+                            , Grid.simple (Grid.fractionOfAvailableSpace 1)
+                            , Grid.simple (Grid.sizeUnitVal (px 50))
+                            ]
+                        , Grid.gap (px 10)
+                        ]
+                    ]
+                ]
+            ]
+            [ item ( 1, 0 ) ( Grid.span 1, Grid.span 1 ) [ arrowSelection xTemplate Grid.columns "v" ]
+            , item ( 0, 1 ) ( Grid.span 1, Grid.span 1 ) [ arrowSelection yTemplate Grid.rows ">" ]
+            , item ( 1, 1 ) ( Grid.span 1, Grid.span 1 ) [ gridView grid xTemplate yTemplate ]
+            , item ( 2, 1 ) ( Grid.span 1, Grid.span 1 ) [ addButton Flex.column ]
+            , item ( 1, 2 ) ( Grid.span 1, Grid.span 1 ) [ addButton Flex.row ]
+            ]
 
-                _ ->
-                    B.text ""
+
+gridView :
+    { c | attributes : { a | style : Elegant.CommonStyle }, children : b }
+    -> List d
+    -> List e
+    -> Node msg
+gridView { attributes, children } xTemplate yTemplate =
+    B.grid
+        [ attributes.style |> Elegant.commonStyleToStyle |> A.rawStyle ]
+        ((List.foldr
+            (\element ( beginning, result ) ->
+                ( beginning + 1, result ++ [ item ( beginning, 0 ) ( Grid.span 1, Grid.untilEndOfCoordinate ) [] ] )
+            )
+            ( 0, [] )
+            xTemplate
+            |> Tuple.second
+         )
+            ++ (List.foldr
+                    (\element ( beginning, result ) ->
+                        ( beginning + 1, result ++ [ item ( 0, beginning ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [] ] )
+                    )
+                    ( 0, [] )
+                    yTemplate
+                    |> Tuple.second
+               )
+        )
+
+
+arrowSelection :
+    List Grid.Repeatable
+    -> (Modifiers Grid.GridContainerCoordinate -> Modifier Grid.GridContainerDetails)
+    -> String
+    -> Node Msg
+arrowSelection repeatables selector text =
+    B.grid
+        [ A.style
+            [ S.gridContainerProperties
+                [ selector
+                    [ Grid.template repeatables ]
+                ]
+            ]
+        ]
+        (B.gridItem [] [ B.text text ] |> List.repeat (List.length repeatables))
+
+
+addButton : Flex.FlexDirection -> Node Msg
+addButton orientation =
+    B.flex
+        [ A.style [ S.flexContainerProperties [ Flex.direction orientation ] ] ]
+        [ B.flexItem [] [ B.text "+" ] ]
 
 
 inspectorView : Model -> Node Msg
@@ -346,7 +387,12 @@ inspectorView model =
                             [ B.text "Box color" ]
                         , B.div []
                             [ B.inputColor [ Events.onInput ChangeBoxColor, A.value color ] ]
-                        , gridEditor tree
+                        , case tree of
+                            Left (Grid grid) ->
+                                gridEditor grid
+
+                            _ ->
+                                B.text ""
                         ]
 
 
@@ -362,7 +408,7 @@ treeViewElement : Int -> Int -> String -> List (Element msg) -> List (Node Msg)
 treeViewElement id selectedId tag =
     List.map (displayTreeView selectedId)
         >> (::) (B.div (selectOrSelected id selectedId) [ B.text tag ])
-        >> B.div [ A.style [ Style.box [ Box.paddingLeft (px 12) ] ] ]
+        >> B.div [ A.style [ S.box [ Box.paddingLeft (px 12) ] ] ]
         >> List.singleton
 
 
@@ -373,7 +419,7 @@ displayTreeView selectedId { id, tree } =
             Left treeType ->
                 case treeType of
                     Text content ->
-                        [ B.div [ A.style [ Style.box [ Box.paddingLeft (px 12) ] ] ]
+                        [ B.div [ A.style [ S.box [ Box.paddingLeft (px 12) ] ] ]
                             [ B.div (selectOrSelected id selectedId) [ B.text "text" ] ]
                         ]
 

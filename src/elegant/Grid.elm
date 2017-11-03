@@ -52,6 +52,7 @@ module Grid
         , GridItemSize
         , GridTemplate
         , GridContainerCoordinate
+        , Repeatable(..)
         )
 
 {-| @docs align
