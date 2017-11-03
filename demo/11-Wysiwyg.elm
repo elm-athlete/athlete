@@ -216,6 +216,9 @@ getByIdHelp id element =
                     Block { children } ->
                         List.concatMap (getByIdHelp id) children
 
+                    Grid { children } ->
+                        List.concatMap (getByIdHelp id) children
+
                     Text content ->
                         []
 
@@ -257,9 +260,30 @@ getColorFromTree tree =
     case tree of
         Left treeType ->
             case treeType of
-                Block heading ->
+                Block { attributes } ->
                     case
-                        heading.attributes.style
+                        attributes.style
+                            |> .display
+                    of
+                        Nothing ->
+                            Color.black
+
+                        Just display ->
+                            case display of
+                                Display.None ->
+                                    Color.black
+
+                                Display.ContentsWrapper contents ->
+                                    contents.maybeBox
+                                        |> Maybe.withDefault Box.default
+                                        |> .background
+                                        |> Maybe.withDefault Background.default
+                                        |> .color
+                                        |> Maybe.withDefault Color.black
+
+                Grid { attributes } ->
+                    case
+                        attributes.style
                             |> .display
                     of
                         Nothing ->
@@ -280,6 +304,27 @@ getColorFromTree tree =
 
                 Text content ->
                     Color.black
+
+        Right (GridItemIntern { attributes }) ->
+            case
+                attributes.style
+                    |> .display
+            of
+                Nothing ->
+                    Color.black
+
+                Just display ->
+                    case display of
+                        Display.None ->
+                            Color.black
+
+                        Display.ContentsWrapper contents ->
+                            contents.maybeBox
+                                |> Maybe.withDefault Box.default
+                                |> .background
+                                |> Maybe.withDefault Background.default
+                                |> .color
+                                |> Maybe.withDefault Color.black
 
 
 extractModifiersWithoutStyleSelector : List ( List a, Attributes.StyleSelector ) -> List a
@@ -321,6 +366,22 @@ displayTreeView selectedId { id, tree } =
                                 :: (List.map (displayTreeView selectedId) content.children)
                             )
                         ]
+
+                    Grid content ->
+                        [ Builder.div
+                            ([ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ])
+                            ((Builder.div (selectOrSelected id selectedId) [ Builder.text "bb-grid" ])
+                                :: (List.map (displayTreeView selectedId) content.children)
+                            )
+                        ]
+
+            Right (GridItemIntern gridItem) ->
+                [ Builder.div
+                    ([ Attributes.style [ Style.box [ Box.paddingLeft (px 12) ] ] ])
+                    ((Builder.div (selectOrSelected id selectedId) [ Builder.text "bb-grid-item" ])
+                        :: (List.map (displayTreeView selectedId) gridItem.children)
+                    )
+                ]
 
 
 defaultP : Int -> Element Msg
@@ -466,8 +527,14 @@ changeOnlyCurrentElementColor color selectedId ({ id, tree } as element) =
                     Block heading ->
                         { element | tree = Left <| Block { heading | children = List.map (changeOnlyCurrentElementColor color selectedId) heading.children } }
 
+                    Grid grid ->
+                        { element | tree = Left <| Grid { grid | children = List.map (changeOnlyCurrentElementColor color selectedId) grid.children } }
+
                     Text content ->
                         element
+
+            Right (GridItemIntern gridItem) ->
+                { element | tree = Right <| GridItemIntern { gridItem | children = List.map (changeOnlyCurrentElementColor color selectedId) gridItem.children } }
 
 
 changeColor : Color.Color -> Either (Tree msg) (GridItem msg) -> Either (Tree msg) (GridItem msg)
@@ -486,8 +553,30 @@ changeColor color tree =
                                     }
                             }
 
+                Grid ({ attributes } as grid) ->
+                    Left <|
+                        Grid
+                            { grid
+                                | attributes =
+                                    { style =
+                                        attributes.style
+                                            |> changeColorOfStyle color
+                                    }
+                            }
+
                 Text content ->
                     tree
+
+        Right (GridItemIntern ({ attributes } as gridItem)) ->
+            Right <|
+                GridItemIntern
+                    { gridItem
+                        | attributes =
+                            { style =
+                                attributes.style
+                                    |> changeColorOfStyle color
+                            }
+                    }
 
 
 changeColorOfStyle : Color.Color -> Elegant.CommonStyle -> Elegant.CommonStyle
@@ -580,8 +669,14 @@ addChildToTree child parent =
                 Block block ->
                     Left <| Block { block | children = block.children ++ [ child ] }
 
+                Grid grid ->
+                    Left <| Grid { grid | children = grid.children ++ [ child ] }
+
                 _ ->
                     parent
+
+        Right (GridItemIntern gridItem) ->
+            Right <| GridItemIntern { gridItem | children = gridItem.children ++ [ child ] }
 
 
 addChildToElement : Element msg -> Element msg -> Element msg
@@ -605,8 +700,14 @@ addChildToChildren tree elementModifier =
                 Block block ->
                     Left <| Block { block | children = List.map elementModifier block.children }
 
+                Grid grid ->
+                    Left <| Grid { grid | children = List.map elementModifier grid.children }
+
                 _ ->
                     tree
+
+        Right (GridItemIntern gridItem) ->
+            Right <| GridItemIntern { gridItem | children = List.map elementModifier gridItem.children }
 
 
 putElementAsChildIntoModel : Model -> (Int -> Element Msg) -> Model
