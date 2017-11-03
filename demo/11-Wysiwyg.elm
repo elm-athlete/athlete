@@ -112,7 +112,23 @@ creationView model =
                                 _ ->
                                     []
     in
-        Builder.div [] (insidePossibilities |> List.map (\( msg, str ) -> Builder.button [ Events.onClick msg ] [ Builder.text str ]))
+        Builder.flex
+            [ Attributes.style
+                [ Style.block [ Block.height (percent 100) ]
+                ]
+            ]
+            (insidePossibilities
+                |> List.map
+                    (\( msg, str ) ->
+                        Builder.flexItem []
+                            [ Builder.button
+                                [ Attributes.style [ Style.block [ Block.height (percent 100) ] ]
+                                , Events.onClick msg
+                                ]
+                                [ Builder.text str ]
+                            ]
+                    )
+            )
 
 
 type alias Style =
