@@ -5,7 +5,8 @@
     "license": "MIT",
     "source-directories": [
         "src/elegant",
-        "src/bodybuilder"
+        "src/bodybuilder",
+        "wysiwyg"
     ],
     "exposed-modules": [
 
