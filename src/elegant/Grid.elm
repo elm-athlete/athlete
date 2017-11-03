@@ -50,10 +50,11 @@ module Grid
         , GridItemDetails
         , GridContainerDetails
         , GridItemSize
+        , GridTemplate
+        , GridContainerCoordinate
         )
 
-{-|
-@docs align
+{-| @docs align
 @docs alignItems
 @docs alignItemsToCouple
 @docs alignSelfToCouple
@@ -242,8 +243,8 @@ repeat =
     Repeat
 
 
-type GridTemplate
-    = TemplateWrapper (List Repeatable)
+type alias GridTemplate =
+    List Repeatable
 
 
 type alias GridContainerCoordinate =
@@ -318,7 +319,7 @@ vertical modifiers gridItemDetails =
 {-| -}
 template : List Repeatable -> Modifier GridContainerCoordinate
 template repeatable gridContainerCoordinate =
-    { gridContainerCoordinate | template = Just (TemplateWrapper repeatable) }
+    { gridContainerCoordinate | template = Just repeatable }
 
 
 {-| -}
@@ -447,7 +448,7 @@ spacingToString spacing =
 
 {-| -}
 templateToCouple : String -> GridTemplate -> ( String, String )
-templateToCouple columnRow (TemplateWrapper repeatable) =
+templateToCouple columnRow repeatable =
     ( "grid-template-" ++ columnRow ++ "s"
     , repeatable
         |> List.map repeatableToString

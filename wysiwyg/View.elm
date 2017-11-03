@@ -12,7 +12,6 @@ import Display
 import Box
 import Block
 import Grid
-import Background
 
 
 view : Model -> Node Msg
@@ -181,6 +180,95 @@ contentViewEl selectedId { tree, id } =
             B.text ""
 
 
+
+-- type InsideDisplay
+--     = Flow
+--     | FlexContainer (Maybe Flex.FlexContainerDetails)
+--     | GridContainer (Maybe Grid.GridContainerDetails)
+
+
+extractGridContainerDetailsFromStyle : Elegant.CommonStyle -> Maybe Grid.GridContainerDetails
+extractGridContainerDetailsFromStyle style =
+    case style.display of
+        Just display ->
+            case display of
+                Display.None ->
+                    Nothing
+
+                Display.ContentsWrapper { insideDisplay } ->
+                    case insideDisplay of
+                        Display.GridContainer gridContainer ->
+                            gridContainer
+
+                        _ ->
+                            Nothing
+
+        Nothing ->
+            Nothing
+
+
+
+-- { gutter : Maybe SizeUnit
+-- , align : Maybe Align
+-- , alignItems : Maybe AlignItems
+-- , template : Maybe GridTemplate
+-- }
+
+
+extractTemplateLengthFromGridContainer :
+    (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate)
+    -> Grid.GridContainerDetails
+    -> Maybe Int
+extractTemplateLengthFromGridContainer getter gridContainer =
+    gridContainer
+        |> getter
+        |> Maybe.andThen .template
+        |> Maybe.map (List.length)
+
+
+extractGridGapFromGridContainer :
+    (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate)
+    -> Grid.GridContainerDetails
+    -> Maybe Elegant.SizeUnit
+extractGridGapFromGridContainer getter gridContainer =
+    gridContainer
+        |> getter
+        |> Maybe.andThen .gutter
+
+
+extractGridGapFromStyle :
+    (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate)
+    -> Elegant.CommonStyle
+    -> Maybe Elegant.SizeUnit
+extractGridGapFromStyle getter =
+    extractGridContainerDetailsFromStyle >> Maybe.andThen (extractGridGapFromGridContainer getter)
+
+
+extractGridTemplateLengthFromStyle :
+    (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate)
+    -> Elegant.CommonStyle
+    -> Maybe Int
+extractGridTemplateLengthFromStyle getter =
+    extractGridContainerDetailsFromStyle >> Maybe.andThen (extractTemplateLengthFromGridContainer getter)
+
+
+extractColorFromStyle : Elegant.CommonStyle -> Maybe Color
+extractColorFromStyle style =
+    case style.display of
+        Nothing ->
+            Nothing
+
+        Just display ->
+            case display of
+                Display.None ->
+                    Nothing
+
+                Display.ContentsWrapper contents ->
+                    contents.maybeBox
+                        |> Maybe.andThen .background
+                        |> Maybe.andThen .color
+
+
 gridEditor : Either (Tree Msg) (GridItem Msg) -> Node Msg
 gridEditor item =
     case item of
@@ -196,13 +284,32 @@ gridEditor item =
                             [ A.style
                                 [ Style.box [ Box.backgroundColor Color.red ]
                                 , Style.gridContainerProperties
-                                    [ Grid.columns
-                                        [ Grid.template
-                                            ([ Grid.simple (Grid.sizeUnitVal (px 12)) ]
-                                                ++ [ Grid.simple (Grid.sizeUnitVal (px 50)) ]
-                                                ++ [ Grid.simple (Grid.sizeUnitVal (px 60)) ]
-                                            )
-                                        ]
+                                    [ Grid.columns <|
+                                        case extractGridTemplateLengthFromStyle .x grid.attributes.style of
+                                            Nothing ->
+                                                []
+
+                                            Just number ->
+                                                [ Grid.template
+                                                    ([ Grid.simple (Grid.sizeUnitVal (px 12)) ]
+                                                        ++ (List.repeat number (Grid.simple (Grid.sizeUnitVal (px 50))))
+                                                        ++ [ Grid.simple (Grid.sizeUnitVal (px 60)) ]
+                                                    )
+                                                , Grid.gap (Maybe.withDefault (px 0) (extractGridGapFromStyle .x grid.attributes.style))
+                                                ]
+                                    , Grid.rows <|
+                                        case extractGridTemplateLengthFromStyle .y grid.attributes.style of
+                                            Nothing ->
+                                                []
+
+                                            Just number ->
+                                                [ Grid.template
+                                                    ([ Grid.simple (Grid.sizeUnitVal (px 12)) ]
+                                                        ++ (List.repeat number (Grid.simple (Grid.sizeUnitVal (px 50))))
+                                                        ++ [ Grid.simple (Grid.sizeUnitVal (px 60)) ]
+                                                    )
+                                                , Grid.gap (Maybe.withDefault (px 0) (extractGridGapFromStyle .y grid.attributes.style))
+                                                ]
                                     ]
                                 ]
                             ]
@@ -309,37 +416,18 @@ getByIdHelp id element =
 
 getColorFromTree : Either (Tree Msg) (GridItem Msg) -> Color.Color
 getColorFromTree tree =
-    case tree of
-        Left treeType ->
-            case treeType of
-                Block { attributes } ->
-                    extractColorFromStyle attributes.style
+    Maybe.withDefault Color.black <|
+        case tree of
+            Left treeType ->
+                case treeType of
+                    Block { attributes } ->
+                        extractColorFromStyle attributes.style
 
-                Grid { attributes } ->
-                    extractColorFromStyle attributes.style
+                    Grid { attributes } ->
+                        extractColorFromStyle attributes.style
 
-                Text content ->
-                    Color.black
+                    Text content ->
+                        Nothing
 
-        Right (GridItem { attributes }) ->
-            extractColorFromStyle attributes.style
-
-
-extractColorFromStyle : Elegant.CommonStyle -> Color
-extractColorFromStyle style =
-    case style.display of
-        Nothing ->
-            Color.black
-
-        Just display ->
-            case display of
-                Display.None ->
-                    Color.black
-
-                Display.ContentsWrapper contents ->
-                    contents.maybeBox
-                        |> Maybe.withDefault Box.default
-                        |> .background
-                        |> Maybe.withDefault Background.default
-                        |> .color
-                        |> Maybe.withDefault Color.black
+            Right (GridItem { attributes }) ->
+                extractColorFromStyle attributes.style

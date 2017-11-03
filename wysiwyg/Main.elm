@@ -10,6 +10,7 @@ import Display
 import Either exposing (Either(..))
 import Types exposing (..)
 import View
+import Grid
 
 
 callOn : a -> (a -> b) -> b
@@ -101,7 +102,33 @@ defaultGrid newId =
                             (Just
                                 (Display.ContentsWrapper
                                     { outsideDisplay = Display.Inline
-                                    , insideDisplay = Display.GridContainer Nothing
+                                    , insideDisplay =
+                                        Display.GridContainer
+                                            (Just
+                                                { x =
+                                                    Just
+                                                        { align = Nothing
+                                                        , alignItems = Nothing
+                                                        , gutter = Just (px 5)
+                                                        , template =
+                                                            Just
+                                                                [ Grid.simple (Grid.fractionOfAvailableSpace 1)
+                                                                , Grid.simple (Grid.fractionOfAvailableSpace 1)
+                                                                ]
+                                                        }
+                                                , y =
+                                                    Just
+                                                        { align = Nothing
+                                                        , alignItems = Nothing
+                                                        , gutter = Just (px 5)
+                                                        , template =
+                                                            Just
+                                                                [ Grid.simple (Grid.fractionOfAvailableSpace 1)
+                                                                , Grid.simple (Grid.fractionOfAvailableSpace 1)
+                                                                ]
+                                                        }
+                                                }
+                                            )
                                     , maybeBox = Nothing
                                     }
                                 )
@@ -303,6 +330,7 @@ putElementAsChildIntoModel : Model -> (Int -> Element Msg) -> Model
 putElementAsChildIntoModel ({ selectedId, element, autoIncrement } as model) childCreator =
     { model
         | element = putElementAsChildIntoSelectedElement selectedId (childCreator autoIncrement) element
+        , selectedId = autoIncrement
         , autoIncrement = autoIncrement + 1
     }
 
