@@ -3,9 +3,8 @@ module View exposing (..)
 import Types exposing (..)
 import BodyBuilder as B exposing (Node)
 import BodyBuilder.Attributes as A
-import BodyBuilder.Events as Events
+import BodyBuilder.Events as E
 import Elegant exposing (Modifier, Modifiers, px, percent)
-import Either exposing (Either(..))
 import Color exposing (Color)
 import Style as S
 import Display
@@ -88,30 +87,25 @@ creationView model =
 
                 Just selectedEl ->
                     case selectedEl.tree of
-                        Right gridElement ->
-                            []
+                        Block a ->
+                            case a.tag of
+                                "div" ->
+                                    [ ( CreateP, "p" )
+                                    , ( CreateH1, "h1" )
+                                    , ( CreateGrid, "grid" )
+                                    ]
 
-                        Left tree ->
-                            case tree of
-                                Block a ->
-                                    case a.tag of
-                                        "div" ->
-                                            [ ( CreateP, "p" )
-                                            , ( CreateH1, "h1" )
-                                            , ( CreateGrid, "grid" )
-                                            ]
+                                "p" ->
+                                    []
 
-                                        "p" ->
-                                            []
-
-                                        "h1" ->
-                                            []
-
-                                        _ ->
-                                            []
+                                "h1" ->
+                                    []
 
                                 _ ->
                                     []
+
+                        _ ->
+                            []
     in
         B.flex
             [ A.style
@@ -124,7 +118,7 @@ creationView model =
                         B.flexItem []
                             [ B.button
                                 [ A.style [ S.block [ Block.height (percent 100) ] ]
-                                , Events.onClick msg
+                                , E.onClick msg
                                 ]
                                 [ B.text str ]
                             ]
@@ -143,41 +137,39 @@ selectOrSelected id selectedId =
     if id == selectedId then
         [ A.style [ S.box [ Box.backgroundColor (Color.rgba 180 180 240 0.4) ] ] ]
     else
-        [ Events.onClick (SelectEl id) ]
+        [ E.onClick (SelectEl id) ]
 
 
 contentViewGridItem : Int -> Element Msg -> List (B.GridItem Msg)
 contentViewGridItem selectedId { tree, id } =
     case tree of
-        Left treeType ->
-            []
-
-        Right (GridItem gridItem) ->
+        GridItem gridItem ->
             [ B.gridItem
                 ([ A.class [ Elegant.commonStyleToCss gridItem.attributes.style ] ] ++ selectOrSelected id selectedId)
                 (List.map (contentViewEl selectedId) gridItem.children)
             ]
 
+        _ ->
+            []
+
 
 contentViewEl : Int -> Element Msg -> Node Msg
 contentViewEl selectedId { tree, id } =
     case tree of
-        Left treeType ->
-            case treeType of
-                Grid grid ->
-                    B.grid
-                        ([ A.class [ Elegant.commonStyleToCss grid.attributes.style ] ] ++ selectOrSelected id selectedId)
-                        (List.concatMap (contentViewGridItem selectedId) grid.children)
+        Grid grid ->
+            B.grid
+                ([ A.class [ Elegant.commonStyleToCss grid.attributes.style ] ] ++ selectOrSelected id selectedId)
+                (List.concatMap (contentViewGridItem selectedId) grid.children)
 
-                Block block ->
-                    block.constructor
-                        ([ A.class [ Elegant.commonStyleToCss block.attributes.style ] ] ++ selectOrSelected id selectedId)
-                        (List.map (contentViewEl selectedId) block.children)
+        Block block ->
+            block.constructor
+                ([ A.class [ Elegant.commonStyleToCss block.attributes.style ] ] ++ selectOrSelected id selectedId)
+                (List.map (contentViewEl selectedId) block.children)
 
-                Text content ->
-                    B.text content
+        Text content ->
+            B.text content
 
-        Right gridItem ->
+        GridItem gridItem ->
             B.text ""
 
 
@@ -285,28 +277,50 @@ gridEditor ({ attributes, children } as grid) =
                 [ S.gridContainerProperties
                     [ Grid.columns
                         [ Grid.template
-                            [ Grid.simple (Grid.sizeUnitVal (px 50))
+                            [ Grid.simple (Grid.sizeUnitVal (px 25))
                             , Grid.simple (Grid.fractionOfAvailableSpace 1)
-                            , Grid.simple (Grid.sizeUnitVal (px 50))
+                            , Grid.simple (Grid.sizeUnitVal (px 25))
                             ]
                         , Grid.gap (px 10)
                         ]
                     , Grid.rows
                         [ Grid.template
-                            [ Grid.simple (Grid.sizeUnitVal (px 50))
+                            [ Grid.simple (Grid.sizeUnitVal (px 25))
                             , Grid.simple (Grid.fractionOfAvailableSpace 1)
-                            , Grid.simple (Grid.sizeUnitVal (px 50))
+                            , Grid.simple (Grid.sizeUnitVal (px 25))
                             ]
                         , Grid.gap (px 10)
                         ]
                     ]
+                , S.block []
                 ]
             ]
-            [ item ( 1, 0 ) ( Grid.span 1, Grid.span 1 ) [ arrowSelection xTemplate Grid.columns "v" ]
-            , item ( 0, 1 ) ( Grid.span 1, Grid.span 1 ) [ arrowSelection yTemplate Grid.rows ">" ]
+            [ item ( 1, 0 ) ( Grid.span 1, Grid.span 1 ) [ arrowSelection xTemplate [ S.block [ Block.width (px 120), Block.alignCenter ] ] Grid.columns (B.text "v") ]
+            , item ( 0, 1 )
+                ( Grid.span 1, Grid.span 1 )
+                [ arrowSelection yTemplate
+                    [ S.block
+                        [ Block.height (px 120) ]
+                    ]
+                    Grid.rows
+                    (B.flex
+                        [ A.style
+                            [ S.flexContainerProperties
+                                [ Flex.align Flex.center
+                                , Flex.justifyContent Flex.justifyContentCenter
+                                ]
+                            , S.block
+                                [ Block.height (percent 100)
+                                , Block.width (percent 100)
+                                ]
+                            ]
+                        ]
+                        [ B.flexItem [] [ B.div [] [ B.text ">" ] ] ]
+                    )
+                ]
             , item ( 1, 1 ) ( Grid.span 1, Grid.span 1 ) [ gridView grid xTemplate yTemplate ]
-            , item ( 2, 1 ) ( Grid.span 1, Grid.span 1 ) [ addButton Flex.column ]
-            , item ( 1, 2 ) ( Grid.span 1, Grid.span 1 ) [ addButton Flex.row ]
+            , item ( 2, 1 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddColumn Flex.column ]
+            , item ( 1, 2 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddRow Flex.row ]
             ]
 
 
@@ -317,10 +331,25 @@ gridView :
     -> Node msg
 gridView { attributes, children } xTemplate yTemplate =
     B.grid
-        [ attributes.style |> Elegant.commonStyleToStyle |> A.rawStyle ]
+        [ attributes.style |> Elegant.commonStyleToStyle |> A.rawStyle, A.style [ S.block [] ] ]
         ((List.foldr
             (\element ( beginning, result ) ->
-                ( beginning + 1, result ++ [ item ( beginning, 0 ) ( Grid.span 1, Grid.untilEndOfCoordinate ) [] ] )
+                ( beginning + 1
+                , result
+                    ++ [ item ( beginning, 0 )
+                            ( Grid.span 1, Grid.untilEndOfCoordinate )
+                            [ B.node
+                                [ A.style
+                                    [ S.block
+                                        [ Block.width (px 120)
+                                        , Block.height (px 120)
+                                        ]
+                                    ]
+                                ]
+                                []
+                            ]
+                       ]
+                )
             )
             ( 0, [] )
             xTemplate
@@ -328,7 +357,22 @@ gridView { attributes, children } xTemplate yTemplate =
          )
             ++ (List.foldr
                     (\element ( beginning, result ) ->
-                        ( beginning + 1, result ++ [ item ( 0, beginning ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [] ] )
+                        ( beginning + 1
+                        , result
+                            ++ [ item ( 0, beginning )
+                                    ( Grid.untilEndOfCoordinate, Grid.span 1 )
+                                    [ B.node
+                                        [ A.style
+                                            [ S.block
+                                                [ Block.width (px 120)
+                                                , Block.height (px 120)
+                                                ]
+                                            ]
+                                        ]
+                                        []
+                                    ]
+                               ]
+                        )
                     )
                     ( 0, [] )
                     yTemplate
@@ -339,26 +383,34 @@ gridView { attributes, children } xTemplate yTemplate =
 
 arrowSelection :
     List Grid.Repeatable
+    -> List (A.StyleModifier (A.NodeAttributes msg))
     -> (Modifiers Grid.GridContainerCoordinate -> Modifier Grid.GridContainerDetails)
-    -> String
-    -> Node Msg
-arrowSelection repeatables selector text =
+    -> Node msg
+    -> Node msg
+arrowSelection repeatables styleModifiers selector content =
     B.grid
         [ A.style
             [ S.gridContainerProperties
                 [ selector
                     [ Grid.template repeatables ]
                 ]
+            , S.block
+                [ Block.width (percent 100)
+                , Block.height (percent 100)
+                ]
             ]
         ]
-        (B.gridItem [] [ B.text text ] |> List.repeat (List.length repeatables))
+        (B.gridItem []
+            [ B.node [ A.style styleModifiers ] [ content ] ]
+            |> List.repeat (List.length repeatables)
+        )
 
 
-addButton : Flex.FlexDirection -> Node Msg
-addButton orientation =
+addButton : Msg -> Flex.FlexDirection -> Node Msg
+addButton msg orientation =
     B.flex
         [ A.style [ S.flexContainerProperties [ Flex.direction orientation ] ] ]
-        [ B.flexItem [] [ B.text "+" ] ]
+        [ B.flexItem [ E.onClick msg ] [ B.text "+" ] ]
 
 
 inspectorView : Model -> Node Msg
@@ -386,9 +438,9 @@ inspectorView model =
                         , B.div []
                             [ B.text "Box color" ]
                         , B.div []
-                            [ B.inputColor [ Events.onInput ChangeBoxColor, A.value color ] ]
+                            [ B.inputColor [ E.onInput ChangeBoxColor, A.value color ] ]
                         , case tree of
-                            Left (Grid grid) ->
+                            Grid grid ->
                                 gridEditor grid
 
                             _ ->
@@ -416,20 +468,18 @@ displayTreeView : Int -> Element msg -> Node Msg
 displayTreeView selectedId { id, tree } =
     B.div [] <|
         case tree of
-            Left treeType ->
-                case treeType of
-                    Text content ->
-                        [ B.div [ A.style [ S.box [ Box.paddingLeft (px 12) ] ] ]
-                            [ B.div (selectOrSelected id selectedId) [ B.text "text" ] ]
-                        ]
+            Text content ->
+                [ B.div [ A.style [ S.box [ Box.paddingLeft (px 12) ] ] ]
+                    [ B.div (selectOrSelected id selectedId) [ B.text "text" ] ]
+                ]
 
-                    Block content ->
-                        treeViewElement id selectedId content.tag content.children
+            Block content ->
+                treeViewElement id selectedId content.tag content.children
 
-                    Grid content ->
-                        treeViewElement id selectedId "bb-grid" content.children
+            Grid content ->
+                treeViewElement id selectedId "bb-grid" content.children
 
-            Right (GridItem gridItem) ->
+            GridItem gridItem ->
                 treeViewElement id selectedId "bb-grid-item" gridItem.children
 
 
@@ -445,35 +495,31 @@ getByIdHelp id element =
         [ element ]
     else
         case element.tree of
-            Left treeType ->
-                case treeType of
-                    Block { children } ->
-                        List.concatMap (getByIdHelp id) children
+            Block { children } ->
+                List.concatMap (getByIdHelp id) children
 
-                    Grid { children } ->
-                        List.concatMap (getByIdHelp id) children
+            Grid { children } ->
+                List.concatMap (getByIdHelp id) children
 
-                    Text content ->
-                        []
+            Text content ->
+                []
 
-            Right (GridItem gridItem) ->
+            GridItem gridItem ->
                 List.concatMap (getByIdHelp id) gridItem.children
 
 
-getColorFromTree : Either (Tree Msg) (GridItem Msg) -> Color.Color
+getColorFromTree : Tree Msg -> Color.Color
 getColorFromTree tree =
     Maybe.withDefault Color.black <|
         case tree of
-            Left treeType ->
-                case treeType of
-                    Block { attributes } ->
-                        extractColorFromStyle attributes.style
+            Block { attributes } ->
+                extractColorFromStyle attributes.style
 
-                    Grid { attributes } ->
-                        extractColorFromStyle attributes.style
+            Grid { attributes } ->
+                extractColorFromStyle attributes.style
 
-                    Text content ->
-                        Nothing
+            Text content ->
+                Nothing
 
-            Right (GridItem { attributes }) ->
+            GridItem { attributes } ->
                 extractColorFromStyle attributes.style
