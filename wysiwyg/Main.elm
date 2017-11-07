@@ -44,6 +44,9 @@ update msg model =
             CreateText ->
                 defaultText "Change me" |> putElementAsChildIntoModel model
 
+            CreateSpan ->
+                defaultSpan |> putElementAsChildIntoModel model
+
             SelectEl id ->
                 model |> setSelectedId id
 
@@ -69,6 +72,13 @@ addChildToTree child parent =
                 |> flip List.append [ child ]
                 |> setChildrenIn block
                 |> Block
+
+        Inline inline ->
+            inline
+                |> .children
+                |> flip List.append [ child ]
+                |> setChildrenIn inline
+                |> Inline
 
         Grid grid ->
             grid
@@ -133,6 +143,13 @@ addChildToChildren elementModifier tree =
                 |> setChildrenIn block
                 |> Block
 
+        Inline inline ->
+            inline
+                |> .children
+                |> List.map elementModifier
+                |> setChildrenIn inline
+                |> Inline
+
         Grid grid ->
             grid
                 |> .children
@@ -170,6 +187,14 @@ changeOnlyCurrentElementColor color selectedId ({ id, tree } as element) =
                     |> List.map (changeOnlyCurrentElementColor color selectedId)
                     |> setChildrenIn heading
                     |> Block
+                    |> setTreeIn element
+
+            Inline inline ->
+                inline
+                    |> .children
+                    |> List.map (changeOnlyCurrentElementColor color selectedId)
+                    |> setChildrenIn inline
+                    |> Inline
                     |> setTreeIn element
 
             Grid grid ->
@@ -211,6 +236,13 @@ changeColor color tree =
                 |> changeColorInAttributes color
                 |> setAttributesIn heading
                 |> Block
+
+        Inline inline ->
+            inline
+                |> .attributes
+                |> changeColorInAttributes color
+                |> setAttributesIn inline
+                |> Inline
 
         Grid grid ->
             grid
@@ -286,6 +318,14 @@ changeOnlyCurrentElementText text selectedId ({ id, tree } as element) =
                     |> List.map (changeOnlyCurrentElementText text selectedId)
                     |> setChildrenIn heading
                     |> Block
+                    |> setTreeIn element
+
+            Inline inline ->
+                inline
+                    |> .children
+                    |> List.map (changeOnlyCurrentElementText text selectedId)
+                    |> setChildrenIn inline
+                    |> Inline
                     |> setTreeIn element
 
             Grid grid ->

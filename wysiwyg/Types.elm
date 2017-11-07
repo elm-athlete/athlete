@@ -37,6 +37,19 @@ blockStyle =
     }
 
 
+inlineStyle : { style : Elegant.CommonStyle }
+inlineStyle =
+    { style =
+        { outsideDisplay = Display.Inline
+        , insideDisplay = Display.Flow
+        , maybeBox = Nothing
+        }
+            |> Display.ContentsWrapper
+            |> Just
+            |> commonStyle
+    }
+
+
 gridContainerXY : a -> { x : Maybe a, y : Maybe a }
 gridContainerXY content =
     { x = Just content
@@ -84,6 +97,17 @@ type alias BlockAttributes msg =
     }
 
 
+type alias NodeAttributes msg =
+    { tag : String
+    , constructor :
+        Modifiers (A.NodeAttributes msg)
+        -> List (Node msg)
+        -> Node msg
+    , attributes : { style : Elegant.CommonStyle }
+    , children : List (Element msg)
+    }
+
+
 setChildrenIn : { a | children : b } -> b -> { a | children : b }
 setChildrenIn record elem =
     { record | children = elem }
@@ -107,6 +131,14 @@ defaultBlockAttributes tag constructor =
     BlockAttributes tag constructor blockStyle []
 
 
+defaultInlineAttributes :
+    String
+    -> (Modifiers (A.NodeAttributes msg) -> List (Node msg) -> Node msg)
+    -> NodeAttributes msg
+defaultInlineAttributes tag constructor =
+    NodeAttributes tag constructor inlineStyle []
+
+
 type alias GridAttributes msg =
     { attributes : { style : Elegant.CommonStyle }
     , children : List (Element msg)
@@ -120,6 +152,7 @@ defaultGridAttributes =
 
 type Tree msg
     = Block (BlockAttributes msg)
+    | Inline (NodeAttributes msg)
     | Grid (GridAttributes msg)
     | GridItem (GridAttributes msg)
     | Text String
@@ -143,6 +176,13 @@ defaultDiv : Int -> Element Msg
 defaultDiv newId =
     defaultBlockAttributes "div" B.div
         |> Block
+        |> defaultElement newId
+
+
+defaultSpan : Int -> Element Msg
+defaultSpan newId =
+    defaultInlineAttributes "span" B.span
+        |> Inline
         |> defaultElement newId
 
 
@@ -199,6 +239,7 @@ type Msg
     | CreateH1
     | CreateGrid
     | CreateDiv
+    | CreateSpan
     | CreateText
     | SelectEl Int
     | ChangeBoxColor Color
