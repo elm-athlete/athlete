@@ -56,10 +56,10 @@ update msg model =
                 model |> setSelectedId id
 
             ChangeBoxColor color ->
-                model |> changeBoxColorOfCurrentElement color
+                model |> changeBoxStyleOfSelectedElement (changeBoxColor color)
 
             ChangeOpacity opacity ->
-                model |> changeOpacityOfCurrentElement ((opacity |> toFloat) / 1000)
+                model |> changeBoxStyleOfSelectedElement (changeBoxOpacity ((opacity |> toFloat) / 1000))
 
             ChangeText text ->
                 model |> changeTextOfCurrentElement text
@@ -76,16 +76,6 @@ addChildToElement ({ tree } as parent) child =
     tree
         |> addChildToTree child
         |> setTreeIn parent
-
-
-changeBoxColorOfCurrentElement : Color.Color -> Model -> Model
-changeBoxColorOfCurrentElement color =
-    changeBoxStyleOfSelectedElement (changeBoxColor color)
-
-
-changeOpacityOfCurrentElement : Float -> Model -> Model
-changeOpacityOfCurrentElement opacity =
-    changeBoxStyleOfSelectedElement (changeBoxOpacity opacity)
 
 
 changeStyleOfSelectedElement : (Elegant.CommonStyle -> Elegant.CommonStyle) -> Model -> Model
