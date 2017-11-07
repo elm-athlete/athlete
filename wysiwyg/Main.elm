@@ -78,17 +78,77 @@ addChildToElement ({ tree } as parent) child =
 
 
 changeBoxColorOfCurrentElement : Color.Color -> Model -> Model
-changeBoxColorOfCurrentElement color ({ element, selectedId } as model) =
-    element
-        |> changeOnlyCurrentElementColor color selectedId
-        |> setElementIn model
+changeBoxColorOfCurrentElement color =
+    changeBoxStyleOfSelectedElement (changeBoxColor color)
 
 
 changeOpacityOfCurrentElement : Float -> Model -> Model
-changeOpacityOfCurrentElement opacity ({ element, selectedId } as model) =
+changeOpacityOfCurrentElement opacity =
+    changeBoxStyleOfSelectedElement (changeBoxOpacity opacity)
+
+
+changeStyleOfSelectedElement : (Elegant.CommonStyle -> Elegant.CommonStyle) -> Model -> Model
+changeStyleOfSelectedElement modifier ({ element, selectedId } as model) =
     element
-        |> changeOnlyCurrentElementOpacity opacity selectedId
+        |> applyToSelectedElement selectedId
+            (modifier
+                |> modifyStyleInAttributes
+                |> applyToAttributes
+            )
         |> setElementIn model
+
+
+modifyStyleInAttributes :
+    (Elegant.CommonStyle -> Elegant.CommonStyle)
+    -> { a | style : Elegant.CommonStyle }
+    -> { a | style : Elegant.CommonStyle }
+modifyStyleInAttributes modifier attributes =
+    attributes.style
+        |> modifier
+        |> setStyleIn attributes
+
+
+changeBoxStyleOfSelectedElement : (Box.Box -> Box.Box) -> Model -> Model
+changeBoxStyleOfSelectedElement modifier =
+    changeStyleOfSelectedElement (modifyBoxInStyle modifier)
+
+
+modifyBoxInStyle : (Box.Box -> Box.Box) -> Elegant.CommonStyle -> Elegant.CommonStyle
+modifyBoxInStyle modifier ({ display } as style) =
+    display
+        |> Maybe.map (modifyDisplayBox modifier >> Just >> setDisplayIn style)
+        |> Maybe.withDefault (commonStyle Display.None)
+
+
+modifyDisplayBox : (Box.Box -> Box.Box) -> Display.DisplayBox -> Display.DisplayBox
+modifyDisplayBox modifier display =
+    case display of
+        Display.None ->
+            Display.None
+
+        Display.ContentsWrapper ({ maybeBox } as contents) ->
+            maybeBox
+                |> Maybe.map modifier
+                |> Maybe.withDefault (modifier Box.default)
+                |> Just
+                |> setMaybeBoxIn contents
+                |> Display.ContentsWrapper
+
+
+changeBoxColor : Color.Color -> Box.Box -> Box.Box
+changeBoxColor color box =
+    color
+        |> Just
+        |> setColorIn (Maybe.withDefault Background.default box.background)
+        |> Just
+        |> setBackgroundIn box
+
+
+changeBoxOpacity : Float -> Box.Box -> Box.Box
+changeBoxOpacity opacity box =
+    opacity
+        |> Just
+        |> setOpacityIn box
 
 
 putElementAsChildIntoModel : Model -> (Int -> Element Msg) -> Model
@@ -200,117 +260,26 @@ applyToAttributes applyOnAttributes tree =
             Text content
 
 
-changeColor : Color.Color -> Tree msg -> Tree msg
-changeColor color =
-    applyToAttributes (changeColorInAttributes color)
-
-
-changeOpacity opacity =
-    applyToAttributes (changeOpacityInAttributes opacity)
-
-
-applyToSelectedElement : (Tree msg -> Tree msg) -> Int -> Element msg -> Element msg
-applyToSelectedElement modifierTree selectedId ({ id, tree } as element) =
+applyToSelectedElement : Int -> (Tree msg -> Tree msg) -> Element msg -> Element msg
+applyToSelectedElement selectedId modifierTree ({ id, tree } as element) =
     tree
         |> (if id == selectedId then
                 modifierTree
             else
-                applyToChildren (List.map (applyToSelectedElement modifierTree selectedId))
+                applyToChildren (List.map (applyToSelectedElement selectedId modifierTree))
            )
         |> setTreeIn element
 
 
-changeOnlyCurrentElementColor : Color.Color -> Int -> Element msg -> Element msg
-changeOnlyCurrentElementColor color =
-    applyToSelectedElement (changeColor color)
-
-
-changeOnlyCurrentElementOpacity opacity =
-    applyToSelectedElement (changeOpacity opacity)
-
-
-changeOnlyCurrentElementText : String -> Int -> Element msg -> Element msg
-changeOnlyCurrentElementText text =
-    applyToSelectedElement (always (Text text))
-
-
-changeColorInAttributes :
-    Color
-    -> { a | style : Elegant.CommonStyle }
-    -> { a | style : Elegant.CommonStyle }
-changeColorInAttributes color attributes =
-    attributes.style
-        |> changeColorOfStyle color
-        |> setStyleIn attributes
-
-
-changeOpacityInAttributes opacity attributes =
-    attributes.style
-        |> changeOpacityOfStyle opacity
-        |> setStyleIn attributes
-
-
-changeColorOfStyle : Color.Color -> Elegant.CommonStyle -> Elegant.CommonStyle
-changeColorOfStyle color ({ display } as style) =
-    display
-        |> Maybe.map (modifyColor color >> Just >> setDisplayIn style)
-        |> Maybe.withDefault (commonStyle Display.None)
-
-
-changeOpacityOfStyle opacity ({ display } as style) =
-    display
-        |> Maybe.map (modifyOpacity opacity >> Just >> setDisplayIn style)
-        |> Maybe.withDefault (commonStyle Display.None)
-
-
-modifyColor : Color.Color -> Display.DisplayBox -> Display.DisplayBox
-modifyColor color display =
-    case display of
-        Display.None ->
-            Display.None
-
-        Display.ContentsWrapper ({ maybeBox } as contents) ->
-            maybeBox
-                |> Maybe.map (\box -> (changeColorInBox color (Maybe.withDefault Background.default box.background) box))
-                |> Maybe.withDefault (changeColorInBox color Background.default Box.default)
-                |> Just
-                |> setMaybeBoxIn contents
-                |> Display.ContentsWrapper
-
-
-modifyOpacity opacity display =
-    case display of
-        Display.None ->
-            Display.None
-
-        Display.ContentsWrapper ({ maybeBox } as contents) ->
-            maybeBox
-                |> Maybe.map (\box -> (changeOpacityInBox opacity box))
-                |> Maybe.withDefault (changeOpacityInBox opacity Box.default)
-                |> Just
-                |> setMaybeBoxIn contents
-                |> Display.ContentsWrapper
-
-
-changeOpacityInBox opacity box =
-    opacity
-        |> Just
-        |> setOpacityIn box
-
-
-changeColorInBox : Color.Color -> Background.Background -> Box.Box -> Box.Box
-changeColorInBox color background box =
-    color
-        |> Just
-        |> setColorIn background
-        |> Just
-        |> setBackgroundIn box
+changeOnlyCurrentElementText : Int -> String -> Element msg -> Element msg
+changeOnlyCurrentElementText id text =
+    applyToSelectedElement id (always (Text text))
 
 
 changeTextOfCurrentElement : String -> Model -> Model
 changeTextOfCurrentElement text ({ element, selectedId } as model) =
     element
-        |> changeOnlyCurrentElementText text selectedId
+        |> changeOnlyCurrentElementText selectedId text
         |> setElementIn model
 
 
@@ -840,6 +809,7 @@ extractColorFromStyle style =
                         |> Maybe.andThen .color
 
 
+extractOpacityFromStyle : Elegant.CommonStyle -> Maybe Float
 extractOpacityFromStyle style =
     case style.display of
         Nothing ->
@@ -1124,6 +1094,7 @@ getByIdHelp id element =
                 List.concatMap (getByIdHelp id) gridItem.children
 
 
+getOpacityFromTree : Tree msg -> Float
 getOpacityFromTree tree =
     Maybe.withDefault 1.0 <|
         case tree of
