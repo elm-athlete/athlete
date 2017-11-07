@@ -5,6 +5,7 @@ module Display
         , InsideDisplay(..)
         , Contents
         , BlockDetails
+        , defaultBlockDetails
         , ListStyleType
         , listStyleNone
         , listStyleDisc

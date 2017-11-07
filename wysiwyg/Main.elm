@@ -59,7 +59,7 @@ createElement msg model =
                 defaultH1
 
             CreateGrid ->
-                defaultGrid
+                defaultGridContainer
 
             CreateDiv ->
                 defaultDiv
@@ -69,6 +69,9 @@ createElement msg model =
 
             CreateSpan ->
                 defaultSpan
+
+            CreateGridItem ->
+                defaultGridItem
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -483,8 +486,8 @@ inlineStyle =
     }
 
 
-gridContainerXY : a -> { x : Maybe a, y : Maybe a }
-gridContainerXY content =
+gridXY : a -> { x : Maybe a, y : Maybe a }
+gridXY content =
     { x = Just content
     , y = Just content
     }
@@ -492,13 +495,13 @@ gridContainerXY content =
 
 gridContainerBase : Display.InsideDisplay
 gridContainerBase =
-    gridContainerXY
+    gridXY
         { align = Nothing
         , alignItems = Nothing
         , gutter = Just (px 5)
         , template =
-            [ Grid.simple (Grid.fractionOfAvailableSpace 1)
-            , Grid.simple (Grid.fractionOfAvailableSpace 1)
+            [ Grid.simple (Grid.sizeUnitVal (px 120))
+            , Grid.simple (Grid.sizeUnitVal (px 120))
             ]
                 |> Just
         }
@@ -506,12 +509,34 @@ gridContainerBase =
         |> Display.GridContainer
 
 
-gridStyle : { style : Elegant.CommonStyle }
-gridStyle =
+gridContainerStyle : { style : Elegant.CommonStyle }
+gridContainerStyle =
     { style =
         { outsideDisplay = Display.Inline
         , maybeBox = Nothing
         , insideDisplay = gridContainerBase
+        }
+            |> Display.ContentsWrapper
+            |> commonStyle
+    }
+
+
+gridItemBase : Display.OutsideDisplay
+gridItemBase =
+    gridXY
+        { align = Nothing
+        , placement = Nothing
+        }
+        |> Just
+        |> flip Display.GridItem (Just Display.defaultBlockDetails)
+
+
+gridItemStyle : { style : Elegant.CommonStyle }
+gridItemStyle =
+    { style =
+        { outsideDisplay = gridItemBase
+        , maybeBox = Nothing
+        , insideDisplay = Display.Flow
         }
             |> Display.ContentsWrapper
             |> commonStyle
@@ -577,9 +602,14 @@ type alias GridAttributes msg =
     }
 
 
-defaultGridAttributes : GridAttributes msg
-defaultGridAttributes =
-    GridAttributes gridStyle []
+defaultGridContainerAttributes : GridAttributes msg
+defaultGridContainerAttributes =
+    GridAttributes gridContainerStyle []
+
+
+defaultGridItemAttributes : GridAttributes msg
+defaultGridItemAttributes =
+    GridAttributes gridItemStyle []
 
 
 type Tree msg
@@ -625,10 +655,17 @@ defaultH1 newId =
         |> defaultElement newId
 
 
-defaultGrid : Int -> Element Msg
-defaultGrid newId =
-    defaultGridAttributes
+defaultGridContainer : Int -> Element Msg
+defaultGridContainer newId =
+    defaultGridContainerAttributes
         |> Grid
+        |> defaultElement newId
+
+
+defaultGridItem : Int -> Element Msg
+defaultGridItem newId =
+    defaultGridItemAttributes
+        |> GridItem
         |> defaultElement newId
 
 
@@ -673,6 +710,7 @@ type CreateElementMsg
     | CreateDiv
     | CreateSpan
     | CreateText
+    | CreateGridItem
 
 
 type Msg
@@ -783,6 +821,17 @@ creationView model =
                         Inline a ->
                             [ ( CreateText, "text" )
                             , ( CreateSpan, "span" )
+                            ]
+
+                        Grid a ->
+                            [ ( CreateGridItem, "grid-item" ) ]
+
+                        GridItem b ->
+                            [ ( CreateGrid, "grid" )
+                            , ( CreateDiv, "div" )
+                            , ( CreateSpan, "span" )
+                            , ( CreateP, "p" )
+                            , ( CreateH1, "h1" )
                             ]
 
                         _ ->
