@@ -93,10 +93,12 @@ creationView model =
                                     [ ( CreateP, "p" )
                                     , ( CreateH1, "h1" )
                                     , ( CreateGrid, "grid" )
+                                    , ( CreateDiv, "div" )
                                     ]
 
                                 "p" ->
-                                    []
+                                    [ ( CreateText, "text" )
+                                    ]
 
                                 "h1" ->
                                     []
@@ -259,6 +261,10 @@ extractColorFromStyle style =
                     contents.maybeBox
                         |> Maybe.andThen .background
                         |> Maybe.andThen .color
+
+
+textEditor text id =
+    B.inputText [ A.value text, E.onInput ChangeText ]
 
 
 gridEditor :
@@ -442,6 +448,9 @@ inspectorView model =
                         , case tree of
                             Grid grid ->
                                 gridEditor grid
+
+                            Text text ->
+                                textEditor text id
 
                             _ ->
                                 B.text ""

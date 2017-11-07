@@ -183,7 +183,10 @@ type Msg
     = CreateP
     | CreateH1
     | CreateGrid
+    | CreateDiv
+    | CreateText
     | SelectEl Int
     | ChangeBoxColor Color
+    | ChangeText String
     | AddColumn
     | AddRow

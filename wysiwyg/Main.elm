@@ -38,11 +38,20 @@ update msg model =
             CreateGrid ->
                 defaultGrid |> putElementAsChildIntoModel model
 
+            CreateDiv ->
+                defaultDiv |> putElementAsChildIntoModel model
+
+            CreateText ->
+                defaultText "Change me" |> putElementAsChildIntoModel model
+
             SelectEl id ->
                 model |> setSelectedId id
 
             ChangeBoxColor color ->
                 model |> changeBoxColorOfCurrentElement color
+
+            ChangeText text ->
+                model |> changeTextOfCurrentElement text
 
             AddColumn ->
                 model |> addColumnInGrid
@@ -155,6 +164,44 @@ changeColorOfStyle color ({ display } as style) =
 changeBoxColorOfCurrentElement : Color.Color -> Model -> Model
 changeBoxColorOfCurrentElement color ({ element, selectedId } as model) =
     { model | element = element |> changeOnlyCurrentElementColor color selectedId }
+
+
+changeTextOfCurrentElement : String -> Model -> Model
+changeTextOfCurrentElement text ({ element, selectedId } as model) =
+    { model | element = element |> changeOnlyCurrentElementText text selectedId }
+
+
+changeOnlyCurrentElementText text selectedId ({ id, tree } as element) =
+    if id == selectedId then
+        { element | tree = Text text }
+    else
+        case tree of
+            Block heading ->
+                heading
+                    |> .children
+                    |> List.map (changeOnlyCurrentElementText text selectedId)
+                    |> setChildrenIn heading
+                    |> Block
+                    |> setTreeIn element
+
+            Grid grid ->
+                grid
+                    |> .children
+                    |> List.map (changeOnlyCurrentElementText text selectedId)
+                    |> setChildrenIn grid
+                    |> Grid
+                    |> setTreeIn element
+
+            GridItem gridItem ->
+                gridItem
+                    |> .children
+                    |> List.map (changeOnlyCurrentElementText text selectedId)
+                    |> setChildrenIn gridItem
+                    |> GridItem
+                    |> setTreeIn element
+
+            Text content ->
+                element
 
 
 addChildToTree : Element msg -> Tree msg -> Tree msg
