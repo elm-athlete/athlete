@@ -8,6 +8,26 @@ import Display
 import Grid
 
 
+setBackground : a -> { c | background : b } -> { c | background : a }
+setBackground elem record =
+    { record | background = elem }
+
+
+setBackgroundIn : { c | background : b } -> a -> { c | background : a }
+setBackgroundIn =
+    flip setBackground
+
+
+setColor : a -> { c | color : b } -> { c | color : a }
+setColor elem record =
+    { record | color = elem }
+
+
+setColorIn : { c | color : b } -> a -> { c | color : a }
+setColorIn =
+    flip setColor
+
+
 type alias Element msg =
     { id : Int
     , tree : Tree msg
@@ -19,9 +39,19 @@ setTreeIn record elem =
     { record | tree = elem }
 
 
-commonStyle : Maybe Display.DisplayBox -> Elegant.CommonStyle
+setMaybeBoxIn : { a | maybeBox : b } -> b -> { a | maybeBox : b }
+setMaybeBoxIn record elem =
+    { record | maybeBox = elem }
+
+
+commonStyle : Display.DisplayBox -> Elegant.CommonStyle
 commonStyle style =
-    Elegant.commonStyle style [] Nothing
+    Elegant.commonStyle (Just style) [] Nothing
+
+
+setDisplayIn : { a | display : b } -> b -> { a | display : b }
+setDisplayIn record elem =
+    { record | display = elem }
 
 
 blockStyle : { style : Elegant.CommonStyle }
@@ -32,7 +62,6 @@ blockStyle =
         , maybeBox = Nothing
         }
             |> Display.ContentsWrapper
-            |> Just
             |> commonStyle
     }
 
@@ -68,7 +97,6 @@ gridStyle =
         , insideDisplay = gridContainerBase
         }
             |> Display.ContentsWrapper
-            |> Just
             |> commonStyle
     }
 

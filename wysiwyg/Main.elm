@@ -232,37 +232,33 @@ changeColor color tree =
 
 changeColorOfStyle : Color.Color -> Elegant.CommonStyle -> Elegant.CommonStyle
 changeColorOfStyle color ({ display } as style) =
+    display
+        |> Maybe.map (modifyColor color >> Just >> setDisplayIn style)
+        |> Maybe.withDefault (commonStyle Display.None)
+
+
+modifyColor : Color.Color -> Display.DisplayBox -> Display.DisplayBox
+modifyColor color display =
     case display of
-        Nothing ->
-            Elegant.commonStyle (Just Display.None) [] Nothing
+        Display.None ->
+            Display.None
 
-        Just displayyy ->
-            case displayyy of
-                Display.None ->
-                    Elegant.commonStyle (Just Display.None) [] Nothing
+        Display.ContentsWrapper ({ maybeBox } as contents) ->
+            maybeBox
+                |> Maybe.map (\box -> (changeColorInBox color (Maybe.withDefault Background.default box.background) box))
+                |> Maybe.withDefault (changeColorInBox color Background.default Box.default)
+                |> Just
+                |> setMaybeBoxIn contents
+                |> Display.ContentsWrapper
 
-                Display.ContentsWrapper ({ maybeBox } as contents) ->
-                    let
-                        newBox =
-                            case maybeBox of
-                                Nothing ->
-                                    let
-                                        defaultBox =
-                                            Box.default
 
-                                        defaultBackground =
-                                            Background.default
-                                    in
-                                        { defaultBox | background = Just { defaultBackground | color = Just color } }
-
-                                Just box ->
-                                    let
-                                        background =
-                                            Maybe.withDefault Background.default box.background
-                                    in
-                                        { box | background = Just { background | color = Just color } }
-                    in
-                        { style | display = Just (Display.ContentsWrapper { contents | maybeBox = Just newBox }) }
+changeColorInBox : Color.Color -> Background.Background -> Box.Box -> Box.Box
+changeColorInBox color background box =
+    color
+        |> Just
+        |> setColorIn background
+        |> Just
+        |> setBackgroundIn box
 
 
 changeTextOfCurrentElement : String -> Model -> Model
