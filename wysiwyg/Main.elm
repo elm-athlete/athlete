@@ -67,41 +67,6 @@ update msg model =
                 model
 
 
-addChildToTree : Element msg -> Tree msg -> Tree msg
-addChildToTree child parent =
-    case parent of
-        Block block ->
-            block
-                |> .children
-                |> flip List.append [ child ]
-                |> setChildrenIn block
-                |> Block
-
-        Inline inline ->
-            inline
-                |> .children
-                |> flip List.append [ child ]
-                |> setChildrenIn inline
-                |> Inline
-
-        Grid grid ->
-            grid
-                |> .children
-                |> flip List.append [ child ]
-                |> setChildrenIn grid
-                |> Grid
-
-        GridItem gridItem ->
-            gridItem
-                |> .children
-                |> flip List.append [ child ]
-                |> setChildrenIn gridItem
-                |> GridItem
-
-        Text content ->
-            Text content
-
-
 addChildToElement : Element msg -> Element msg -> Element msg
 addChildToElement ({ tree } as parent) child =
     tree
@@ -133,43 +98,8 @@ putElementAsChildIntoSelectedElement selectedId child ({ id, tree } as parent) =
             |> setTreeIn parent
     else
         tree
-            |> addChildToChildren (putElementAsChildIntoSelectedElement selectedId child)
+            |> mapChildren (putElementAsChildIntoSelectedElement selectedId child)
             |> setTreeIn parent
-
-
-addChildToChildren : (Element msg -> Element msg) -> Tree msg -> Tree msg
-addChildToChildren elementModifier tree =
-    case tree of
-        Block block ->
-            block
-                |> .children
-                |> List.map elementModifier
-                |> setChildrenIn block
-                |> Block
-
-        Inline inline ->
-            inline
-                |> .children
-                |> List.map elementModifier
-                |> setChildrenIn inline
-                |> Inline
-
-        Grid grid ->
-            grid
-                |> .children
-                |> List.map elementModifier
-                |> setChildrenIn grid
-                |> Grid
-
-        GridItem gridItem ->
-            gridItem
-                |> .children
-                |> List.map elementModifier
-                |> setChildrenIn gridItem
-                |> GridItem
-
-        Text content ->
-            Text content
 
 
 addColumnInGrid : Model -> Model
@@ -177,48 +107,138 @@ addColumnInGrid model =
     model
 
 
-changeOnlyCurrentElementColor : Color.Color -> Int -> Element msg -> Element msg
-changeOnlyCurrentElementColor color selectedId ({ id, tree } as element) =
+mapChildren : (Element msg -> Element msg) -> Tree msg -> Tree msg
+mapChildren elementModifier =
+    applyToChildren (List.map elementModifier)
+
+
+addChildToTree : Element msg -> Tree msg -> Tree msg
+addChildToTree child =
+    applyToChildren (flip List.append [ child ])
+
+
+modifyChildren : (a -> a) -> { b | children : a } -> { b | children : a }
+modifyChildren applyOnElements treeInside =
+    treeInside
+        |> .children
+        |> applyOnElements
+        |> setChildrenIn treeInside
+
+
+modifyAttributes : (a -> a) -> { b | attributes : a } -> { b | attributes : a }
+modifyAttributes applyOnAttributes treeInside =
+    treeInside
+        |> .attributes
+        |> applyOnAttributes
+        |> setAttributesIn treeInside
+
+
+applyToChildren : (List (Element msg) -> List (Element msg)) -> Tree msg -> Tree msg
+applyToChildren applyOnElements tree =
+    case tree of
+        Block block ->
+            block
+                |> modifyChildren applyOnElements
+                |> Block
+
+        Inline inline ->
+            inline
+                |> modifyChildren applyOnElements
+                |> Inline
+
+        Grid grid ->
+            grid
+                |> modifyChildren applyOnElements
+                |> Grid
+
+        GridItem gridItem ->
+            gridItem
+                |> modifyChildren applyOnElements
+                |> GridItem
+
+        Text content ->
+            Text content
+
+
+applyToAttributes :
+    ({ style : Elegant.CommonStyle } -> { style : Elegant.CommonStyle })
+    -> Tree msg
+    -> Tree msg
+applyToAttributes applyOnAttributes tree =
+    case tree of
+        Block block ->
+            block
+                |> modifyAttributes applyOnAttributes
+                |> Block
+
+        Inline inline ->
+            inline
+                |> modifyAttributes applyOnAttributes
+                |> Inline
+
+        Grid grid ->
+            grid
+                |> modifyAttributes applyOnAttributes
+                |> Grid
+
+        GridItem gridItem ->
+            gridItem
+                |> modifyAttributes applyOnAttributes
+                |> GridItem
+
+        Text content ->
+            Text content
+
+
+changeColor : Color.Color -> Tree msg -> Tree msg
+changeColor color =
+    applyToAttributes (changeColorInAttributes color)
+
+
+applyToSelectedElement : (Tree msg -> Tree msg) -> Int -> Element msg -> Element msg
+applyToSelectedElement modifierTree selectedId ({ id, tree } as element) =
     if id == selectedId then
         tree
-            |> changeColor color
+            |> modifierTree
             |> setTreeIn element
     else
         case tree of
             Block heading ->
                 heading
-                    |> .children
-                    |> List.map (changeOnlyCurrentElementColor color selectedId)
-                    |> setChildrenIn heading
+                    |> modifyChildren (List.map (applyToSelectedElement modifierTree selectedId))
                     |> Block
                     |> setTreeIn element
 
             Inline inline ->
                 inline
-                    |> .children
-                    |> List.map (changeOnlyCurrentElementColor color selectedId)
-                    |> setChildrenIn inline
+                    |> modifyChildren (List.map (applyToSelectedElement modifierTree selectedId))
                     |> Inline
                     |> setTreeIn element
 
             Grid grid ->
                 grid
-                    |> .children
-                    |> List.map (changeOnlyCurrentElementColor color selectedId)
-                    |> setChildrenIn grid
+                    |> modifyChildren (List.map (applyToSelectedElement modifierTree selectedId))
                     |> Grid
                     |> setTreeIn element
 
             GridItem gridItem ->
                 gridItem
-                    |> .children
-                    |> List.map (changeOnlyCurrentElementColor color selectedId)
-                    |> setChildrenIn gridItem
+                    |> modifyChildren (List.map (applyToSelectedElement modifierTree selectedId))
                     |> GridItem
                     |> setTreeIn element
 
             Text content ->
                 element
+
+
+changeOnlyCurrentElementColor : Color.Color -> Int -> Element msg -> Element msg
+changeOnlyCurrentElementColor color =
+    applyToSelectedElement (changeColor color)
+
+
+changeOnlyCurrentElementText : String -> Int -> Element msg -> Element msg
+changeOnlyCurrentElementText text =
+    applyToSelectedElement (always (Text text))
 
 
 changeColorInAttributes :
@@ -229,41 +249,6 @@ changeColorInAttributes color attributes =
     attributes.style
         |> changeColorOfStyle color
         |> setStyleIn attributes
-
-
-changeColor : Color.Color -> Tree msg -> Tree msg
-changeColor color tree =
-    case tree of
-        Block heading ->
-            heading
-                |> .attributes
-                |> changeColorInAttributes color
-                |> setAttributesIn heading
-                |> Block
-
-        Inline inline ->
-            inline
-                |> .attributes
-                |> changeColorInAttributes color
-                |> setAttributesIn inline
-                |> Inline
-
-        Grid grid ->
-            grid
-                |> .attributes
-                |> changeColorInAttributes color
-                |> setAttributesIn grid
-                |> Grid
-
-        GridItem gridItem ->
-            gridItem
-                |> .attributes
-                |> changeColorInAttributes color
-                |> setAttributesIn gridItem
-                |> GridItem
-
-        Text content ->
-            Text content
 
 
 changeColorOfStyle : Color.Color -> Elegant.CommonStyle -> Elegant.CommonStyle
@@ -302,60 +287,6 @@ changeTextOfCurrentElement text ({ element, selectedId } as model) =
     element
         |> changeOnlyCurrentElementText text selectedId
         |> setElementIn model
-
-
-changeOnlyCurrentElementText : String -> Int -> Element msg -> Element msg
-changeOnlyCurrentElementText text selectedId ({ id, tree } as element) =
-    if id == selectedId then
-        text
-            |> Text
-            |> setTreeIn element
-    else
-        case tree of
-            Block heading ->
-                heading
-                    |> .children
-                    |> List.map (changeOnlyCurrentElementText text selectedId)
-                    |> setChildrenIn heading
-                    |> Block
-                    |> setTreeIn element
-
-            Inline inline ->
-                inline
-                    |> .children
-                    |> List.map (changeOnlyCurrentElementText text selectedId)
-                    |> setChildrenIn inline
-                    |> Inline
-                    |> setTreeIn element
-
-            Grid grid ->
-                grid
-                    |> .children
-                    |> List.map (changeOnlyCurrentElementText text selectedId)
-                    |> setChildrenIn grid
-                    |> Grid
-                    |> setTreeIn element
-
-            GridItem gridItem ->
-                gridItem
-                    |> .children
-                    |> List.map (changeOnlyCurrentElementText text selectedId)
-                    |> setChildrenIn gridItem
-                    |> GridItem
-                    |> setTreeIn element
-
-            Text content ->
-                element
-
-
-main : Program Never Model Msg
-main =
-    B.program
-        { init = init
-        , update = update
-        , subscriptions = subscriptions
-        , view = view
-        }
 
 
 setBackground : a -> { c | background : b } -> { c | background : a }
@@ -800,13 +731,6 @@ contentViewEl selectedId { tree, id } =
             B.text ""
 
 
-
--- type InsideDisplay
---     = Flow
---     | FlexContainer (Maybe Flex.FlexContainerDetails)
---     | GridContainer (Maybe Grid.GridContainerDetails)
-
-
 extractGridContainerDetailsFromStyle : Elegant.CommonStyle -> Maybe Grid.GridContainerDetails
 extractGridContainerDetailsFromStyle style =
     case style.display of
@@ -825,14 +749,6 @@ extractGridContainerDetailsFromStyle style =
 
         Nothing ->
             Nothing
-
-
-
--- { gutter : Maybe SizeUnit
--- , align : Maybe Align
--- , alignItems : Maybe AlignItems
--- , template : Maybe GridTemplate
--- }
 
 
 extractTemplateFromGridContainer :
@@ -1167,3 +1083,13 @@ getColorFromTree tree =
 
             GridItem { attributes } ->
                 extractColorFromStyle attributes.style
+
+
+main : Program Never Model Msg
+main =
+    B.program
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
