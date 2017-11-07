@@ -91,7 +91,7 @@ update msg model =
                 model |> addColumnInGrid
 
             AddRow ->
-                model
+                model |> addRowInGrid
 
 
 addChildToElement : Element msg -> Element msg -> Element msg
@@ -122,20 +122,69 @@ modifyStyleInAttributes modifier attributes =
         |> setStyleIn attributes
 
 
+addColumnInGrid : Model -> Model
+addColumnInGrid =
+    changeGridContainerStyleOfSelectedElement (modifyGridContainerToAddColumn)
+
+
+addRowInGrid : Model -> Model
+addRowInGrid =
+    changeGridContainerStyleOfSelectedElement (modifyGridContainerToAddRow)
+
+
+modifyGridContainerToAddRow : Grid.GridContainerDetails -> Grid.GridContainerDetails
+modifyGridContainerToAddRow ({ y } as gridContainerDetails) =
+    y
+        |> Maybe.withDefault (Grid.GridContainerCoordinate Nothing Nothing Nothing Nothing)
+        |> addSimpleToTemplate
+        |> Just
+        |> setYIn gridContainerDetails
+
+
+modifyGridContainerToAddColumn : Grid.GridContainerDetails -> Grid.GridContainerDetails
+modifyGridContainerToAddColumn ({ x } as gridContainerDetails) =
+    x
+        |> Maybe.withDefault (Grid.GridContainerCoordinate Nothing Nothing Nothing Nothing)
+        |> addSimpleToTemplate
+        |> Just
+        |> setXIn gridContainerDetails
+
+
+addSimpleToTemplate : Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
+addSimpleToTemplate ({ template } as coordinates) =
+    template
+        |> Maybe.withDefault []
+        |> flip List.append [ Grid.simple (Grid.sizeUnitVal (px 120)) ]
+        |> Just
+        |> setTemplateIn coordinates
+
+
 changeBoxStyleOfSelectedElement : (Box.Box -> Box.Box) -> Model -> Model
 changeBoxStyleOfSelectedElement modifier =
     changeStyleOfSelectedElement (modifyBoxInStyle modifier)
 
 
+changeGridContainerStyleOfSelectedElement : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Model -> Model
+changeGridContainerStyleOfSelectedElement modifier =
+    changeStyleOfSelectedElement (modifyGridContainerInStyle modifier)
+
+
 modifyBoxInStyle : (Box.Box -> Box.Box) -> Elegant.CommonStyle -> Elegant.CommonStyle
 modifyBoxInStyle modifier ({ display } as style) =
     display
-        |> Maybe.map (modifyDisplayBox modifier >> Just >> setDisplayIn style)
+        |> Maybe.map (modifyBoxInDisplayBox modifier >> Just >> setDisplayIn style)
         |> Maybe.withDefault (commonStyle Display.None)
 
 
-modifyDisplayBox : (Box.Box -> Box.Box) -> Display.DisplayBox -> Display.DisplayBox
-modifyDisplayBox modifier display =
+modifyGridContainerInStyle : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Elegant.CommonStyle -> Elegant.CommonStyle
+modifyGridContainerInStyle modifier ({ display } as style) =
+    display
+        |> Maybe.map (modifyGridContainerInDisplayBox modifier >> Just >> setDisplayIn style)
+        |> Maybe.withDefault (commonStyle Display.None)
+
+
+modifyBoxInDisplayBox : (Box.Box -> Box.Box) -> Display.DisplayBox -> Display.DisplayBox
+modifyBoxInDisplayBox modifier display =
     case display of
         Display.None ->
             Display.None
@@ -146,6 +195,29 @@ modifyDisplayBox modifier display =
                 |> Maybe.withDefault (modifier Box.default)
                 |> Just
                 |> setMaybeBoxIn contents
+                |> Display.ContentsWrapper
+
+
+modifyGridContainerInDisplayBox : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Display.DisplayBox -> Display.DisplayBox
+modifyGridContainerInDisplayBox modifier display =
+    case display of
+        Display.None ->
+            Display.None
+
+        Display.ContentsWrapper ({ insideDisplay } as contents) ->
+            (case insideDisplay of
+                Display.Flow ->
+                    Display.Flow
+
+                Display.FlexContainer flexContainer ->
+                    Display.FlexContainer flexContainer
+
+                Display.GridContainer gridContainerDetails ->
+                    gridContainerDetails
+                        |> Maybe.map modifier
+                        |> Display.GridContainer
+            )
+                |> setInsideDisplayIn contents
                 |> Display.ContentsWrapper
 
 
@@ -184,11 +256,6 @@ putElementAsChildIntoSelectedElement selectedId child ({ id, tree } as parent) =
         tree
             |> mapChildren (putElementAsChildIntoSelectedElement selectedId child)
             |> setTreeIn parent
-
-
-addColumnInGrid : Model -> Model
-addColumnInGrid model =
-    model
 
 
 mapChildren : (Element msg -> Element msg) -> Tree msg -> Tree msg
@@ -307,6 +374,16 @@ setBackgroundIn =
     flip setBackground
 
 
+setInsideDisplay : a -> { c | insideDisplay : b } -> { c | insideDisplay : a }
+setInsideDisplay elem record =
+    { record | insideDisplay = elem }
+
+
+setInsideDisplayIn : { c | insideDisplay : b } -> a -> { c | insideDisplay : a }
+setInsideDisplayIn =
+    flip setInsideDisplay
+
+
 setColor : a -> { c | color : b } -> { c | color : a }
 setColor elem record =
     { record | color = elem }
@@ -325,6 +402,36 @@ setOpacity elem record =
 setOpacityIn : { c | opacity : b } -> a -> { c | opacity : a }
 setOpacityIn =
     flip setOpacity
+
+
+setX : a -> { c | x : b } -> { c | x : a }
+setX elem record =
+    { record | x = elem }
+
+
+setXIn : { c | x : b } -> a -> { c | x : a }
+setXIn =
+    flip setX
+
+
+setY : a -> { c | y : b } -> { c | y : a }
+setY elem record =
+    { record | y = elem }
+
+
+setYIn : { c | y : b } -> a -> { c | y : a }
+setYIn =
+    flip setY
+
+
+setTemplate : a -> { c | template : b } -> { c | template : a }
+setTemplate elem record =
+    { record | template = elem }
+
+
+setTemplateIn : { c | template : b } -> a -> { c | template : a }
+setTemplateIn =
+    flip setTemplate
 
 
 type alias Element msg =
@@ -913,6 +1020,40 @@ gridEditor ({ attributes, children } as grid) =
             ]
 
 
+replaceTemplateByOneFraction : Grid.GridContainerDetails -> Grid.GridContainerDetails
+replaceTemplateByOneFraction gridContainerDetails =
+    gridContainerDetails
+        |> modifyGridContainerToReplaceTemplateInX
+        |> modifyGridContainerToReplaceTemplateInY
+
+
+modifyGridContainerToReplaceTemplateInY : Grid.GridContainerDetails -> Grid.GridContainerDetails
+modifyGridContainerToReplaceTemplateInY ({ y } as gridContainerDetails) =
+    y
+        |> Maybe.withDefault (Grid.GridContainerCoordinate Nothing Nothing Nothing Nothing)
+        |> replaceTemplate
+        |> Just
+        |> setYIn gridContainerDetails
+
+
+modifyGridContainerToReplaceTemplateInX : Grid.GridContainerDetails -> Grid.GridContainerDetails
+modifyGridContainerToReplaceTemplateInX ({ x } as gridContainerDetails) =
+    x
+        |> Maybe.withDefault (Grid.GridContainerCoordinate Nothing Nothing Nothing Nothing)
+        |> replaceTemplate
+        |> Just
+        |> setXIn gridContainerDetails
+
+
+replaceTemplate : Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
+replaceTemplate ({ template } as coordinate) =
+    template
+        |> Maybe.withDefault []
+        |> List.map (always (Grid.simple (Grid.fractionOfAvailableSpace 1)))
+        |> Just
+        |> setTemplateIn coordinate
+
+
 gridView :
     { c | attributes : { a | style : Elegant.CommonStyle }, children : b }
     -> List d
@@ -920,7 +1061,12 @@ gridView :
     -> Node msg
 gridView { attributes, children } xTemplate yTemplate =
     B.grid
-        [ attributes.style |> Elegant.commonStyleToStyle |> A.rawStyle, A.style [ S.block [] ] ]
+        [ attributes.style
+            |> modifyGridContainerInStyle (replaceTemplateByOneFraction)
+            |> Elegant.commonStyleToStyle
+            |> A.rawStyle
+        , A.style [ S.block [] ]
+        ]
         ((List.foldr
             (\element ( beginning, result ) ->
                 ( beginning + 1
