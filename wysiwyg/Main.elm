@@ -4,6 +4,7 @@ import BodyBuilder as B exposing (Node)
 import BodyBuilder.Attributes as A
 import BodyBuilder.Events as E
 import Style as S
+import Constants as C
 import Color exposing (Color)
 import Elegant exposing (px, vh, percent, Modifiers, Modifier)
 import Box
@@ -675,7 +676,10 @@ creationView model =
                     (\( msg, str ) ->
                         B.flexItem []
                             [ B.button
-                                [ A.style [ S.block [ Block.height (percent 100) ] ]
+                                [ A.style
+                                    [ S.block [ Block.height (percent 100), Block.width (px 50) ]
+                                    , S.box [ Box.borderNone, Box.backgroundColor (Color.rgba 0 0 0 0) ]
+                                    ]
                                 , E.onClick msg
                                 ]
                                 [ B.text str ]
@@ -995,7 +999,7 @@ inspectorView model =
                 B.div [] [ B.text "Nothing" ]
 
             Just { id, tree } ->
-                B.div []
+                B.div [ A.style [ S.box [ Box.paddingAll (C.medium) ] ] ]
                     [ B.h1 [] [ B.text "Inspector" ]
                     , case tree of
                         Text t ->
@@ -1030,7 +1034,7 @@ inspectorView model =
 
 treeView : Model -> Node Msg
 treeView { selectedId, element } =
-    B.div []
+    B.div [ A.style [ S.box [ Box.paddingAll (C.medium) ] ] ]
         [ B.h1 [] [ B.text "Tree view" ]
         , displayTreeView selectedId element
         ]
