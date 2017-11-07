@@ -51,6 +51,97 @@ update msg model =
                 model
 
 
+addChildToTree : Element msg -> Tree msg -> Tree msg
+addChildToTree child parent =
+    case parent of
+        Block block ->
+            block
+                |> .children
+                |> flip List.append [ child ]
+                |> setChildrenIn block
+                |> Block
+
+        Grid grid ->
+            grid
+                |> .children
+                |> flip List.append [ child ]
+                |> setChildrenIn grid
+                |> Grid
+
+        GridItem gridItem ->
+            gridItem
+                |> .children
+                |> flip List.append [ child ]
+                |> setChildrenIn gridItem
+                |> GridItem
+
+        Text content ->
+            Text content
+
+
+addChildToElement : Element msg -> Element msg -> Element msg
+addChildToElement ({ tree } as parent) child =
+    tree
+        |> addChildToTree child
+        |> setTreeIn parent
+
+
+changeBoxColorOfCurrentElement : Color.Color -> Model -> Model
+changeBoxColorOfCurrentElement color ({ element, selectedId } as model) =
+    element
+        |> changeOnlyCurrentElementColor color selectedId
+        |> setElementIn model
+
+
+putElementAsChildIntoModel : Model -> (Int -> Element Msg) -> Model
+putElementAsChildIntoModel ({ selectedId, element, autoIncrement } as model) childCreator =
+    element
+        |> putElementAsChildIntoSelectedElement selectedId (childCreator autoIncrement)
+        |> setElementIn model
+        |> setSelectedId autoIncrement
+        |> setAutoIncrement (autoIncrement + 1)
+
+
+putElementAsChildIntoSelectedElement : Int -> Element msg -> Element msg -> Element msg
+putElementAsChildIntoSelectedElement selectedId child ({ id, tree } as parent) =
+    if id == selectedId then
+        tree
+            |> addChildToTree child
+            |> setTreeIn parent
+    else
+        tree
+            |> addChildToChildren (putElementAsChildIntoSelectedElement selectedId child)
+            |> setTreeIn parent
+
+
+addChildToChildren : (Element msg -> Element msg) -> Tree msg -> Tree msg
+addChildToChildren elementModifier tree =
+    case tree of
+        Block block ->
+            block
+                |> .children
+                |> List.map elementModifier
+                |> setChildrenIn block
+                |> Block
+
+        Grid grid ->
+            grid
+                |> .children
+                |> List.map elementModifier
+                |> setChildrenIn grid
+                |> Grid
+
+        GridItem gridItem ->
+            gridItem
+                |> .children
+                |> List.map elementModifier
+                |> setChildrenIn gridItem
+                |> GridItem
+
+        Text content ->
+            Text content
+
+
 addColumnInGrid : Model -> Model
 addColumnInGrid model =
     model
@@ -59,7 +150,9 @@ addColumnInGrid model =
 changeOnlyCurrentElementColor : Color.Color -> Int -> Element msg -> Element msg
 changeOnlyCurrentElementColor color selectedId ({ id, tree } as element) =
     if id == selectedId then
-        { element | tree = changeColor color tree }
+        tree
+            |> changeColor color
+            |> setTreeIn element
     else
         case tree of
             Block heading ->
@@ -91,30 +184,41 @@ changeOnlyCurrentElementColor color selectedId ({ id, tree } as element) =
 
 
 changeColorInAttributes :
-    { b | attributes : { style : Elegant.CommonStyle } }
-    -> Color
-    -> { b | attributes : { style : Elegant.CommonStyle } }
-changeColorInAttributes element color =
-    element.attributes.style
+    Color
+    -> { a | style : Elegant.CommonStyle }
+    -> { a | style : Elegant.CommonStyle }
+changeColorInAttributes color attributes =
+    attributes.style
         |> changeColorOfStyle color
-        |> setStyleIn element.attributes
-        |> setAttributesIn element
+        |> setStyleIn attributes
 
 
 changeColor : Color.Color -> Tree msg -> Tree msg
 changeColor color tree =
     case tree of
         Block heading ->
-            Block <| changeColorInAttributes heading color
+            heading
+                |> .attributes
+                |> changeColorInAttributes color
+                |> setAttributesIn heading
+                |> Block
 
         Grid grid ->
-            Grid <| changeColorInAttributes grid color
+            grid
+                |> .attributes
+                |> changeColorInAttributes color
+                |> setAttributesIn grid
+                |> Grid
 
         GridItem gridItem ->
-            GridItem <| changeColorInAttributes gridItem color
+            gridItem
+                |> .attributes
+                |> changeColorInAttributes color
+                |> setAttributesIn gridItem
+                |> GridItem
 
         Text content ->
-            tree
+            Text content
 
 
 changeColorOfStyle : Color.Color -> Elegant.CommonStyle -> Elegant.CommonStyle
@@ -150,65 +254,6 @@ changeColorOfStyle color ({ display } as style) =
                                         { box | background = Just { background | color = Just color } }
                     in
                         { style | display = Just (Display.ContentsWrapper { contents | maybeBox = Just newBox }) }
-
-
-changeBoxColorOfCurrentElement : Color.Color -> Model -> Model
-changeBoxColorOfCurrentElement color ({ element, selectedId } as model) =
-    { model | element = element |> changeOnlyCurrentElementColor color selectedId }
-
-
-addChildToTree : Element msg -> Tree msg -> Tree msg
-addChildToTree child parent =
-    case parent of
-        Block block ->
-            Block { block | children = block.children ++ [ child ] }
-
-        Grid grid ->
-            Grid { grid | children = grid.children ++ [ child ] }
-
-        GridItem gridItem ->
-            GridItem { gridItem | children = gridItem.children ++ [ child ] }
-
-        _ ->
-            parent
-
-
-addChildToElement : Element msg -> Element msg -> Element msg
-addChildToElement parent child =
-    { parent | tree = parent.tree |> addChildToTree child }
-
-
-putElementAsChildIntoSelectedElement : Int -> Element msg -> Element msg -> Element msg
-putElementAsChildIntoSelectedElement selectedId child parent =
-    if parent.id == selectedId then
-        { parent | tree = addChildToTree child parent.tree }
-    else
-        { parent | tree = addChildToChildren parent.tree (putElementAsChildIntoSelectedElement selectedId child) }
-
-
-addChildToChildren : Tree msg -> (Element msg -> Element msg) -> Tree msg
-addChildToChildren tree elementModifier =
-    case tree of
-        Block block ->
-            Block { block | children = List.map elementModifier block.children }
-
-        Grid grid ->
-            Grid { grid | children = List.map elementModifier grid.children }
-
-        GridItem gridItem ->
-            GridItem { gridItem | children = List.map elementModifier gridItem.children }
-
-        _ ->
-            tree
-
-
-putElementAsChildIntoModel : Model -> (Int -> Element Msg) -> Model
-putElementAsChildIntoModel ({ selectedId, element, autoIncrement } as model) childCreator =
-    { model
-        | element = putElementAsChildIntoSelectedElement selectedId (childCreator autoIncrement) element
-        , selectedId = autoIncrement
-        , autoIncrement = autoIncrement + 1
-    }
 
 
 main : Program Never Model Msg

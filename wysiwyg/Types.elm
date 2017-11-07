@@ -174,9 +174,24 @@ type alias Model =
     }
 
 
+setElement : a -> { c | element : b } -> { c | element : a }
+setElement id model =
+    { model | element = id }
+
+
+setElementIn : { c | element : b } -> a -> { c | element : a }
+setElementIn =
+    flip setElement
+
+
 setSelectedId : a -> { c | selectedId : b } -> { c | selectedId : a }
 setSelectedId id model =
     { model | selectedId = id }
+
+
+setAutoIncrement : a -> { c | autoIncrement : b } -> { c | autoIncrement : a }
+setAutoIncrement id model =
+    { model | autoIncrement = id }
 
 
 type Msg
