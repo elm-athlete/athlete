@@ -94,17 +94,26 @@ creationView model =
                                     , ( CreateH1, "h1" )
                                     , ( CreateGrid, "grid" )
                                     , ( CreateDiv, "div" )
+                                    , ( CreateSpan, "span" )
                                     ]
 
                                 "p" ->
                                     [ ( CreateText, "text" )
+                                    , ( CreateSpan, "span" )
                                     ]
 
                                 "h1" ->
-                                    []
+                                    [ ( CreateText, "text" )
+                                    , ( CreateSpan, "span" )
+                                    ]
 
                                 _ ->
                                     []
+
+                        Inline a ->
+                            [ ( CreateText, "text" )
+                            , ( CreateSpan, "span" )
+                            ]
 
                         _ ->
                             []
@@ -167,6 +176,11 @@ contentViewEl selectedId { tree, id } =
             block.constructor
                 ([ A.class [ Elegant.commonStyleToCss block.attributes.style ] ] ++ selectOrSelected id selectedId)
                 (List.map (contentViewEl selectedId) block.children)
+
+        Inline node ->
+            node.constructor
+                ([ A.class [ Elegant.commonStyleToCss node.attributes.style ] ] ++ selectOrSelected id selectedId)
+                (List.map (contentViewEl selectedId) node.children)
 
         Text content ->
             B.text content
@@ -486,6 +500,9 @@ displayTreeView selectedId { id, tree } =
             Block content ->
                 treeViewElement id selectedId content.tag content.children
 
+            Inline content ->
+                treeViewElement id selectedId content.tag content.children
+
             Grid content ->
                 treeViewElement id selectedId "bb-grid" content.children
 
@@ -508,6 +525,9 @@ getByIdHelp id element =
             Block { children } ->
                 List.concatMap (getByIdHelp id) children
 
+            Inline { children } ->
+                List.concatMap (getByIdHelp id) children
+
             Grid { children } ->
                 List.concatMap (getByIdHelp id) children
 
@@ -523,6 +543,9 @@ getColorFromTree tree =
     Maybe.withDefault Color.black <|
         case tree of
             Block { attributes } ->
+                extractColorFromStyle attributes.style
+
+            Inline { attributes } ->
                 extractColorFromStyle attributes.style
 
             Grid { attributes } ->
