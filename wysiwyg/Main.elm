@@ -248,14 +248,13 @@ putElementAsChildIntoModel ({ selectedId, element, autoIncrement } as model) chi
 
 putElementAsChildIntoSelectedElement : Int -> Element msg -> Element msg -> Element msg
 putElementAsChildIntoSelectedElement selectedId child ({ id, tree } as parent) =
-    if id == selectedId then
-        tree
-            |> addChildToTree child
-            |> setTreeIn parent
-    else
-        tree
-            |> mapChildren (putElementAsChildIntoSelectedElement selectedId child)
-            |> setTreeIn parent
+    tree
+        |> (if id == selectedId then
+                addChildToTree child
+            else
+                mapChildren (putElementAsChildIntoSelectedElement selectedId child)
+           )
+        |> setTreeIn parent
 
 
 mapChildren : (Element msg -> Element msg) -> Tree msg -> Tree msg
