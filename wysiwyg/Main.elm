@@ -57,6 +57,9 @@ update msg model =
             ChangeBoxColor color ->
                 model |> changeBoxColorOfCurrentElement color
 
+            ChangeOpacity opacity ->
+                model |> changeOpacityOfCurrentElement ((opacity |> toFloat) / 1000)
+
             ChangeText text ->
                 model |> changeTextOfCurrentElement text
 
@@ -78,6 +81,13 @@ changeBoxColorOfCurrentElement : Color.Color -> Model -> Model
 changeBoxColorOfCurrentElement color ({ element, selectedId } as model) =
     element
         |> changeOnlyCurrentElementColor color selectedId
+        |> setElementIn model
+
+
+changeOpacityOfCurrentElement : Float -> Model -> Model
+changeOpacityOfCurrentElement opacity ({ element, selectedId } as model) =
+    element
+        |> changeOnlyCurrentElementOpacity opacity selectedId
         |> setElementIn model
 
 
@@ -195,6 +205,10 @@ changeColor color =
     applyToAttributes (changeColorInAttributes color)
 
 
+changeOpacity opacity =
+    applyToAttributes (changeOpacityInAttributes opacity)
+
+
 applyToSelectedElement : (Tree msg -> Tree msg) -> Int -> Element msg -> Element msg
 applyToSelectedElement modifierTree selectedId ({ id, tree } as element) =
     tree
@@ -209,6 +223,10 @@ applyToSelectedElement modifierTree selectedId ({ id, tree } as element) =
 changeOnlyCurrentElementColor : Color.Color -> Int -> Element msg -> Element msg
 changeOnlyCurrentElementColor color =
     applyToSelectedElement (changeColor color)
+
+
+changeOnlyCurrentElementOpacity opacity =
+    applyToSelectedElement (changeOpacity opacity)
 
 
 changeOnlyCurrentElementText : String -> Int -> Element msg -> Element msg
@@ -226,10 +244,22 @@ changeColorInAttributes color attributes =
         |> setStyleIn attributes
 
 
+changeOpacityInAttributes opacity attributes =
+    attributes.style
+        |> changeOpacityOfStyle opacity
+        |> setStyleIn attributes
+
+
 changeColorOfStyle : Color.Color -> Elegant.CommonStyle -> Elegant.CommonStyle
 changeColorOfStyle color ({ display } as style) =
     display
         |> Maybe.map (modifyColor color >> Just >> setDisplayIn style)
+        |> Maybe.withDefault (commonStyle Display.None)
+
+
+changeOpacityOfStyle opacity ({ display } as style) =
+    display
+        |> Maybe.map (modifyOpacity opacity >> Just >> setDisplayIn style)
         |> Maybe.withDefault (commonStyle Display.None)
 
 
@@ -246,6 +276,26 @@ modifyColor color display =
                 |> Just
                 |> setMaybeBoxIn contents
                 |> Display.ContentsWrapper
+
+
+modifyOpacity opacity display =
+    case display of
+        Display.None ->
+            Display.None
+
+        Display.ContentsWrapper ({ maybeBox } as contents) ->
+            maybeBox
+                |> Maybe.map (\box -> (changeOpacityInBox opacity box))
+                |> Maybe.withDefault (changeOpacityInBox opacity Box.default)
+                |> Just
+                |> setMaybeBoxIn contents
+                |> Display.ContentsWrapper
+
+
+changeOpacityInBox opacity box =
+    opacity
+        |> Just
+        |> setOpacityIn box
 
 
 changeColorInBox : Color.Color -> Background.Background -> Box.Box -> Box.Box
@@ -282,6 +332,16 @@ setColor elem record =
 setColorIn : { c | color : b } -> a -> { c | color : a }
 setColorIn =
     flip setColor
+
+
+setOpacity : a -> { c | opacity : b } -> { c | opacity : a }
+setOpacity elem record =
+    { record | opacity = elem }
+
+
+setOpacityIn : { c | opacity : b } -> a -> { c | opacity : a }
+setOpacityIn =
+    flip setOpacity
 
 
 type alias Element msg =
@@ -526,6 +586,7 @@ type Msg
     | CreateText
     | SelectEl Int
     | ChangeBoxColor Color
+    | ChangeOpacity Int
     | ChangeText String
     | AddColumn
     | AddRow
@@ -779,6 +840,21 @@ extractColorFromStyle style =
                         |> Maybe.andThen .color
 
 
+extractOpacityFromStyle style =
+    case style.display of
+        Nothing ->
+            Nothing
+
+        Just display ->
+            case display of
+                Display.None ->
+                    Nothing
+
+                Display.ContentsWrapper contents ->
+                    contents.maybeBox
+                        |> Maybe.andThen .opacity
+
+
 textEditor : String -> Int -> Node Msg
 textEditor text id =
     B.inputText [ A.value text, E.onInput ChangeText ]
@@ -949,29 +1025,37 @@ inspectorView model =
                 B.div [] [ B.text "Nothing" ]
 
             Just { id, tree } ->
-                let
-                    color : Color.Color
-                    color =
-                        getColorFromTree tree
-                in
-                    B.div []
-                        [ B.h1 [] [ B.text "Inspector" ]
-                        , B.div []
-                            [ B.text "Box Attributes" ]
-                        , B.div []
-                            [ B.text "Box color" ]
-                        , B.div []
-                            [ B.inputColor [ E.onInput ChangeBoxColor, A.value color ] ]
-                        , case tree of
-                            Grid grid ->
-                                gridEditor grid
+                B.div []
+                    [ B.h1 [] [ B.text "Inspector" ]
+                    , case tree of
+                        Text t ->
+                            B.none
 
-                            Text text ->
-                                textEditor text id
+                        _ ->
+                            B.div []
+                                [ B.div []
+                                    [ B.text "Box Attributes" ]
+                                , B.div []
+                                    [ B.div []
+                                        [ B.text "Box color" ]
+                                    , B.div []
+                                        [ B.inputColor [ E.onInput ChangeBoxColor, A.value (getColorFromTree tree) ] ]
+                                    , B.div []
+                                        [ B.text "Box opacity" ]
+                                    , B.div []
+                                        [ B.inputRange [ A.min 0, A.max 1000, E.onInput ChangeOpacity, A.value (1000 * getOpacityFromTree tree |> round) ] ]
+                                    ]
+                                ]
+                    , case tree of
+                        Grid grid ->
+                            gridEditor grid
 
-                            _ ->
-                                B.text ""
-                        ]
+                        Text text ->
+                            textEditor text id
+
+                        _ ->
+                            B.text ""
+                    ]
 
 
 treeView : Model -> Node Msg
@@ -1038,6 +1122,25 @@ getByIdHelp id element =
 
             GridItem gridItem ->
                 List.concatMap (getByIdHelp id) gridItem.children
+
+
+getOpacityFromTree tree =
+    Maybe.withDefault 1.0 <|
+        case tree of
+            Block { attributes } ->
+                extractOpacityFromStyle attributes.style
+
+            Inline { attributes } ->
+                extractOpacityFromStyle attributes.style
+
+            Grid { attributes } ->
+                extractOpacityFromStyle attributes.style
+
+            Text content ->
+                Nothing
+
+            GridItem { attributes } ->
+                extractOpacityFromStyle attributes.style
 
 
 getColorFromTree : Tree Msg -> Color.Color

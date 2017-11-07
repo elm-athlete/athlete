@@ -49,6 +49,10 @@ text =
     Html.text
 
 
+none =
+    text ""
+
+
 br : Node msg
 br =
     Html.br [] []
