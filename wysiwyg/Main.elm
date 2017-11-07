@@ -30,36 +30,59 @@ subscriptions model =
     Sub.none
 
 
+type ChangeBoxStyleMsg
+    = ChangeColor Color
+    | ChangeOpacity Int
+
+
+handleBoxChange : ChangeBoxStyleMsg -> Model -> Model
+handleBoxChange action model =
+    model
+        |> changeBoxStyleOfSelectedElement
+            (case action of
+                ChangeColor color ->
+                    changeBoxColor color
+
+                ChangeOpacity opacity ->
+                    changeBoxOpacity ((opacity |> toFloat) / 1000)
+            )
+
+
+createElement : CreateElementMsg -> Model -> Model
+createElement msg model =
+    putElementAsChildIntoModel model <|
+        case msg of
+            CreateP ->
+                defaultP
+
+            CreateH1 ->
+                defaultH1
+
+            CreateGrid ->
+                defaultGrid
+
+            CreateDiv ->
+                defaultDiv
+
+            CreateText ->
+                defaultText "Change me"
+
+            CreateSpan ->
+                defaultSpan
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     Update.identity <|
         case msg of
-            CreateP ->
-                defaultP |> putElementAsChildIntoModel model
-
-            CreateH1 ->
-                defaultH1 |> putElementAsChildIntoModel model
-
-            CreateGrid ->
-                defaultGrid |> putElementAsChildIntoModel model
-
-            CreateDiv ->
-                defaultDiv |> putElementAsChildIntoModel model
-
-            CreateText ->
-                defaultText "Change me" |> putElementAsChildIntoModel model
-
-            CreateSpan ->
-                defaultSpan |> putElementAsChildIntoModel model
+            CreateElement msg ->
+                model |> createElement msg
 
             SelectEl id ->
                 model |> setSelectedId id
 
-            ChangeBoxColor color ->
-                model |> changeBoxStyleOfSelectedElement (changeBoxColor color)
-
-            ChangeOpacity opacity ->
-                model |> changeBoxStyleOfSelectedElement (changeBoxOpacity ((opacity |> toFloat) / 1000))
+            ChangeBoxStyle action ->
+                model |> handleBoxChange action
 
             ChangeText text ->
                 model |> changeTextOfCurrentElement text
@@ -537,16 +560,19 @@ setAutoIncrement id model =
     { model | autoIncrement = id }
 
 
-type Msg
+type CreateElementMsg
     = CreateP
     | CreateH1
     | CreateGrid
     | CreateDiv
     | CreateSpan
     | CreateText
+
+
+type Msg
+    = CreateElement CreateElementMsg
     | SelectEl Int
-    | ChangeBoxColor Color
-    | ChangeOpacity Int
+    | ChangeBoxStyle ChangeBoxStyleMsg
     | ChangeText String
     | AddColumn
     | AddRow
@@ -670,7 +696,7 @@ creationView model =
                                     [ S.block [ Block.height (percent 100), Block.width (px 50) ]
                                     , S.box [ Box.borderNone, Box.backgroundColor (Color.rgba 0 0 0 0) ]
                                     ]
-                                , E.onClick msg
+                                , E.onClick (CreateElement msg)
                                 ]
                                 [ B.text str ]
                             ]
@@ -1003,11 +1029,11 @@ inspectorView model =
                                     [ B.div []
                                         [ B.text "Box color" ]
                                     , B.div []
-                                        [ B.inputColor [ E.onInput ChangeBoxColor, A.value (getColorFromTree tree) ] ]
+                                        [ B.inputColor [ E.onInput (ChangeBoxStyle << ChangeColor), A.value (getColorFromTree tree) ] ]
                                     , B.div []
                                         [ B.text "Box opacity" ]
                                     , B.div []
-                                        [ B.inputRange [ A.min 0, A.max 1000, E.onInput ChangeOpacity, A.value (1000 * getOpacityFromTree tree |> round) ] ]
+                                        [ B.inputRange [ A.min 0, A.max 1000, E.onInput (ChangeBoxStyle << ChangeOpacity), A.value (1000 * getOpacityFromTree tree |> round) ] ]
                                     ]
                                 ]
                     , case tree of
