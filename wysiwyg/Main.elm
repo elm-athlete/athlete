@@ -197,38 +197,13 @@ changeColor color =
 
 applyToSelectedElement : (Tree msg -> Tree msg) -> Int -> Element msg -> Element msg
 applyToSelectedElement modifierTree selectedId ({ id, tree } as element) =
-    if id == selectedId then
-        tree
-            |> modifierTree
-            |> setTreeIn element
-    else
-        case tree of
-            Block heading ->
-                heading
-                    |> modifyChildren (List.map (applyToSelectedElement modifierTree selectedId))
-                    |> Block
-                    |> setTreeIn element
-
-            Inline inline ->
-                inline
-                    |> modifyChildren (List.map (applyToSelectedElement modifierTree selectedId))
-                    |> Inline
-                    |> setTreeIn element
-
-            Grid grid ->
-                grid
-                    |> modifyChildren (List.map (applyToSelectedElement modifierTree selectedId))
-                    |> Grid
-                    |> setTreeIn element
-
-            GridItem gridItem ->
-                gridItem
-                    |> modifyChildren (List.map (applyToSelectedElement modifierTree selectedId))
-                    |> GridItem
-                    |> setTreeIn element
-
-            Text content ->
-                element
+    tree
+        |> (if id == selectedId then
+                modifierTree
+            else
+                applyToChildren (List.map (applyToSelectedElement modifierTree selectedId))
+           )
+        |> setTreeIn element
 
 
 changeOnlyCurrentElementColor : Color.Color -> Int -> Element msg -> Element msg
