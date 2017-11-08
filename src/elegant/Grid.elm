@@ -28,6 +28,9 @@ module Grid
         , placement
         , placementToCouple
         , placementToString
+        , size
+        , sizeToCouple
+        , sizeToString
         , repeat
         , repeatOptionToString
         , repeatableToString
@@ -83,6 +86,9 @@ module Grid
 @docs placement
 @docs placementToCouple
 @docs placementToString
+@docs size
+@docs sizeToCouple
+@docs sizeToString
 @docs repeat
 @docs repeatOptionToString
 @docs repeatableToString
@@ -274,7 +280,8 @@ span =
 
 
 type alias GridItemCoordinate =
-    { placement : Maybe ( Int, GridItemSize )
+    { placement : Maybe Int
+    , size : Maybe GridItemSize
     , align : Maybe Align
     }
 
@@ -308,13 +315,13 @@ rows modifiers gridContainerDetails =
 {-| -}
 horizontal : Modifiers GridItemCoordinate -> Modifier GridItemDetails
 horizontal modifiers gridItemDetails =
-    { gridItemDetails | x = modifiedElementOrNothing (GridItemCoordinate Nothing Nothing) modifiers }
+    { gridItemDetails | x = modifiedElementOrNothing (GridItemCoordinate Nothing Nothing Nothing) modifiers }
 
 
 {-| -}
 vertical : Modifiers GridItemCoordinate -> Modifier GridItemDetails
 vertical modifiers gridItemDetails =
-    { gridItemDetails | y = modifiedElementOrNothing (GridItemCoordinate Nothing Nothing) modifiers }
+    { gridItemDetails | y = modifiedElementOrNothing (GridItemCoordinate Nothing Nothing Nothing) modifiers }
 
 
 {-| -}
@@ -366,9 +373,15 @@ spaceEvenly =
 
 
 {-| -}
-placement : Int -> GridItemSize -> Modifier GridItemCoordinate
-placement value itemSize gridItemCoordinate =
-    { gridItemCoordinate | placement = Just ( value + 1, itemSize ) }
+placement : Int -> Modifier GridItemCoordinate
+placement value gridItemCoordinate =
+    { gridItemCoordinate | placement = Just (value + 1) }
+
+
+{-| -}
+size : GridItemSize -> Modifier GridItemCoordinate
+size itemSize gridItemCoordinate =
+    { gridItemCoordinate | size = Just itemSize }
 
 
 {-| -}
@@ -521,28 +534,39 @@ gridItemDetailsToCouples gridItemDetails =
 gridItemCoordinateToCouples : String -> String -> GridItemCoordinate -> List ( String, String )
 gridItemCoordinateToCouples columnRow alignJustify gridItemCoordinate =
     [ unwrapToCouple .placement (placementToCouple columnRow)
+    , unwrapToCouple .size (sizeToCouple columnRow)
     , unwrapToCouple .align (alignSelfToCouple alignJustify)
     ]
         |> List.concatMap (callOn gridItemCoordinate)
 
 
 {-| -}
-placementToCouple : String -> ( Int, GridItemSize ) -> ( String, String )
+placementToCouple : String -> Int -> ( String, String )
 placementToCouple columnRow placement =
-    ( "grid-" ++ columnRow, placementToString placement )
+    ( "grid-" ++ columnRow ++ "-start", placementToString placement )
 
 
 {-| -}
-placementToString : ( Int, GridItemSize ) -> String
-placementToString ( beginning, itemSize ) =
+placementToString : Int -> String
+placementToString beginning =
     toString beginning
-        ++ " / "
-        ++ case itemSize of
-            UntilEndOfCoordinate ->
-                "-1"
 
-            Span val ->
-                "span " ++ (toString val)
+
+{-| -}
+sizeToCouple : String -> GridItemSize -> ( String, String )
+sizeToCouple columnRow size =
+    ( "grid-" ++ columnRow ++ "-end", sizeToString size )
+
+
+{-| -}
+sizeToString : GridItemSize -> String
+sizeToString itemSize =
+    case itemSize of
+        UntilEndOfCoordinate ->
+            "-1"
+
+        Span val ->
+            "span " ++ (toString val)
 
 
 {-| -}

@@ -35,6 +35,7 @@ module Shadow
 @docs plain
 @docs blurry
 
+
 # Compilation
 
 @docs boxShadowToCouple
@@ -168,12 +169,11 @@ insetToStringList inset =
 
 boxShadowToString : Shadow -> String
 boxShadowToString { inset, offset, spreadRadius, color, blurRadius } =
-    Debug.log "Ici "
-        ([ offsetToStringList offset
-         , blurAndSpreadRadiusToStringList blurRadius spreadRadius
-         , colorToStringList color
-         , insetToStringList inset
-         ]
-            |> List.concat
-            |> String.join " "
-        )
+    ([ offsetToStringList offset
+     , blurAndSpreadRadiusToStringList blurRadius spreadRadius
+     , colorToStringList color
+     , insetToStringList inset
+     ]
+        |> List.concat
+        |> String.join " "
+    )

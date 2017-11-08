@@ -583,6 +583,7 @@ gridItemBase =
     gridXY
         { align = Nothing
         , placement = Nothing
+        , size = Nothing
         }
         |> Just
         |> flip Display.GridItem (Just Display.defaultBlockDetails)
@@ -825,11 +826,13 @@ item ( x, y ) ( width, height ) =
         [ A.style
             [ S.gridItemProperties
                 [ Grid.horizontal
-                    [ Grid.placement x width
+                    [ Grid.placement x
+                    , Grid.size width
                     , Grid.align Grid.stretch
                     ]
                 , Grid.vertical
-                    [ Grid.placement y height
+                    [ Grid.placement y
+                    , Grid.size height
                     , Grid.align Grid.stretch
                     ]
                 ]
