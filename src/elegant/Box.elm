@@ -429,7 +429,7 @@ paddingLeft size =
 shadowCenteredBlurry : SizeUnit -> Color -> Modifier Box
 shadowCenteredBlurry size color =
     boxShadow
-        [ setColor (Just color)
+        [ setColor color
         , Shadow.blurRadius size
         ]
 

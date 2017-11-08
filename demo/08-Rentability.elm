@@ -143,7 +143,7 @@ standardCellStyle =
                     , Character.size Constants.zeta
                     ]
                 ]
-            , Box.padding [ Padding.all Constants.large ]
+            , Box.paddingAll Constants.large
             , Box.background [ Elegant.color Color.white ]
             ]
         ]

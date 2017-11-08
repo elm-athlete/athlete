@@ -7,8 +7,10 @@ import Style as S
 import Constants as C
 import Color exposing (Color)
 import Elegant exposing (px, vh, percent, Modifiers, Modifier)
+import Shadow
 import Box
 import Block
+import Border
 import Background
 import Display
 import Update
@@ -462,28 +464,25 @@ setDisplayIn record elem =
     { record | display = elem }
 
 
-blockStyle : { style : Elegant.CommonStyle }
-blockStyle =
+outsideDependentStyle outsideDisplay =
     { style =
-        { outsideDisplay = Display.Block Nothing
+        { outsideDisplay = outsideDisplay
         , insideDisplay = Display.Flow
         , maybeBox = Nothing
         }
             |> Display.ContentsWrapper
             |> commonStyle
     }
+
+
+blockStyle : { style : Elegant.CommonStyle }
+blockStyle =
+    outsideDependentStyle (Display.Block Nothing)
 
 
 inlineStyle : { style : Elegant.CommonStyle }
 inlineStyle =
-    { style =
-        { outsideDisplay = Display.Inline
-        , insideDisplay = Display.Flow
-        , maybeBox = Nothing
-        }
-            |> Display.ContentsWrapper
-            |> commonStyle
-    }
+    outsideDependentStyle Display.Inline
 
 
 gridXY : a -> { x : Maybe a, y : Maybe a }
@@ -868,7 +867,7 @@ contentView { element, selectedId } =
 selectOrSelected : Int -> Int -> Modifiers (A.VisibleAttributesAndEvents Msg a)
 selectOrSelected id selectedId =
     if id == selectedId then
-        [ A.style [ S.box [ Box.backgroundColor (Color.rgba 180 180 240 0.4) ] ] ]
+        [ A.style [ S.box [ Box.shadow [ Shadow.blurry (px 5) (px 5) (Color.rgba 0 0 0 0.1) ] ] ] ]
     else
         [ E.onClick (SelectEl id) ]
 
@@ -905,7 +904,9 @@ contentViewEl selectedId { tree, id } =
                 (List.map (contentViewEl selectedId) node.children)
 
         Text content ->
-            B.text content
+            B.span (selectOrSelected id selectedId)
+                [ B.text content
+                ]
 
         GridItem gridItem ->
             B.text ""
@@ -1262,11 +1263,6 @@ displayTreeView : Int -> Element msg -> Node Msg
 displayTreeView selectedId { id, tree } =
     B.div [] <|
         case tree of
-            Text content ->
-                [ B.div [ A.style [ S.box [ Box.paddingLeft (px 12) ] ] ]
-                    [ B.div (selectOrSelected id selectedId) [ B.text "text" ] ]
-                ]
-
             Block content ->
                 treeViewElement id selectedId content.tag content.children
 
@@ -1278,6 +1274,11 @@ displayTreeView selectedId { id, tree } =
 
             GridItem gridItem ->
                 treeViewElement id selectedId "bb-grid-item" gridItem.children
+
+            Text content ->
+                [ B.div [ A.style [ S.box [ Box.paddingLeft (px 12) ] ] ]
+                    [ B.div (selectOrSelected id selectedId) [ B.text "text" ] ]
+                ]
 
 
 getById : Int -> Element msg -> Maybe (Element msg)
@@ -1301,11 +1302,11 @@ getByIdHelp id element =
             Grid { children } ->
                 List.concatMap (getByIdHelp id) children
 
-            Text content ->
-                []
-
             GridItem gridItem ->
                 List.concatMap (getByIdHelp id) gridItem.children
+
+            Text content ->
+                []
 
 
 getOpacityFromTree : Tree msg -> Float
@@ -1321,11 +1322,11 @@ getOpacityFromTree tree =
             Grid { attributes } ->
                 extractOpacityFromStyle attributes.style
 
-            Text content ->
-                Nothing
-
             GridItem { attributes } ->
                 extractOpacityFromStyle attributes.style
+
+            Text content ->
+                Nothing
 
 
 getColorFromTree : Tree Msg -> Color.Color
@@ -1341,11 +1342,11 @@ getColorFromTree tree =
             Grid { attributes } ->
                 extractColorFromStyle attributes.style
 
-            Text content ->
-                Nothing
-
             GridItem { attributes } ->
                 extractColorFromStyle attributes.style
+
+            Text content ->
+                Nothing
 
 
 main : Program Never Model Msg

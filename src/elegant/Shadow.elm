@@ -8,6 +8,7 @@ module Shadow
         , offset
         , standard
         , plain
+        , blurry
         , boxShadowToCouple
         )
 
@@ -32,7 +33,7 @@ module Shadow
 @docs offset
 @docs standard
 @docs plain
-
+@docs blurry
 
 # Compilation
 
@@ -44,7 +45,6 @@ import Color exposing (Color)
 import Color.Convert
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
-import Elegant.Helpers as Helpers
 
 
 {-| The Shadow record contains everything about box shadow.
@@ -60,9 +60,9 @@ can then use modifiers. I.E.
 -}
 type alias Shadow =
     { inset : Bool
-    , spreadRadius : Maybe SizeUnit
-    , blurRadius : Maybe SizeUnit
-    , color : Maybe Color
+    , spreadRadius : SizeUnit
+    , blurRadius : SizeUnit
+    , color : Color
     , offset : ( SizeUnit, SizeUnit )
     }
 
@@ -72,7 +72,7 @@ You are free to use it as you wish, but it is instanciated automatically by `Ele
 -}
 default : Shadow
 default =
-    Shadow False Nothing Nothing Nothing ( Px 0, Px 0 )
+    Shadow False (Px 0) (Px 0) Color.black ( Px 0, Px 0 )
 
 
 {-| Set the inset of the Shadow.
@@ -86,14 +86,14 @@ inset =
 -}
 spreadRadius : SizeUnit -> Modifier Shadow
 spreadRadius =
-    setSpreadRadius << Just
+    setSpreadRadius
 
 
 {-| Set the blurRadius of the Shadow.
 -}
 blurRadius : SizeUnit -> Modifier Shadow
 blurRadius =
-    setBlurRadius << Just
+    setBlurRadius
 
 
 {-| Set the offset of the Shadow.
@@ -108,7 +108,7 @@ offset =
 standard : SizeUnit -> Color -> ( SizeUnit, SizeUnit ) -> Modifier Shadow
 standard size color offset =
     blurRadius size
-        >> setColor (Just color)
+        >> setColor color
         >> setOffset offset
 
 
@@ -117,7 +117,14 @@ standard size color offset =
 plain : ( SizeUnit, SizeUnit ) -> Color -> Modifier Shadow
 plain offset color =
     setOffset offset
-        >> setColor (Just color)
+        >> setColor color
+
+
+{-| Creates a plain boxShadow.
+-}
+blurry : SizeUnit -> SizeUnit -> Color -> Modifier Shadow
+blurry spread blur color =
+    spreadRadius spread << blurRadius blur << plain ( Px 0, Px 0 ) color
 
 
 {-| Compiles a `Shadow` record to the corresponding CSS tuple.
@@ -138,19 +145,17 @@ offsetToStringList ( x, y ) =
         |> List.map sizeUnitToString
 
 
-blurAndSpreadRadiusToStringList : Maybe SizeUnit -> Maybe SizeUnit -> List String
+blurAndSpreadRadiusToStringList : SizeUnit -> SizeUnit -> List String
 blurAndSpreadRadiusToStringList blurRadius spreadRadius =
     [ blurRadius
     , spreadRadius
     ]
-        |> List.concatMap (Helpers.emptyListOrApply sizeUnitToString)
+        |> List.map sizeUnitToString
 
 
-maybeColorToStringList : Maybe Color -> List String
-maybeColorToStringList =
-    Maybe.map Color.Convert.colorToCssRgba
-        >> Maybe.map List.singleton
-        >> Maybe.withDefault []
+colorToStringList : Color -> List String
+colorToStringList =
+    Color.Convert.colorToCssRgba >> List.singleton
 
 
 insetToStringList : Bool -> List String
@@ -163,11 +168,12 @@ insetToStringList inset =
 
 boxShadowToString : Shadow -> String
 boxShadowToString { inset, offset, spreadRadius, color, blurRadius } =
-    ([ offsetToStringList offset
-     , blurAndSpreadRadiusToStringList blurRadius spreadRadius
-     , maybeColorToStringList color
-     , insetToStringList inset
-     ]
-        |> List.concat
-        |> String.join " "
-    )
+    Debug.log "Ici "
+        ([ offsetToStringList offset
+         , blurAndSpreadRadiusToStringList blurRadius spreadRadius
+         , colorToStringList color
+         , insetToStringList inset
+         ]
+            |> List.concat
+            |> String.join " "
+        )
