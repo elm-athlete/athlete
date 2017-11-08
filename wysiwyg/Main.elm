@@ -1101,12 +1101,12 @@ gridEditor ({ attributes, children } as grid) =
                 , S.block []
                 ]
             ]
-            [ item ( 1, 0 ) ( Grid.span 1, Grid.span 1 ) [ arrowSelection xTemplate [ S.block [ Block.width (px 120), Block.alignCenter ] ] Grid.columns (B.text "v") ]
+            [ item ( 1, 0 ) ( Grid.span 1, Grid.span 1 ) [ arrowSelection xTemplate [ S.block [ Block.width (px (round (240 / (List.length xTemplate |> toFloat)))), Block.alignCenter ] ] Grid.columns (B.text "v") ]
             , item ( 0, 1 )
                 ( Grid.span 1, Grid.span 1 )
                 [ arrowSelection yTemplate
                     [ S.block
-                        [ Block.height (px 120) ]
+                        [ Block.height (px (round (240 / (List.length yTemplate |> toFloat)))) ]
                     ]
                     Grid.rows
                     (B.flex
@@ -1186,7 +1186,7 @@ gridView { attributes, children } xTemplate yTemplate =
                             [ B.node
                                 [ A.style
                                     [ S.block
-                                        [ Block.width (px 120)
+                                        [ Block.width (px (round (240 / (List.length xTemplate |> toFloat))))
                                         , Block.height (px 120)
                                         ]
                                     ]
@@ -1210,7 +1210,7 @@ gridView { attributes, children } xTemplate yTemplate =
                                         [ A.style
                                             [ S.block
                                                 [ Block.width (px 120)
-                                                , Block.height (px 120)
+                                                , Block.height (px (round (240 / (List.length yTemplate |> toFloat))))
                                                 ]
                                             ]
                                         ]
@@ -1237,7 +1237,7 @@ arrowSelection repeatables styleModifiers selector content =
         [ A.style
             [ S.gridContainerProperties
                 [ selector
-                    [ Grid.template repeatables ]
+                    [ repeatables |> List.map (always (Grid.simple (Grid.fractionOfAvailableSpace 1))) |> Grid.template ]
                 ]
             , S.block
                 [ Block.width (percent 100)
