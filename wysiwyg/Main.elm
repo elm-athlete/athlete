@@ -97,12 +97,44 @@ update msg model =
             AddRow ->
                 model |> addRowInGrid
 
+            ChangeGridItemPlacementX value ->
+                model |> changeGridItemPlacementXOfCurrentElement value
+
+            ChangeGridItemPlacementY value ->
+                model |> changeGridItemPlacementYOfCurrentElement value
+
+            ChangeGridItemSizeX value ->
+                model |> changeGridItemSizeXOfCurrentElement value
+
+            ChangeGridItemSizeY value ->
+                model |> changeGridItemSizeYOfCurrentElement value
+
 
 addChildToElement : Element msg -> Element msg -> Element msg
 addChildToElement ({ tree } as parent) child =
     tree
         |> addChildToTree child
         |> setTreeIn parent
+
+
+changeGridItemPlacementXOfCurrentElement : Int -> Model -> Model
+changeGridItemPlacementXOfCurrentElement placement =
+    changeStyleOfSelectedElement (modifyGridItemInStyle (modifyGridItemPlacementX placement))
+
+
+changeGridItemPlacementYOfCurrentElement : Int -> Model -> Model
+changeGridItemPlacementYOfCurrentElement placement =
+    changeStyleOfSelectedElement (modifyGridItemInStyle (modifyGridItemPlacementY placement))
+
+
+changeGridItemSizeXOfCurrentElement : Int -> Model -> Model
+changeGridItemSizeXOfCurrentElement size =
+    changeStyleOfSelectedElement (modifyGridItemInStyle (modifyGridItemSizeX size))
+
+
+changeGridItemSizeYOfCurrentElement : Int -> Model -> Model
+changeGridItemSizeYOfCurrentElement size =
+    changeStyleOfSelectedElement (modifyGridItemInStyle (modifyGridItemSizeY size))
 
 
 changeStyleOfSelectedElement : (Elegant.CommonStyle -> Elegant.CommonStyle) -> Model -> Model
@@ -151,6 +183,21 @@ modifyGridContainer getter setter modifier gridContainerDetails =
         |> setter gridContainerDetails
 
 
+modifyGridItem :
+    (Grid.GridItemDetails -> Maybe Grid.GridItemCoordinate)
+    -> (Grid.GridItemDetails -> Maybe Grid.GridItemCoordinate -> Grid.GridItemDetails)
+    -> (Grid.GridItemCoordinate -> Grid.GridItemCoordinate)
+    -> Grid.GridItemDetails
+    -> Grid.GridItemDetails
+modifyGridItem getter setter modifier gridItemDetails =
+    gridItemDetails
+        |> getter
+        |> Maybe.withDefault (Grid.GridItemCoordinate Nothing Nothing Nothing)
+        |> modifier
+        |> Just
+        |> setter gridItemDetails
+
+
 modifyGridContainerX :
     (Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate)
     -> Grid.GridContainerDetails
@@ -167,6 +214,22 @@ modifyGridContainerY =
     modifyGridContainer .y setYIn
 
 
+modifyGridItemX :
+    (Grid.GridItemCoordinate -> Grid.GridItemCoordinate)
+    -> Grid.GridItemDetails
+    -> Grid.GridItemDetails
+modifyGridItemX =
+    modifyGridItem .x setXIn
+
+
+modifyGridItemY :
+    (Grid.GridItemCoordinate -> Grid.GridItemCoordinate)
+    -> Grid.GridItemDetails
+    -> Grid.GridItemDetails
+modifyGridItemY =
+    modifyGridItem .y setYIn
+
+
 modifyGridContainerToAddRow : Grid.GridContainerDetails -> Grid.GridContainerDetails
 modifyGridContainerToAddRow =
     modifyGridContainerY addSimpleToTemplate
@@ -175,6 +238,36 @@ modifyGridContainerToAddRow =
 modifyGridContainerToAddColumn : Grid.GridContainerDetails -> Grid.GridContainerDetails
 modifyGridContainerToAddColumn =
     modifyGridContainerX addSimpleToTemplate
+
+
+modifyGridItemPlacementX : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
+modifyGridItemPlacementX placement =
+    modifyGridItemX (modifyPlacement placement)
+
+
+modifyGridItemPlacementY : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
+modifyGridItemPlacementY placement =
+    modifyGridItemY (modifyPlacement placement)
+
+
+modifyGridItemSizeX : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
+modifyGridItemSizeX size =
+    modifyGridItemX (modifySize size)
+
+
+modifyGridItemSizeY : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
+modifyGridItemSizeY size =
+    modifyGridItemY (modifySize size)
+
+
+modifySize : Int -> Grid.GridItemCoordinate -> Grid.GridItemCoordinate
+modifySize size coordinate =
+    { coordinate | size = Just (Grid.span size) }
+
+
+modifyPlacement : Int -> Grid.GridItemCoordinate -> Grid.GridItemCoordinate
+modifyPlacement placement coordinate =
+    { coordinate | placement = Just placement }
 
 
 addSimpleToTemplate : Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
@@ -210,6 +303,11 @@ modifyElementInStyle elementModifier modifier ({ display } as style) =
 modifyBoxInStyle : (Box.Box -> Box.Box) -> Elegant.CommonStyle -> Elegant.CommonStyle
 modifyBoxInStyle =
     modifyElementInStyle modifyBoxInDisplayBox
+
+
+modifyGridItemInStyle : (Grid.GridItemDetails -> Grid.GridItemDetails) -> Elegant.CommonStyle -> Elegant.CommonStyle
+modifyGridItemInStyle =
+    modifyElementInStyle (modifyOutsideDisplayInDisplayBox << modifyGridItemInOutsideDisplay)
 
 
 modifyGridContainerInStyle : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Elegant.CommonStyle -> Elegant.CommonStyle
@@ -256,6 +354,18 @@ modifyOutsideDisplayInDisplayBox modifier display =
                 |> modifier
                 |> setOutsideDisplayIn contents
                 |> Display.ContentsWrapper
+
+
+modifyGridItemInOutsideDisplay : (Grid.GridItemDetails -> Grid.GridItemDetails) -> Display.OutsideDisplay -> Display.OutsideDisplay
+modifyGridItemInOutsideDisplay modifier outsideDisplay =
+    case outsideDisplay of
+        Display.GridItem gridItemDetails boxDetails ->
+            gridItemDetails
+                |> Maybe.map modifier
+                |> flip Display.GridItem boxDetails
+
+        _ ->
+            outsideDisplay
 
 
 modifyGridContainerInInsideDisplay : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Display.InsideDisplay -> Display.InsideDisplay
@@ -778,6 +888,10 @@ type Msg
     | ChangeText String
     | AddColumn
     | AddRow
+    | ChangeGridItemPlacementX Int
+    | ChangeGridItemPlacementY Int
+    | ChangeGridItemSizeX Int
+    | ChangeGridItemSizeY Int
 
 
 view : Model -> Node Msg
@@ -1299,9 +1413,30 @@ inspectorView model =
                         Text text ->
                             textEditor text id
 
+                        GridItem gridItem ->
+                            gridItemEditor gridItem
+
                         _ ->
                             B.text ""
                     ]
+
+
+gridItemEditor : GridAttributes Msg -> Node Msg
+gridItemEditor { attributes, children } =
+    B.div []
+        [ B.div []
+            [ B.node [] [ B.text "placement X" ]
+            , B.node [] [ B.inputNumber [ E.onInput ChangeGridItemPlacementX ] ]
+            , B.node [] [ B.text " Y " ]
+            , B.node [] [ B.inputNumber [ E.onInput ChangeGridItemPlacementY ] ]
+            ]
+        , B.div []
+            [ B.node [] [ B.text "size X" ]
+            , B.node [] [ B.inputNumber [ E.onInput ChangeGridItemSizeX ] ]
+            , B.node [] [ B.text " Y " ]
+            , B.node [] [ B.inputNumber [ E.onInput ChangeGridItemSizeY ] ]
+            ]
+        ]
 
 
 treeView : Model -> Node Msg

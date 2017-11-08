@@ -55,6 +55,7 @@ module Grid
         , GridItemSize
         , GridTemplate
         , GridContainerCoordinate
+        , GridItemCoordinate
         , Repeatable(..)
         )
 
