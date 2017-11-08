@@ -16,11 +16,13 @@ item ( x, y ) ( width, height ) =
         [ Attributes.style
             [ Style.gridItemProperties
                 [ Grid.horizontal
-                    [ Grid.placement x (Grid.span width)
+                    [ Grid.placement x
+                    , Grid.size (Grid.span width)
                     , Grid.align Grid.stretch
                     ]
                 , Grid.vertical
-                    [ Grid.placement y (Grid.span height)
+                    [ Grid.placement y
+                    , Grid.size (Grid.span height)
                     , Grid.align Grid.stretch
                     ]
                 ]

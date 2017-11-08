@@ -7,7 +7,7 @@ import BodyBuilder.Attributes as Attributes
 import Box
 import Typography
 import Typography.Character
-import BoxShadow
+import Shadow
 import Border
 import Color exposing (Color)
 import Corner
@@ -56,8 +56,8 @@ mainStyle =
         , Box.padding
             [ Padding.all (px 30) ]
         , Box.boxShadow
-            [ BoxShadow.standard (px 30) Color.black ( px 3, px 3 )
-            , BoxShadow.inset True
+            [ Shadow.standard (px 30) Color.black ( px 3, px 3 )
+            , Shadow.inset True
             ]
         , Box.border
             [ Border.all
