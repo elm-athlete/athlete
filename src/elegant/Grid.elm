@@ -52,7 +52,7 @@ module Grid
         , viewWidth
         , GridItemDetails
         , GridContainerDetails
-        , GridItemSize
+        , GridItemSize(..)
         , GridTemplate
         , GridContainerCoordinate
         , GridItemCoordinate

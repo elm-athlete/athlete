@@ -1176,6 +1176,28 @@ extractOpacityFromStyle style =
                         |> Maybe.andThen .opacity
 
 
+extractGridItemAttributes :
+    { a | display : Maybe Display.DisplayBox }
+    -> Maybe Grid.GridItemDetails
+extractGridItemAttributes style =
+    case style.display of
+        Nothing ->
+            Nothing
+
+        Just display ->
+            case display of
+                Display.None ->
+                    Nothing
+
+                Display.ContentsWrapper contents ->
+                    case contents.outsideDisplay of
+                        Display.GridItem details _ ->
+                            details
+
+                        _ ->
+                            Nothing
+
+
 textEditor : String -> Int -> Node Msg
 textEditor text id =
     B.inputText [ A.value text, E.onInput ChangeText ]
@@ -1423,20 +1445,72 @@ inspectorView model =
 
 gridItemEditor : GridAttributes Msg -> Node Msg
 gridItemEditor { attributes, children } =
-    B.div []
-        [ B.div []
-            [ B.node [] [ B.text "placement X" ]
-            , B.node [] [ B.inputNumber [ E.onInput ChangeGridItemPlacementX ] ]
-            , B.node [] [ B.text " Y " ]
-            , B.node [] [ B.inputNumber [ E.onInput ChangeGridItemPlacementY ] ]
+    let
+        gridItemAttributes =
+            attributes
+                |> .style
+                |> extractGridItemAttributes
+
+        placementXY =
+            gridItemAttributes
+                |> Maybe.andThen extractPlacementFromAttributes
+                |> Maybe.withDefault ( 0, 0 )
+
+        sizeXY =
+            gridItemAttributes
+                |> Maybe.andThen extractSizeFromAttributes
+                |> Maybe.withDefault ( 0, 0 )
+    in
+        B.div []
+            [ B.div []
+                [ B.node [] [ B.text "placement X" ]
+                , B.node [] [ B.inputNumber [ A.value (Tuple.first placementXY), E.onInput ChangeGridItemPlacementX ] ]
+                , B.node [] [ B.text " Y " ]
+                , B.node [] [ B.inputNumber [ A.value (Tuple.second placementXY), E.onInput ChangeGridItemPlacementY ] ]
+                ]
+            , B.div []
+                [ B.node [] [ B.text "size X" ]
+                , B.node [] [ B.inputNumber [ A.value (Tuple.first sizeXY), E.onInput ChangeGridItemSizeX ] ]
+                , B.node [] [ B.text " Y " ]
+                , B.node [] [ B.inputNumber [ A.value (Tuple.second sizeXY), E.onInput ChangeGridItemSizeY ] ]
+                ]
             ]
-        , B.div []
-            [ B.node [] [ B.text "size X" ]
-            , B.node [] [ B.inputNumber [ E.onInput ChangeGridItemSizeX ] ]
-            , B.node [] [ B.text " Y " ]
-            , B.node [] [ B.inputNumber [ E.onInput ChangeGridItemSizeY ] ]
-            ]
-        ]
+
+
+extractSizeFromAttributes : Grid.GridItemDetails -> Maybe ( Int, Int )
+extractSizeFromAttributes { x, y } =
+    Just
+        ( x
+            |> Maybe.andThen .size
+            |> Maybe.andThen extractSpan
+            |> Maybe.withDefault 0
+        , y
+            |> Maybe.andThen .size
+            |> Maybe.andThen extractSpan
+            |> Maybe.withDefault 0
+        )
+
+
+extractSpan : Grid.GridItemSize -> Maybe Int
+extractSpan size =
+    case size of
+        Grid.Span x ->
+            Just x
+
+        Grid.UntilEndOfCoordinate ->
+            Nothing
+
+
+extractPlacementFromAttributes : Grid.GridItemDetails -> Maybe ( Int, Int )
+extractPlacementFromAttributes { x, y } =
+    Just
+        ( x
+            |> Maybe.andThen .placement
+            |> Maybe.withDefault 0
+        , y
+            |> Maybe.andThen .placement
+            |> Maybe.withDefault 0
+        )
 
 
 treeView : Model -> Node Msg
