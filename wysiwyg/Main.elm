@@ -10,7 +10,6 @@ import Elegant exposing (px, vh, percent, Modifiers, Modifier)
 import Shadow
 import Box
 import Block
-import Border
 import Background
 import Display
 import Update
@@ -137,22 +136,45 @@ addRowInGrid =
     changeGridContainerStyleOfSelectedElement (modifyGridContainerToAddRow)
 
 
-modifyGridContainerToAddRow : Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToAddRow ({ y } as gridContainerDetails) =
-    y
+modifyGridContainer :
+    (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate)
+    -> (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate -> Grid.GridContainerDetails)
+    -> (Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate)
+    -> Grid.GridContainerDetails
+    -> Grid.GridContainerDetails
+modifyGridContainer getter setter modifier gridContainerDetails =
+    gridContainerDetails
+        |> getter
         |> Maybe.withDefault (Grid.GridContainerCoordinate Nothing Nothing Nothing Nothing)
-        |> addSimpleToTemplate
+        |> modifier
         |> Just
-        |> setYIn gridContainerDetails
+        |> setter gridContainerDetails
+
+
+modifyGridContainerX :
+    (Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate)
+    -> Grid.GridContainerDetails
+    -> Grid.GridContainerDetails
+modifyGridContainerX =
+    modifyGridContainer .x setXIn
+
+
+modifyGridContainerY :
+    (Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate)
+    -> Grid.GridContainerDetails
+    -> Grid.GridContainerDetails
+modifyGridContainerY =
+    modifyGridContainer .y setYIn
+
+
+modifyGridContainerToAddRow : Grid.GridContainerDetails -> Grid.GridContainerDetails
+modifyGridContainerToAddRow =
+    modifyGridContainerY addSimpleToTemplate
 
 
 modifyGridContainerToAddColumn : Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToAddColumn ({ x } as gridContainerDetails) =
-    x
-        |> Maybe.withDefault (Grid.GridContainerCoordinate Nothing Nothing Nothing Nothing)
-        |> addSimpleToTemplate
-        |> Just
-        |> setXIn gridContainerDetails
+modifyGridContainerToAddColumn =
+    modifyGridContainerX addSimpleToTemplate
 
 
 addSimpleToTemplate : Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
@@ -174,18 +196,25 @@ changeGridContainerStyleOfSelectedElement modifier =
     changeStyleOfSelectedElement (modifyGridContainerInStyle modifier)
 
 
-modifyBoxInStyle : (Box.Box -> Box.Box) -> Elegant.CommonStyle -> Elegant.CommonStyle
-modifyBoxInStyle modifier ({ display } as style) =
+modifyElementInStyle :
+    ((a -> a) -> Display.DisplayBox -> Display.DisplayBox)
+    -> (a -> a)
+    -> Elegant.CommonStyle
+    -> Elegant.CommonStyle
+modifyElementInStyle elementModifier modifier ({ display } as style) =
     display
-        |> Maybe.map (modifyBoxInDisplayBox modifier >> Just >> setDisplayIn style)
+        |> Maybe.map (elementModifier modifier >> Just >> setDisplayIn style)
         |> Maybe.withDefault (commonStyle Display.None)
+
+
+modifyBoxInStyle : (Box.Box -> Box.Box) -> Elegant.CommonStyle -> Elegant.CommonStyle
+modifyBoxInStyle =
+    modifyElementInStyle modifyBoxInDisplayBox
 
 
 modifyGridContainerInStyle : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Elegant.CommonStyle -> Elegant.CommonStyle
-modifyGridContainerInStyle modifier ({ display } as style) =
-    display
-        |> Maybe.map (modifyGridContainerInDisplayBox modifier >> Just >> setDisplayIn style)
-        |> Maybe.withDefault (commonStyle Display.None)
+modifyGridContainerInStyle =
+    modifyElementInStyle (modifyInsideDisplayInDisplayBox << modifyGridContainerInInsideDisplay)
 
 
 modifyBoxInDisplayBox : (Box.Box -> Box.Box) -> Display.DisplayBox -> Display.DisplayBox
@@ -203,27 +232,45 @@ modifyBoxInDisplayBox modifier display =
                 |> Display.ContentsWrapper
 
 
-modifyGridContainerInDisplayBox : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Display.DisplayBox -> Display.DisplayBox
-modifyGridContainerInDisplayBox modifier display =
+modifyInsideDisplayInDisplayBox : (Display.InsideDisplay -> Display.InsideDisplay) -> Display.DisplayBox -> Display.DisplayBox
+modifyInsideDisplayInDisplayBox modifier display =
     case display of
         Display.None ->
             Display.None
 
         Display.ContentsWrapper ({ insideDisplay } as contents) ->
-            (case insideDisplay of
-                Display.Flow ->
-                    Display.Flow
-
-                Display.FlexContainer flexContainer ->
-                    Display.FlexContainer flexContainer
-
-                Display.GridContainer gridContainerDetails ->
-                    gridContainerDetails
-                        |> Maybe.map modifier
-                        |> Display.GridContainer
-            )
+            insideDisplay
+                |> modifier
                 |> setInsideDisplayIn contents
                 |> Display.ContentsWrapper
+
+
+modifyOutsideDisplayInDisplayBox : (Display.OutsideDisplay -> Display.OutsideDisplay) -> Display.DisplayBox -> Display.DisplayBox
+modifyOutsideDisplayInDisplayBox modifier display =
+    case display of
+        Display.None ->
+            Display.None
+
+        Display.ContentsWrapper ({ outsideDisplay } as contents) ->
+            outsideDisplay
+                |> modifier
+                |> setOutsideDisplayIn contents
+                |> Display.ContentsWrapper
+
+
+modifyGridContainerInInsideDisplay : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Display.InsideDisplay -> Display.InsideDisplay
+modifyGridContainerInInsideDisplay modifier insideDisplay =
+    case insideDisplay of
+        Display.Flow ->
+            Display.Flow
+
+        Display.FlexContainer flexContainer ->
+            Display.FlexContainer flexContainer
+
+        Display.GridContainer gridContainerDetails ->
+            gridContainerDetails
+                |> Maybe.map modifier
+                |> Display.GridContainer
 
 
 changeBoxColor : Color.Color -> Box.Box -> Box.Box
@@ -388,6 +435,16 @@ setInsideDisplayIn =
     flip setInsideDisplay
 
 
+setOutsideDisplay : a -> { c | outsideDisplay : b } -> { c | outsideDisplay : a }
+setOutsideDisplay elem record =
+    { record | outsideDisplay = elem }
+
+
+setOutsideDisplayIn : { c | outsideDisplay : b } -> a -> { c | outsideDisplay : a }
+setOutsideDisplayIn =
+    flip setOutsideDisplay
+
+
 setColor : a -> { c | color : b } -> { c | color : a }
 setColor elem record =
     { record | color = elem }
@@ -464,6 +521,7 @@ setDisplayIn record elem =
     { record | display = elem }
 
 
+outsideDependentStyle : Display.OutsideDisplay -> { style : Elegant.CommonStyle }
 outsideDependentStyle outsideDisplay =
     { style =
         { outsideDisplay = outsideDisplay

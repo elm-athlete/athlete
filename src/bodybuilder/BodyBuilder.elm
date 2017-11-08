@@ -49,6 +49,7 @@ text =
     Html.text
 
 
+none : Node msg
 none =
     text ""
 
