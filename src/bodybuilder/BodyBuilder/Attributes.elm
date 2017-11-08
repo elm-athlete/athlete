@@ -301,7 +301,7 @@ type alias FlowAttributes msg =
     }
 
 
-{-| Computed :         MaybeBlockContainer (FlowAttributes msg)
+{-| Computed : MaybeBlockContainer (FlowAttributes msg)
 -}
 type alias NodeAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
@@ -754,6 +754,7 @@ type alias InputNumberAttributes msg =
     , max : Maybe Int
     , min : Maybe Int
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    , disabled : Bool
     }
 
 
@@ -1049,7 +1050,7 @@ headingAttributesToHtmlAttributes =
 
 disabled : Modifier (DisabledAttribute a)
 disabled attrs =
-    { attrs | disabled = False }
+    { attrs | disabled = True }
 
 
 disabledAttributeToHtmlAttributes : Bool -> List (Html.Attribute msg)
@@ -1360,6 +1361,7 @@ defaultInputNumberAttributes =
     , step = Nothing
     , block = Nothing
     , rawStyle = Nothing
+    , disabled = False
     }
 
 
@@ -1370,6 +1372,7 @@ inputNumberAttributesToHtmlAttributes attributes =
     , unwrapMaybeAttribute Html.Attributes.max << (Maybe.map toString << .max)
     ]
         |> List.concatMap (callOn attributes)
+        |> List.append [ Html.Attributes.disabled attributes.disabled ]
         |> List.append (inputVisibleToHtmlAttributes attributes)
         |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
 
@@ -1522,6 +1525,7 @@ defaultInputRangeAttributes =
     , step = Nothing
     , block = Nothing
     , rawStyle = Nothing
+    , disabled = False
     }
 
 
