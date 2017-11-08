@@ -53,14 +53,18 @@ type alias ValueAttribute b a =
     { a | value : Maybe b }
 
 
-{-| -}
-type alias TitleAttribute a =
-    { a | title : Maybe String }
 
-
-{-| -}
-type alias IdAttribute a =
-    { a | id : Maybe String }
+--
+-- {-| -}
+-- type alias TitleAttribute a =
+--     { a | title : Maybe String }
+--
+--
+-- {-| -}
+-- type alias IdAttribute a =
+--     { a | id : Maybe String }
+--
+--
 
 
 {-| -}
@@ -78,19 +82,28 @@ type alias MinAttribute a =
     { a | min : Maybe Int }
 
 
-{-| -}
-type alias ClassAttribute a =
-    { a | class : List String }
+
+--
+-- {-| -}
+-- type alias ClassAttribute a =
+--     { a | class : List String }
+--
+--
+-- {-| -}
+-- type alias TabindexAttribute a =
+--     { a | tabindex : Maybe Int }
+--
+--
+-- {-| -}
 
 
-{-| -}
-type alias TabindexAttribute a =
-    { a | tabindex : Maybe Int }
-
-
-{-| -}
 type alias TargetAttribute a =
     { a | target : Maybe String }
+
+
+
+--
+--
 
 
 {-| -}
@@ -107,19 +120,23 @@ type alias WidthAttribute a =
     { a | width : Maybe Int }
 
 
-{-| -}
-type alias HeightAttribute a =
-    { a | height : Maybe Int }
 
-
-{-| -}
-type alias SrcAttribute a =
-    { a | src : String }
-
-
-{-| -}
-type alias AltAttribute a =
-    { a | alt : String }
+--
+-- {-| -}
+-- type alias HeightAttribute a =
+--     { a | height : Maybe Int }
+--
+--
+-- {-| -}
+-- type alias SrcAttribute a =
+--     { a | src : String }
+--
+--
+-- {-| -}
+-- type alias AltAttribute a =
+--     { a | alt : String }
+--
+--
 
 
 {-| -}
@@ -135,54 +152,61 @@ type alias BlockContainer a =
     { a | block : List ( Modifiers BlockDetails, StyleSelector ) }
 
 
-{-| -}
-type alias AutocompleteAttribute a =
-    { a | autocomplete : Bool }
 
-
-{-| -}
-type alias PlaceholderAttribute a =
-    { a | placeholder : Maybe String }
-
-
-type alias PositionAttribute a =
-    { a | position : Position }
-
-
-type alias DataAttribute a =
-    { a | data : List ( String, String ) }
-
-
-type alias TypeContainer a =
-    { a | type_ : String }
+--
+-- {-| -}
+-- type alias AutocompleteAttribute a =
+--     { a | autocomplete : Bool }
+--
+--
+-- {-| -}
+-- type alias PlaceholderAttribute a =
+--     { a | placeholder : Maybe String }
+--
+--
+-- type alias PositionAttribute a =
+--     { a | position : Position }
+--
+--
+-- type alias DataAttribute a =
+--     { a | data : List ( String, String ) }
+--
+--
+-- type alias TypeContainer a =
+--     { a | type_ : String }
+--
+--
 
 
 type alias BoxContainer a =
     { a | box : List ( Modifiers Box.Box, StyleSelector ) }
 
 
-type alias CheckedContainer a =
-    { a | checked : Bool }
 
-
-type alias UniversalContainer a =
-    { a | universal : UniversalAttributes }
-
-
-type alias FlexContainerProperties a =
-    { a | flexContainerProperties : List ( Modifiers Flex.FlexContainerDetails, StyleSelector ) }
-
-
-type alias FlexItemProperties a =
-    { a | flexItemProperties : List ( Modifiers Flex.FlexItemDetails, StyleSelector ) }
-
-
-type alias GridContainerProperties a =
-    { a | gridContainerProperties : List ( Modifiers Grid.GridContainerDetails, StyleSelector ) }
-
-
-type alias GridItemProperties a =
-    { a | gridItemProperties : List ( Modifiers Grid.GridItemDetails, StyleSelector ) }
+--
+-- type alias CheckedContainer a =
+--     { a | checked : Bool }
+--
+--
+-- type alias UniversalContainer a =
+--     { a | universal : UniversalAttributes }
+--
+--
+-- type alias FlexContainerProperties a =
+--     { a | flexContainerProperties : List ( Modifiers Flex.FlexContainerDetails, StyleSelector ) }
+--
+--
+-- type alias FlexItemProperties a =
+--     { a | flexItemProperties : List ( Modifiers Flex.FlexItemDetails, StyleSelector ) }
+--
+--
+-- type alias GridContainerProperties a =
+--     { a | gridContainerProperties : List ( Modifiers Grid.GridContainerDetails, StyleSelector ) }
+--
+--
+-- type alias GridItemProperties a =
+--     { a | gridItemProperties : List ( Modifiers Grid.GridItemDetails, StyleSelector ) }
+--
 
 
 {-| -}
@@ -381,24 +405,19 @@ type alias HeadingAttributes msg =
 
 
 -- MaybeBlockContainer (DisabledAttribute (VisibleAttributesAndEvents msg a))
-
-
-{-| -}
-type alias ButtonAttributesBase msg a =
-    { a
-        | disabled : Bool
-        , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-        , onMouseEvents : Maybe (OnMouseEventsInside msg)
-        , onEvent : Maybe ( String, Decoder msg )
-        , onBlurEvent : Maybe msg
-        , onFocusEvent : Maybe msg
-        , box : List ( Modifiers Box.Box, StyleSelector )
-        , universal : UniversalAttributes
-        , rawStyle : Maybe Elegant.Style
-    }
-
-
-
+-- {-| -}
+-- type alias ButtonAttributesBase msg a =
+--     { a
+--         | disabled : Bool
+--         , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+--         , onMouseEvents : Maybe (OnMouseEventsInside msg)
+--         , onEvent : Maybe ( String, Decoder msg )
+--         , onBlurEvent : Maybe msg
+--         , onFocusEvent : Maybe msg
+--         , box : List ( Modifiers Box.Box, StyleSelector )
+--         , universal : UniversalAttributes
+--         , rawStyle : Maybe Elegant.Style
+--     }
 -- ButtonAttributesBase msg {}
 
 
@@ -572,25 +591,26 @@ type alias LabelAttributes msg =
     }
 
 
-{-| This code should be simplified with the later, but it's very faster without the function calls
-VisibleAttributesAndEvents msg (InputAttributes a)
--}
-type alias InputVisibleAttributes msg a =
-    { a
-        | name : Maybe String
-        , type_ : String
-        , universal : UniversalAttributes
-        , box : List ( Modifiers Box.Box, StyleSelector )
-        , onMouseEvents : Maybe (OnMouseEventsInside msg)
-        , onEvent : Maybe ( String, Decoder msg )
-        , onBlurEvent : Maybe msg
-        , onFocusEvent : Maybe msg
-        , label : Maybe (Shared.Label msg)
-        , rawStyle : Maybe Elegant.Style
-    }
 
-
-
+-- {-| This code should be simplified with the later, but it's very faster without the function calls
+-- VisibleAttributesAndEvents msg (InputAttributes a)
+-- -}
+--
+--
+--
+-- type alias InputVisibleAttributes msg a =
+--     { a
+--         | name : Maybe String
+--         , type_ : String
+--         , universal : UniversalAttributes
+--         , box : List ( Modifiers Box.Box, StyleSelector )
+--         , onMouseEvents : Maybe (OnMouseEventsInside msg)
+--         , onEvent : Maybe ( String, Decoder msg )
+--         , onBlurEvent : Maybe msg
+--         , onFocusEvent : Maybe msg
+--         , label : Maybe (Shared.Label msg)
+--         , rawStyle : Maybe Elegant.Style
+--     }
 -- {-| StringValue (InputVisibleAttributes msg a)
 -- -}
 -- type alias InputStringValueAttributes msg a =
@@ -689,12 +709,19 @@ type alias InputTextAttributes msg =
 
 
 type alias InputSubmitAttributes msg =
-    OnSubmitEvent msg
-        (ButtonAttributesBase msg
-            { label : Maybe (Shared.Label msg)
-            , type_ : String
-            }
-        )
+    { label : Maybe (Shared.Label msg)
+    , type_ : String
+    , disabled : Bool
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , onSubmitEvent : Maybe msg
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , universal : UniversalAttributes
+    , rawStyle : Maybe Elegant.Style
+    }
 
 
 {-| -}
@@ -710,28 +737,24 @@ type alias InputUrlAttributes msg =
 
 
 type alias InputNumberAttributes msg =
-    MaybeBlockContainer
-        (StepAttribute
-            (MaxAttribute
-                (MinAttribute
-                    (OnIntInputEvent msg
-                        (IntValue
-                            { name : Maybe String
-                            , type_ : String
-                            , universal : UniversalAttributes
-                            , box : List ( Modifiers Box.Box, StyleSelector )
-                            , onMouseEvents : Maybe (OnMouseEventsInside msg)
-                            , onEvent : Maybe ( String, Decoder msg )
-                            , onBlurEvent : Maybe msg
-                            , onFocusEvent : Maybe msg
-                            , label : Maybe (Shared.Label msg)
-                            , rawStyle : Maybe Elegant.Style
-                            }
-                        )
-                    )
-                )
-            )
-        )
+    { name : Maybe String
+    , type_ : String
+    , universal : UniversalAttributes
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , label : Maybe (Shared.Label msg)
+    , rawStyle : Maybe Elegant.Style
+    , value : Maybe Int
+    , onInputEvent : Maybe (Int -> msg)
+    , fromStringInput : String -> Int
+    , step : Maybe Int
+    , max : Maybe Int
+    , min : Maybe Int
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
 
 
 {-| -}
@@ -742,22 +765,21 @@ type alias InputNumberAttributes msg =
 
 
 type alias InputColorAttributes msg =
-    MaybeBlockContainer
-        (OnColorInputEvent msg
-            (ColorValue
-                { name : Maybe String
-                , type_ : String
-                , universal : UniversalAttributes
-                , box : List ( Modifiers Box.Box, StyleSelector )
-                , onMouseEvents : Maybe (OnMouseEventsInside msg)
-                , onEvent : Maybe ( String, Decoder msg )
-                , onBlurEvent : Maybe msg
-                , onFocusEvent : Maybe msg
-                , label : Maybe (Shared.Label msg)
-                , rawStyle : Maybe Elegant.Style
-                }
-            )
-        )
+    { name : Maybe String
+    , type_ : String
+    , universal : UniversalAttributes
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , label : Maybe (Shared.Label msg)
+    , rawStyle : Maybe Elegant.Style
+    , value : Maybe Color
+    , onInputEvent : Maybe (Color -> msg)
+    , fromStringInput : String -> Color
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
 
 
 {-| -}
@@ -768,18 +790,18 @@ type alias InputColorAttributes msg =
 
 
 type alias InputFileAttributes msg =
-    MaybeBlockContainer
-        { name : Maybe String
-        , type_ : String
-        , universal : UniversalAttributes
-        , box : List ( Modifiers Box.Box, StyleSelector )
-        , onMouseEvents : Maybe (OnMouseEventsInside msg)
-        , onEvent : Maybe ( String, Decoder msg )
-        , onBlurEvent : Maybe msg
-        , onFocusEvent : Maybe msg
-        , label : Maybe (Shared.Label msg)
-        , rawStyle : Maybe Elegant.Style
-        }
+    { name : Maybe String
+    , type_ : String
+    , universal : UniversalAttributes
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, Decoder msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , label : Maybe (Shared.Label msg)
+    , rawStyle : Maybe Elegant.Style
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    }
 
 
 label : List (Html msg) -> { c | label : Maybe (Shared.Label msg) } -> { c | label : Maybe (Shared.Label msg) }
@@ -1128,7 +1150,7 @@ width val attrs =
     { attrs | width = Just val }
 
 
-height : Int -> Modifier (HeightAttribute a)
+height : a -> { c | height : b } -> { c | height : Maybe a }
 height val attrs =
     { attrs | height = Just val }
 
@@ -1202,7 +1224,7 @@ progressAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
 
 
-data : List ( String, String ) -> Modifier (DataAttribute a)
+data : a -> { c | data : b } -> { c | data : a }
 data val attrs =
     { attrs | data = val }
 
@@ -1257,12 +1279,12 @@ inputVisibleToHtmlAttributes attributes =
         (inputAttributesToHtmlAttributes attributes)
 
 
-autocomplete : Bool -> Modifier (AutocompleteAttribute a)
+autocomplete : a -> { c | autocomplete : b } -> { c | autocomplete : a }
 autocomplete val attrs =
     { attrs | autocomplete = val }
 
 
-placeholder : String -> Modifier (PlaceholderAttribute a)
+placeholder : a -> { c | placeholder : b } -> { c | placeholder : Maybe a }
 placeholder val attrs =
     { attrs | placeholder = Just val }
 
