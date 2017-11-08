@@ -98,16 +98,22 @@ update msg model =
                 model |> addRowInGrid
 
             ChangeGridItemPlacementX value ->
-                model |> changeGridItemPlacementXOfCurrentElement value
+                model |> changeGridItemPlacementXOfCurrentElement (value + 1)
 
             ChangeGridItemPlacementY value ->
-                model |> changeGridItemPlacementYOfCurrentElement value
+                model |> changeGridItemPlacementYOfCurrentElement (value + 1)
 
             ChangeGridItemSizeX value ->
                 model |> changeGridItemSizeXOfCurrentElement value
 
             ChangeGridItemSizeY value ->
                 model |> changeGridItemSizeYOfCurrentElement value
+
+            ToggleGridItemPlacementX value ->
+                model |> toggleGridItemPlacementXOfCurrentElement value
+
+            ToggleGridItemPlacementY value ->
+                model |> toggleGridItemPlacementYOfCurrentElement value
 
 
 addChildToElement : Element msg -> Element msg -> Element msg
@@ -125,6 +131,16 @@ changeGridItemPlacementXOfCurrentElement placement =
 changeGridItemPlacementYOfCurrentElement : Int -> Model -> Model
 changeGridItemPlacementYOfCurrentElement placement =
     changeStyleOfSelectedElement (modifyGridItemInStyle (modifyGridItemPlacementY placement))
+
+
+toggleGridItemPlacementXOfCurrentElement : Bool -> Model -> Model
+toggleGridItemPlacementXOfCurrentElement value =
+    changeStyleOfSelectedElement (modifyGridItemInStyle (toggleGridItemPlacementX value))
+
+
+toggleGridItemPlacementYOfCurrentElement : Bool -> Model -> Model
+toggleGridItemPlacementYOfCurrentElement value =
+    changeStyleOfSelectedElement (modifyGridItemInStyle (toggleGridItemPlacementY value))
 
 
 changeGridItemSizeXOfCurrentElement : Int -> Model -> Model
@@ -245,6 +261,16 @@ modifyGridItemPlacementX placement =
     modifyGridItemX (modifyPlacement placement)
 
 
+toggleGridItemPlacementX : Bool -> Grid.GridItemDetails -> Grid.GridItemDetails
+toggleGridItemPlacementX value =
+    modifyGridItemX (togglePlacement value)
+
+
+toggleGridItemPlacementY : Bool -> Grid.GridItemDetails -> Grid.GridItemDetails
+toggleGridItemPlacementY value =
+    modifyGridItemY (togglePlacement value)
+
+
 modifyGridItemPlacementY : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
 modifyGridItemPlacementY placement =
     modifyGridItemY (modifyPlacement placement)
@@ -268,6 +294,17 @@ modifySize size coordinate =
 modifyPlacement : Int -> Grid.GridItemCoordinate -> Grid.GridItemCoordinate
 modifyPlacement placement coordinate =
     { coordinate | placement = Just placement }
+
+
+togglePlacement :
+    Bool
+    -> { b | placement : Maybe Int }
+    -> { b | placement : Maybe Int }
+togglePlacement value coordinate =
+    if value then
+        { coordinate | placement = Just 1 }
+    else
+        { coordinate | placement = Nothing }
 
 
 addSimpleToTemplate : Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
@@ -892,6 +929,8 @@ type Msg
     | ChangeGridItemPlacementY Int
     | ChangeGridItemSizeX Int
     | ChangeGridItemSizeY Int
+    | ToggleGridItemPlacementX Bool
+    | ToggleGridItemPlacementY Bool
 
 
 view : Model -> Node Msg
@@ -1454,40 +1493,91 @@ gridItemEditor { attributes, children } =
         placementXY =
             gridItemAttributes
                 |> Maybe.andThen extractPlacementFromAttributes
-                |> Maybe.withDefault ( 0, 0 )
+                |> Maybe.withDefault ( Nothing, Nothing )
 
         sizeXY =
             gridItemAttributes
                 |> Maybe.andThen extractSizeFromAttributes
-                |> Maybe.withDefault ( 0, 0 )
+                |> Maybe.withDefault ( Nothing, Nothing )
     in
         B.div []
             [ B.div []
-                [ B.node [] [ B.text "placement X" ]
-                , B.node [] [ B.inputNumber [ A.value (Tuple.first placementXY), E.onInput ChangeGridItemPlacementX ] ]
-                , B.node [] [ B.text " Y " ]
-                , B.node [] [ B.inputNumber [ A.value (Tuple.second placementXY), E.onInput ChangeGridItemPlacementY ] ]
+                [ B.inputCheckbox
+                    [ A.checked (Tuple.first placementXY |> isJust)
+                    , E.onCheck ToggleGridItemPlacementX
+                    ]
+                , B.node [] [ B.text "placement X" ]
+                , B.node []
+                    [ B.inputNumber
+                        ([ A.value (Tuple.first placementXY |> Maybe.withDefault 1 |> flip (-) 1)
+                         , E.onInput ChangeGridItemPlacementX
+                         ]
+                            ++ if Tuple.first placementXY |> isJust then
+                                []
+                               else
+                                [ A.disabled ]
+                        )
+                    ]
+                , B.inputCheckbox
+                    [ A.checked (Tuple.second placementXY |> isJust)
+                    , E.onCheck ToggleGridItemPlacementY
+                    ]
+                , B.node [] [ B.text " placement Y " ]
+                , B.node []
+                    [ B.inputNumber
+                        ([ A.value (Tuple.second placementXY |> Maybe.withDefault 1 |> flip (-) 1)
+                         , E.onInput ChangeGridItemPlacementY
+                         ]
+                            ++ if Tuple.second placementXY |> isJust then
+                                Debug.log "not disable" []
+                               else
+                                Debug.log "disable" [ A.disabled ]
+                        )
+                    ]
                 ]
             , B.div []
                 [ B.node [] [ B.text "size X" ]
-                , B.node [] [ B.inputNumber [ A.value (Tuple.first sizeXY), E.onInput ChangeGridItemSizeX ] ]
-                , B.node [] [ B.text " Y " ]
-                , B.node [] [ B.inputNumber [ A.value (Tuple.second sizeXY), E.onInput ChangeGridItemSizeY ] ]
+                , B.node []
+                    [ B.inputNumber
+                        [ A.value (Tuple.first sizeXY |> Maybe.withDefault 1)
+                        , E.onInput ChangeGridItemSizeX
+                        ]
+                    ]
+                , B.node [] [ B.text " size Y " ]
+                , B.node []
+                    [ B.inputNumber
+                        [ A.value (Tuple.second sizeXY |> Maybe.withDefault 1)
+                        , E.onInput ChangeGridItemSizeY
+                        ]
+                    ]
                 ]
             ]
 
 
-extractSizeFromAttributes : Grid.GridItemDetails -> Maybe ( Int, Int )
+isJust : Maybe a -> Bool
+isJust a =
+    case a of
+        Nothing ->
+            False
+
+        Just _ ->
+            True
+
+
+isNothing : Maybe a -> Bool
+isNothing =
+    not << isJust
+
+
+extractSizeFromAttributes : Grid.GridItemDetails -> Maybe ( Maybe Int, Maybe Int )
 extractSizeFromAttributes { x, y } =
     Just
         ( x
             |> Maybe.andThen .size
             |> Maybe.andThen extractSpan
-            |> Maybe.withDefault 0
         , y
             |> Maybe.andThen .size
             |> Maybe.andThen extractSpan
-            |> Maybe.withDefault 0
         )
 
 
@@ -1501,16 +1591,9 @@ extractSpan size =
             Nothing
 
 
-extractPlacementFromAttributes : Grid.GridItemDetails -> Maybe ( Int, Int )
+extractPlacementFromAttributes : Grid.GridItemDetails -> Maybe ( Maybe Int, Maybe Int )
 extractPlacementFromAttributes { x, y } =
-    Just
-        ( x
-            |> Maybe.andThen .placement
-            |> Maybe.withDefault 0
-        , y
-            |> Maybe.andThen .placement
-            |> Maybe.withDefault 0
-        )
+    Just ( x |> Maybe.andThen .placement, y |> Maybe.andThen .placement )
 
 
 treeView : Model -> Node Msg
