@@ -338,7 +338,7 @@ addSimpleToTemplate : Grid.GridContainerCoordinate -> Grid.GridContainerCoordina
 addSimpleToTemplate ({ template } as coordinates) =
     template
         |> Maybe.withDefault []
-        |> flip List.append [ Grid.simple (Grid.sizeUnitVal (px 120)) ]
+        |> flip List.append [ Grid.simple (Grid.Fr 1) ]
         |> Just
         |> setTemplateIn coordinates
 
@@ -814,9 +814,24 @@ gridXY content =
     }
 
 
+gridXAndY x y =
+    { x = Just x
+    , y = Just y
+    }
+
+
 gridContainerBase : Display.InsideDisplay
 gridContainerBase =
-    gridXY
+    gridXAndY
+        { align = Nothing
+        , alignItems = Nothing
+        , gutter = Just (px 5)
+        , template =
+            [ Grid.simple (Grid.Fr 1)
+            , Grid.simple (Grid.Fr 1)
+            ]
+                |> Just
+        }
         { align = Nothing
         , alignItems = Nothing
         , gutter = Just (px 5)
@@ -1078,22 +1093,17 @@ view model =
                     , Grid.alignItems (Grid.alignWrapper Grid.center)
                     ]
                 ]
-            , S.box [ Box.backgroundColor Color.white ]
+            , S.box [ Box.backgroundColor Color.black ]
             ]
         ]
-        [ item ( 0, 0 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ creationView model ]
-        , item ( 0, 1 ) ( Grid.span 1, Grid.untilEndOfCoordinate ) [ contentView model ]
-        , item ( 1, 1 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ inspectorView model ]
-        , item ( 1, 2 ) ( Grid.untilEndOfCoordinate, Grid.untilEndOfCoordinate ) [ treeView model ]
+        [ whiteItem ( 0, 0 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ creationView model ]
+        , transparentItem ( 0, 1 ) ( Grid.span 1, Grid.untilEndOfCoordinate ) [ contentView model ]
+        , whiteItem ( 1, 1 ) ( Grid.untilEndOfCoordinate, Grid.span 1 ) [ inspectorView model ]
+        , whiteItem ( 1, 2 ) ( Grid.untilEndOfCoordinate, Grid.untilEndOfCoordinate ) [ treeView model ]
         ]
 
 
-item :
-    ( Int, Int )
-    -> ( Grid.GridItemSize, Grid.GridItemSize )
-    -> List (Node msg)
-    -> B.GridItem msg
-item ( x, y ) ( width, height ) =
+item color ( x, y ) ( width, height ) =
     B.gridItem
         [ A.style
             [ S.gridItemProperties
@@ -1108,9 +1118,13 @@ item ( x, y ) ( width, height ) =
                     , Grid.align Grid.stretch
                     ]
                 ]
-            , S.box [ Box.backgroundColor (Color.rgba 0 0 0 0.1) ]
+            , S.box [ color ]
             ]
         ]
+
+
+transparentItem =
+    item (Box.backgroundColor (Color.rgba 0 0 0 0))
 
 
 creationView : Model -> Node Msg
@@ -1193,14 +1207,18 @@ creationView model =
 
 contentView : Model -> Node Msg
 contentView { element, selectedId } =
-    B.div []
-        [ contentViewEl selectedId element ]
+    B.grid [ A.style [ S.block [ Block.fullHeight ], S.box [ Box.background [ Background.images [ Background.image "/transparent.png" ] ] ] ] ]
+        [ B.gridItem []
+            [ B.div []
+                [ contentViewEl selectedId element ]
+            ]
+        ]
 
 
 selectOrSelected : Int -> Int -> Modifiers (A.VisibleAttributesAndEvents Msg a)
 selectOrSelected id selectedId =
     if id == selectedId then
-        [ A.style [ S.box [ Box.shadow [ Shadow.blurry (px 5) (px 5) (Color.rgba 0 0 0 0.1) ] ] ] ]
+        [ A.style [ S.box [ Box.shadow [ Shadow.blurry (px 5) (px 5) (Color.rgba 30 222 121 0.8) ] ] ] ]
     else
         [ E.onClick (SelectEl id) ]
 
@@ -1361,6 +1379,10 @@ textEditor text id =
     B.inputText [ A.value text, E.onInput ChangeText ]
 
 
+whiteItem =
+    item (Box.backgroundColor (Color.white))
+
+
 gridEditor :
     { attributes : { style : Elegant.CommonStyle }, children : List (Element Msg) }
     -> Node Msg
@@ -1395,7 +1417,7 @@ gridEditor ({ attributes, children } as grid) =
                 , S.block []
                 ]
             ]
-            [ item ( 1, 0 )
+            [ whiteItem ( 1, 0 )
                 ( Grid.span 1, Grid.span 1 )
                 [ arrowSelection xTemplate
                     [ S.block [ Block.width (px (round (240 / (List.length xTemplate |> toFloat)))), Block.alignCenter ] ]
@@ -1422,7 +1444,8 @@ gridEditor ({ attributes, children } as grid) =
                             ]
                     )
                 ]
-            , item ( 0, 1 )
+            , whiteItem
+                ( 0, 1 )
                 ( Grid.span 1, Grid.span 1 )
                 [ arrowSelection yTemplate
                     [ S.block
@@ -1445,9 +1468,9 @@ gridEditor ({ attributes, children } as grid) =
                             [ B.flexItem [] [ B.div [] [ B.text ">" ] ] ]
                     )
                 ]
-            , item ( 1, 1 ) ( Grid.span 1, Grid.span 1 ) [ gridView grid xTemplate yTemplate ]
-            , item ( 2, 1 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddColumn Flex.column ]
-            , item ( 1, 2 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddRow Flex.row ]
+            , transparentItem ( 1, 1 ) ( Grid.span 1, Grid.span 1 ) [ gridView grid xTemplate yTemplate ]
+            , whiteItem ( 2, 1 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddColumn Flex.column ]
+            , whiteItem ( 1, 2 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddRow Flex.row ]
             ]
 
 
@@ -1496,55 +1519,65 @@ gridView { attributes, children } xTemplate yTemplate =
             |> modifyGridContainerInStyle (replaceTemplateByOneFraction)
             |> Elegant.commonStyleToStyle
             |> A.rawStyle
-        , A.style [ S.block [] ]
+        , A.style [ S.block [ Block.fullHeight ] ]
         ]
-        ((List.foldr
-            (\element ( beginning, result ) ->
-                ( beginning + 1
-                , result
-                    ++ [ item ( beginning, 0 )
-                            ( Grid.span 1, Grid.untilEndOfCoordinate )
-                            [ B.node
-                                [ A.style
-                                    [ S.block
-                                        [ Block.width (px (round (240 / (List.length xTemplate |> toFloat))))
-                                        , Block.height (px 120)
-                                        ]
-                                    ]
-                                ]
-                                []
-                            ]
-                       ]
-                )
-            )
-            ( 0, [] )
-            xTemplate
-            |> Tuple.second
-         )
-            ++ (List.foldr
-                    (\element ( beginning, result ) ->
-                        ( beginning + 1
-                        , result
-                            ++ [ item ( 0, beginning )
-                                    ( Grid.untilEndOfCoordinate, Grid.span 1 )
-                                    [ B.node
-                                        [ A.style
-                                            [ S.block
-                                                [ Block.width (px 120)
-                                                , Block.height (px (round (240 / (List.length yTemplate |> toFloat))))
-                                                ]
-                                            ]
-                                        ]
-                                        []
-                                    ]
-                               ]
-                        )
-                    )
-                    ( 0, [] )
-                    yTemplate
-                    |> Tuple.second
-               )
-        )
+        (B.gridItem [ A.style [ S.box [ Box.backgroundColor (Color.rgb 50 50 50) ] ] ] [] |> List.repeat (List.length xTemplate * List.length yTemplate))
+
+
+
+-- ((List.foldr
+--     (\element ( beginning, result ) ->
+--         ( beginning + 1
+--         , result
+--             ++ [ transparentItem ( beginning, 0 )
+--                     ( Grid.span 1, Grid.untilEndOfCoordinate )
+--                     [ B.node
+--                         [ A.style
+--                             [ S.block
+--                                 [ Block.width (px (round (240 / (List.length xTemplate |> toFloat))))
+--                                 , Block.height (px 120)
+--                                 ]
+--                             , S.box
+--                                 [ Box.backgroundColor Color.white
+--                                 ]
+--                             ]
+--                         ]
+--                         []
+--                     ]
+--                ]
+--         )
+--     )
+--     ( 0, [] )
+--     xTemplate
+--     |> Tuple.second
+--  )
+--     ++ (List.foldr
+--             (\element ( beginning, result ) ->
+--                 ( beginning + 1
+--                 , result
+--                     ++ [ transparentItem
+--                             ( 0, beginning )
+--                             ( Grid.untilEndOfCoordinate, Grid.span 1 )
+--                             [ B.node
+--                                 [ A.style
+--                                     [ S.block
+--                                         [ Block.height (px (round (240 / (List.length yTemplate |> toFloat))))
+--                                         ]
+--                                     , S.box
+--                                         [ Box.backgroundColor Color.white
+--                                         ]
+--                                     ]
+--                                 ]
+--                                 []
+--                             ]
+--                        ]
+--                 )
+--             )
+--             ( 0, [] )
+--             yTemplate
+--             |> Tuple.second
+--        )
+-- )
 
 
 arrowSelection :
