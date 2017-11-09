@@ -958,7 +958,7 @@ defaultFlexContainerAttributes =
     , box = []
     , universal = defaultUniversalAttributes
     , block = Nothing
-    , flexContainerProperties = []
+    , flexContainerProperties = [ ( [], defaultStyleSelector ) ]
     , rawStyle = Nothing
     }
 
@@ -972,7 +972,7 @@ defaultGridContainerAttributes =
     , box = []
     , universal = defaultUniversalAttributes
     , block = Nothing
-    , gridContainerProperties = []
+    , gridContainerProperties = [ ( [], defaultStyleSelector ) ]
     , rawStyle = Nothing
     }
 
@@ -985,7 +985,7 @@ defaultHeadingAttributes =
     , onMouseEvents = Nothing
     , box = []
     , universal = defaultUniversalAttributes
-    , block = []
+    , block = [ ( [], defaultStyleSelector ) ]
     , rawStyle = Nothing
     }
 
