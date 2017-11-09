@@ -117,14 +117,10 @@ update msg model =
                 model |> toggleGridItemPlacementYOfCurrentElement value
 
             ChangeColumnSize columnNumber size ->
-                let
-                    test =
-                        Debug.log "test" columnNumber
-                in
-                    model |> changeGridColumnSizeOfCurrentElement columnNumber size
+                model |> changeGridColumnSizeOfCurrentElement columnNumber size
 
             ChangeColumnUnit columnNumber unit ->
-                model
+                model |> changeGridColumnUnitOfCurrentElement columnNumber unit
 
 
 addChildToElement : Element msg -> Element msg -> Element msg
@@ -193,6 +189,11 @@ addColumnInGrid =
 changeGridColumnSizeOfCurrentElement : Int -> Int -> Model -> Model
 changeGridColumnSizeOfCurrentElement columnNumber size =
     changeGridContainerStyleOfSelectedElement (modifyGridContainerToResizeColumn columnNumber size)
+
+
+changeGridColumnUnitOfCurrentElement : Int -> String -> Model -> Model
+changeGridColumnUnitOfCurrentElement columnNumber unit =
+    changeGridContainerStyleOfSelectedElement (modifyGridContainerToChangeUnitColumn columnNumber unit)
 
 
 addRowInGrid : Model -> Model
@@ -277,6 +278,11 @@ modifyGridContainerToResizeColumn columnNumber size =
     modifyGridContainerX (modifySimpleSize columnNumber size)
 
 
+modifyGridContainerToChangeUnitColumn : Int -> String -> Grid.GridContainerDetails -> Grid.GridContainerDetails
+modifyGridContainerToChangeUnitColumn columnNumber unit =
+    modifyGridContainerX (modifySimpleUnit columnNumber unit)
+
+
 modifyGridItemPlacementX : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
 modifyGridItemPlacementX placement =
     modifyGridItemX (modifyPlacement placement)
@@ -344,11 +350,53 @@ modifySimpleSize columnNumber size ({ template } as coordinates) =
         |> setTemplateIn coordinates
 
 
+modifySimpleUnit : Int -> String -> Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
+modifySimpleUnit columnNumber unit ({ template } as coordinates) =
+    template
+        |> Maybe.map (modifyUnitOfNthColumn columnNumber unit)
+        |> setTemplateIn coordinates
+
+
 modifySizeOfNthColumn : Int -> Int -> List Grid.Repeatable -> List Grid.Repeatable
 modifySizeOfNthColumn columnNumber size repeatables =
     (List.take columnNumber repeatables)
         ++ (modifySizeOfRepeatable (List.head (List.drop columnNumber repeatables)) size)
         ++ (List.drop (columnNumber + 1) repeatables)
+
+
+modifyUnitOfNthColumn : Int -> String -> List Grid.Repeatable -> List Grid.Repeatable
+modifyUnitOfNthColumn columnNumber unit repeatables =
+    (List.take columnNumber repeatables)
+        ++ (modifyUnitOfRepeatable (List.head (List.drop columnNumber repeatables)) unit)
+        ++ (List.drop (columnNumber + 1) repeatables)
+
+
+modifyUnitOfRepeatable : Maybe Grid.Repeatable -> String -> List Grid.Repeatable
+modifyUnitOfRepeatable repeatable unit =
+    case repeatable of
+        Nothing ->
+            []
+
+        Just repeatable_ ->
+            List.singleton <|
+                case repeatable_ of
+                    Grid.Simple x ->
+                        Grid.Simple <|
+                            case unit of
+                                "fr" ->
+                                    Grid.Fr 1
+
+                                "px" ->
+                                    Grid.SizeUnitVal (Elegant.px 120)
+
+                                "%" ->
+                                    Grid.SizeUnitVal (Elegant.percent 100)
+
+                                _ ->
+                                    x
+
+                    elem ->
+                        elem
 
 
 modifySizeOfRepeatable : Maybe Grid.Repeatable -> Int -> List Grid.Repeatable
@@ -1522,8 +1570,6 @@ arrowSelection repeatables styleModifiers selector content =
             ]
         ]
         (repeatables
-            |> Debug.log "testtest"
-            |> Debug.log "testtestsuite"
             |> List.foldr (generateSizeModifier styleModifiers content) ( (List.length repeatables) - 1, [] )
             |> Tuple.second
         )
