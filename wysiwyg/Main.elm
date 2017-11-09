@@ -122,6 +122,12 @@ update msg model =
             ChangeColumnUnit columnNumber unit ->
                 model |> changeGridColumnUnitOfCurrentElement columnNumber unit
 
+            ChangeRowSize rowNumber size ->
+                model |> changeGridRowSizeOfCurrentElement rowNumber size
+
+            ChangeRowUnit rowNumber unit ->
+                model |> changeGridRowUnitOfCurrentElement rowNumber unit
+
 
 addChildToElement : Element msg -> Element msg -> Element msg
 addChildToElement ({ tree } as parent) child =
@@ -191,9 +197,19 @@ changeGridColumnSizeOfCurrentElement columnNumber size =
     changeGridContainerStyleOfSelectedElement (modifyGridContainerToResizeColumn columnNumber size)
 
 
+changeGridRowSizeOfCurrentElement : Int -> Int -> Model -> Model
+changeGridRowSizeOfCurrentElement rowNumber size =
+    changeGridContainerStyleOfSelectedElement (modifyGridContainerToResizeRow rowNumber size)
+
+
 changeGridColumnUnitOfCurrentElement : Int -> String -> Model -> Model
 changeGridColumnUnitOfCurrentElement columnNumber unit =
     changeGridContainerStyleOfSelectedElement (modifyGridContainerToChangeUnitColumn columnNumber unit)
+
+
+changeGridRowUnitOfCurrentElement : Int -> String -> Model -> Model
+changeGridRowUnitOfCurrentElement rowNumber unit =
+    changeGridContainerStyleOfSelectedElement (modifyGridContainerToChangeUnitRow rowNumber unit)
 
 
 addRowInGrid : Model -> Model
@@ -278,9 +294,19 @@ modifyGridContainerToResizeColumn columnNumber size =
     modifyGridContainerX (modifySimpleSize columnNumber size)
 
 
+modifyGridContainerToResizeRow : Int -> Int -> Grid.GridContainerDetails -> Grid.GridContainerDetails
+modifyGridContainerToResizeRow rowNumber size =
+    modifyGridContainerY (modifySimpleSize rowNumber size)
+
+
 modifyGridContainerToChangeUnitColumn : Int -> String -> Grid.GridContainerDetails -> Grid.GridContainerDetails
 modifyGridContainerToChangeUnitColumn columnNumber unit =
     modifyGridContainerX (modifySimpleUnit columnNumber unit)
+
+
+modifyGridContainerToChangeUnitRow : Int -> String -> Grid.GridContainerDetails -> Grid.GridContainerDetails
+modifyGridContainerToChangeUnitRow rowNumber unit =
+    modifyGridContainerY (modifySimpleUnit rowNumber unit)
 
 
 modifyGridItemPlacementX : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
@@ -1065,6 +1091,8 @@ type Msg
     | ToggleGridItemPlacementY Bool
     | ChangeColumnSize Int Int
     | ChangeColumnUnit Int String
+    | ChangeRowSize Int Int
+    | ChangeRowUnit Int String
 
 
 view : Model -> Node Msg
@@ -1452,12 +1480,13 @@ gridEditor ({ attributes, children } as grid) =
                         [ Block.height (px (round (240 / (List.length yTemplate |> toFloat)))) ]
                     ]
                     Grid.rows
-                    (\_ _ _ ->
+                    (\value type_ rowNumber ->
                         B.flex
                             [ A.style
                                 [ S.flexContainerProperties
                                     [ Flex.align Flex.center
                                     , Flex.justifyContent Flex.justifyContentCenter
+                                    , Flex.direction Flex.column
                                     ]
                                 , S.block
                                     [ Block.height (percent 100)
@@ -1465,7 +1494,24 @@ gridEditor ({ attributes, children } as grid) =
                                     ]
                                 ]
                             ]
-                            [ B.flexItem [] [ B.div [] [ B.text ">" ] ] ]
+                            [ B.flexItem []
+                                [ B.inputNumber
+                                    [ A.value value
+                                    , E.onInput (ChangeRowSize rowNumber)
+                                    , A.style
+                                        [ S.block
+                                            [ Block.width (px 40) ]
+                                        ]
+                                    ]
+                                ]
+                            , B.flexItem []
+                                [ B.select [ E.onInput (ChangeRowUnit rowNumber) ]
+                                    [ B.option "fr" "fr" ("fr" == type_)
+                                    , B.option "px" "px" ("px" == type_)
+                                    , B.option "%" "%" ("%" == type_)
+                                    ]
+                                ]
+                            ]
                     )
                 ]
             , transparentItem ( 1, 1 ) ( Grid.span 1, Grid.span 1 ) [ gridView grid xTemplate yTemplate ]
@@ -1522,62 +1568,6 @@ gridView { attributes, children } xTemplate yTemplate =
         , A.style [ S.block [ Block.fullHeight ] ]
         ]
         (B.gridItem [ A.style [ S.box [ Box.backgroundColor (Color.rgb 50 50 50) ] ] ] [] |> List.repeat (List.length xTemplate * List.length yTemplate))
-
-
-
--- ((List.foldr
---     (\element ( beginning, result ) ->
---         ( beginning + 1
---         , result
---             ++ [ transparentItem ( beginning, 0 )
---                     ( Grid.span 1, Grid.untilEndOfCoordinate )
---                     [ B.node
---                         [ A.style
---                             [ S.block
---                                 [ Block.width (px (round (240 / (List.length xTemplate |> toFloat))))
---                                 , Block.height (px 120)
---                                 ]
---                             , S.box
---                                 [ Box.backgroundColor Color.white
---                                 ]
---                             ]
---                         ]
---                         []
---                     ]
---                ]
---         )
---     )
---     ( 0, [] )
---     xTemplate
---     |> Tuple.second
---  )
---     ++ (List.foldr
---             (\element ( beginning, result ) ->
---                 ( beginning + 1
---                 , result
---                     ++ [ transparentItem
---                             ( 0, beginning )
---                             ( Grid.untilEndOfCoordinate, Grid.span 1 )
---                             [ B.node
---                                 [ A.style
---                                     [ S.block
---                                         [ Block.height (px (round (240 / (List.length yTemplate |> toFloat))))
---                                         ]
---                                     , S.box
---                                         [ Box.backgroundColor Color.white
---                                         ]
---                                     ]
---                                 ]
---                                 []
---                             ]
---                        ]
---                 )
---             )
---             ( 0, [] )
---             yTemplate
---             |> Tuple.second
---        )
--- )
 
 
 arrowSelection :
