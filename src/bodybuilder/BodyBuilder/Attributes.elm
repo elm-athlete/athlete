@@ -276,6 +276,8 @@ type alias SelectAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , rawStyle : Maybe Elegant.Style
+    , onInputEvent : Maybe (String -> msg)
+    , fromStringInput : String -> String
     }
 
 
@@ -1597,6 +1599,8 @@ defaultSelectAttributes =
     , onEvent = Nothing
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
+    , onInputEvent = Nothing
+    , fromStringInput = identity
     , rawStyle = Nothing
     }
 
@@ -1605,3 +1609,4 @@ selectAttributesToHtmlAttributes : SelectAttributes msg -> List (Html.Attribute 
 selectAttributesToHtmlAttributes attributes =
     unwrapMaybeAttribute Html.Attributes.value attributes.value
         |> List.append (visibleAttributesToHtmlAttributes attributes)
+        |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))

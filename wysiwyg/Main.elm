@@ -15,6 +15,7 @@ import Display
 import Update
 import Grid
 import Flex
+import Helpers.Shared
 
 
 init : ( Model, Cmd Msg )
@@ -115,6 +116,16 @@ update msg model =
             ToggleGridItemPlacementY value ->
                 model |> toggleGridItemPlacementYOfCurrentElement value
 
+            ChangeColumnSize columnNumber size ->
+                let
+                    test =
+                        Debug.log "test" columnNumber
+                in
+                    model |> changeGridColumnSizeOfCurrentElement columnNumber size
+
+            ChangeColumnUnit columnNumber unit ->
+                model
+
 
 addChildToElement : Element msg -> Element msg -> Element msg
 addChildToElement ({ tree } as parent) child =
@@ -177,6 +188,11 @@ modifyStyleInAttributes modifier attributes =
 addColumnInGrid : Model -> Model
 addColumnInGrid =
     changeGridContainerStyleOfSelectedElement (modifyGridContainerToAddColumn)
+
+
+changeGridColumnSizeOfCurrentElement : Int -> Int -> Model -> Model
+changeGridColumnSizeOfCurrentElement columnNumber size =
+    changeGridContainerStyleOfSelectedElement (modifyGridContainerToResizeColumn columnNumber size)
 
 
 addRowInGrid : Model -> Model
@@ -256,6 +272,11 @@ modifyGridContainerToAddColumn =
     modifyGridContainerX addSimpleToTemplate
 
 
+modifyGridContainerToResizeColumn : Int -> Int -> Grid.GridContainerDetails -> Grid.GridContainerDetails
+modifyGridContainerToResizeColumn columnNumber size =
+    modifyGridContainerX (modifySimpleSize columnNumber size)
+
+
 modifyGridItemPlacementX : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
 modifyGridItemPlacementX placement =
     modifyGridItemX (modifyPlacement placement)
@@ -314,6 +335,54 @@ addSimpleToTemplate ({ template } as coordinates) =
         |> flip List.append [ Grid.simple (Grid.sizeUnitVal (px 120)) ]
         |> Just
         |> setTemplateIn coordinates
+
+
+modifySimpleSize : Int -> Int -> Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
+modifySimpleSize columnNumber size ({ template } as coordinates) =
+    template
+        |> Maybe.map (modifySizeOfNthColumn columnNumber size)
+        |> setTemplateIn coordinates
+
+
+modifySizeOfNthColumn : Int -> Int -> List Grid.Repeatable -> List Grid.Repeatable
+modifySizeOfNthColumn columnNumber size repeatables =
+    (List.take columnNumber repeatables)
+        ++ (modifySizeOfRepeatable (List.head (List.drop columnNumber repeatables)) size)
+        ++ (List.drop (columnNumber + 1) repeatables)
+
+
+modifySizeOfRepeatable : Maybe Grid.Repeatable -> Int -> List Grid.Repeatable
+modifySizeOfRepeatable repeatable size =
+    case repeatable of
+        Nothing ->
+            []
+
+        Just repeatable_ ->
+            List.singleton <|
+                case repeatable_ of
+                    Grid.Simple x ->
+                        Grid.Simple <|
+                            case x of
+                                Grid.Fr x ->
+                                    Grid.Fr size
+
+                                Grid.SizeUnitVal sizeUnit ->
+                                    Grid.SizeUnitVal <|
+                                        case sizeUnit of
+                                            Helpers.Shared.Px x ->
+                                                Helpers.Shared.Px size
+
+                                            Helpers.Shared.Percent x ->
+                                                Helpers.Shared.Percent (toFloat size)
+
+                                            elem ->
+                                                elem
+
+                                elem ->
+                                    elem
+
+                    elem ->
+                        elem
 
 
 changeBoxStyleOfSelectedElement : (Box.Box -> Box.Box) -> Model -> Model
@@ -716,7 +785,7 @@ gridContainerBase =
 gridContainerStyle : { style : Elegant.CommonStyle }
 gridContainerStyle =
     { style =
-        { outsideDisplay = Display.Inline
+        { outsideDisplay = Display.Block Nothing
         , maybeBox = Nothing
         , insideDisplay = gridContainerBase
         }
@@ -931,6 +1000,8 @@ type Msg
     | ChangeGridItemSizeY Int
     | ToggleGridItemPlacementX Bool
     | ToggleGridItemPlacementY Bool
+    | ChangeColumnSize Int Int
+    | ChangeColumnUnit Int String
 
 
 view : Model -> Node Msg
@@ -1276,7 +1347,33 @@ gridEditor ({ attributes, children } as grid) =
                 , S.block []
                 ]
             ]
-            [ item ( 1, 0 ) ( Grid.span 1, Grid.span 1 ) [ arrowSelection xTemplate [ S.block [ Block.width (px (round (240 / (List.length xTemplate |> toFloat)))), Block.alignCenter ] ] Grid.columns (B.text "v") ]
+            [ item ( 1, 0 )
+                ( Grid.span 1, Grid.span 1 )
+                [ arrowSelection xTemplate
+                    [ S.block [ Block.width (px (round (240 / (List.length xTemplate |> toFloat)))), Block.alignCenter ] ]
+                    Grid.columns
+                    (\value type_ columnNumber ->
+                        B.flex []
+                            [ B.flexItem []
+                                [ B.inputNumber
+                                    [ A.value value
+                                    , E.onInput (ChangeColumnSize columnNumber)
+                                    , A.style
+                                        [ S.block
+                                            [ Block.width (px 40) ]
+                                        ]
+                                    ]
+                                ]
+                            , B.flexItem []
+                                [ B.select [ E.onInput (ChangeColumnUnit columnNumber) ]
+                                    [ B.option "fr" "fr" ("fr" == type_)
+                                    , B.option "px" "px" ("px" == type_)
+                                    , B.option "%" "%" ("%" == type_)
+                                    ]
+                                ]
+                            ]
+                    )
+                ]
             , item ( 0, 1 )
                 ( Grid.span 1, Grid.span 1 )
                 [ arrowSelection yTemplate
@@ -1284,19 +1381,20 @@ gridEditor ({ attributes, children } as grid) =
                         [ Block.height (px (round (240 / (List.length yTemplate |> toFloat)))) ]
                     ]
                     Grid.rows
-                    (B.flex
-                        [ A.style
-                            [ S.flexContainerProperties
-                                [ Flex.align Flex.center
-                                , Flex.justifyContent Flex.justifyContentCenter
-                                ]
-                            , S.block
-                                [ Block.height (percent 100)
-                                , Block.width (percent 100)
+                    (\_ _ _ ->
+                        B.flex
+                            [ A.style
+                                [ S.flexContainerProperties
+                                    [ Flex.align Flex.center
+                                    , Flex.justifyContent Flex.justifyContentCenter
+                                    ]
+                                , S.block
+                                    [ Block.height (percent 100)
+                                    , Block.width (percent 100)
+                                    ]
                                 ]
                             ]
-                        ]
-                        [ B.flexItem [] [ B.div [] [ B.text ">" ] ] ]
+                            [ B.flexItem [] [ B.div [] [ B.text ">" ] ] ]
                     )
                 ]
             , item ( 1, 1 ) ( Grid.span 1, Grid.span 1 ) [ gridView grid xTemplate yTemplate ]
@@ -1405,14 +1503,17 @@ arrowSelection :
     List Grid.Repeatable
     -> List (A.StyleModifier (A.NodeAttributes msg))
     -> (Modifiers Grid.GridContainerCoordinate -> Modifier Grid.GridContainerDetails)
-    -> Node msg
+    -> (Int -> String -> Int -> Node msg)
     -> Node msg
 arrowSelection repeatables styleModifiers selector content =
     B.grid
         [ A.style
             [ S.gridContainerProperties
                 [ selector
-                    [ repeatables |> List.map (always (Grid.simple (Grid.fractionOfAvailableSpace 1))) |> Grid.template ]
+                    [ repeatables
+                        |> List.map (always (Grid.simple (Grid.fractionOfAvailableSpace 1)))
+                        |> Grid.template
+                    ]
                 ]
             , S.block
                 [ Block.width (percent 100)
@@ -1420,9 +1521,54 @@ arrowSelection repeatables styleModifiers selector content =
                 ]
             ]
         ]
-        (B.gridItem []
-            [ B.node [ A.style styleModifiers ] [ content ] ]
-            |> List.repeat (List.length repeatables)
+        (repeatables
+            |> Debug.log "testtest"
+            |> Debug.log "testtestsuite"
+            |> List.foldr (generateSizeModifier styleModifiers content) ( (List.length repeatables) - 1, [] )
+            |> Tuple.second
+        )
+
+
+generateSizeModifier :
+    List (A.StyleModifier (A.NodeAttributes msg))
+    -> (Int -> String -> Int -> Node msg)
+    -> Grid.Repeatable
+    -> ( Int, List (B.GridItem msg) )
+    -> ( Int, List (B.GridItem msg) )
+generateSizeModifier styleModifiers content repeatable ( placement, acc ) =
+    let
+        ( size, unit ) =
+            case repeatable of
+                Grid.Simple x ->
+                    case x of
+                        Grid.SizeUnitVal y ->
+                            case y of
+                                Helpers.Shared.Px z ->
+                                    ( z, "px" )
+
+                                Helpers.Shared.Percent z ->
+                                    ( round z, "%" )
+
+                                _ ->
+                                    ( 1, "fr" )
+
+                        Grid.Fr y ->
+                            ( y, "fr" )
+
+                        _ ->
+                            ( 1, "fr" )
+
+                _ ->
+                    ( 1, "fr" )
+    in
+        ( placement - 1
+        , (B.gridItem []
+            [ B.node
+                [ A.style styleModifiers ]
+                [ content size unit placement ]
+            ]
+          )
+            :: acc
         )
 
 

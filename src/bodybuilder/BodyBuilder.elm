@@ -293,9 +293,14 @@ select =
         BodyBuilder.Attributes.selectAttributesToHtmlAttributes
 
 
-option : String -> String -> Option msg
-option value content =
-    Option <| Html.option [ Html.Attributes.value value ] [ Html.text content ]
+option : String -> String -> Bool -> Option msg
+option value content selected =
+    Option <|
+        Html.option
+            [ Html.Attributes.value value
+            , Html.Attributes.selected selected
+            ]
+            [ Html.text content ]
 
 
 heading : String -> Modifiers (HeadingAttributes msg) -> List (Node msg) -> Node msg
