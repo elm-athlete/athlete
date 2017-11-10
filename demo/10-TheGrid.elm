@@ -8,10 +8,31 @@ import Style
 import Grid
 import Box
 import Block
+import Flex
 
 
-item : ( Int, Int ) -> ( Int, Int ) -> List (Node msg) -> Builder.GridItem msg
-item ( x, y ) ( width, height ) =
+top =
+    -1
+
+
+left =
+    -1
+
+
+right =
+    1
+
+
+center =
+    0
+
+
+bottom =
+    1
+
+
+cell : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int ) -> List (Node msg) -> Builder.GridItem msg
+cell ( x, y ) ( width, height ) alignment content =
     Builder.gridItem
         [ Attributes.style
             [ Style.gridItemProperties
@@ -27,6 +48,19 @@ item ( x, y ) ( width, height ) =
                     ]
                 ]
             , Style.box [ Box.backgroundColor Color.purple ]
+            ]
+        ]
+        [ Builder.flex
+            [ Attributes.style
+                [ Style.flexContainerProperties
+                    [ Flex.alignXY alignment
+                    ]
+                , Style.block
+                    [ Block.height (percent 100)
+                    ]
+                ]
+            ]
+            [ Builder.flexItem [] content
             ]
         ]
 
@@ -61,10 +95,10 @@ example =
             , Style.box [ Box.backgroundColor Color.lightPurple ]
             ]
         ]
-        [ item ( 0, 0 ) ( 2, 1 ) [ Builder.text "1" ]
-        , item ( 2, 0 ) ( 1, 2 ) [ Builder.text "2" ]
-        , item ( 1, 2 ) ( 2, 1 ) [ Builder.text "3" ]
-        , item ( 0, 1 ) ( 1, 2 ) [ Builder.text "4" ]
+        [ cell ( 0, 0 ) ( 2, 1 ) ( bottom, left ) [ Builder.text "1" ]
+        , cell ( 2, 0 ) ( 1, 2 ) ( center, center ) [ Builder.text "2" ]
+        , cell ( 1, 2 ) ( 2, 1 ) ( top, right ) [ Builder.text "3" ]
+        , cell ( 0, 1 ) ( 1, 2 ) ( center, right ) [ Builder.text "4" ]
         ]
 
 

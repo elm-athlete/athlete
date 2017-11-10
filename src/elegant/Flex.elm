@@ -11,6 +11,7 @@ module Flex
         , noWrap
         , Align
         , align
+        , alignXY
         , baseline
         , center
         , flexStart
@@ -60,6 +61,7 @@ module Flex
 ## AlignItems / AlignSelf
 
 @docs align
+@docs alignXY
 @docs baseline
 @docs center
 @docs flexStart
@@ -241,6 +243,8 @@ type JustifyContent
     = JustifyContentSpaceBetween
     | JustifyContentSpaceAround
     | JustifyContentCenter
+    | JustifyFlexStart
+    | JustifyFlexEnd
 
 
 {-| Accepts a justify-content and modifies the flex container accordingly.
@@ -359,6 +363,40 @@ alignToString align =
             "stretch"
 
 
+alignXY : ( number, number1 ) -> FlexContainerDetails -> FlexContainerDetails
+alignXY ( x, y ) =
+    let
+        toto =
+            case x of
+                (-1) ->
+                    align AlignFlexStart
+
+                0 ->
+                    align AlignCenter
+
+                1 ->
+                    align AlignFlexEnd
+
+                _ ->
+                    identity
+
+        titi =
+            case y of
+                (-1) ->
+                    justifyContent JustifyFlexStart
+
+                0 ->
+                    justifyContent JustifyContentCenter
+
+                1 ->
+                    justifyContent JustifyFlexEnd
+
+                _ ->
+                    identity
+    in
+        titi << toto
+
+
 {-|
 -}
 flexItemDetailsToCouples : FlexItemDetails -> List ( String, String )
@@ -439,6 +477,12 @@ justifyContentToString val =
 
         JustifyContentCenter ->
             "center"
+
+        JustifyFlexStart ->
+            "flex-start"
+
+        JustifyFlexEnd ->
+            "flex-end"
 
 
 flexWrapToCouple : FlexWrap -> ( String, String )
