@@ -78,55 +78,57 @@ createElement msg model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    Update.identity <|
-        case msg of
-            CreateElement msg ->
-                model |> createElement msg
+    Update.identity
+        (model
+            |> case msg of
+                CreateElement msg ->
+                    createElement msg
 
-            SelectEl id ->
-                model |> setSelectedId id
+                SelectEl id ->
+                    setSelectedId id
 
-            ChangeBoxStyle action ->
-                model |> handleBoxChange action
+                ChangeBoxStyle action ->
+                    handleBoxChange action
 
-            ChangeText text ->
-                model |> changeTextOfCurrentElement text
+                ChangeText text ->
+                    changeTextOfCurrentElement text
 
-            AddColumn ->
-                model |> addColumnInGrid
+                AddColumn ->
+                    addColumnInGrid
 
-            AddRow ->
-                model |> addRowInGrid
+                AddRow ->
+                    addRowInGrid
 
-            ChangeGridItemPlacementX value ->
-                model |> changeGridItemPlacementXOfCurrentElement (value + 1)
+                ChangeGridItemPlacementX value ->
+                    changeGridItemPlacementXOfCurrentElement (value + 1)
 
-            ChangeGridItemPlacementY value ->
-                model |> changeGridItemPlacementYOfCurrentElement (value + 1)
+                ChangeGridItemPlacementY value ->
+                    changeGridItemPlacementYOfCurrentElement (value + 1)
 
-            ChangeGridItemSizeX value ->
-                model |> changeGridItemSizeXOfCurrentElement value
+                ChangeGridItemSizeX value ->
+                    changeGridItemSizeXOfCurrentElement value
 
-            ChangeGridItemSizeY value ->
-                model |> changeGridItemSizeYOfCurrentElement value
+                ChangeGridItemSizeY value ->
+                    changeGridItemSizeYOfCurrentElement value
 
-            ToggleGridItemPlacementX value ->
-                model |> toggleGridItemPlacementXOfCurrentElement value
+                ToggleGridItemPlacementX value ->
+                    toggleGridItemPlacementXOfCurrentElement value
 
-            ToggleGridItemPlacementY value ->
-                model |> toggleGridItemPlacementYOfCurrentElement value
+                ToggleGridItemPlacementY value ->
+                    toggleGridItemPlacementYOfCurrentElement value
 
-            ChangeColumnSize columnNumber size ->
-                model |> changeGridColumnSizeOfCurrentElement columnNumber size
+                ChangeColumnSize columnNumber size ->
+                    changeGridColumnSizeOfCurrentElement columnNumber size
 
-            ChangeColumnUnit columnNumber unit ->
-                model |> changeGridColumnUnitOfCurrentElement columnNumber unit
+                ChangeColumnUnit columnNumber unit ->
+                    changeGridColumnUnitOfCurrentElement columnNumber unit
 
-            ChangeRowSize rowNumber size ->
-                model |> changeGridRowSizeOfCurrentElement rowNumber size
+                ChangeRowSize rowNumber size ->
+                    changeGridRowSizeOfCurrentElement rowNumber size
 
-            ChangeRowUnit rowNumber unit ->
-                model |> changeGridRowUnitOfCurrentElement rowNumber unit
+                ChangeRowUnit rowNumber unit ->
+                    changeGridRowUnitOfCurrentElement rowNumber unit
+        )
 
 
 addChildToElement : Element msg -> Element msg -> Element msg
@@ -138,32 +140,32 @@ addChildToElement ({ tree } as parent) child =
 
 changeGridItemPlacementXOfCurrentElement : Int -> Model -> Model
 changeGridItemPlacementXOfCurrentElement placement =
-    changeStyleOfSelectedElement (modifyGridItemInStyle (modifyGridItemPlacementX placement))
+    changeStyleOfSelectedElement (updateGridItemInStyle (updateGridItemPlacementX placement))
 
 
 changeGridItemPlacementYOfCurrentElement : Int -> Model -> Model
 changeGridItemPlacementYOfCurrentElement placement =
-    changeStyleOfSelectedElement (modifyGridItemInStyle (modifyGridItemPlacementY placement))
+    changeStyleOfSelectedElement (updateGridItemInStyle (updateGridItemPlacementY placement))
 
 
 toggleGridItemPlacementXOfCurrentElement : Bool -> Model -> Model
 toggleGridItemPlacementXOfCurrentElement value =
-    changeStyleOfSelectedElement (modifyGridItemInStyle (toggleGridItemPlacementX value))
+    changeStyleOfSelectedElement (updateGridItemInStyle (toggleGridItemPlacementX value))
 
 
 toggleGridItemPlacementYOfCurrentElement : Bool -> Model -> Model
 toggleGridItemPlacementYOfCurrentElement value =
-    changeStyleOfSelectedElement (modifyGridItemInStyle (toggleGridItemPlacementY value))
+    changeStyleOfSelectedElement (updateGridItemInStyle (toggleGridItemPlacementY value))
 
 
 changeGridItemSizeXOfCurrentElement : Int -> Model -> Model
 changeGridItemSizeXOfCurrentElement size =
-    changeStyleOfSelectedElement (modifyGridItemInStyle (modifyGridItemSizeX size))
+    changeStyleOfSelectedElement (updateGridItemInStyle (updateGridItemSizeX size))
 
 
 changeGridItemSizeYOfCurrentElement : Int -> Model -> Model
 changeGridItemSizeYOfCurrentElement size =
-    changeStyleOfSelectedElement (modifyGridItemInStyle (modifyGridItemSizeY size))
+    changeStyleOfSelectedElement (updateGridItemInStyle (updateGridItemSizeY size))
 
 
 changeStyleOfSelectedElement : (Elegant.CommonStyle -> Elegant.CommonStyle) -> Model -> Model
@@ -171,17 +173,17 @@ changeStyleOfSelectedElement modifier ({ element, selectedId } as model) =
     element
         |> applyToSelectedElement selectedId
             (modifier
-                |> modifyStyleInAttributes
+                |> updateStyleInAttributes
                 |> applyToAttributes
             )
         |> setElementIn model
 
 
-modifyStyleInAttributes :
+updateStyleInAttributes :
     (Elegant.CommonStyle -> Elegant.CommonStyle)
     -> { a | style : Elegant.CommonStyle }
     -> { a | style : Elegant.CommonStyle }
-modifyStyleInAttributes modifier attributes =
+updateStyleInAttributes modifier attributes =
     attributes.style
         |> modifier
         |> setStyleIn attributes
@@ -189,41 +191,41 @@ modifyStyleInAttributes modifier attributes =
 
 addColumnInGrid : Model -> Model
 addColumnInGrid =
-    changeGridContainerStyleOfSelectedElement (modifyGridContainerToAddColumn)
+    changeGridContainerStyleOfSelectedElement (updateGridContainerToAddColumn)
 
 
 changeGridColumnSizeOfCurrentElement : Int -> Int -> Model -> Model
 changeGridColumnSizeOfCurrentElement columnNumber size =
-    changeGridContainerStyleOfSelectedElement (modifyGridContainerToResizeColumn columnNumber size)
+    changeGridContainerStyleOfSelectedElement (updateGridContainerToResizeColumn columnNumber size)
 
 
 changeGridRowSizeOfCurrentElement : Int -> Int -> Model -> Model
 changeGridRowSizeOfCurrentElement rowNumber size =
-    changeGridContainerStyleOfSelectedElement (modifyGridContainerToResizeRow rowNumber size)
+    changeGridContainerStyleOfSelectedElement (updateGridContainerToResizeRow rowNumber size)
 
 
 changeGridColumnUnitOfCurrentElement : Int -> String -> Model -> Model
 changeGridColumnUnitOfCurrentElement columnNumber unit =
-    changeGridContainerStyleOfSelectedElement (modifyGridContainerToChangeUnitColumn columnNumber unit)
+    changeGridContainerStyleOfSelectedElement (updateGridContainerToChangeUnitColumn columnNumber unit)
 
 
 changeGridRowUnitOfCurrentElement : Int -> String -> Model -> Model
 changeGridRowUnitOfCurrentElement rowNumber unit =
-    changeGridContainerStyleOfSelectedElement (modifyGridContainerToChangeUnitRow rowNumber unit)
+    changeGridContainerStyleOfSelectedElement (updateGridContainerToChangeUnitRow rowNumber unit)
 
 
 addRowInGrid : Model -> Model
 addRowInGrid =
-    changeGridContainerStyleOfSelectedElement (modifyGridContainerToAddRow)
+    changeGridContainerStyleOfSelectedElement (updateGridContainerToAddRow)
 
 
-modifyGridContainer :
+updateGridContainer :
     (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate)
     -> (Grid.GridContainerDetails -> Maybe Grid.GridContainerCoordinate -> Grid.GridContainerDetails)
     -> (Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate)
     -> Grid.GridContainerDetails
     -> Grid.GridContainerDetails
-modifyGridContainer getter setter modifier gridContainerDetails =
+updateGridContainer getter setter modifier gridContainerDetails =
     gridContainerDetails
         |> getter
         |> Maybe.withDefault (Grid.GridContainerCoordinate Nothing Nothing Nothing Nothing)
@@ -232,13 +234,13 @@ modifyGridContainer getter setter modifier gridContainerDetails =
         |> setter gridContainerDetails
 
 
-modifyGridItem :
+updateGridItem :
     (Grid.GridItemDetails -> Maybe Grid.GridItemCoordinate)
     -> (Grid.GridItemDetails -> Maybe Grid.GridItemCoordinate -> Grid.GridItemDetails)
     -> (Grid.GridItemCoordinate -> Grid.GridItemCoordinate)
     -> Grid.GridItemDetails
     -> Grid.GridItemDetails
-modifyGridItem getter setter modifier gridItemDetails =
+updateGridItem getter setter modifier gridItemDetails =
     gridItemDetails
         |> getter
         |> Maybe.withDefault (Grid.GridItemCoordinate Nothing Nothing Nothing)
@@ -247,105 +249,105 @@ modifyGridItem getter setter modifier gridItemDetails =
         |> setter gridItemDetails
 
 
-modifyGridContainerX :
+updateGridContainerX :
     (Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate)
     -> Grid.GridContainerDetails
     -> Grid.GridContainerDetails
-modifyGridContainerX =
-    modifyGridContainer .x setXIn
+updateGridContainerX =
+    updateGridContainer .x setXIn
 
 
-modifyGridContainerY :
+updateGridContainerY :
     (Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate)
     -> Grid.GridContainerDetails
     -> Grid.GridContainerDetails
-modifyGridContainerY =
-    modifyGridContainer .y setYIn
+updateGridContainerY =
+    updateGridContainer .y setYIn
 
 
-modifyGridItemX :
+updateGridItemX :
     (Grid.GridItemCoordinate -> Grid.GridItemCoordinate)
     -> Grid.GridItemDetails
     -> Grid.GridItemDetails
-modifyGridItemX =
-    modifyGridItem .x setXIn
+updateGridItemX =
+    updateGridItem .x setXIn
 
 
-modifyGridItemY :
+updateGridItemY :
     (Grid.GridItemCoordinate -> Grid.GridItemCoordinate)
     -> Grid.GridItemDetails
     -> Grid.GridItemDetails
-modifyGridItemY =
-    modifyGridItem .y setYIn
+updateGridItemY =
+    updateGridItem .y setYIn
 
 
-modifyGridContainerToAddRow : Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToAddRow =
-    modifyGridContainerY addSimpleToTemplate
+updateGridContainerToAddRow : Grid.GridContainerDetails -> Grid.GridContainerDetails
+updateGridContainerToAddRow =
+    updateGridContainerY addSimpleToTemplate
 
 
-modifyGridContainerToAddColumn : Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToAddColumn =
-    modifyGridContainerX addSimpleToTemplate
+updateGridContainerToAddColumn : Grid.GridContainerDetails -> Grid.GridContainerDetails
+updateGridContainerToAddColumn =
+    updateGridContainerX addSimpleToTemplate
 
 
-modifyGridContainerToResizeColumn : Int -> Int -> Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToResizeColumn columnNumber size =
-    modifyGridContainerX (modifySimpleSize columnNumber size)
+updateGridContainerToResizeColumn : Int -> Int -> Grid.GridContainerDetails -> Grid.GridContainerDetails
+updateGridContainerToResizeColumn columnNumber size =
+    updateGridContainerX (updateSimpleSize columnNumber size)
 
 
-modifyGridContainerToResizeRow : Int -> Int -> Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToResizeRow rowNumber size =
-    modifyGridContainerY (modifySimpleSize rowNumber size)
+updateGridContainerToResizeRow : Int -> Int -> Grid.GridContainerDetails -> Grid.GridContainerDetails
+updateGridContainerToResizeRow rowNumber size =
+    updateGridContainerY (updateSimpleSize rowNumber size)
 
 
-modifyGridContainerToChangeUnitColumn : Int -> String -> Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToChangeUnitColumn columnNumber unit =
-    modifyGridContainerX (modifySimpleUnit columnNumber unit)
+updateGridContainerToChangeUnitColumn : Int -> String -> Grid.GridContainerDetails -> Grid.GridContainerDetails
+updateGridContainerToChangeUnitColumn columnNumber unit =
+    updateGridContainerX (updateSimpleUnit columnNumber unit)
 
 
-modifyGridContainerToChangeUnitRow : Int -> String -> Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToChangeUnitRow rowNumber unit =
-    modifyGridContainerY (modifySimpleUnit rowNumber unit)
+updateGridContainerToChangeUnitRow : Int -> String -> Grid.GridContainerDetails -> Grid.GridContainerDetails
+updateGridContainerToChangeUnitRow rowNumber unit =
+    updateGridContainerY (updateSimpleUnit rowNumber unit)
 
 
-modifyGridItemPlacementX : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
-modifyGridItemPlacementX placement =
-    modifyGridItemX (modifyPlacement placement)
+updateGridItemPlacementX : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
+updateGridItemPlacementX placement =
+    updateGridItemX (updatePlacement placement)
 
 
 toggleGridItemPlacementX : Bool -> Grid.GridItemDetails -> Grid.GridItemDetails
 toggleGridItemPlacementX value =
-    modifyGridItemX (togglePlacement value)
+    updateGridItemX (togglePlacement value)
 
 
 toggleGridItemPlacementY : Bool -> Grid.GridItemDetails -> Grid.GridItemDetails
 toggleGridItemPlacementY value =
-    modifyGridItemY (togglePlacement value)
+    updateGridItemY (togglePlacement value)
 
 
-modifyGridItemPlacementY : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
-modifyGridItemPlacementY placement =
-    modifyGridItemY (modifyPlacement placement)
+updateGridItemPlacementY : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
+updateGridItemPlacementY placement =
+    updateGridItemY (updatePlacement placement)
 
 
-modifyGridItemSizeX : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
-modifyGridItemSizeX size =
-    modifyGridItemX (modifySize size)
+updateGridItemSizeX : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
+updateGridItemSizeX size =
+    updateGridItemX (updateSize size)
 
 
-modifyGridItemSizeY : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
-modifyGridItemSizeY size =
-    modifyGridItemY (modifySize size)
+updateGridItemSizeY : Int -> Grid.GridItemDetails -> Grid.GridItemDetails
+updateGridItemSizeY size =
+    updateGridItemY (updateSize size)
 
 
-modifySize : Int -> Grid.GridItemCoordinate -> Grid.GridItemCoordinate
-modifySize size coordinate =
+updateSize : Int -> Grid.GridItemCoordinate -> Grid.GridItemCoordinate
+updateSize size coordinate =
     { coordinate | size = Just (Grid.span size) }
 
 
-modifyPlacement : Int -> Grid.GridItemCoordinate -> Grid.GridItemCoordinate
-modifyPlacement placement coordinate =
+updatePlacement : Int -> Grid.GridItemCoordinate -> Grid.GridItemCoordinate
+updatePlacement placement coordinate =
     { coordinate | placement = Just placement }
 
 
@@ -369,36 +371,36 @@ addSimpleToTemplate ({ template } as coordinates) =
         |> setTemplateIn coordinates
 
 
-modifySimpleSize : Int -> Int -> Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
-modifySimpleSize columnNumber size ({ template } as coordinates) =
+updateSimpleSize : Int -> Int -> Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
+updateSimpleSize columnNumber size ({ template } as coordinates) =
     template
-        |> Maybe.map (modifySizeOfNthColumn columnNumber size)
+        |> Maybe.map (updateSizeOfNthColumn columnNumber size)
         |> setTemplateIn coordinates
 
 
-modifySimpleUnit : Int -> String -> Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
-modifySimpleUnit columnNumber unit ({ template } as coordinates) =
+updateSimpleUnit : Int -> String -> Grid.GridContainerCoordinate -> Grid.GridContainerCoordinate
+updateSimpleUnit columnNumber unit ({ template } as coordinates) =
     template
-        |> Maybe.map (modifyUnitOfNthColumn columnNumber unit)
+        |> Maybe.map (updateUnitOfNthColumn columnNumber unit)
         |> setTemplateIn coordinates
 
 
-modifySizeOfNthColumn : Int -> Int -> List Grid.Repeatable -> List Grid.Repeatable
-modifySizeOfNthColumn columnNumber size repeatables =
+updateSizeOfNthColumn : Int -> Int -> List Grid.Repeatable -> List Grid.Repeatable
+updateSizeOfNthColumn columnNumber size repeatables =
     (List.take columnNumber repeatables)
-        ++ (modifySizeOfRepeatable (List.head (List.drop columnNumber repeatables)) size)
+        ++ (updateSizeOfRepeatable (List.head (List.drop columnNumber repeatables)) size)
         ++ (List.drop (columnNumber + 1) repeatables)
 
 
-modifyUnitOfNthColumn : Int -> String -> List Grid.Repeatable -> List Grid.Repeatable
-modifyUnitOfNthColumn columnNumber unit repeatables =
+updateUnitOfNthColumn : Int -> String -> List Grid.Repeatable -> List Grid.Repeatable
+updateUnitOfNthColumn columnNumber unit repeatables =
     (List.take columnNumber repeatables)
-        ++ (modifyUnitOfRepeatable (List.head (List.drop columnNumber repeatables)) unit)
+        ++ (updateUnitOfRepeatable (List.head (List.drop columnNumber repeatables)) unit)
         ++ (List.drop (columnNumber + 1) repeatables)
 
 
-modifyUnitOfRepeatable : Maybe Grid.Repeatable -> String -> List Grid.Repeatable
-modifyUnitOfRepeatable repeatable unit =
+updateUnitOfRepeatable : Maybe Grid.Repeatable -> String -> List Grid.Repeatable
+updateUnitOfRepeatable repeatable unit =
     case repeatable of
         Nothing ->
             []
@@ -425,8 +427,8 @@ modifyUnitOfRepeatable repeatable unit =
                         elem
 
 
-modifySizeOfRepeatable : Maybe Grid.Repeatable -> Int -> List Grid.Repeatable
-modifySizeOfRepeatable repeatable size =
+updateSizeOfRepeatable : Maybe Grid.Repeatable -> Int -> List Grid.Repeatable
+updateSizeOfRepeatable repeatable size =
     case repeatable of
         Nothing ->
             []
@@ -461,42 +463,42 @@ modifySizeOfRepeatable repeatable size =
 
 changeBoxStyleOfSelectedElement : (Box.Box -> Box.Box) -> Model -> Model
 changeBoxStyleOfSelectedElement modifier =
-    changeStyleOfSelectedElement (modifyBoxInStyle modifier)
+    changeStyleOfSelectedElement (updateBoxInStyle modifier)
 
 
 changeGridContainerStyleOfSelectedElement : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Model -> Model
 changeGridContainerStyleOfSelectedElement modifier =
-    changeStyleOfSelectedElement (modifyGridContainerInStyle modifier)
+    changeStyleOfSelectedElement (updateGridContainerInStyle modifier)
 
 
-modifyElementInStyle :
+updateElementInStyle :
     ((a -> a) -> Display.DisplayBox -> Display.DisplayBox)
     -> (a -> a)
     -> Elegant.CommonStyle
     -> Elegant.CommonStyle
-modifyElementInStyle elementModifier modifier ({ display } as style) =
+updateElementInStyle elementModifier modifier ({ display } as style) =
     display
         |> Maybe.map (elementModifier modifier >> Just >> setDisplayIn style)
         |> Maybe.withDefault (commonStyle Display.None)
 
 
-modifyBoxInStyle : (Box.Box -> Box.Box) -> Elegant.CommonStyle -> Elegant.CommonStyle
-modifyBoxInStyle =
-    modifyElementInStyle modifyBoxInDisplayBox
+updateBoxInStyle : (Box.Box -> Box.Box) -> Elegant.CommonStyle -> Elegant.CommonStyle
+updateBoxInStyle =
+    updateElementInStyle updateBoxInDisplayBox
 
 
-modifyGridItemInStyle : (Grid.GridItemDetails -> Grid.GridItemDetails) -> Elegant.CommonStyle -> Elegant.CommonStyle
-modifyGridItemInStyle =
-    modifyElementInStyle (modifyOutsideDisplayInDisplayBox << modifyGridItemInOutsideDisplay)
+updateGridItemInStyle : (Grid.GridItemDetails -> Grid.GridItemDetails) -> Elegant.CommonStyle -> Elegant.CommonStyle
+updateGridItemInStyle =
+    updateElementInStyle (updateOutsideDisplayInDisplayBox << updateGridItemInOutsideDisplay)
 
 
-modifyGridContainerInStyle : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Elegant.CommonStyle -> Elegant.CommonStyle
-modifyGridContainerInStyle =
-    modifyElementInStyle (modifyInsideDisplayInDisplayBox << modifyGridContainerInInsideDisplay)
+updateGridContainerInStyle : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Elegant.CommonStyle -> Elegant.CommonStyle
+updateGridContainerInStyle =
+    updateElementInStyle (updateInsideDisplayInDisplayBox << updateGridContainerInInsideDisplay)
 
 
-modifyBoxInDisplayBox : (Box.Box -> Box.Box) -> Display.DisplayBox -> Display.DisplayBox
-modifyBoxInDisplayBox modifier display =
+updateBoxInDisplayBox : (Box.Box -> Box.Box) -> Display.DisplayBox -> Display.DisplayBox
+updateBoxInDisplayBox modifier display =
     case display of
         Display.None ->
             Display.None
@@ -510,8 +512,8 @@ modifyBoxInDisplayBox modifier display =
                 |> Display.ContentsWrapper
 
 
-modifyInsideDisplayInDisplayBox : (Display.InsideDisplay -> Display.InsideDisplay) -> Display.DisplayBox -> Display.DisplayBox
-modifyInsideDisplayInDisplayBox modifier display =
+updateInsideDisplayInDisplayBox : (Display.InsideDisplay -> Display.InsideDisplay) -> Display.DisplayBox -> Display.DisplayBox
+updateInsideDisplayInDisplayBox modifier display =
     case display of
         Display.None ->
             Display.None
@@ -523,8 +525,8 @@ modifyInsideDisplayInDisplayBox modifier display =
                 |> Display.ContentsWrapper
 
 
-modifyOutsideDisplayInDisplayBox : (Display.OutsideDisplay -> Display.OutsideDisplay) -> Display.DisplayBox -> Display.DisplayBox
-modifyOutsideDisplayInDisplayBox modifier display =
+updateOutsideDisplayInDisplayBox : (Display.OutsideDisplay -> Display.OutsideDisplay) -> Display.DisplayBox -> Display.DisplayBox
+updateOutsideDisplayInDisplayBox modifier display =
     case display of
         Display.None ->
             Display.None
@@ -536,8 +538,8 @@ modifyOutsideDisplayInDisplayBox modifier display =
                 |> Display.ContentsWrapper
 
 
-modifyGridItemInOutsideDisplay : (Grid.GridItemDetails -> Grid.GridItemDetails) -> Display.OutsideDisplay -> Display.OutsideDisplay
-modifyGridItemInOutsideDisplay modifier outsideDisplay =
+updateGridItemInOutsideDisplay : (Grid.GridItemDetails -> Grid.GridItemDetails) -> Display.OutsideDisplay -> Display.OutsideDisplay
+updateGridItemInOutsideDisplay modifier outsideDisplay =
     case outsideDisplay of
         Display.GridItem gridItemDetails boxDetails ->
             gridItemDetails
@@ -548,8 +550,8 @@ modifyGridItemInOutsideDisplay modifier outsideDisplay =
             outsideDisplay
 
 
-modifyGridContainerInInsideDisplay : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Display.InsideDisplay -> Display.InsideDisplay
-modifyGridContainerInInsideDisplay modifier insideDisplay =
+updateGridContainerInInsideDisplay : (Grid.GridContainerDetails -> Grid.GridContainerDetails) -> Display.InsideDisplay -> Display.InsideDisplay
+updateGridContainerInInsideDisplay modifier insideDisplay =
     case insideDisplay of
         Display.Flow ->
             Display.Flow
@@ -609,16 +611,16 @@ addChildToTree child =
     applyToChildren (flip List.append [ child ])
 
 
-modifyChildren : (a -> a) -> { b | children : a } -> { b | children : a }
-modifyChildren applyOnElements treeInside =
+updateChildren : (a -> a) -> { b | children : a } -> { b | children : a }
+updateChildren applyOnElements treeInside =
     treeInside
         |> .children
         |> applyOnElements
         |> setChildrenIn treeInside
 
 
-modifyAttributes : (a -> a) -> { b | attributes : a } -> { b | attributes : a }
-modifyAttributes applyOnAttributes treeInside =
+updateAttributes : (a -> a) -> { b | attributes : a } -> { b | attributes : a }
+updateAttributes applyOnAttributes treeInside =
     treeInside
         |> .attributes
         |> applyOnAttributes
@@ -630,22 +632,22 @@ applyToChildren applyOnElements tree =
     case tree of
         Block block ->
             block
-                |> modifyChildren applyOnElements
+                |> updateChildren applyOnElements
                 |> Block
 
         Inline inline ->
             inline
-                |> modifyChildren applyOnElements
+                |> updateChildren applyOnElements
                 |> Inline
 
         Grid grid ->
             grid
-                |> modifyChildren applyOnElements
+                |> updateChildren applyOnElements
                 |> Grid
 
         GridItem gridItem ->
             gridItem
-                |> modifyChildren applyOnElements
+                |> updateChildren applyOnElements
                 |> GridItem
 
         Text content ->
@@ -660,22 +662,22 @@ applyToAttributes applyOnAttributes tree =
     case tree of
         Block block ->
             block
-                |> modifyAttributes applyOnAttributes
+                |> updateAttributes applyOnAttributes
                 |> Block
 
         Inline inline ->
             inline
-                |> modifyAttributes applyOnAttributes
+                |> updateAttributes applyOnAttributes
                 |> Inline
 
         Grid grid ->
             grid
-                |> modifyAttributes applyOnAttributes
+                |> updateAttributes applyOnAttributes
                 |> Grid
 
         GridItem gridItem ->
             gridItem
-                |> modifyAttributes applyOnAttributes
+                |> updateAttributes applyOnAttributes
                 |> GridItem
 
         Text content ->
@@ -1523,12 +1525,12 @@ gridEditor ({ attributes, children } as grid) =
 replaceTemplateByOneFraction : Grid.GridContainerDetails -> Grid.GridContainerDetails
 replaceTemplateByOneFraction gridContainerDetails =
     gridContainerDetails
-        |> modifyGridContainerToReplaceTemplateInX
-        |> modifyGridContainerToReplaceTemplateInY
+        |> updateGridContainerToReplaceTemplateInX
+        |> updateGridContainerToReplaceTemplateInY
 
 
-modifyGridContainerToReplaceTemplateInY : Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToReplaceTemplateInY ({ y } as gridContainerDetails) =
+updateGridContainerToReplaceTemplateInY : Grid.GridContainerDetails -> Grid.GridContainerDetails
+updateGridContainerToReplaceTemplateInY ({ y } as gridContainerDetails) =
     y
         |> Maybe.withDefault (Grid.GridContainerCoordinate Nothing Nothing Nothing Nothing)
         |> replaceTemplate
@@ -1536,8 +1538,8 @@ modifyGridContainerToReplaceTemplateInY ({ y } as gridContainerDetails) =
         |> setYIn gridContainerDetails
 
 
-modifyGridContainerToReplaceTemplateInX : Grid.GridContainerDetails -> Grid.GridContainerDetails
-modifyGridContainerToReplaceTemplateInX ({ x } as gridContainerDetails) =
+updateGridContainerToReplaceTemplateInX : Grid.GridContainerDetails -> Grid.GridContainerDetails
+updateGridContainerToReplaceTemplateInX ({ x } as gridContainerDetails) =
     x
         |> Maybe.withDefault (Grid.GridContainerCoordinate Nothing Nothing Nothing Nothing)
         |> replaceTemplate
@@ -1562,7 +1564,7 @@ gridView :
 gridView { attributes, children } xTemplate yTemplate =
     B.grid
         [ attributes.style
-            |> modifyGridContainerInStyle (replaceTemplateByOneFraction)
+            |> updateGridContainerInStyle (replaceTemplateByOneFraction)
             |> Elegant.commonStyleToStyle
             |> A.rawStyle
         , A.style [ S.block [ Block.fullHeight ] ]
