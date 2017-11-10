@@ -1,5 +1,24 @@
 module Constants exposing (..)
 
+{-|
+@docs huge
+@docs large
+@docs medium
+@docs small
+@docs tiny
+@docs zero
+@docs alpha
+@docs beta
+@docs gamma
+@docs delta
+@docs epsilon
+@docs zeta
+@docs eta
+@docs theta
+@docs iota
+@docs kappa
+-}
+
 import Helpers.Shared exposing (..)
 
 

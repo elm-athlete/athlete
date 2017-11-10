@@ -20,7 +20,7 @@ import Helpers.Shared
 
 init : ( Model, Cmd Msg )
 init =
-    { element = defaultDiv 1
+    { element = defaultGridContainer 1
     , selectedId = 1
     , autoIncrement = 2
     }
@@ -1645,7 +1645,7 @@ addButton : Msg -> Flex.FlexDirection -> Node Msg
 addButton msg orientation =
     B.flex
         [ A.style [ S.flexContainerProperties [ Flex.direction orientation ] ] ]
-        [ B.flexItem [ E.onClick msg ] [ B.text "+" ] ]
+        [ B.flexItem [] [ B.button [ E.onClick msg ] [ B.text "+" ] ] ]
 
 
 inspectorView : Model -> Node Msg

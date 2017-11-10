@@ -378,8 +378,7 @@ pageView insidePageView_ transition data page =
                     ]
                 ]
             ]
-
-        -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
+          -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
         ]
         [ insidePageView_ page data transition ]
 
