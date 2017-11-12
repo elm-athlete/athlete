@@ -962,19 +962,20 @@ defaultInlineAttributes tag constructor =
 
 
 type alias GridAttributes msg =
-    { attributes : { style : Elegant.CommonStyle }
+    { tag : String
+    , attributes : { style : Elegant.CommonStyle }
     , children : List (Element msg)
     }
 
 
 defaultGridContainerAttributes : GridAttributes msg
 defaultGridContainerAttributes =
-    GridAttributes gridContainerStyle []
+    GridAttributes "grid" gridContainerStyle []
 
 
 defaultGridItemAttributes : GridAttributes msg
 defaultGridItemAttributes =
-    GridAttributes gridItemStyle []
+    GridAttributes "grid-item" gridItemStyle []
 
 
 type Tree msg
@@ -1153,6 +1154,7 @@ item color ( x, y ) ( width, height ) =
         ]
 
 
+transparentItem : ( Int, Int ) -> ( Grid.GridItemSize, Grid.GridItemSize ) -> List (Node msg) -> B.GridItem msg
 transparentItem =
     item (Box.backgroundColor (Color.rgba 0 0 0 0))
 
@@ -1258,7 +1260,7 @@ contentViewGridItem selectedId { tree, id } =
     case tree of
         GridItem gridItem ->
             [ B.gridItem
-                ([ A.class [ Elegant.commonStyleToCss gridItem.attributes.style ] ] ++ selectOrSelected id selectedId)
+                (selection gridItem id selectedId)
                 (List.map (contentViewEl selectedId) gridItem.children)
             ]
 
@@ -1266,22 +1268,26 @@ contentViewGridItem selectedId { tree, id } =
             []
 
 
+selection element id selectedId =
+    ([ A.class [ Elegant.commonStyleToCss element.attributes.style ] ] ++ selectOrSelected id selectedId)
+
+
 contentViewEl : Int -> Element Msg -> Node Msg
 contentViewEl selectedId { tree, id } =
     case tree of
         Grid grid ->
             B.grid
-                ([ A.class [ Elegant.commonStyleToCss grid.attributes.style ] ] ++ selectOrSelected id selectedId)
+                (selection grid id selectedId)
                 (List.concatMap (contentViewGridItem selectedId) grid.children)
 
         Block block ->
             block.constructor
-                ([ A.class [ Elegant.commonStyleToCss block.attributes.style ] ] ++ selectOrSelected id selectedId)
+                (selection block id selectedId)
                 (List.map (contentViewEl selectedId) block.children)
 
         Inline node ->
             node.constructor
-                ([ A.class [ Elegant.commonStyleToCss node.attributes.style ] ] ++ selectOrSelected id selectedId)
+                (selection node id selectedId)
                 (List.map (contentViewEl selectedId) node.children)
 
         Text content ->
@@ -1414,7 +1420,7 @@ whiteItem =
 
 
 gridEditor :
-    { attributes : { style : Elegant.CommonStyle }, children : List (Element Msg) }
+    GridAttributes Msg
     -> Node Msg
 gridEditor ({ attributes, children } as grid) =
     let
@@ -1677,11 +1683,11 @@ inspectorView model =
                                     [ B.div []
                                         [ B.text "Box color" ]
                                     , B.div []
-                                        [ B.inputColor [ E.onInput (ChangeBoxStyle << ChangeColor), A.value (getColorFromTree tree) ] ]
+                                        [ B.inputColor [ E.onInput (ChangeBoxStyle << ChangeColor), A.value (getColorFromElement tree) ] ]
                                     , B.div []
                                         [ B.text "Box opacity" ]
                                     , B.div []
-                                        [ B.inputRange [ A.min 0, A.max 1000, E.onInput (ChangeBoxStyle << ChangeOpacity), A.value (1000 * getOpacityFromTree tree |> round) ] ]
+                                        [ B.inputRange [ A.min 0, A.max 1000, E.onInput (ChangeBoxStyle << ChangeOpacity), A.value (1000 * getOpacityFromElement tree |> round) ] ]
                                     ]
                                 ]
                     , case tree of
@@ -1832,23 +1838,13 @@ treeViewElement id selectedId tag =
 displayTreeView : Int -> Element msg -> Node Msg
 displayTreeView selectedId { id, tree } =
     B.div [] <|
-        case tree of
-            Block content ->
-                treeViewElement id selectedId content.tag content.children
-
-            Inline content ->
-                treeViewElement id selectedId content.tag content.children
-
-            Grid content ->
-                treeViewElement id selectedId "bb-grid" content.children
-
-            GridItem gridItem ->
-                treeViewElement id selectedId "bb-grid-item" gridItem.children
-
-            Text content ->
-                [ B.div [ A.style [ S.box [ Box.paddingLeft (px 12) ] ] ]
-                    [ B.div (selectOrSelected id selectedId) [ B.text "text" ] ]
-                ]
+        foldOnTagAndChildren
+            ([ B.div [ A.style [ S.box [ Box.paddingLeft (px 12) ] ] ]
+                [ B.div (selectOrSelected id selectedId) [ B.text "text" ] ]
+             ]
+            )
+            (treeViewElement id selectedId)
+            tree
 
 
 getById : Int -> Element msg -> Maybe (Element msg)
@@ -1862,61 +1858,76 @@ getByIdHelp id element =
     if id == element.id then
         [ element ]
     else
-        case element.tree of
-            Block { children } ->
-                List.concatMap (getByIdHelp id) children
-
-            Inline { children } ->
-                List.concatMap (getByIdHelp id) children
-
-            Grid { children } ->
-                List.concatMap (getByIdHelp id) children
-
-            GridItem gridItem ->
-                List.concatMap (getByIdHelp id) gridItem.children
-
-            Text content ->
-                []
+        foldOnChildren [] (List.concatMap (getByIdHelp id)) element.tree
 
 
-getOpacityFromTree : Tree msg -> Float
-getOpacityFromTree tree =
-    Maybe.withDefault 1.0 <|
-        case tree of
-            Block { attributes } ->
-                extractOpacityFromStyle attributes.style
-
-            Inline { attributes } ->
-                extractOpacityFromStyle attributes.style
-
-            Grid { attributes } ->
-                extractOpacityFromStyle attributes.style
-
-            GridItem { attributes } ->
-                extractOpacityFromStyle attributes.style
-
-            Text content ->
-                Nothing
+getOpacityFromElement : Tree msg -> Float
+getOpacityFromElement tree =
+    getPropertyFromStyle 1.0 extractOpacityFromStyle tree
 
 
-getColorFromTree : Tree Msg -> Color.Color
-getColorFromTree tree =
-    Maybe.withDefault Color.black <|
-        case tree of
-            Block { attributes } ->
-                extractColorFromStyle attributes.style
+getColorFromElement : Tree Msg -> Color.Color
+getColorFromElement tree =
+    getPropertyFromStyle Color.black extractColorFromStyle tree
 
-            Inline { attributes } ->
-                extractColorFromStyle attributes.style
 
-            Grid { attributes } ->
-                extractColorFromStyle attributes.style
+getPropertyFromStyle default fun element =
+    Maybe.withDefault default <|
+        foldOnAttributes Nothing (fun << .style) element
 
-            GridItem { attributes } ->
-                extractColorFromStyle attributes.style
 
-            Text content ->
-                Nothing
+foldOnAttributes default fun element =
+    case element of
+        Block { attributes } ->
+            fun attributes
+
+        Inline { attributes } ->
+            fun attributes
+
+        Grid { attributes } ->
+            fun attributes
+
+        GridItem { attributes } ->
+            fun attributes
+
+        _ ->
+            default
+
+
+foldOnChildren default fun element =
+    case element of
+        Block { children } ->
+            fun children
+
+        Inline { children } ->
+            fun children
+
+        Grid { children } ->
+            fun children
+
+        GridItem { children } ->
+            fun children
+
+        _ ->
+            default
+
+
+foldOnTagAndChildren default fun element =
+    case element of
+        Block { tag, children } ->
+            fun tag children
+
+        Inline { tag, children } ->
+            fun tag children
+
+        Grid { tag, children } ->
+            fun tag children
+
+        GridItem { tag, children } ->
+            fun tag children
+
+        _ ->
+            default
 
 
 main : Program Never Model Msg

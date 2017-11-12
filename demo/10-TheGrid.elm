@@ -6,63 +6,14 @@ import Color exposing (Color)
 import Elegant exposing (px, vh, percent)
 import Style
 import Grid
+import Grid.Extra
 import Box
 import Block
-import Flex
 
 
-top =
-    -1
-
-
-left =
-    -1
-
-
-right =
-    1
-
-
-center =
-    0
-
-
-bottom =
-    1
-
-
-cell : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int ) -> List (Node msg) -> Builder.GridItem msg
-cell ( x, y ) ( width, height ) alignment content =
-    Builder.gridItem
-        [ Attributes.style
-            [ Style.gridItemProperties
-                [ Grid.horizontal
-                    [ Grid.placement x
-                    , Grid.size (Grid.span width)
-                    , Grid.align Grid.stretch
-                    ]
-                , Grid.vertical
-                    [ Grid.placement y
-                    , Grid.size (Grid.span height)
-                    , Grid.align Grid.stretch
-                    ]
-                ]
-            , Style.box [ Box.backgroundColor Color.purple ]
-            ]
-        ]
-        [ Builder.flex
-            [ Attributes.style
-                [ Style.flexContainerProperties
-                    [ Flex.alignXY alignment
-                    ]
-                , Style.block
-                    [ Block.height (percent 100)
-                    ]
-                ]
-            ]
-            [ Builder.flexItem [] content
-            ]
-        ]
+cellWithpurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( number, number1 ) -> List (Node msg) -> Builder.GridItem msg
+cellWithpurpleBackground =
+    Grid.Extra.cell [ Style.box [ Box.backgroundColor Color.purple ] ]
 
 
 example : Node msg
@@ -95,11 +46,15 @@ example =
             , Style.box [ Box.backgroundColor Color.lightPurple ]
             ]
         ]
-        [ cell ( 0, 0 ) ( 2, 1 ) ( bottom, left ) [ Builder.text "1" ]
-        , cell ( 2, 0 ) ( 1, 2 ) ( center, center ) [ Builder.text "2" ]
-        , cell ( 1, 2 ) ( 2, 1 ) ( top, right ) [ Builder.text "3" ]
-        , cell ( 0, 1 ) ( 1, 2 ) ( center, right ) [ Builder.text "4" ]
+        [ cellWithpurpleBackground ( 0, 0 ) ( 2, 1 ) ( Grid.Extra.bottom, Grid.Extra.left ) [ content "bottom left" ]
+        , cellWithpurpleBackground ( 2, 0 ) ( 1, 2 ) ( Grid.Extra.center, Grid.Extra.center ) [ content "center" ]
+        , cellWithpurpleBackground ( 1, 2 ) ( 2, 1 ) ( Grid.Extra.top, Grid.Extra.right ) [ content "top right" ]
+        , cellWithpurpleBackground ( 0, 1 ) ( 1, 2 ) ( Grid.Extra.center, Grid.Extra.right ) [ content "center right" ]
         ]
+
+
+content str =
+    Builder.div [ Attributes.style [ Style.box [ Box.backgroundColor Color.yellow, Box.paddingAll (px 24) ] ] ] [ Builder.text str ]
 
 
 main : Node msg
