@@ -1492,7 +1492,7 @@ gridEditor ({ attributes, children } as grid) =
                         B.flex
                             [ A.style
                                 [ S.flexContainerProperties
-                                    [ Flex.align Flex.center
+                                    [ Flex.align Flex.alignCenter
                                     , Flex.justifyContent Flex.justifyContentCenter
                                     , Flex.direction Flex.column
                                     ]

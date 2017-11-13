@@ -13,7 +13,7 @@ module Flex
         , align
         , alignXY
         , baseline
-        , center
+        , alignCenter
         , flexStart
         , flexEnd
         , inherit
@@ -63,7 +63,7 @@ module Flex
 @docs align
 @docs alignXY
 @docs baseline
-@docs center
+@docs alignCenter
 @docs flexStart
 @docs flexEnd
 @docs inherit
@@ -196,8 +196,8 @@ baseline =
 
 {-| Generates a center alignment.
 -}
-center : Align
-center =
+alignCenter : Align
+alignCenter =
     AlignCenter
 
 
@@ -243,8 +243,8 @@ type JustifyContent
     = JustifyContentSpaceBetween
     | JustifyContentSpaceAround
     | JustifyContentCenter
-    | JustifyFlexStart
-    | JustifyFlexEnd
+    | JustifyContentFlexStart
+    | JustifyContentFlexEnd
 
 
 {-| Accepts a justify-content and modifies the flex container accordingly.
@@ -363,38 +363,45 @@ alignToString align =
             "stretch"
 
 
-alignXY : ( number, number1 ) -> FlexContainerDetails -> FlexContainerDetails
+alignXY : ( Align, JustifyContent ) -> FlexContainerDetails -> FlexContainerDetails
 alignXY ( x, y ) =
-    let
-        toto =
-            case x of
-                (-1) ->
-                    align AlignFlexStart
+    align x >> justifyContent y
 
-                0 ->
-                    align AlignCenter
 
-                1 ->
-                    align AlignFlexEnd
+topLeft =
+    alignXY ( AlignFlexStart, JustifyContentFlexStart )
 
-                _ ->
-                    identity
 
-        titi =
-            case y of
-                (-1) ->
-                    justifyContent JustifyFlexStart
+topCenter =
+    alignXY ( AlignCenter, JustifyContentFlexStart )
 
-                0 ->
-                    justifyContent JustifyContentCenter
 
-                1 ->
-                    justifyContent JustifyFlexEnd
+topRight =
+    alignXY ( AlignFlexEnd, JustifyContentFlexStart )
 
-                _ ->
-                    identity
-    in
-        titi << toto
+
+centerLeft =
+    alignXY ( AlignFlexStart, JustifyContentCenter )
+
+
+center =
+    alignXY ( AlignCenter, JustifyContentCenter )
+
+
+centerRight =
+    alignXY ( AlignFlexEnd, JustifyContentCenter )
+
+
+bottomLeft =
+    alignXY ( AlignFlexStart, JustifyContentFlexEnd )
+
+
+bottomCenter =
+    alignXY ( AlignCenter, JustifyContentFlexEnd )
+
+
+bottomRight =
+    alignXY ( AlignFlexEnd, JustifyContentFlexEnd )
 
 
 {-|
@@ -478,10 +485,10 @@ justifyContentToString val =
         JustifyContentCenter ->
             "center"
 
-        JustifyFlexStart ->
+        JustifyContentFlexStart ->
             "flex-start"
 
-        JustifyFlexEnd ->
+        JustifyContentFlexEnd ->
             "flex-end"
 
 

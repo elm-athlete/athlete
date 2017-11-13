@@ -11,9 +11,9 @@ import Box
 import Block
 
 
-cellWithpurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( number, number1 ) -> List (Node msg) -> Builder.GridItem msg
-cellWithpurpleBackground =
-    Grid.Extra.cell [ Style.box [ Box.backgroundColor Color.purple ] ]
+alignedCellWithPurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int ) -> List (Node msg) -> Builder.GridItem msg
+alignedCellWithPurpleBackground =
+    Grid.Extra.alignedCell [ Style.box [ Box.backgroundColor Color.purple ] ]
 
 
 example : Node msg
@@ -46,10 +46,10 @@ example =
             , Style.box [ Box.backgroundColor Color.lightPurple ]
             ]
         ]
-        [ cellWithpurpleBackground ( 0, 0 ) ( 2, 1 ) ( Grid.Extra.bottom, Grid.Extra.left ) [ content "bottom left" ]
-        , cellWithpurpleBackground ( 2, 0 ) ( 1, 2 ) ( Grid.Extra.center, Grid.Extra.center ) [ content "center" ]
-        , cellWithpurpleBackground ( 1, 2 ) ( 2, 1 ) ( Grid.Extra.top, Grid.Extra.right ) [ content "top right" ]
-        , cellWithpurpleBackground ( 0, 1 ) ( 1, 2 ) ( Grid.Extra.center, Grid.Extra.right ) [ content "center right" ]
+        [ alignedCellWithPurpleBackground ( 0, 0 ) ( 2, 1 ) ( Grid.Extra.bottom, Grid.Extra.left ) [ content "bottom left" ]
+        , alignedCellWithPurpleBackground ( 2, 0 ) ( 1, 2 ) ( Grid.Extra.center, Grid.Extra.center ) [ content "center" ]
+        , alignedCellWithPurpleBackground ( 1, 2 ) ( 2, 1 ) ( Grid.Extra.top, Grid.Extra.right ) [ content "top right" ]
+        , alignedCellWithPurpleBackground ( 0, 1 ) ( 1, 2 ) ( Grid.Extra.center, Grid.Extra.right ) [ content "center right" ]
         ]
 
 

@@ -8,7 +8,7 @@ import Style
 import Grid
 import Box
 import Block
-import Flex
+import Flex.Extra
 
 
 top =
@@ -31,7 +31,11 @@ bottom =
     1
 
 
-cell cellStyle ( x, y ) ( width, height ) alignment content =
+alignedCell cellStyle ( x, y ) ( width, height ) alignment content =
+    cell cellStyle ( x, y ) ( width, height ) [ Flex.Extra.alignedContent alignment content ]
+
+
+cell cellStyle ( x, y ) ( width, height ) =
     Builder.gridItem
         [ Attributes.style
             ([ Style.gridItemProperties
@@ -49,17 +53,4 @@ cell cellStyle ( x, y ) ( width, height ) alignment content =
              ]
                 ++ cellStyle
             )
-        ]
-        [ Builder.flex
-            [ Attributes.style
-                [ Style.flexContainerProperties
-                    [ Flex.alignXY alignment
-                    ]
-                , Style.block
-                    [ Block.height (percent 100)
-                    ]
-                ]
-            ]
-            [ Builder.flexItem [] content
-            ]
         ]
