@@ -1,5 +1,5 @@
 {
-    "version": "8.1.2",
+    "version": "8.0.0",
     "summary": "Framework for inline CSS",
     "repository": "https://github.com/elm-bodybuilder/elegant.git",
     "license": "MIT",
@@ -32,10 +32,9 @@
         "Position",
         "Router",
         "Style",
-        "Surrounded",
         "Typography",
         "Typography.Character"
-      ],
+    ],
     "native-modules": true,
     "dependencies": {
         "Fresheyeball/elm-tuple-extra": "3.0.0 <= v < 4.0.0",

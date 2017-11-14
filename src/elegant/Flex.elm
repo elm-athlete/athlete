@@ -33,6 +33,15 @@ module Flex
         , flexContainerDetailsToCouples
         , defaultFlexContainerDetails
         , defaultFlexItemDetails
+        , topLeft
+        , topCenter
+        , topRight
+        , centerLeft
+        , center
+        , centerRight
+        , bottomLeft
+        , bottomCenter
+        , bottomRight
         )
 
 {-| Flex handles everything related to the flex element.
@@ -78,6 +87,17 @@ module Flex
 @docs spaceAround
 @docs justifyContentCenter
 
+
+## Positionning
+@docs topLeft
+@docs topCenter
+@docs topRight
+@docs centerLeft
+@docs center
+@docs centerRight
+@docs bottomLeft
+@docs bottomCenter
+@docs bottomRight
 
 ## Flex
 
@@ -363,43 +383,72 @@ alignToString align =
             "stretch"
 
 
+{-|
+-}
 alignXY : ( Align, JustifyContent ) -> FlexContainerDetails -> FlexContainerDetails
 alignXY ( x, y ) =
     align x >> justifyContent y
 
 
+{-|
+-}
+topLeft : FlexContainerDetails -> FlexContainerDetails
 topLeft =
     alignXY ( AlignFlexStart, JustifyContentFlexStart )
 
 
+{-|
+-}
+topCenter : FlexContainerDetails -> FlexContainerDetails
 topCenter =
     alignXY ( AlignCenter, JustifyContentFlexStart )
 
 
+{-|
+-}
+topRight : FlexContainerDetails -> FlexContainerDetails
 topRight =
     alignXY ( AlignFlexEnd, JustifyContentFlexStart )
 
 
+{-|
+-}
+centerLeft : FlexContainerDetails -> FlexContainerDetails
 centerLeft =
     alignXY ( AlignFlexStart, JustifyContentCenter )
 
 
+{-|
+-}
+center : FlexContainerDetails -> FlexContainerDetails
 center =
     alignXY ( AlignCenter, JustifyContentCenter )
 
 
+{-|
+-}
+centerRight : FlexContainerDetails -> FlexContainerDetails
 centerRight =
     alignXY ( AlignFlexEnd, JustifyContentCenter )
 
 
+{-|
+-}
+bottomLeft : FlexContainerDetails -> FlexContainerDetails
 bottomLeft =
     alignXY ( AlignFlexStart, JustifyContentFlexEnd )
 
 
+{-|
+-}
+bottomCenter : FlexContainerDetails -> FlexContainerDetails
 bottomCenter =
     alignXY ( AlignCenter, JustifyContentFlexEnd )
 
 
+{-|
+-}
+bottomRight : FlexContainerDetails -> FlexContainerDetails
 bottomRight =
     alignXY ( AlignFlexEnd, JustifyContentFlexEnd )
 

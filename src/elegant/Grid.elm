@@ -111,7 +111,14 @@ module Grid
 @docs vertical
 @docs viewWidth
 @docs GridItemDetails
+@docs GridItemCoordinate
 @docs GridContainerDetails
+@docs GridContainerCoordinate
+@docs GridItemSize
+@docs GridTemplate
+@docs Repeatable
+@docs ValType
+@docs align
 -}
 
 import Helpers.Shared exposing (..)
@@ -159,6 +166,7 @@ type AlignItems
     | Space Spacing
 
 
+{-| -}
 type ValType
     = SizeUnitVal SizeUnit
     | Fr Int
@@ -204,6 +212,7 @@ auto =
     Auto
 
 
+{-| -}
 type Repeatable
     = Simple ValType
     | Minmax ValType ValType
@@ -252,10 +261,12 @@ repeat =
     Repeat
 
 
+{-| -}
 type alias GridTemplate =
     List Repeatable
 
 
+{-| -}
 type alias GridContainerCoordinate =
     { gutter : Maybe SizeUnit
     , align : Maybe Align
@@ -264,6 +275,7 @@ type alias GridContainerCoordinate =
     }
 
 
+{-| -}
 type GridItemSize
     = UntilEndOfCoordinate
     | Span Int
@@ -281,6 +293,7 @@ span =
     Span
 
 
+{-| -}
 type alias GridItemCoordinate =
     { placement : Maybe Int
     , size : Maybe GridItemSize
