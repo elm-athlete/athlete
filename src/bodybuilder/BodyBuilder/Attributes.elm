@@ -7,24 +7,27 @@ module BodyBuilder.Attributes exposing (..)
 @docs StyleModifier
 @docs style
 @docs ValueAttribute
-@docs TitleAttribute
-@docs IdAttribute
+@docs BlockAttributes
+@docs rawStyle
+@docs rawStyleToHtmlAttributes
+-- @docs TitleAttribute
+-- @docs IdAttribute
 @docs StepAttribute
 @docs MaxAttribute
 @docs MinAttribute
-@docs ClassAttribute
-@docs TabindexAttribute
+-- @docs ClassAttribute
+-- @docs TabindexAttribute
 @docs TargetAttribute
 @docs HrefAttribute
 @docs NameAttribute
 @docs WidthAttribute
-@docs HeightAttribute
-@docs SrcAttribute
-@docs AltAttribute
+-- @docs HeightAttribute
+-- @docs SrcAttribute
+-- @docs AltAttribute
 @docs DisabledAttribute
 @docs MaybeBlockContainer
 @docs BlockContainer
-@docs AutocompleteAttribute
+-- @docs AutocompleteAttribute
 @docs PlaceholderAttribute
 @docs PositionAttribute
 @docs DataAttribute
@@ -53,7 +56,7 @@ module BodyBuilder.Attributes exposing (..)
 @docs GridContainerAttributes
 @docs GridItemAttributes
 @docs HeadingAttributes
-@docs ButtonAttributesBase
+-- @docs ButtonAttributesBase
 @docs ButtonAttributes
 @docs AAttributes
 @docs TextareaAttributes
@@ -65,11 +68,11 @@ module BodyBuilder.Attributes exposing (..)
 @docs InputHiddenAttributes
 @docs LabelAttributes
 @docs label
-@docs InputVisibleAttributes
-@docs InputStringValueAttributes
+-- @docs InputVisibleAttributes
+-- @docs InputStringValueAttributes
 @docs InputRadioAttributes
 @docs InputCheckboxAttributes
-@docs InputTextAttributesBase
+-- @docs InputTextAttributesBase
 @docs InputTextAttributes
 @docs InputSubmitAttributes
 @docs InputUrlAttributes
@@ -210,6 +213,7 @@ style styles =
         |> Function.compose
 
 
+{-| -}
 rawStyle : a -> { c | rawStyle : b } -> { c | rawStyle : Maybe a }
 rawStyle theStyle attrs =
     { attrs | rawStyle = Just theStyle }
@@ -264,6 +268,7 @@ type alias MinAttribute a =
 -- {-| -}
 
 
+{-| -}
 type alias TargetAttribute a =
     { a | target : Maybe String }
 
@@ -567,6 +572,7 @@ type alias GridItemAttributes msg =
 -- BlockContainer (FlowAttributes msg)
 
 
+{-| -}
 type alias BlockAttributes msg =
     { block : List ( Modifiers BlockDetails, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
@@ -754,6 +760,7 @@ type alias InputAttributes a =
 -- UniversalContainer (TypeContainer (InputAttributes (StringValue {})))
 
 
+{-| -}
 type alias InputHiddenAttributes =
     { name : Maybe String, type_ : String, value : Maybe String, universal : UniversalAttributes }
 
@@ -762,6 +769,7 @@ type alias InputHiddenAttributes =
 -- MaybeBlockContainer (PositionAttribute (FlowAttributes msg))
 
 
+{-| -}
 type alias LabelAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
     , onEvent : Maybe ( String, Decoder msg )
@@ -987,6 +995,7 @@ type alias InputFileAttributes msg =
     }
 
 
+{-| -}
 label : List (Html msg) -> { c | label : Maybe (Shared.Label msg) } -> { c | label : Maybe (Shared.Label msg) }
 label content record =
     { record | label = Just (Shared.label <| \input -> Html.label [] (input :: content)) }
@@ -1123,6 +1132,7 @@ visibleAttributesToHtmlAttributes visibleAttributes =
         |> List.concatMap (callOn visibleAttributes)
 
 
+{-| -}
 rawStyleToHtmlAttributes : Elegant.Style -> List (Html.Attribute msg)
 rawStyleToHtmlAttributes style =
     [ Html.Attributes.class (Elegant.styleToCss style) ]
@@ -1373,6 +1383,7 @@ width val attrs =
     { attrs | width = Just val }
 
 
+{-| -}
 height : a -> { c | height : b } -> { c | height : Maybe a }
 height val attrs =
     { attrs | height = Just val }
@@ -1453,6 +1464,7 @@ progressAttributesToHtmlAttributes =
     visibleAttributesToHtmlAttributes
 
 
+{-| -}
 data : a -> { c | data : b } -> { c | data : a }
 data val attrs =
     { attrs | data = val }
@@ -1514,11 +1526,13 @@ inputVisibleToHtmlAttributes attributes =
         (inputAttributesToHtmlAttributes attributes)
 
 
+{-| -}
 autocomplete : a -> { c | autocomplete : b } -> { c | autocomplete : a }
 autocomplete val attrs =
     { attrs | autocomplete = val }
 
 
+{-| -}
 placeholder : a -> { c | placeholder : b } -> { c | placeholder : Maybe a }
 placeholder val attrs =
     { attrs | placeholder = Just val }

@@ -35,6 +35,7 @@ import Date
 import Date exposing (Month(..))
 import Date.Extra as Date
 import Style
+import Json.Decode as Decode exposing (Decoder)
 
 
 type alias Persisted a =
@@ -97,6 +98,7 @@ type Msg
     | DestroyAppartment Int
     | SaveAppartmentAttributes
     | SaveAppartmentAttributesHelper Time
+    | UpdateData Data
 
 
 type alias MarkdownString =
@@ -627,6 +629,9 @@ update msg model =
         UpdateAppartmentAttributes customMsg ->
             ( model |> updateAppartmentAttributes customMsg, Cmd.none )
 
+        UpdateData data ->
+            ( { model | data = data }, Cmd.none )
+
         SaveAppartmentAttributes ->
             ( model, Task.perform SaveAppartmentAttributesHelper Time.now )
 
@@ -637,38 +642,57 @@ update msg model =
             ( model |> destroyAppartment id, Cmd.none )
 
 
+fetchData : Decoder a -> (a -> msg) -> Sub msg
+fetchData decoder msg =
+    Sub.none
+
+
+decodeData : Decoder Data
+decodeData =
+    Decode.succeed { appartments = [], draftAppartment = initAppartmentAttributes }
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Router.maybeTransitionSubscription StandardHistoryWrapper model.history.transition
+    Sub.batch
+        [ Router.maybeTransitionSubscription StandardHistoryWrapper model.history.transition
+        , fetchData decodeData UpdateData
+        ]
+
+
+
+-- initAppartments : List Appartment
+-- initAppartments =
+--     [ { id = 1
+--       , createdAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
+--       , updatedAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
+--       , attributes =
+--             { title = "Immeuble rapport (Belfort)"
+--             , details = "details"
+--             , monthlyRent = defaultMonthlyRent
+--             , collocs = defaultCollocs
+--             , works = 0
+--             , rate = 0.0175
+--             }
+--       }
+--     , { id = 2
+--       , createdAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
+--       , updatedAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
+--       , attributes =
+--             { title = "Immeuble rapport 2 (Belfort)"
+--             , details = "details"
+--             , monthlyRent = defaultMonthlyRent
+--             , collocs = defaultCollocs
+--             , works = 0
+--             , rate = 0.0175
+--             }
+--       }
+--     ]
 
 
 initAppartments : List Appartment
 initAppartments =
-    [ { id = 1
-      , createdAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
-      , updatedAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
-      , attributes =
-            { title = "Immeuble rapport (Belfort)"
-            , details = "details"
-            , monthlyRent = defaultMonthlyRent
-            , collocs = defaultCollocs
-            , works = 0
-            , rate = 0.0175
-            }
-      }
-    , { id = 2
-      , createdAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
-      , updatedAt = Date.fromCalendarDate 2017 Aug 10 |> Date.toTime
-      , attributes =
-            { title = "Immeuble rapport 2 (Belfort)"
-            , details = "details"
-            , monthlyRent = defaultMonthlyRent
-            , collocs = defaultCollocs
-            , works = 0
-            , rate = 0.0175
-            }
-      }
-    ]
+    []
 
 
 initAppartmentAttributes : AppartmentAttributes

@@ -55,6 +55,7 @@ module BodyBuilder exposing (..)
 @docs aside
 @docs footer
 @docs header
+@docs none
 @docs commonNode
 @docs commonChildlessNode
 @docs commonBlockFlexlessNode
@@ -390,6 +391,7 @@ select =
         BodyBuilder.Attributes.selectAttributesToHtmlAttributes
 
 
+{-| -}
 option : String -> String -> Bool -> Option msg
 option value content selected =
     Option <|

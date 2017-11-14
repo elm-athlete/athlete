@@ -7,6 +7,7 @@ module Block exposing (..)
 @docs alignLeft
 @docs maxWidth
 @docs height
+@docs fullHeight
 @docs width
 -}
 
@@ -52,11 +53,13 @@ height size =
     Display.dimensions [ Dimensions.height size ]
 
 
+{-| -}
 fullHeight : Modifier Display.BlockDetails
 fullHeight =
     height (Percent 100)
 
 
+{-| -}
 width : SizeUnit -> Modifier Display.BlockDetails
 width size =
     Display.dimensions [ Dimensions.width size ]

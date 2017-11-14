@@ -17,7 +17,7 @@
         "BodyBuilder.Events",
         "Border",
         "Box",
-        "BoxShadow",
+        "Shadow",
         "Constants",
         "Corner",
         "Cursor",

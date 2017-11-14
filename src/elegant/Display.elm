@@ -41,7 +41,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs ListStyleType
 @docs Alignment
 @docs TextOverflow
-
+@docs defaultBlockDetails
 
 # Modifiers
 
@@ -155,6 +155,8 @@ type alias BlockDetails =
     }
 
 
+{-|
+-}
 defaultBlockDetails : BlockDetails
 defaultBlockDetails =
     BlockDetails Nothing Nothing Nothing Nothing Nothing

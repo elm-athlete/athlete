@@ -130,7 +130,8 @@ customCounter title min max step val msg =
                     , Box.paddingHorizontal (px 10)
                     ]
                 ]
-              -- , customNumberFieldParameters
+
+            -- , customNumberFieldParameters
             ]
         ]
 
@@ -370,26 +371,27 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
                 ]
             ]
             [ text "Parametrable grid" ]
-          -- , grid (Px 26)
-          --     [ (col 3 1)
-          --         [ customCounter "Gutter width" 0 100 1 gutterWidth ChangeGutter ]
-          --     , (col 3 1)
-          --         [ customCounter "Columns number" 6 12 2 columnsNumber ChangeColumnsNumber ]
-          --     , (col 3 1)
-          --         [ customCounter "Columns width : number of units by column" 2 6 1 columnWidth ChangeWidth ]
-          --     ]
-          -- , grid (Px gutterWidth)
-          --     [ col columnsNumber columnWidth (exampleGridContent "BodyBuilder")
-          --     , col columnsNumber (columnWidth) (exampleGridContent "is")
-          --     , col columnsNumber (columnWidth) (exampleGridContent "awesome")
-          --     , col columnsNumber (columnWidth) (exampleGridContent "to")
-          --     ]
-          -- , grid (Px gutterWidth)
-          --     [ col 12 6 (exampleGridContent "design")
-          --     , col 12 6 (exampleGridContent "your")
-          --     , col 12 6 (exampleGridContent "own")
-          --     , col 12 6 (exampleGridContent "grids")
-          --     ]
+
+        -- , grid (Px 26)
+        --     [ (col 3 1)
+        --         [ customCounter "Gutter width" 0 100 1 gutterWidth ChangeGutter ]
+        --     , (col 3 1)
+        --         [ customCounter "Columns number" 6 12 2 columnsNumber ChangeColumnsNumber ]
+        --     , (col 3 1)
+        --         [ customCounter "Columns width : number of units by column" 2 6 1 columnWidth ChangeWidth ]
+        --     ]
+        -- , grid (Px gutterWidth)
+        --     [ col columnsNumber columnWidth (exampleGridContent "BodyBuilder")
+        --     , col columnsNumber (columnWidth) (exampleGridContent "is")
+        --     , col columnsNumber (columnWidth) (exampleGridContent "awesome")
+        --     , col columnsNumber (columnWidth) (exampleGridContent "to")
+        --     ]
+        -- , grid (Px gutterWidth)
+        --     [ col 12 6 (exampleGridContent "design")
+        --     , col 12 6 (exampleGridContent "your")
+        --     , col 12 6 (exampleGridContent "own")
+        --     , col 12 6 (exampleGridContent "grids")
+        --     ]
         ]
 
 

@@ -31,6 +31,11 @@ module Elegant
         )
 
 {-| @docs Modifier
+@docs CommonStyle
+@docs Modifier
+@docs commonStyle
+@docs commonStyleToCss
+@docs commonStyleToStyle
 @docs Modifiers
 @docs SizeUnit
 @docs Style
@@ -72,10 +77,14 @@ type Style
     = Style CommonStyle.Style
 
 
+{-|
+-}
 type alias CommonStyle =
     CommonStyle.Style
 
 
+{-|
+-}
 commonStyle :
     Maybe DisplayBox
     -> List CommonStyle.ScreenWidth
@@ -85,6 +94,8 @@ commonStyle =
     CommonStyle.Style
 
 
+{-|
+-}
 commonStyleToStyle : CommonStyle -> Style
 commonStyleToStyle =
     Style
@@ -224,6 +235,8 @@ classes (Style style) =
 --         |> Elegant.Convert.stylesToCss
 
 
+{-|
+-}
 commonStyleToCss : CommonStyle -> String
 commonStyleToCss style =
     let

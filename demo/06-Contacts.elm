@@ -201,10 +201,11 @@ showView bodyFun data =
                     [ Flex.shrink 1000000 ]
                 , Style.block
                     []
-                  -- [ Elegant.overflowYScroll
-                  -- , Elegant.fullWidth
-                  -- ,
-                  -- ]
+
+                -- [ Elegant.overflowYScroll
+                -- , Elegant.fullWidth
+                -- ,
+                -- ]
                 ]
             ]
             [ bodyFun data
@@ -224,7 +225,7 @@ fullFlexCenter content =
                     ]
                 ]
             , Style.flexContainerProperties
-                [ Flex.align Flex.center
+                [ Flex.align Flex.alignCenter
                 , Flex.justifyContent Flex.justifyContentCenter
                 ]
             ]
