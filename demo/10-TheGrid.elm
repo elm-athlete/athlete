@@ -47,10 +47,10 @@ example =
             , Style.box [ Box.backgroundColor Color.lightPurple ]
             ]
         ]
-        [ alignedCellWithPurpleBackground ( 0, 0 ) ( 2, 1 ) ( Flex.flexStart, Flex.justifyContentFlexEnd ) [ content "bottom left" ]
+        [ alignedCellWithPurpleBackground ( 0, 0 ) ( 2, 1 ) ( Flex.flexEnd, Flex.justifyContentFlexStart ) [ content "bottom left" ]
         , alignedCellWithPurpleBackground ( 2, 0 ) ( 1, 2 ) ( Flex.alignCenter, Flex.justifyContentCenter ) [ content "center" ]
-        , alignedCellWithPurpleBackground ( 1, 2 ) ( 2, 1 ) ( Flex.flexEnd, Flex.justifyContentFlexStart ) [ content "top right" ]
-        , alignedCellWithPurpleBackground ( 0, 1 ) ( 1, 2 ) ( Flex.flexEnd, Flex.justifyContentCenter ) [ content "center right" ]
+        , alignedCellWithPurpleBackground ( 1, 2 ) ( 2, 1 ) ( Flex.flexStart, Flex.justifyContentFlexEnd ) [ content "top right" ]
+        , alignedCellWithPurpleBackground ( 0, 1 ) ( 1, 2 ) ( Flex.alignCenter, Flex.justifyContentFlexEnd ) [ content "center right" ]
         ]
 
 
