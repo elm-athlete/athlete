@@ -114,7 +114,7 @@ import Color exposing (Color)
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 import Typography
-import Typography.Character as Character
+import Character
 import Padding
 import Border
 import Corner

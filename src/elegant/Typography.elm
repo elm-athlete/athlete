@@ -94,7 +94,7 @@ module Typography
 import Function
 import Color exposing (Color)
 import Either exposing (Either(..))
-import Typography.Character as Character exposing (Character)
+import Character as Character exposing (Character)
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 

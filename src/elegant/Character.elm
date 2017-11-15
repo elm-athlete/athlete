@@ -1,4 +1,4 @@
-module Typography.Character
+module Character
     exposing
         ( Character
         , FontTilt

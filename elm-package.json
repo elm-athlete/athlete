@@ -9,12 +9,12 @@
         "wysiwyg"
     ],
     "exposed-modules": [
-        "Elegant",
-        "Background",
-        "Block",
         "BodyBuilder",
         "BodyBuilder.Attributes",
         "BodyBuilder.Events",
+        "Elegant",
+        "Background",
+        "Block",
         "Border",
         "Box",
         "Shadow",

@@ -11,26 +11,6 @@ import Block
 import Flex.Extra
 
 
-top =
-    -1
-
-
-left =
-    -1
-
-
-right =
-    1
-
-
-center =
-    0
-
-
-bottom =
-    1
-
-
 alignedCell cellStyle ( x, y ) ( width, height ) alignment content =
     cell cellStyle ( x, y ) ( width, height ) [ Flex.Extra.alignedContent alignment content ]
 

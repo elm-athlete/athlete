@@ -43,6 +43,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 @docs TextOverflow
 @docs defaultBlockDetails
 
+
 # Modifiers
 
 
@@ -78,7 +79,6 @@ every style, for every element. Each element can be block, inline, flow or flex.
 # Compilation
 
 @docs displayBoxToCouples
-)
 
 -}
 
@@ -86,7 +86,7 @@ import Helpers.Css
 import Box
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
-import Display.Overflow as Overflow
+import Overflow
 import Dimensions
 import Flex
 import Grid
@@ -155,8 +155,7 @@ type alias BlockDetails =
     }
 
 
-{-|
--}
+{-| -}
 defaultBlockDetails : BlockDetails
 defaultBlockDetails =
     BlockDetails Nothing Nothing Nothing Nothing Nothing

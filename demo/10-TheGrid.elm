@@ -9,9 +9,10 @@ import Grid
 import Grid.Extra
 import Box
 import Block
+import Flex
 
 
-alignedCellWithPurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int ) -> List (Node msg) -> Builder.GridItem msg
+alignedCellWithPurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( Flex.Align, Flex.JustifyContent ) -> List (Node msg) -> Builder.GridItem msg
 alignedCellWithPurpleBackground =
     Grid.Extra.alignedCell [ Style.box [ Box.backgroundColor Color.purple ] ]
 
@@ -46,10 +47,10 @@ example =
             , Style.box [ Box.backgroundColor Color.lightPurple ]
             ]
         ]
-        [ alignedCellWithPurpleBackground ( 0, 0 ) ( 2, 1 ) ( Grid.Extra.bottom, Grid.Extra.left ) [ content "bottom left" ]
-        , alignedCellWithPurpleBackground ( 2, 0 ) ( 1, 2 ) ( Grid.Extra.center, Grid.Extra.center ) [ content "center" ]
-        , alignedCellWithPurpleBackground ( 1, 2 ) ( 2, 1 ) ( Grid.Extra.top, Grid.Extra.right ) [ content "top right" ]
-        , alignedCellWithPurpleBackground ( 0, 1 ) ( 1, 2 ) ( Grid.Extra.center, Grid.Extra.right ) [ content "center right" ]
+        [ alignedCellWithPurpleBackground ( 0, 0 ) ( 2, 1 ) ( Flex.flexStart, Flex.flexEnd ) [ content "bottom left" ]
+        , alignedCellWithPurpleBackground ( 2, 0 ) ( 1, 2 ) Flex.center [ content "center" ]
+        , alignedCellWithPurpleBackground ( 1, 2 ) ( 2, 1 ) Flex.topRight [ content "top right" ]
+        , alignedCellWithPurpleBackground ( 0, 1 ) ( 1, 2 ) Flex.centerRight [ content "center right" ]
         ]
 
 

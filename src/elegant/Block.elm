@@ -12,7 +12,7 @@ module Block exposing (..)
 -}
 
 import Helpers.Shared exposing (..)
-import Display.Overflow
+import Overflow
 import Display
 import Dimensions
 
@@ -20,7 +20,7 @@ import Dimensions
 {-| -}
 overflowHidden : Modifier Display.BlockDetails
 overflowHidden =
-    Display.overflow [ Display.Overflow.overflowXY Display.Overflow.hidden ]
+    Display.overflow [ Overflow.overflowXY Overflow.hidden ]
 
 
 {-| -}

@@ -242,7 +242,7 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
             [ style
                 [ Style.flexContainerProperties
                     [ Flex.justifyContent Flex.spaceBetween
-                    , Flex.align Flex.center
+                    , Flex.center
                     ]
                 , Style.block []
                 ]
@@ -352,10 +352,9 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
             , name "inputUrl"
             ]
         , textarea []
-        , inputSubmit
-            [ blockStyle []
-            , value "Submit Form"
-            ]
+        , button
+            [ blockStyle [] ]
+            [ text "Submit Form" ]
         , h2
             [ style
                 [ Style.box

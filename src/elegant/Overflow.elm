@@ -1,4 +1,4 @@
-module Display.Overflow
+module Overflow
     exposing
         ( overflowX
         , overflowY
@@ -12,8 +12,7 @@ module Display.Overflow
         , Overflow(..)
         )
 
-{-|
-  Handles Overflow
+{-| Handles Overflow
 
 @docs FullOverflow
 @docs overflowX
@@ -25,6 +24,7 @@ module Display.Overflow
 @docs default
 @docs scroll
 @docs Overflow
+
 -}
 
 import Helpers.Vector exposing (Vector)
@@ -44,63 +44,55 @@ type alias FullOverflow =
     Vector (Maybe Overflow)
 
 
-{-|
--}
+{-| -}
 default : Vector (Maybe Overflow)
 default =
     ( Nothing, Nothing )
 
 
-{-|
- OverflowX to handle overflow X of an element
+{-| OverflowX to handle overflow X of an element
 -}
 overflowX : Overflow -> Modifier FullOverflow
 overflowX val ( x, y ) =
     ( Just val, y )
 
 
-{-|
- OverflowY to handle overflow Y of an element
+{-| OverflowY to handle overflow Y of an element
 -}
 overflowY : Overflow -> Modifier FullOverflow
 overflowY val ( x, y ) =
     ( x, Just val )
 
 
-{-|
- OverflowY to handle overflow XY of an element
+{-| OverflowY to handle overflow XY of an element
 -}
 overflowXY : Overflow -> Modifier FullOverflow
 overflowXY val ( x, y ) =
     ( Just val, Just val )
 
 
-{-|
- always visible overflow)
+{-| always visible overflow)
 -}
 visible : Overflow
 visible =
     OverflowVisible
 
 
-{-|
-  hidden overflow
+{-| hidden overflow
 -}
 hidden : Overflow
 hidden =
     OverflowHidden
 
 
-{-|
-  auto overflow
+{-| auto overflow
 -}
 auto : Overflow
 auto =
     OverflowAuto
 
 
-{-|
-  scroll overflow
+{-| scroll overflow
 -}
 scroll : Overflow
 scroll =

@@ -7,7 +7,7 @@ import Block
 import Flex
 
 
-alignedContent : ( number, number1 ) -> List (Node msg) -> Node msg
+alignedContent : ( Flex.Align, Flex.JustifyContent ) -> List (Node msg) -> Node msg
 alignedContent alignment content =
     Builder.flex
         [ Attributes.style
