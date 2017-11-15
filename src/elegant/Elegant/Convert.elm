@@ -12,22 +12,10 @@ computeStyle displayBox =
     Display.displayBoxToCouples displayBox
 
 
-
-{- This parts focused on generating classes names from Style and ScreenWidths.
-   classesNamesFromStyle accepts the content of a Style object, and
-   generates a list of Strings containing all classes names relative to the Style object.
-   The function can take a suffix, which is a Maybe String. This symbolize the
-   possible suffix of the style, i.e. the pseudo-classes and selectors in CSS.
-
-   classesNamesFromStyle (Just "hover") generates classes names
-   looking like my-example-class-name_hover, where classesNamesFromStyle
-   Nothing generates classes names looking like my-example-class-name. This is useful
-   to later generates the corresponding CSS class my-example-class-name_hover:hover
-   containing styles, visible only on hover. This allows to handle all possible
-   pseudo-classes and selectors, while keeping CSS classes as short as possible.
+{-| This function focuses on generating classes names from Style and ScreenWidths.
+classesNamesFromStyle accepts the content of a Style object, and
+generates a list of Strings containing all classes names relative to the Style object.
 -}
-
-
 classesNamesFromStyle : Style -> List String
 classesNamesFromStyle ({ screenWidths, display, suffix } as style) =
     let
@@ -61,30 +49,6 @@ screenWidthToClassesNames suffix { min, max, style } =
 addScreenWidthToClassName : String -> String -> String
 addScreenWidthToClassName =
     flip (++)
-
-
-
-{- This part focus on generating CSS classes from Style. The main function is
-   stylesToCss, accepting a list of Style, and generating the list of corresponding
-   CSS classes. The first step consists to extract all the styles from the various
-   screen widths (i.e. media queries in CSS), and merging them with the default styles.
-   Then, they are transformed to atomic classes. They are records with the strict
-   minimum inside, to turn them in CSS classes easily. Pre-compiled code are then added
-   before returning the result.
-
-   Using the same classes names generator than before, the classes matches easily
-   and gives the correct behavior. The main function (fetchStylesOrCompute) is a
-   caching function. The first thing done is to fetch if the Style has already
-   been compiled. If it is, it just extract the styles from the cache, and returns
-   them. Otherwise, it compiles the styles, and inserts them into the cache, for
-   later use.
--}
--- stylesToCss : List Style -> List String
--- stylesToCss styles =
---     styles
---         |> List.concatMap fetchStylesOrCompute
---         |> List.append [ boxSizingCss ]
---         |> List.Extra.unique
 
 
 fetchStylesOrCompute : String -> Style -> List String

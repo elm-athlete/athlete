@@ -30,9 +30,9 @@ module Elegant
         , withScreenWidth
         )
 
-{-| @docs Modifier
-@docs CommonStyle
+{-|
 @docs Modifier
+@docs CommonStyle
 @docs commonStyle
 @docs commonStyleToCss
 @docs commonStyleToStyle

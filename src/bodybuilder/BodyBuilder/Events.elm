@@ -33,39 +33,42 @@ module BodyBuilder.Events
         , onEventToHtmlAttributes
         )
 
-{-|
+{-| This module entirely replaces Html.Events, providing a type-safer alternative.
+This is designed to work with BodyBuilder.
+It is not compatible with Html, though.
 
+@docs checkEventToHtmlEvent
+@docs focusEventToHtmlAttributes
+@docs inputEventToHtmlEvent
+@docs mouseEventsToHtmlAttributes
+@docs on
+@docs onBlur
+@docs OnBlurEvent
+@docs onBlurEventToHtmlAttributes
+@docs onCheck
+@docs OnCheckEvent
+@docs onClick
+@docs OnColorInputEvent
+@docs onDoubleClick
+@docs OnEvent
+@docs onEventToHtmlAttributes
+@docs onFocus
+@docs OnFocusEvent
+@docs onInput
+@docs OnIntInputEvent
+@docs onMouseDown
+@docs onMouseEnter
 @docs OnMouseEvents
 @docs OnMouseEventsInside
-@docs onClick
-@docs onDoubleClick
-@docs onMouseUp
+@docs onMouseLeave
 @docs onMouseOut
 @docs onMouseOver
-@docs onMouseDown
-@docs onMouseLeave
-@docs onMouseEnter
-@docs mouseEventsToHtmlAttributes
+@docs onMouseUp
 @docs OnStringInputEvent
-@docs OnIntInputEvent
-@docs OnColorInputEvent
-@docs onInput
-@docs inputEventToHtmlEvent
-@docs OnCheckEvent
-@docs onCheck
-@docs checkEventToHtmlEvent
-@docs OnSubmitEvent
 @docs onSubmit
+@docs OnSubmitEvent
 @docs submitEventToHtmlEvent
-@docs OnFocusEvent
-@docs onFocus
-@docs focusEventToHtmlAttributes
-@docs OnBlurEvent
-@docs onBlur
-@docs onBlurEventToHtmlAttributes
-@docs OnEvent
-@docs on
-@docs onEventToHtmlAttributes
+
 -}
 
 import Html

@@ -1,0 +1,4148 @@
+[
+  {
+    "name": "Router",
+    "comment": " Router based on BodyBuilder and Elegant implementing transitions between\npages and history (backward and forward)\n\n@docs History\n@docs StandardHistoryMsg\n@docs Page\n@docs Transition\n\n@docs handleStandardHistory\n@docs maybeTransitionSubscription\n@docs initHistoryAndData\n@docs push\n@docs slideUp\n@docs pageWithDefaultTransition\n@docs pageWithTransition\n@docs pageWithoutTransition\n\n@docs headerElement\n@docs pageWithHeader\n@docs headerButton\n@docs historyView\n\n",
+    "aliases": [
+      {
+        "name": "History",
+        "comment": " Generic History type handling current page, before pages, after pages\nand current transition\n",
+        "args": [
+          "route"
+        ],
+        "type": "{ before : List (Router.Page route) , current : Router.Page route , after : List (Router.Page route) , transition : Maybe.Maybe Router.Transition }"
+      },
+      {
+        "name": "Page",
+        "comment": " Page type handling transition\n",
+        "args": [
+          "customRoute"
+        ],
+        "type": "{ maybeTransition : Maybe.Maybe Router.Transition , route : customRoute }"
+      },
+      {
+        "name": "Transition",
+        "comment": " Transition between 2 pages\n",
+        "args": [],
+        "type": "{ timer : Float , length : Float , kind : Router.Kind , direction : Router.Direction , easing : Router.Easing }"
+      }
+    ],
+    "types": [
+      {
+        "name": "StandardHistoryMsg",
+        "comment": " Standard History Messages type :\nTick to handle transitions with RequestAnimationFrame\nBack to handle back buttons\n",
+        "args": [],
+        "cases": [
+          [
+            "Back",
+            []
+          ]
+        ]
+      }
+    ],
+    "values": [
+      {
+        "name": "handleStandardHistory",
+        "comment": " handle model's history update using historyMsg\n",
+        "type": "Router.StandardHistoryMsg -> { a | history : Router.History route } -> ( { a | history : Router.History route }, Platform.Cmd.Cmd msg )"
+      },
+      {
+        "name": "headerButton",
+        "comment": " display button\n",
+        "type": "msg -> String -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "headerElement",
+        "comment": " display header\n",
+        "type": "{ a | center : BodyBuilder.Node msg, left : BodyBuilder.Node msg, right : BodyBuilder.Node msg } -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "historyView",
+        "comment": " display the current possible transition from one page to the other using\nthe history and its own routing system\n",
+        "type": "(Router.Page route -> data -> Maybe.Maybe Router.Transition -> BodyBuilder.Node msg) -> Router.History route -> data -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "initHistoryAndData",
+        "comment": " initialize history and data based on the routing system\n",
+        "type": "route -> data -> { history : Router.History route, data : data }"
+      },
+      {
+        "name": "maybeTransitionSubscription",
+        "comment": " maybe transition subscription\n",
+        "type": "(Router.StandardHistoryMsg -> msg) -> Maybe.Maybe a -> Platform.Sub.Sub msg"
+      },
+      {
+        "name": "pageWithDefaultTransition",
+        "comment": " creates a page with the defaultTransition\n",
+        "type": "route -> Router.Page route"
+      },
+      {
+        "name": "pageWithHeader",
+        "comment": " ",
+        "type": "BodyBuilder.Node msg -> BodyBuilder.Node msg -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "pageWithTransition",
+        "comment": " creates a page with a custom transition\n",
+        "type": "Router.Transition -> route -> Router.Page route"
+      },
+      {
+        "name": "pageWithoutTransition",
+        "comment": " creates a page without any transition\n",
+        "type": "route -> Router.Page route"
+      },
+      {
+        "name": "push",
+        "comment": " push a page into history\n",
+        "type": "Router.Page route -> Router.History route -> Router.History route"
+      },
+      {
+        "name": "slideUp",
+        "comment": " slideUp transition\n",
+        "type": "Router.Transition"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "BodyBuilder",
+    "comment": " This module entirely replaces Html, providing a type-safer alternatives.\nThis also manages inlining styling through Elegant.\nIt is perfectly compatible with Html, though.\n\n- [Types](#types)\n  - [Elements](#elements-types)\n  - [Attributes](#attributes)\n- [Elements](#elements)\n  - [Special](#special)\n  - [Inline](#inline)\n  - [Block](#block)\n- [Program](#program)\n\n# Types\n\n\n## Elements Types\n\n@docs Node, FlexItem, GridItem, Option\n\n\n## Attributes\n\n@docs BlockAttributes\n\n\n# Elements\n\n\n## Special\n\n@docs text, none, flexItem, gridItem, option, br\n\n\n## Inline\n\nThose elements are inline by default. However, their behavior can be overrided by\nusing `Style.block []`. They become block, and behaves like this.\n\n@docs node, span, flex, grid, a, button, img, audio, inputColor, inputFile, inputHidden, inputNumber, inputCheckbox, inputPassword, inputRadio, inputRange, inputSubmit, inputTel, inputText, inputUrl, progress, select, textarea\n\n\n## Block\n\nThose elements are block by default. Their behavior can't be overrided.\nIt is possible to style those elements using `Style.blockProperties`.\n\n@docs div, header, footer, nav, section, article, aside, h1, h2, h3, h4, h5, h6, p\n\n\n# Program\n\n@docs program\n\n",
+    "aliases": [
+      {
+        "name": "BlockAttributes",
+        "comment": " Represents the attributes for a block element, i.e. an element which can't be\nanything else other than a block. This includes titles, paragraph, section, nav,\narticle, aside, footer, header and div. This element have to use `Style.blockProperties`\nto set style on them.\n",
+        "args": [
+          "msg"
+        ],
+        "type": "BodyBuilder.Attributes.HeadingAttributes msg"
+      },
+      {
+        "name": "Node",
+        "comment": " The main type of BodyBuilder. It is an alias to Html, in order to keep\nperfect backward compatibility.\n",
+        "args": [
+          "msg"
+        ],
+        "type": "Html.Html msg"
+      }
+    ],
+    "types": [
+      {
+        "name": "FlexItem",
+        "comment": " The type of the flex items. A flex container contains only specific items.\nThose are represented by this type. They're generated by the flexItem function,\nto be used exclusively in flex.\n",
+        "args": [
+          "msg"
+        ],
+        "cases": []
+      },
+      {
+        "name": "GridItem",
+        "comment": " The type of the grid items. A grid container contains only specific items.\nThose are represented by this type. They're generated by the gridItem function,\nto be used exclusively in grid.\n",
+        "args": [
+          "msg"
+        ],
+        "cases": []
+      },
+      {
+        "name": "Option",
+        "comment": " Represents the different options used in select items. They're generated by\nthe option function, exclusively to be used in select.\n",
+        "args": [
+          "msg"
+        ],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "a",
+        "comment": " Generates a link in the DOM. A link is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an a whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineLink : Node msg\n    inlineLink =\n        -- This produces an inline a in the DOM.\n        BodyBuilder.a [] []\n\n    blockLink : Node msg\n    blockLink =\n        -- This produces a block a in the DOM.\n        BodyBuilder.a [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.AAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "article",
+        "comment": " Generates the corresponding article in the DOM. This is used mainly to respect\nthe HTML semantic and for accessibility.\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.BlockAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "aside",
+        "comment": " Generates the corresponding aside in the DOM. This is used mainly to respect\nthe HTML semantic and for accessibility.\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.BlockAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "audio",
+        "comment": " Generates an audio in the DOM. An audio is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an audio whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineAudio : Node msg\n    inlineAudio =\n        -- This produces an inline audio in the DOM.\n        BodyBuilder.audio [] []\n\n    blockAudio : Node msg\n    blockAudio =\n        -- This produces a block audio in the DOM.\n        BodyBuilder.audio [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.AudioAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "br",
+        "comment": " Puts a br in the DOM. You can't set any attributes or events on it, since\nyou want br to insert a carriage return.\n",
+        "type": "BodyBuilder.Node msg"
+      },
+      {
+        "name": "button",
+        "comment": " Generates a button in the DOM. A button is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an button whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineButton : Node msg\n    inlineButton =\n        -- This produces an inline button in the DOM.\n        BodyBuilder.button [] []\n\n    blockButton : Node msg\n    blockButton =\n        -- This produces a block button in the DOM.\n        BodyBuilder.button [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.ButtonAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "div",
+        "comment": " For backward compatibilty. It behaves like div in Html.\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.BlockAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "flex",
+        "comment": " Generates an inline flex in the DOM. A flex is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use a flex whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineFlex : Node msg\n    inlineFlex =\n        -- This produces an inline flex in the DOM.\n        BodyBuilder.flex [] []\n\n    blockFlex : Node msg\n    blockFlex =\n        -- This produces a block flex in the DOM.\n        BodyBuilder.flex [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.FlexContainerAttributes msg) -> List (BodyBuilder.FlexItem msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "flexItem",
+        "comment": " Generates a flexItem in the DOM. A flexItem is only used inside flex, and\ncan contains the specific styling of the flexChildren.\n\n    flexElement : Node msg\n    flexElement =\n        BodyBuilder.flex []\n            [ BodyBuilder.flexItem []\n                [ Html.text \"I'm inside a flex-item!\" ]\n            ]\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.FlexItemAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.FlexItem msg"
+      },
+      {
+        "name": "footer",
+        "comment": " Generates the corresponding footer in the DOM. This is used mainly to respect\nthe HTML semantic and for accessibility.\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.BlockAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "grid",
+        "comment": " Generates an inline grid in the DOM. A grid is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use a grid whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineGrid : Node msg\n    inlineGrid =\n        -- This produces an inline grid in the DOM.\n        BodyBuilder.grid [] []\n\n    blockGrid : Node msg\n    blockGrid =\n        -- This produces a block grid in the DOM.\n        BodyBuilder.grid [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.GridContainerAttributes msg) -> List (BodyBuilder.GridItem msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "gridItem",
+        "comment": " Generates a gridItem in the DOM. A gridItem is only used inside grid, and\ncan contains the specific styling of the gridChildren.\n\n    gridElement : Node msg\n    gridElement =\n        BodyBuilder.grid []\n            [ BodyBuilder.gridItem []\n                [ Html.text \"I'm inside a grid-item!\" ]\n            ]\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.GridItemAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.GridItem msg"
+      },
+      {
+        "name": "h1",
+        "comment": " Generates an h1 in the DOM. An h1 is block, and can't be anything else.\nYou can add custom block style on it, but can't turn it inline.\n\n    title : Node msg\n    title =\n        BodyBuilder.h1\n            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]\n            [ Html.text \"I'm inside a title!\" ]\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.HeadingAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "h2",
+        "comment": " Generates an h2 in the DOM. An h2 is block, and can't be anything else.\nYou can add custom block style on it, but can't turn it inline.\n\n    title : Node msg\n    title =\n        BodyBuilder.h2\n            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]\n            [ Html.text \"I'm inside a title!\" ]\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.HeadingAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "h3",
+        "comment": " Generates an h3 in the DOM. An h3 is block, and can't be anything else.\nYou can add custom block style on it, but can't turn it inline.\n\n    title : Node msg\n    title =\n        BodyBuilder.h3\n            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]\n            [ Html.text \"I'm inside a title!\" ]\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.HeadingAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "h4",
+        "comment": " Generates an h4 in the DOM. An h4 is block, and can't be anything else.\nYou can add custom block style on it, but can't turn it inline.\n\n    title : Node msg\n    title =\n        BodyBuilder.h4\n            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]\n            [ Html.text \"I'm inside a title!\" ]\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.HeadingAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "h5",
+        "comment": " Generates an h5 in the DOM. An h5 is block, and can't be anything else.\nYou can add custom block style on it, but can't turn it inline.\n\n    title : Node msg\n    title =\n        BodyBuilder.h5\n            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]\n            [ Html.text \"I'm inside a title!\" ]\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.HeadingAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "h6",
+        "comment": " Generates an h6 in the DOM. An h6 is block, and can't be anything else.\nYou can add custom block style on it, but can't turn it inline.\n\n    title : Node msg\n    title =\n        BodyBuilder.h6\n            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]\n            [ Html.text \"I'm inside a title!\" ]\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.HeadingAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "header",
+        "comment": " Generates the corresponding header in the DOM. This is used mainly to respect\nthe HTML semantic and for accessibility.\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.BlockAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "img",
+        "comment": " Generates an image in the DOM. An image is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an img whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineImage : Node msg\n    inlineImage =\n        -- This produces an inline img in the DOM.\n        BodyBuilder.img [] []\n\n    blockImage : Node msg\n    blockImage =\n        -- This produces a block img in the DOM.\n        BodyBuilder.img [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "String -> String -> Helpers.Shared.Modifiers (BodyBuilder.Attributes.ImgAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputCheckbox",
+        "comment": " Generates a checkbox input in the DOM. A checkbox input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputCheckbox whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineCheckboxInput : Node msg\n    inlineCheckboxInput =\n        -- This produces an inline checkbox input in the DOM.\n        BodyBuilder.inputCheckbox [] []\n\n    blockCheckboxInput : Node msg\n    blockCheckboxInput =\n        -- This produces a block checkbox input in the DOM.\n        BodyBuilder.inputCheckbox [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputCheckboxAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputColor",
+        "comment": " Generates a color input in the DOM. A color input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputColor whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineColorInput : Node msg\n    inlineColorInput =\n        -- This produces an inline color input in the DOM.\n        BodyBuilder.inputColor [] []\n\n    blockColorInput : Node msg\n    blockColorInput =\n        -- This produces a block color input in the DOM.\n        BodyBuilder.inputColor [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputColorAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputFile",
+        "comment": " Generates a file input in the DOM. A file input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputFile whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineFileInput : Node msg\n    inlineFileInput =\n        -- This produces an inline file input in the DOM.\n        BodyBuilder.inputFile [] []\n\n    blockFileInput : Node msg\n    blockFileInput =\n        -- This produces a block file input in the DOM.\n        BodyBuilder.inputFile [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputFileAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputHidden",
+        "comment": " Generates an hidden input in the DOM. An hidden input is not displayed in the DOM.\n\n    hiddenInput : Node msg\n    hiddenInput =\n        -- This produces an hidden input in the DOM.\n        BodyBuilder.inputHidden []\n\n",
+        "type": "Helpers.Shared.Modifiers BodyBuilder.Attributes.InputHiddenAttributes -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputNumber",
+        "comment": " Generates a number input in the DOM. A number input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputNumber whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineNumberInput : Node msg\n    inlineNumberInput =\n        -- This produces an inline number input in the DOM.\n        BodyBuilder.inputNumber [] []\n\n    blockNumberInput : Node msg\n    blockNumberInput =\n        -- This produces a block number input in the DOM.\n        BodyBuilder.inputNumber [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputNumberAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputPassword",
+        "comment": " Generates a password input in the DOM. A password input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputPassword whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlinePasswordInput : Node msg\n    inlinePasswordInput =\n        -- This produces an inline password input in the DOM.\n        BodyBuilder.inputPassword [] []\n\n    blockPasswordInput : Node msg\n    blockPasswordInput =\n        -- This produces a block password input in the DOM.\n        BodyBuilder.inputPassword [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputPasswordAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputRadio",
+        "comment": " Generates a radio input in the DOM. A radio input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputRadio whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineRadioInput : Node msg\n    inlineRadioInput =\n        -- This produces an inline radio input in the DOM.\n        BodyBuilder.inputRadio [] []\n\n    blockRadioInput : Node msg\n    blockRadioInput =\n        -- This produces a block radio input in the DOM.\n        BodyBuilder.inputRadio [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputRadioAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputRange",
+        "comment": " Generates a range input in the DOM. A range input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputRange whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineRangeInput : Node msg\n    inlineRangeInput =\n        -- This produces an inline range input in the DOM.\n        BodyBuilder.inputRange [] []\n\n    blockRangeInput : Node msg\n    blockRangeInput =\n        -- This produces a block range input in the DOM.\n        BodyBuilder.inputRange [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputRangeAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputSubmit",
+        "comment": " Generates a submit input in the DOM. A submit input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputSubmit whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineSubmitInput : Node msg\n    inlineSubmitInput =\n        -- This produces an inline submit input in the DOM.\n        BodyBuilder.inputSubmit [] []\n\n    blockSubmitInput : Node msg\n    blockSubmitInput =\n        -- This produces a block submit input in the DOM.\n        BodyBuilder.inputSubmit [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputSubmitAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputTel",
+        "comment": " Generates a tel input in the DOM. A tel input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputTel whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineTelInput : Node msg\n    inlineTelInput =\n        -- This produces an inline tel input in the DOM.\n        BodyBuilder.inputTel [] []\n\n    blockTelInput : Node msg\n    blockTelInput =\n        -- This produces a block tel input in the DOM.\n        BodyBuilder.inputTel [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputTextAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputText",
+        "comment": " Generates a text input in the DOM. A text input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputText whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineTextInput : Node msg\n    inlineTextInput =\n        -- This produces an inline text input in the DOM.\n        BodyBuilder.inputText [] []\n\n    blockTextInput : Node msg\n    blockTextInput =\n        -- This produces a block text input in the DOM.\n        BodyBuilder.inputText [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputTextAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "inputUrl",
+        "comment": " Generates an url input in the DOM. An url input is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an inputUrl whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineUrlInput : Node msg\n    inlineUrlInput =\n        -- This produces an inline url input in the DOM.\n        BodyBuilder.inputUrl [] []\n\n    blockUrlInput : Node msg\n    blockUrlInput =\n        -- This produces a block url input in the DOM.\n        BodyBuilder.inputUrl [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.InputUrlAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "nav",
+        "comment": " Generates the corresponding nav in the DOM. This is used mainly to respect\nthe HTML semantic and for accessibility.\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.BlockAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "node",
+        "comment": " Generates an empty inline node in the DOM. A node is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use a node whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineElement : Node msg\n    inlineElement =\n        -- This produces an inline node in the DOM.\n        BodyBuilder.node [] []\n\n    blockElement : Node msg\n    blockElement =\n        -- This produces a block node in the DOM.\n        BodyBuilder.node [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.NodeAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "none",
+        "comment": " Don't create anything in the DOM. This is useful when you have a conditionnal\nand are forced to return a Node.\n\n    textOrNone : Maybe String -> Node msg\n    textOrNone value =\n        case value of\n            Nothing ->\n                BodyBuilder.none\n\n            Just content ->\n                BodyBuilder.text content\n\n",
+        "type": "BodyBuilder.Node msg"
+      },
+      {
+        "name": "option",
+        "comment": " Generates an option in the DOM. An option is only used inside select, and\nconstituted of to String: the value and the content. It can also be selected, or not.\n\n    selectElement : Node msg\n    selectElement =\n        BodyBuilder.select []\n            [ BodyBuilder.option \"Paris\" \"We're in Paris!\" True\n            , BodyBuilder.option \"London\" \"We're in London!\" False\n            , BodyBuilder.option \"Berlin\" \"We're in Berlin!\" False\n            ]\n\n",
+        "type": "String -> String -> Bool -> BodyBuilder.Option msg"
+      },
+      {
+        "name": "p",
+        "comment": " Generates a p in the DOM. A p is block, and can't be anything else.\nYou can add custom block style on it, but can't turn it inline.\n\n    title : Node msg\n    title =\n        BodyBuilder.p\n            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]\n            [ Html.text \"I'm inside a paragrah!\" ]\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.HeadingAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "program",
+        "comment": " Creates a program, like you could with Html. This allows you to completely\noverrides Html to focus on BodyBuilder.\n",
+        "type": "{ init : ( model, Platform.Cmd.Cmd msg ) , subscriptions : model -> Platform.Sub.Sub msg , update : msg -> model -> ( model, Platform.Cmd.Cmd msg ) , view : model -> Html.Html msg } -> Platform.Program Basics.Never model msg"
+      },
+      {
+        "name": "progress",
+        "comment": " Generates a progress in the DOM. A progress is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an progress whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineProgress : Node msg\n    inlineProgress =\n        -- This produces an inline progress in the DOM.\n        BodyBuilder.progress [] []\n\n    blockProgress : Node msg\n    blockProgress =\n        -- This produces a block progress in the DOM.\n        BodyBuilder.progress [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.ProgressAttributes msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "section",
+        "comment": " Generates the corresponding section in the DOM. This is used mainly to respect\nthe HTML semantic and for accessibility.\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.BlockAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "select",
+        "comment": " Generates a select in the DOM. A select is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use a select whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineSelect : Node msg\n    inlineSelect =\n        -- This produces an inline select in the DOM.\n        BodyBuilder.select [] []\n\n    blockSelect : Node msg\n    blockSelect =\n        -- This produces a block select in the DOM.\n        BodyBuilder.select [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.SelectAttributes msg) -> List (BodyBuilder.Option msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "span",
+        "comment": " For backward compatibilty. It behaves like node, but avoids to rewrote all your\ncode when switching to BodyBuilder.\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.NodeAttributes msg) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "text",
+        "comment": " Puts plain text in the DOM. You can't set any attributes or events on it.\n",
+        "type": "String -> BodyBuilder.Node msg"
+      },
+      {
+        "name": "textarea",
+        "comment": " Generates a textarea in the DOM. A textarea is inline by default, but\nchanges its behavior when specifically set as block. You don't have to worry about\nthe display: use an textarea whenever you want, style like you want, it will adapt to\nwhat you wrote.\n\n    inlineTextarea : Node msg\n    inlineTextarea =\n        -- This produces an inline textarea in the DOM.\n        BodyBuilder.textarea [] []\n\n    blockTextarea : Node msg\n    blockTextarea =\n        -- This produces a block textarea in the DOM.\n        BodyBuilder.textarea [ BodyBuilder.Attributes.style [ Style.block [] ] ] []\n\n",
+        "type": "Helpers.Shared.Modifiers (BodyBuilder.Attributes.TextareaAttributes msg) -> BodyBuilder.Node msg"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Style",
+    "comment": "\n@docs box\n@docs block\n@docs blockProperties\n@docs flexContainerProperties\n@docs flexItemProperties\n@docs gridContainerProperties\n@docs gridItemProperties\n@docs waitForStyleSelector\n@docs media\n@docs setMedia\n@docs greater\n@docs lesser\n@docs between\n@docs pseudoClass\n@docs setPseudoClass\n@docs hover\n@docs focus\n",
+    "aliases": [],
+    "types": [],
+    "values": [
+      {
+        "name": "between",
+        "comment": " ",
+        "type": "Int -> Int -> BodyBuilder.Attributes.MediaQuery"
+      },
+      {
+        "name": "block",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Display.BlockDetails -> BodyBuilder.Attributes.StyleModifier (BodyBuilder.Attributes.MaybeBlockContainer a)"
+      },
+      {
+        "name": "blockProperties",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Display.BlockDetails -> BodyBuilder.Attributes.StyleModifier (BodyBuilder.Attributes.BlockContainer a)"
+      },
+      {
+        "name": "box",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Box.Box -> BodyBuilder.Attributes.StyleModifier (BodyBuilder.Attributes.BoxContainer a)"
+      },
+      {
+        "name": "flexContainerProperties",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Flex.FlexContainerDetails -> BodyBuilder.Attributes.StyleModifier (BodyBuilder.Attributes.FlexContainerAttributes msg)"
+      },
+      {
+        "name": "flexItemProperties",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Flex.FlexItemDetails -> BodyBuilder.Attributes.StyleModifier (BodyBuilder.Attributes.FlexItemAttributes msg)"
+      },
+      {
+        "name": "focus",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.StyleModifier a -> BodyBuilder.Attributes.StyleModifier a"
+      },
+      {
+        "name": "greater",
+        "comment": " ",
+        "type": "Int -> BodyBuilder.Attributes.MediaQuery"
+      },
+      {
+        "name": "gridContainerProperties",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Grid.GridContainerDetails -> BodyBuilder.Attributes.StyleModifier (BodyBuilder.Attributes.GridContainerAttributes msg)"
+      },
+      {
+        "name": "gridItemProperties",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Grid.GridItemDetails -> BodyBuilder.Attributes.StyleModifier (BodyBuilder.Attributes.GridItemAttributes msg)"
+      },
+      {
+        "name": "hover",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.StyleModifier a -> BodyBuilder.Attributes.StyleModifier a"
+      },
+      {
+        "name": "lesser",
+        "comment": " ",
+        "type": "Int -> BodyBuilder.Attributes.MediaQuery"
+      },
+      {
+        "name": "media",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.MediaQuery -> BodyBuilder.Attributes.StyleModifier a -> BodyBuilder.Attributes.StyleModifier a"
+      },
+      {
+        "name": "pseudoClass",
+        "comment": " ",
+        "type": "String -> BodyBuilder.Attributes.StyleModifier a -> BodyBuilder.Attributes.StyleModifier a"
+      },
+      {
+        "name": "setMedia",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.MediaQuery -> Helpers.Shared.Modifier BodyBuilder.Attributes.StyleSelector"
+      },
+      {
+        "name": "setPseudoClass",
+        "comment": " ",
+        "type": "String -> Helpers.Shared.Modifier BodyBuilder.Attributes.StyleSelector"
+      },
+      {
+        "name": "waitForStyleSelector",
+        "comment": " ",
+        "type": "(( a, BodyBuilder.Attributes.StyleSelector ) -> b -> b) -> a -> BodyBuilder.Attributes.StyleModifier b"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "BodyBuilder.Attributes",
+    "comment": " This module entirely replaces Html.Attributes, providing a type-safer alternatives.\nThis is designed to work with BodyBuilder.\nIt is not compatible with Html.Attributes, though.\n\n@docs AAttributes\n@docs aAttributesToHtmlAttributes\n@docs AudioAttributes\n@docs audioAttributesToHtmlAttributes\n@docs autocomplete\n@docs BlockAttributes\n@docs BlockContainer\n@docs BoxContainer\n@docs ButtonAttributes\n@docs buttonAttributesToHtmlAttributes\n@docs checked\n@docs CheckedContainer\n@docs class\n@docs ColorValue\n@docs data\n@docs DataAttribute\n@docs defaultAAttributes\n@docs defaultAudioAttributes\n@docs defaultButtonAttributes\n@docs defaultFlexContainerAttributes\n@docs defaultFlexItemAttributes\n@docs defaultFlowAttributes\n@docs defaultGridContainerAttributes\n@docs defaultGridItemAttributes\n@docs defaultHeadingAttributes\n@docs defaultImgAttributes\n@docs defaultInputCheckboxAttributes\n@docs defaultInputColorAttributes\n@docs defaultInputFileAttributes\n@docs defaultInputHiddenAttributes\n@docs defaultInputNumberAttributes\n@docs defaultInputPasswordAttributes\n@docs defaultInputRadioAttributes\n@docs defaultInputRangeAttributes\n@docs defaultInputSubmitAttributes\n@docs defaultInputTextAttributes\n@docs defaultInputUrlAttributes\n@docs defaultNodeAttributes\n@docs defaultProgressAttributes\n@docs defaultScriptAttributes\n@docs defaultSelectAttributes\n@docs defaultStyleSelector\n@docs defaultTextareaAttributes\n@docs defaultUniversalAttributes\n@docs disabled\n@docs DisabledAttribute\n@docs disabledAttributeToHtmlAttributes\n@docs FlexContainerAttributes\n@docs flexContainerAttributesToHtmlAttributes\n@docs FlexContainerProperties\n@docs FlexItemAttributes\n@docs flexItemAttributesToHtmlAttributes\n@docs FlexItemProperties\n@docs FlowAttributes\n@docs flowAttributesToHtmlAttributes\n@docs GridContainerAttributes\n@docs gridContainerAttributesToHtmlAttributes\n@docs GridContainerProperties\n@docs GridItemAttributes\n@docs gridItemAttributesToHtmlAttributes\n@docs GridItemProperties\n@docs HeadingAttributes\n@docs headingAttributesToHtmlAttributes\n@docs height\n@docs href\n@docs HrefAttribute\n@docs id\n@docs ImgAttributes\n@docs imgAttributesToHtmlAttributes\n@docs InputAttributes\n@docs inputAttributesToHtmlAttributes\n@docs InputCheckboxAttributes\n@docs inputCheckboxAttributesToHtmlAttributes\n@docs InputColorAttributes\n@docs inputColorAttributesToHtmlAttributes\n@docs InputFileAttributes\n@docs inputFileAttributesToHtmlAttributes\n@docs InputHiddenAttributes\n@docs inputHiddenAttributesToHtmlAttributes\n@docs InputNumberAttributes\n@docs inputNumberAttributesToHtmlAttributes\n@docs InputPasswordAttributes\n@docs inputPasswordAttributesToHtmlAttributes\n@docs InputRadioAttributes\n@docs inputRadioAttributesToHtmlAttributes\n@docs InputRangeAttributes\n@docs inputRangeAttributesToHtmlAttributes\n@docs InputSubmitAttributes\n@docs inputSubmitAttributesToHtmlAttributes\n@docs InputTextAttributes\n@docs inputTextAttributesToHtmlAttributes\n@docs InputUrlAttributes\n@docs inputUrlAttributesToHtmlAttributes\n@docs inputVisibleToHtmlAttributes\n@docs IntValue\n@docs label\n@docs LabelAttributes\n@docs max\n@docs MaxAttribute\n@docs MaybeBlockContainer\n@docs MediaQuery\n@docs min\n@docs MinAttribute\n@docs name\n@docs NameAttribute\n@docs NodeAttributes\n@docs nodeAttributesToHtmlAttributes\n@docs placeholder\n@docs PlaceholderAttribute\n@docs Position\n@docs PositionAttribute\n@docs ProgressAttributes\n@docs progressAttributesToHtmlAttributes\n@docs rawStyle\n@docs rawStyleToHtmlAttributes\n@docs ScriptAttributes\n@docs scriptAttributesToHtmlAttributes\n@docs SelectAttributes\n@docs selectAttributesToHtmlAttributes\n@docs setClass\n@docs setId\n@docs setTabIndex\n@docs setTitle\n@docs setUniversal\n@docs setUniversalIn\n@docs setValueInUniversal\n@docs step\n@docs StepAttribute\n@docs StringValue\n@docs style\n@docs StyleModifier\n@docs StyleSelector\n@docs tabindex\n@docs target\n@docs TargetAttribute\n@docs TextareaAttributes\n@docs textareaAttributesToHtmlAttributes\n@docs title\n@docs TypeContainer\n@docs UniversalAttributes\n@docs universalAttributesToHtmlAttributes\n@docs UniversalContainer\n@docs value\n@docs ValueAttribute\n@docs VisibleAttributes\n@docs VisibleAttributesAndEvents\n@docs visibleAttributesToHtmlAttributes\n@docs width\n@docs WidthAttribute\n\n",
+    "aliases": [
+      {
+        "name": "AAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , href : Maybe.Maybe String , target : Maybe.Maybe String , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "AudioAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , src : String , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "BlockAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ block : List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "BlockContainer",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | block : List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector ) }"
+      },
+      {
+        "name": "BoxContainer",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) }"
+      },
+      {
+        "name": "ButtonAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ disabled : Bool , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "CheckedContainer",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | checked : Bool }"
+      },
+      {
+        "name": "ColorValue",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "BodyBuilder.Attributes.ValueAttribute Color.Color a"
+      },
+      {
+        "name": "DataAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | data : List ( String, String ) }"
+      },
+      {
+        "name": "DisabledAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | disabled : Bool }"
+      },
+      {
+        "name": "FlexContainerAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ flexContainerProperties : List ( Helpers.Shared.Modifiers Flex.FlexContainerDetails , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "FlexContainerProperties",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | flexContainerProperties : List ( Helpers.Shared.Modifiers Flex.FlexContainerDetails , BodyBuilder.Attributes.StyleSelector ) }"
+      },
+      {
+        "name": "FlexItemAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ flexItemProperties : List ( Helpers.Shared.Modifiers Flex.FlexItemDetails , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "FlexItemProperties",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | flexItemProperties : List ( Helpers.Shared.Modifiers Flex.FlexItemDetails , BodyBuilder.Attributes.StyleSelector ) }"
+      },
+      {
+        "name": "FlowAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "GridContainerAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ gridContainerProperties : List ( Helpers.Shared.Modifiers Grid.GridContainerDetails , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "GridContainerProperties",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | gridContainerProperties : List ( Helpers.Shared.Modifiers Grid.GridContainerDetails , BodyBuilder.Attributes.StyleSelector ) }"
+      },
+      {
+        "name": "GridItemAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ gridItemProperties : List ( Helpers.Shared.Modifiers Grid.GridItemDetails , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "GridItemProperties",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | gridItemProperties : List ( Helpers.Shared.Modifiers Grid.GridItemDetails , BodyBuilder.Attributes.StyleSelector ) }"
+      },
+      {
+        "name": "HeadingAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "BodyBuilder.Attributes.BlockAttributes msg"
+      },
+      {
+        "name": "HrefAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | href : Maybe.Maybe String }"
+      },
+      {
+        "name": "ImgAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , src : String , alt : String , width : Maybe.Maybe Int , height : Maybe.Maybe Int , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "InputAttributes",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | type_ : String, name : Maybe.Maybe String }"
+      },
+      {
+        "name": "InputCheckboxAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ name : Maybe.Maybe String , type_ : String , universal : BodyBuilder.Attributes.UniversalAttributes , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , value : Maybe.Maybe String , label : Maybe.Maybe (BodyBuilder.Shared.Label msg) , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , checked : Bool , onCheckEvent : Maybe.Maybe (Bool -> msg) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "InputColorAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ name : Maybe.Maybe String , type_ : String , universal : BodyBuilder.Attributes.UniversalAttributes , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , label : Maybe.Maybe (BodyBuilder.Shared.Label msg) , rawStyle : Maybe.Maybe Elegant.Style , value : Maybe.Maybe Color.Color , onInputEvent : Maybe.Maybe (Color.Color -> msg) , fromStringInput : String -> Color.Color , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) }"
+      },
+      {
+        "name": "InputFileAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ name : Maybe.Maybe String , type_ : String , universal : BodyBuilder.Attributes.UniversalAttributes , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , label : Maybe.Maybe (BodyBuilder.Shared.Label msg) , rawStyle : Maybe.Maybe Elegant.Style , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) }"
+      },
+      {
+        "name": "InputHiddenAttributes",
+        "comment": " ",
+        "args": [],
+        "type": "{ name : Maybe.Maybe String , type_ : String , value : Maybe.Maybe String , universal : BodyBuilder.Attributes.UniversalAttributes }"
+      },
+      {
+        "name": "InputNumberAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ name : Maybe.Maybe String , type_ : String , universal : BodyBuilder.Attributes.UniversalAttributes , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , label : Maybe.Maybe (BodyBuilder.Shared.Label msg) , rawStyle : Maybe.Maybe Elegant.Style , value : Maybe.Maybe Int , onInputEvent : Maybe.Maybe (Int -> msg) , fromStringInput : String -> Int , step : Maybe.Maybe Int , max : Maybe.Maybe Int , min : Maybe.Maybe Int , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , disabled : Bool }"
+      },
+      {
+        "name": "InputPasswordAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "BodyBuilder.Attributes.InputTextAttributes msg"
+      },
+      {
+        "name": "InputRadioAttributes",
+        "comment": " InputStringValueAttributes msg {}\n",
+        "args": [
+          "msg"
+        ],
+        "type": "{ name : Maybe.Maybe String , type_ : String , universal : BodyBuilder.Attributes.UniversalAttributes , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , value : Maybe.Maybe String , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , label : Maybe.Maybe (BodyBuilder.Shared.Label msg) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "InputRangeAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "BodyBuilder.Attributes.InputNumberAttributes msg"
+      },
+      {
+        "name": "InputSubmitAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ label : Maybe.Maybe (BodyBuilder.Shared.Label msg) , type_ : String , disabled : Bool , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , onSubmitEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "InputTextAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ name : Maybe.Maybe String , type_ : String , universal : BodyBuilder.Attributes.UniversalAttributes , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , value : Maybe.Maybe String , label : Maybe.Maybe (BodyBuilder.Shared.Label msg) , placeholder : Maybe.Maybe String , autocomplete : Bool , onInputEvent : Maybe.Maybe (String -> msg) , fromStringInput : String -> String , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "InputUrlAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "BodyBuilder.Attributes.InputTextAttributes msg"
+      },
+      {
+        "name": "IntValue",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "BodyBuilder.Attributes.ValueAttribute Int a"
+      },
+      {
+        "name": "LabelAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , position : BodyBuilder.Attributes.Position , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "MaxAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | max : Maybe.Maybe Int }"
+      },
+      {
+        "name": "MaybeBlockContainer",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) }"
+      },
+      {
+        "name": "MinAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | min : Maybe.Maybe Int }"
+      },
+      {
+        "name": "NameAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | name : Maybe.Maybe String }"
+      },
+      {
+        "name": "NodeAttributes",
+        "comment": " Computed : MaybeBlockContainer (FlowAttributes msg)\n",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "PlaceholderAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | placeholder : Maybe.Maybe String }"
+      },
+      {
+        "name": "PositionAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | position : BodyBuilder.Attributes.Position }"
+      },
+      {
+        "name": "ProgressAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "ScriptAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , src : String , data : List ( String, String ) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "SelectAttributes",
+        "comment": " Computed : -- MaybeBlockContainer (StringValue (FlowAttributes msg))\n",
+        "args": [
+          "msg"
+        ],
+        "type": "{ block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , value : Maybe.Maybe String , onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , rawStyle : Maybe.Maybe Elegant.Style , onInputEvent : Maybe.Maybe (String -> msg) , fromStringInput : String -> String }"
+      },
+      {
+        "name": "StepAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | step : Maybe.Maybe Int }"
+      },
+      {
+        "name": "StringValue",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "BodyBuilder.Attributes.ValueAttribute String a"
+      },
+      {
+        "name": "StyleModifier",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "BodyBuilder.Attributes.StyleSelector -> Helpers.Shared.Modifier a"
+      },
+      {
+        "name": "StyleSelector",
+        "comment": " ",
+        "args": [],
+        "type": "{ media : Maybe.Maybe BodyBuilder.Attributes.MediaQuery , pseudoClass : Maybe.Maybe String }"
+      },
+      {
+        "name": "TargetAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | target : Maybe.Maybe String }"
+      },
+      {
+        "name": "TextareaAttributes",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , value : Maybe.Maybe String , onInputEvent : Maybe.Maybe (String -> msg) , fromStringInput : String -> String , name : Maybe.Maybe String , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "TypeContainer",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | type_ : String }"
+      },
+      {
+        "name": "UniversalAttributes",
+        "comment": " TitleAttribute (TabindexAttribute (IdAttribute (ClassAttribute {})))\n",
+        "args": [],
+        "type": "{ title : Maybe.Maybe String , tabindex : Maybe.Maybe Int , id : Maybe.Maybe String , class : List String }"
+      },
+      {
+        "name": "UniversalContainer",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | universal : BodyBuilder.Attributes.UniversalAttributes }"
+      },
+      {
+        "name": "ValueAttribute",
+        "comment": " ",
+        "args": [
+          "b",
+          "a"
+        ],
+        "type": "{ a | value : Maybe.Maybe b }"
+      },
+      {
+        "name": "VisibleAttributes",
+        "comment": " Computed : BoxContainer (UniversalContainer a)\n",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ), universal : BodyBuilder.Attributes.UniversalAttributes, rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "VisibleAttributesAndEvents",
+        "comment": " OnEvent msg (OnFocusEvent msg (OnBlurEvent msg (OnMouseEvents msg (VisibleAttributes a))))\n",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "{ a | onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg), onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ), onBlurEvent : Maybe.Maybe msg, onFocusEvent : Maybe.Maybe msg, box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ), universal : BodyBuilder.Attributes.UniversalAttributes, rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "WidthAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | width : Maybe.Maybe Int }"
+      }
+    ],
+    "types": [
+      {
+        "name": "MediaQuery",
+        "comment": " ",
+        "args": [],
+        "cases": [
+          [
+            "Greater",
+            [
+              "Int"
+            ]
+          ],
+          [
+            "Lesser",
+            [
+              "Int"
+            ]
+          ],
+          [
+            "Between",
+            [
+              "Int",
+              "Int"
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "Position",
+        "comment": " ",
+        "args": [],
+        "cases": [
+          [
+            "Before",
+            []
+          ],
+          [
+            "After",
+            []
+          ]
+        ]
+      }
+    ],
+    "values": [
+      {
+        "name": "aAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.AAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "audioAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.AudioAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "autocomplete",
+        "comment": " ",
+        "type": "a -> { c | autocomplete : b } -> { c | autocomplete : a }"
+      },
+      {
+        "name": "buttonAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.ButtonAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "checked",
+        "comment": " ",
+        "type": "Bool -> Helpers.Shared.Modifier (BodyBuilder.Attributes.InputCheckboxAttributes msg)"
+      },
+      {
+        "name": "class",
+        "comment": " ",
+        "type": "List String -> Helpers.Shared.Modifier { a | universal : BodyBuilder.Attributes.UniversalAttributes }"
+      },
+      {
+        "name": "data",
+        "comment": " ",
+        "type": "a -> { c | data : b } -> { c | data : a }"
+      },
+      {
+        "name": "defaultAAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.AAttributes msg"
+      },
+      {
+        "name": "defaultAudioAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.AudioAttributes msg"
+      },
+      {
+        "name": "defaultButtonAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.ButtonAttributes msg"
+      },
+      {
+        "name": "defaultFlexContainerAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.FlexContainerAttributes msg"
+      },
+      {
+        "name": "defaultFlexItemAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.FlexItemAttributes msg"
+      },
+      {
+        "name": "defaultFlowAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.FlowAttributes msg"
+      },
+      {
+        "name": "defaultGridContainerAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.GridContainerAttributes msg"
+      },
+      {
+        "name": "defaultGridItemAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.GridItemAttributes msg"
+      },
+      {
+        "name": "defaultHeadingAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.HeadingAttributes msg"
+      },
+      {
+        "name": "defaultImgAttributes",
+        "comment": " ",
+        "type": "String -> String -> BodyBuilder.Attributes.ImgAttributes msg"
+      },
+      {
+        "name": "defaultInputCheckboxAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputCheckboxAttributes msg"
+      },
+      {
+        "name": "defaultInputColorAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputColorAttributes msg"
+      },
+      {
+        "name": "defaultInputFileAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputFileAttributes msg"
+      },
+      {
+        "name": "defaultInputHiddenAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputHiddenAttributes"
+      },
+      {
+        "name": "defaultInputNumberAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputNumberAttributes msg"
+      },
+      {
+        "name": "defaultInputPasswordAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputPasswordAttributes msg"
+      },
+      {
+        "name": "defaultInputRadioAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputRadioAttributes msg"
+      },
+      {
+        "name": "defaultInputRangeAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputRangeAttributes msg"
+      },
+      {
+        "name": "defaultInputSubmitAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputSubmitAttributes msg"
+      },
+      {
+        "name": "defaultInputTextAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputTextAttributes msg"
+      },
+      {
+        "name": "defaultInputUrlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputUrlAttributes msg"
+      },
+      {
+        "name": "defaultNodeAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.NodeAttributes msg"
+      },
+      {
+        "name": "defaultProgressAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.ProgressAttributes msg"
+      },
+      {
+        "name": "defaultScriptAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.ScriptAttributes msg"
+      },
+      {
+        "name": "defaultSelectAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.SelectAttributes msg"
+      },
+      {
+        "name": "defaultStyleSelector",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.StyleSelector"
+      },
+      {
+        "name": "defaultTextareaAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.TextareaAttributes msg"
+      },
+      {
+        "name": "defaultUniversalAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.UniversalAttributes"
+      },
+      {
+        "name": "disabled",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier (BodyBuilder.Attributes.DisabledAttribute a)"
+      },
+      {
+        "name": "disabledAttributeToHtmlAttributes",
+        "comment": " ",
+        "type": "Bool -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "flexContainerAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.FlexContainerAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "flexItemAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.FlexItemAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "flowAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.FlowAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "gridContainerAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.GridContainerAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "gridItemAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.GridItemAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "headingAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.HeadingAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "height",
+        "comment": " ",
+        "type": "a -> { c | height : b } -> { c | height : Maybe.Maybe a }"
+      },
+      {
+        "name": "href",
+        "comment": " ",
+        "type": "String -> Helpers.Shared.Modifier (BodyBuilder.Attributes.HrefAttribute a)"
+      },
+      {
+        "name": "id",
+        "comment": " ",
+        "type": "String -> Helpers.Shared.Modifier { a | universal : BodyBuilder.Attributes.UniversalAttributes }"
+      },
+      {
+        "name": "imgAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.ImgAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputAttributes a -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputCheckboxAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputCheckboxAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputColorAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputColorAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputFileAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputFileAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputHiddenAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputHiddenAttributes -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputNumberAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputNumberAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputPasswordAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputPasswordAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputRadioAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputRadioAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputRangeAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputRangeAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputSubmitAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputSubmitAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputTextAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputTextAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputUrlAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.InputUrlAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputVisibleToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.VisibleAttributesAndEvents msg { a | name : Maybe.Maybe String, type_ : String } -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "label",
+        "comment": " ",
+        "type": "List (Html.Html msg) -> { c | label : Maybe.Maybe (BodyBuilder.Shared.Label msg) } -> { c | label : Maybe.Maybe (BodyBuilder.Shared.Label msg) }"
+      },
+      {
+        "name": "max",
+        "comment": " ",
+        "type": "Int -> Helpers.Shared.Modifier (BodyBuilder.Attributes.MaxAttribute a)"
+      },
+      {
+        "name": "min",
+        "comment": " ",
+        "type": "Int -> Helpers.Shared.Modifier (BodyBuilder.Attributes.MinAttribute a)"
+      },
+      {
+        "name": "name",
+        "comment": " ",
+        "type": "String -> Helpers.Shared.Modifier (BodyBuilder.Attributes.NameAttribute a)"
+      },
+      {
+        "name": "nodeAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.NodeAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "placeholder",
+        "comment": " ",
+        "type": "a -> { c | placeholder : b } -> { c | placeholder : Maybe.Maybe a }"
+      },
+      {
+        "name": "progressAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.ProgressAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "rawStyle",
+        "comment": " ",
+        "type": "a -> { c | rawStyle : b } -> { c | rawStyle : Maybe.Maybe a }"
+      },
+      {
+        "name": "rawStyleToHtmlAttributes",
+        "comment": " ",
+        "type": "Elegant.Style -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "scriptAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.ScriptAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "selectAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.SelectAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "setClass",
+        "comment": " ",
+        "type": "List String -> { a | class : List String } -> { a | class : List String }"
+      },
+      {
+        "name": "setId",
+        "comment": " ",
+        "type": "String -> { a | id : Maybe.Maybe String } -> { a | id : Maybe.Maybe String }"
+      },
+      {
+        "name": "setTabIndex",
+        "comment": " ",
+        "type": "Int -> { a | tabindex : Maybe.Maybe Int } -> { a | tabindex : Maybe.Maybe Int }"
+      },
+      {
+        "name": "setTitle",
+        "comment": " ",
+        "type": "String -> { a | title : Maybe.Maybe String } -> { a | title : Maybe.Maybe String }"
+      },
+      {
+        "name": "setUniversal",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.UniversalAttributes -> { a | universal : BodyBuilder.Attributes.UniversalAttributes } -> { a | universal : BodyBuilder.Attributes.UniversalAttributes }"
+      },
+      {
+        "name": "setUniversalIn",
+        "comment": " ",
+        "type": "{ a | universal : BodyBuilder.Attributes.UniversalAttributes } -> BodyBuilder.Attributes.UniversalAttributes -> { a | universal : BodyBuilder.Attributes.UniversalAttributes }"
+      },
+      {
+        "name": "setValueInUniversal",
+        "comment": " ",
+        "type": "(a -> BodyBuilder.Attributes.UniversalAttributes -> BodyBuilder.Attributes.UniversalAttributes) -> a -> { c | universal : BodyBuilder.Attributes.UniversalAttributes } -> { c | universal : BodyBuilder.Attributes.UniversalAttributes }"
+      },
+      {
+        "name": "step",
+        "comment": " ",
+        "type": "Int -> Helpers.Shared.Modifier (BodyBuilder.Attributes.StepAttribute a)"
+      },
+      {
+        "name": "style",
+        "comment": " ",
+        "type": "List (BodyBuilder.Attributes.StyleModifier a) -> Helpers.Shared.Modifier a"
+      },
+      {
+        "name": "tabindex",
+        "comment": " ",
+        "type": "Int -> Helpers.Shared.Modifier { a | universal : BodyBuilder.Attributes.UniversalAttributes }"
+      },
+      {
+        "name": "target",
+        "comment": " ",
+        "type": "String -> Helpers.Shared.Modifier (BodyBuilder.Attributes.TargetAttribute a)"
+      },
+      {
+        "name": "textareaAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.TextareaAttributes msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "title",
+        "comment": " ",
+        "type": "String -> Helpers.Shared.Modifier { a | universal : BodyBuilder.Attributes.UniversalAttributes }"
+      },
+      {
+        "name": "universalAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.UniversalAttributes -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "value",
+        "comment": " ",
+        "type": "a -> { c | value : b } -> { c | value : Maybe.Maybe a }"
+      },
+      {
+        "name": "visibleAttributesToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Attributes.VisibleAttributesAndEvents msg a -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "width",
+        "comment": " ",
+        "type": "Int -> Helpers.Shared.Modifier (BodyBuilder.Attributes.WidthAttribute a)"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Elegant",
+    "comment": "\n@docs Modifier\n@docs CommonStyle\n@docs commonStyle\n@docs commonStyleToCss\n@docs commonStyleToStyle\n@docs Modifiers\n@docs SizeUnit\n@docs Style\n@docs classes\n@docs color\n@docs em\n@docs emptyStyle\n@docs inlineStyle\n@docs opposite\n@docs percent\n@docs pt\n@docs px\n@docs rem\n@docs screenWidthBetween\n@docs screenWidthGE\n@docs screenWidthLE\n@docs setSuffix\n@docs style\n@docs styleToCss\n@docs toCommonStyle\n@docs toInlineStyles\n@docs vh\n@docs withScreenWidth\n",
+    "aliases": [
+      {
+        "name": "CommonStyle",
+        "comment": "\n",
+        "args": [],
+        "type": "Helpers.Style.Style"
+      },
+      {
+        "name": "Modifier",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "Helpers.Shared.Modifier a"
+      },
+      {
+        "name": "Modifiers",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "Helpers.Shared.Modifiers a"
+      },
+      {
+        "name": "SizeUnit",
+        "comment": " ",
+        "args": [],
+        "type": "Helpers.Shared.SizeUnit"
+      }
+    ],
+    "types": [
+      {
+        "name": "Style",
+        "comment": " Contains all style for an element used with Elegant.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "classes",
+        "comment": " Generate all the classes of a list of Styles\n",
+        "type": "Elegant.Style -> String"
+      },
+      {
+        "name": "color",
+        "comment": " ",
+        "type": "a -> { b | color : Maybe.Maybe a } -> { b | color : Maybe.Maybe a }"
+      },
+      {
+        "name": "commonStyle",
+        "comment": "\n",
+        "type": "Maybe.Maybe Display.DisplayBox -> List Helpers.Style.ScreenWidth -> Maybe.Maybe String -> Helpers.Style.Style"
+      },
+      {
+        "name": "commonStyleToCss",
+        "comment": "\n",
+        "type": "Elegant.CommonStyle -> String"
+      },
+      {
+        "name": "commonStyleToStyle",
+        "comment": "\n",
+        "type": "Elegant.CommonStyle -> Elegant.Style"
+      },
+      {
+        "name": "em",
+        "comment": " ",
+        "type": "Float -> Elegant.SizeUnit"
+      },
+      {
+        "name": "emptyStyle",
+        "comment": " ",
+        "type": "Elegant.Style"
+      },
+      {
+        "name": "inlineStyle",
+        "comment": " ",
+        "type": "Display.DisplayBox -> Html.Attribute msg"
+      },
+      {
+        "name": "opposite",
+        "comment": " Calculate the opposite of a size unit value.\nEx : opposite (Px 2) == Px -2\n",
+        "type": "Elegant.SizeUnit -> Elegant.SizeUnit"
+      },
+      {
+        "name": "percent",
+        "comment": " ",
+        "type": "Float -> Elegant.SizeUnit"
+      },
+      {
+        "name": "pt",
+        "comment": " ",
+        "type": "Int -> Elegant.SizeUnit"
+      },
+      {
+        "name": "px",
+        "comment": " ",
+        "type": "Int -> Elegant.SizeUnit"
+      },
+      {
+        "name": "rem",
+        "comment": " ",
+        "type": "Float -> Elegant.SizeUnit"
+      },
+      {
+        "name": "screenWidthBetween",
+        "comment": " ",
+        "type": "Int -> Int -> Display.DisplayBox -> Elegant.Modifier Elegant.Style"
+      },
+      {
+        "name": "screenWidthGE",
+        "comment": " ",
+        "type": "Int -> Display.DisplayBox -> Elegant.Modifier Elegant.Style"
+      },
+      {
+        "name": "screenWidthLE",
+        "comment": " ",
+        "type": "Int -> Display.DisplayBox -> Elegant.Modifier Elegant.Style"
+      },
+      {
+        "name": "setSuffix",
+        "comment": " ",
+        "type": "String -> Elegant.Style -> Elegant.Style"
+      },
+      {
+        "name": "style",
+        "comment": " ",
+        "type": "Display.DisplayBox -> Elegant.Style"
+      },
+      {
+        "name": "styleToCss",
+        "comment": " ",
+        "type": "Elegant.Style -> String"
+      },
+      {
+        "name": "toCommonStyle",
+        "comment": " ",
+        "type": "Elegant.Style -> Helpers.Style.Style"
+      },
+      {
+        "name": "toInlineStyles",
+        "comment": " ",
+        "type": "Elegant.Style -> List ( String, String )"
+      },
+      {
+        "name": "vh",
+        "comment": " ",
+        "type": "Float -> Elegant.SizeUnit"
+      },
+      {
+        "name": "withScreenWidth",
+        "comment": " ",
+        "type": "List Helpers.Style.ScreenWidth -> Elegant.Modifier Elegant.Style"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Block",
+    "comment": "\n@docs overflowHidden\n@docs alignCenter\n@docs alignRight\n@docs alignLeft\n@docs maxWidth\n@docs height\n@docs fullHeight\n@docs width\n",
+    "aliases": [],
+    "types": [],
+    "values": [
+      {
+        "name": "alignCenter",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "alignLeft",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "alignRight",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "fullHeight",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "height",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "maxWidth",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "overflowHidden",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "width",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Display.BlockDetails"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Display",
+    "comment": " Display contains everything about an element rendering. It is the basis of\nevery style, for every element. Each element can be block, inline, flow or flex.\n\n\n# Types\n\n@docs DisplayBox\n@docs Contents\n@docs OutsideDisplay\n@docs InsideDisplay\n@docs BlockDetails\n@docs ListStyleType\n@docs Alignment\n@docs TextOverflow\n@docs defaultBlockDetails\n\n\n# Modifiers\n\n\n## List\n\n@docs listStyleNone\n@docs listStyleDisc\n@docs listStyleCircle\n@docs listStyleSquare\n@docs listStyleDecimal\n@docs listStyleGeorgian\n\n\n## Alignment\n\n@docs alignment\n@docs right\n@docs center\n@docs left\n@docs justify\n\n\n## Overflow\n\n@docs overflow\n@docs textOverflowEllipsis\n\n## Dimensions\n@docs dimensions\n@docs fullWidth\n\n\n# Compilation\n\n@docs displayBoxToCouples\n\n",
+    "aliases": [
+      {
+        "name": "BlockDetails",
+        "comment": " Contains all styles which can be applied to a block.\nIt is automatically instanciated by `Display.block`.\n",
+        "args": [],
+        "type": "{ listStyleType : Maybe.Maybe Display.ListStyleType , alignment : Maybe.Maybe Display.Alignment , overflow : Maybe.Maybe Overflow.FullOverflow , textOverflow : Maybe.Maybe Display.TextOverflow , dimensions : Maybe.Maybe Dimensions.Dimensions }"
+      },
+      {
+        "name": "Contents",
+        "comment": " ",
+        "args": [],
+        "type": "{ outsideDisplay : Display.OutsideDisplay , insideDisplay : Display.InsideDisplay , maybeBox : Maybe.Maybe Box.Box }"
+      }
+    ],
+    "types": [
+      {
+        "name": "Alignment",
+        "comment": " Represents the alignment inside a block. Can be center, right, left or justify.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "DisplayBox",
+        "comment": " Represents a box and contains all the style inside.\nIf the display is none, no style is included. Otherwise, the display\ntype requires the corresponding styles. I.e. if using a flex container,\nthen only styles applying to flex container can be used. If using a block\ncontainer, only styles applying to block can be used, and so on.\n\nYou don't use it directly, but rather generating one with the corresponding\nfunctions, then giving it to a function which needs one. If you want to bypass\nit, you can use `Display.displayBoxToCouples`, which generates the equivalent\nCSS.\n\n",
+        "args": [],
+        "cases": [
+          [
+            "None",
+            []
+          ],
+          [
+            "ContentsWrapper",
+            [
+              "Display.Contents"
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "InsideDisplay",
+        "comment": " Represents the style from inside a display.\nCan be flow, or flex (and containing flex details).\n",
+        "args": [],
+        "cases": [
+          [
+            "Flow",
+            []
+          ],
+          [
+            "FlexContainer",
+            [
+              "Maybe.Maybe Flex.FlexContainerDetails"
+            ]
+          ],
+          [
+            "GridContainer",
+            [
+              "Maybe.Maybe Grid.GridContainerDetails"
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "ListStyleType",
+        "comment": " Represents the type of the list style.\nCan be none, disc, circle, square, decimal or georgian.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "OutsideDisplay",
+        "comment": " Represents the style from outside the display.\nCan be inline, block, or flex-item.\n",
+        "args": [],
+        "cases": [
+          [
+            "Inline",
+            []
+          ],
+          [
+            "Block",
+            [
+              "Maybe.Maybe Display.BlockDetails"
+            ]
+          ],
+          [
+            "FlexItem",
+            [
+              "Maybe.Maybe Flex.FlexItemDetails",
+              "Maybe.Maybe Display.BlockDetails"
+            ]
+          ],
+          [
+            "GridItem",
+            [
+              "Maybe.Maybe Grid.GridItemDetails",
+              "Maybe.Maybe Display.BlockDetails"
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "TextOverflow",
+        "comment": " Represents the text-overflow.\nCan be ellipsis.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "alignment",
+        "comment": " Accepts the alignment and modifies the block accordingly.\n",
+        "type": "Display.Alignment -> Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "center",
+        "comment": " Defines the alignment as center.\n",
+        "type": "Display.Alignment"
+      },
+      {
+        "name": "defaultBlockDetails",
+        "comment": " ",
+        "type": "Display.BlockDetails"
+      },
+      {
+        "name": "dimensions",
+        "comment": " Accepts dimensions modifiers and modifies the block accordingly.\n",
+        "type": "Helpers.Shared.Modifiers Dimensions.Dimensions -> Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "displayBoxToCouples",
+        "comment": " Compiles a DisplayBox to the corresponding CSS list of tuples.\nHandles only defined styles, ignoring `Nothing` fields.\n",
+        "type": "Display.DisplayBox -> List ( String, String )"
+      },
+      {
+        "name": "fullWidth",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "justify",
+        "comment": " Defines the alignment as justify.\n",
+        "type": "Display.Alignment"
+      },
+      {
+        "name": "left",
+        "comment": " Defines the alignment as left.\n",
+        "type": "Display.Alignment"
+      },
+      {
+        "name": "listStyleCircle",
+        "comment": " Set the list style to circle.\n",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "listStyleDecimal",
+        "comment": " Set the list style to decimal.\n",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "listStyleDisc",
+        "comment": " Set the list style to disc.\n",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "listStyleGeorgian",
+        "comment": " Set the list style to georgian.\n",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "listStyleNone",
+        "comment": " Set the list style to none.\n",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "listStyleSquare",
+        "comment": " Set the list style to square.\n",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "overflow",
+        "comment": " Accepts a list of Overflow modifiers and modifies the block accordingly.\n",
+        "type": "Helpers.Shared.Modifiers Overflow.FullOverflow -> Helpers.Shared.Modifier Display.BlockDetails"
+      },
+      {
+        "name": "right",
+        "comment": " Defines the alignment as right.\n",
+        "type": "Display.Alignment"
+      },
+      {
+        "name": "textOverflowEllipsis",
+        "comment": " Modifies the block to give an text-overflow ellipsis.\n",
+        "type": "Helpers.Shared.Modifier Display.BlockDetails"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Box",
+    "comment": " Handles all modifications for the box. You don't need to instanciate one,\nas it's automatically done by Elegant and the different display elements.\nIt contains only modifiers, and they can be found in the respective modules.\n\n\n# Types\n\n@docs Box\n@docs Visibility\n\n\n# Modifiers\n\n@docs appearanceNone\n@docs background\n@docs border\n@docs boxShadow\n@docs shadow\n@docs corner\n@docs cursor\n@docs margin\n@docs opacity\n@docs outline\n@docs padding\n@docs position\n@docs typography\n@docs visibility\n@docs zIndex\n\n\n# Shortcuts\n\n@docs outlineNone\n@docs backgroundColor\n@docs cornerRound\n@docs cornerRadius\n@docs borderNone\n@docs borderColor\n@docs borderWidth\n@docs borderSolid\n@docs paddingAll\n@docs paddingHorizontal\n@docs paddingVertical\n@docs paddingTop\n@docs paddingRight\n@docs paddingBottom\n@docs paddingLeft\n@docs shadowCenteredBlurry\n@docs marginAuto\n@docs fontFamilySansSerif\n@docs systemFont\n@docs textColor\n\n\n# Values\n\n@docs default\n@docs visible\n@docs hidden\n\n\n# Compilation\n\n@docs boxToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Box",
+        "comment": " Represents a box, handling the properties of blocks. They are automatically\ninstanciated to avoid to deal with it directly. The focus is on the modifiers, available\nin respective modules.\n\n    Elegant.displayBlock []\n        [ Box.cursor Cursor.default\n        -- You can use any Box functions here to add custom style...\n        ]\n\n",
+        "args": [],
+        "type": "{ appearance : Maybe.Maybe String , background : Maybe.Maybe Background.Background , border : Maybe.Maybe (Surrounded.Surrounded Border.Border) , boxShadow : Maybe.Maybe Shadow.Shadow , corner : Maybe.Maybe Corner.Corner , cursor : Maybe.Maybe Cursor.Cursor , margin : Maybe.Maybe (Surrounded.Surrounded Margin.Margin) , opacity : Maybe.Maybe Float , outline : Maybe.Maybe Outline.Outline , padding : Maybe.Maybe (Surrounded.Surrounded Padding.Padding) , position : Maybe.Maybe Position.Position , typography : Maybe.Maybe Typography.Typography , visibility : Maybe.Maybe Box.Visibility , zIndex : Maybe.Maybe Int }"
+      }
+    ],
+    "types": [
+      {
+        "name": "Visibility",
+        "comment": " Defines the visibility of an element. It can be either visible or hidden.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "appearanceNone",
+        "comment": " Accepts an Int for the `zIndex` and modifies the Box accordingly.\n",
+        "type": "Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "background",
+        "comment": " Accepts a list of modifiers for the `Background` and modifies the Box accordingly.\n",
+        "type": "Helpers.Shared.Modifiers Background.Background -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "backgroundColor",
+        "comment": " ",
+        "type": "Color.Color -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "border",
+        "comment": " Accepts a list of modifiers for the `Border` and modifies the Box accordingly.\n",
+        "type": "Helpers.Shared.Modifiers (Surrounded.Surrounded Border.Border) -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "borderColor",
+        "comment": " ",
+        "type": "Color.Color -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "borderNone",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "borderSolid",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "borderWidth",
+        "comment": " ",
+        "type": "Int -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "boxShadow",
+        "comment": " Accepts a list of modifiers for the `Shadow` and modifies the Box accordingly.\n",
+        "type": "Helpers.Shared.Modifiers Shadow.Shadow -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "boxToCouples",
+        "comment": " Compiles a `Box` to the corresponding CSS list of tuples.\nCompiles only the defined styles, ignoring the `Nothing` fields.\n",
+        "type": "Box.Box -> List ( String, String )"
+      },
+      {
+        "name": "corner",
+        "comment": " Accepts a list of modifiers for the `Corner` and modifies the Box accordingly.\n",
+        "type": "Helpers.Shared.Modifiers Corner.Corner -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "cornerRadius",
+        "comment": " ",
+        "type": "Int -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "cornerRound",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "cursor",
+        "comment": " Accepts a `Cursor` and modifies the Box accordingly.\n",
+        "type": "Cursor.Cursor -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "default",
+        "comment": " Generates a default empty Box.\n",
+        "type": "Box.Box"
+      },
+      {
+        "name": "fontFamilySansSerif",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "hidden",
+        "comment": " ",
+        "type": "Box.Visibility"
+      },
+      {
+        "name": "margin",
+        "comment": " Accepts a list of modifiers for the `Margin` and modifies the Box accordingly.\n",
+        "type": "Helpers.Shared.Modifiers (Surrounded.Surrounded Margin.Margin) -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "marginAuto",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "opacity",
+        "comment": " Accepts a size for the `opacity` and modifies the Box accordingly.\n",
+        "type": "Float -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "outline",
+        "comment": " Accepts a list of modifiers for the `Outline` and modifies the Box accordingly.\n",
+        "type": "Helpers.Shared.Modifiers Outline.Outline -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "outlineNone",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "padding",
+        "comment": " Accepts a list of modifiers for the `Padding` and modifies the Box accordingly.\n",
+        "type": "Helpers.Shared.Modifiers (Surrounded.Surrounded Padding.Padding) -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "paddingAll",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "paddingBottom",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "paddingHorizontal",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "paddingLeft",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "paddingRight",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "paddingTop",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "paddingVertical",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "position",
+        "comment": " Accepts a `Position` and modifies the Box accordingly.\n",
+        "type": "Position.Position -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "shadow",
+        "comment": " Alias of boxShadow\n",
+        "type": "Helpers.Shared.Modifiers Shadow.Shadow -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "shadowCenteredBlurry",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Color.Color -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "systemFont",
+        "comment": " ",
+        "type": "String -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "textColor",
+        "comment": " ",
+        "type": "Color.Color -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "typography",
+        "comment": " Accepts a list of modifiers for the `Typography` and modifies the Box accordingly.\n",
+        "type": "Helpers.Shared.Modifiers Typography.Typography -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "visibility",
+        "comment": " Accepts a `Visibility` and modifies the Box accordingly.\n",
+        "type": "Box.Visibility -> Helpers.Shared.Modifier Box.Box"
+      },
+      {
+        "name": "visible",
+        "comment": " ",
+        "type": "Box.Visibility"
+      },
+      {
+        "name": "zIndex",
+        "comment": " Accepts an Int for the `zIndex` and modifies the Box accordingly.\n",
+        "type": "Int -> Helpers.Shared.Modifier Box.Box"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Typography",
+    "comment": " Typography contains everything about fonts and characters rendering.\n\n\n# Types\n\n@docs Typography\n@docs Capitalization\n@docs Decoration\n@docs WhiteSpaceWrap\n@docs UserSelect\n@docs Normal\n\n\n# Default typography\n\n@docs default\n\n\n# Typography modifiers\n\n\n## Characters rendering\n\n@docs character\n\n\n## Text Transformations\n\n@docs capitalize\n@docs lowercase\n@docs uppercase\n\n\n## Text Decorations\n\n@docs underline\n@docs lineThrough\n@docs noDecoration\n\n\n## Whitespace Management\n\n@docs whiteSpaceNoWrap\n\n\n## User Interactions\n\n@docs userSelect\n\n\n## Line Height\n\n@docs lineHeightNormal\n@docs lineHeight\n\n\n# Shortcuts\n\n@docs fontSize\n@docs bold\n\n\n# Compilation\n\n@docs typographyToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Typography",
+        "comment": " The `Typography` record contains everything about fonts rendering,\nincluding character rendering. You probably won't use it as is, but instead using\n`Box.typography` which automatically generate an empty `Typography` record. You\ncan then use modifiers. I.E.\n\n    Box.typography\n        [ Typography.color Color.white\n        , Typography.italic\n        ]\n\n",
+        "args": [],
+        "type": "{ character : Maybe.Maybe Character.Character , capitalization : Maybe.Maybe Typography.Capitalization , decoration : Maybe.Maybe Typography.Decoration , color : Maybe.Maybe Color.Color , whiteSpaceWrap : Maybe.Maybe Typography.WhiteSpaceWrap , userSelect : Maybe.Maybe Typography.UserSelect , lineHeight : Maybe.Maybe (Either.Either Helpers.Shared.SizeUnit Typography.Normal) }"
+      },
+      {
+        "name": "UserSelect",
+        "comment": " Represents the interaction with the user. If set to `True`, the user\ncan interact with the text, i.e. can select it, copy and paste. If set to\n`False`, nothing can be done.\n",
+        "args": [],
+        "type": "Bool"
+      }
+    ],
+    "types": [
+      {
+        "name": "Capitalization",
+        "comment": " Represents the possible transformations of the text.\nIt can be Uppercase, Lowercase, or Capitalize. They are created by `uppercase`,\n`lowercase` and `capitalize`.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "Decoration",
+        "comment": " Represents the possible decorations of the text.\nIt can be None, Underline or LineThrough. They are created by `noDecoration`,\n`underline` and `lineThrough`.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "Normal",
+        "comment": " Value representing the 'normal' value in `line-height`.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "WhiteSpaceWrap",
+        "comment": " Represents the whitespaces management in the text.\nIt can be NoWrap, and created by `whiteSpaceNoWrap`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "bold",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "capitalize",
+        "comment": " Capitalize the first letter in the text.\n'just an example' is transformed in 'Just an example'.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "character",
+        "comment": " Modify the character rendering of the text. The characters options are in\n`Typography.Character`.\nIt creates a default empty `Character` record, modifies it according to the\nmodifiers, then set the resulting `Character` in Typography.\n\n    Typography.character\n        [ Typography.Character.weight 700\n        , Typography.Character.italic\n        ]\n\n",
+        "type": "Helpers.Shared.Modifiers Character.Character -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Typography` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Box.typography`.\n",
+        "type": "Typography.Typography"
+      },
+      {
+        "name": "fontSize",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "lineHeight",
+        "comment": " Set the lineHeight to the desired value. Can be px, pt, vh, em or rem.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "lineHeightNormal",
+        "comment": " Set the lineHeight property to respect the space defined by the User Agent of\nthe user's browser. It usually is 1.2em, but can vary.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "lineThrough",
+        "comment": " Print a line through the text.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "lowercase",
+        "comment": " Turn the entire text in lowercase.\n'JuST an ExAMPle' is transformed in 'just an example'.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "noDecoration",
+        "comment": " Remove every decoration (underline or lineThrough) on the text.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "typographyToCouples",
+        "comment": " Compiles a `Typography` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Typography.Typography -> List ( String, String )"
+      },
+      {
+        "name": "underline",
+        "comment": " Underline the text.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "uppercase",
+        "comment": " Turn the entire text in uppercase.\n'JuST an ExAMPle' is transformed in 'JUST AN EXAMPLE'.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "userSelect",
+        "comment": " Allow or disallow user to interact with the text, i.e. select, copy, etc.\n",
+        "type": "Bool -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "whiteSpaceNoWrap",
+        "comment": " Cancel the wrapping of the text on whitespaces. It forces text to stay on one line.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Shadow",
+    "comment": " Shadow contains everything about boxShadow.\n\n\n# Types\n\n@docs Shadow\n\n\n# Default box shadow\n\n@docs default\n\n\n# Shadow modifiers\n\n@docs inset\n@docs blurRadius\n@docs spreadRadius\n@docs offset\n@docs standard\n@docs plain\n@docs blurry\n\n\n# Compilation\n\n@docs boxShadowToCouple\n\n",
+    "aliases": [
+      {
+        "name": "Shadow",
+        "comment": " The Shadow record contains everything about box shadow.\nYou probably won't use it as is, but instead using `Elegant.boxShadow`\nwhich automatically generate an empty `Shadow` record. You\ncan then use modifiers. I.E.\n\n    Elegant.boxShadow\n        [ Shadow.inset True\n        , Shadow.spreadRadius (px 30)\n        ]\n\n",
+        "args": [],
+        "type": "{ inset : Bool , spreadRadius : Helpers.Shared.SizeUnit , blurRadius : Helpers.Shared.SizeUnit , color : Color.Color , offset : ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) }"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "blurRadius",
+        "comment": " Set the blurRadius of the Shadow.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "blurry",
+        "comment": " Creates a plain boxShadow.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.SizeUnit -> Color.Color -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "boxShadowToCouple",
+        "comment": " Compiles a `Shadow` record to the corresponding CSS tuple.\nCompiles only parts which are defined, ignoring `Nothing` fields.\n",
+        "type": "Shadow.Shadow -> ( String, String )"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Shadow` record, with every field equal to Nothing except inset (to `False`) and offset (to `( 0, 0 )`).\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.boxShadow`.\n",
+        "type": "Shadow.Shadow"
+      },
+      {
+        "name": "inset",
+        "comment": " Set the inset of the Shadow.\n",
+        "type": "Bool -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "offset",
+        "comment": " Set the offset of the Shadow.\n",
+        "type": "( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "plain",
+        "comment": " Creates a plain boxShadow.\n",
+        "type": "( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Color.Color -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "spreadRadius",
+        "comment": " Set the spreadRadius of the Shadow.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "standard",
+        "comment": " Defines a standard boxShadow.\n",
+        "type": "Helpers.Shared.SizeUnit -> Color.Color -> ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Helpers.Shared.Modifier Shadow.Shadow"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Padding",
+    "comment": " Padding contains everything about paddings rendering.\n\n\n# Types\n\n@docs Padding\n\n\n# Default padding\n\n@docs default\n\n\n# Padding selectors\n\n@docs top\n@docs right\n@docs bottom\n@docs left\n@docs horizontal\n@docs vertical\n@docs all\n\n\n# Compilation\n\n@docs paddingToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Padding",
+        "comment": " The `Padding` record contains everything about one padding side.\nYou probably won't use it as is, but instead using `Elegant.padding`\nwhich automatically generate an empty `Padding` record. You\ncan then use modifiers. I.E.\n\n    Elegant.padding\n        [ Padding.top <| Padding.width (px 30)\n        , Padding.vertical <| Padding.width (px 40)\n        ]\n\n",
+        "args": [],
+        "type": "Helpers.Shared.SizeUnit"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "all",
+        "comment": " Accepts a padding modifier, and modify the four sides of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "bottom",
+        "comment": " Accepts a padding modifier, and modify the bottom side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Padding` record, equal to 0 px.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.padding`.\n",
+        "type": "Padding.Padding"
+      },
+      {
+        "name": "horizontal",
+        "comment": " Accepts a padding modifier, and modify both the top and the bottom side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "left",
+        "comment": " Accepts a padding modifier, and modify the left side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "paddingToCouples",
+        "comment": " Compiles a `Surrounded Padding` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Surrounded.Surrounded Padding.Padding -> List ( String, String )"
+      },
+      {
+        "name": "right",
+        "comment": " Accepts a padding modifier, and modify the right side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "top",
+        "comment": " Accepts a padding modifier, and modify the top side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "vertical",
+        "comment": " Accepts a padding modifier, and modify both the right and left side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Position",
+    "comment": " Position contains everything about position rendering.\n\n\n# Types\n\n@docs Position\n@docs Coordinates\n\n\n# Position selection\n\n@docs static\n@docs absolute\n@docs relative\n@docs fixed\n@docs sticky\n\n\n# Position modifiers\n\n@docs top\n@docs right\n@docs bottom\n@docs left\n@docs horizontal\n@docs vertical\n@docs all\n\n\n# Compilation\n\n@docs positionToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Coordinates",
+        "comment": " Represents the coordinates of the element. There is top, bottom, left and right.\n",
+        "args": [],
+        "type": "Surrounded.Surrounded Helpers.Shared.SizeUnit"
+      }
+    ],
+    "types": [
+      {
+        "name": "Position",
+        "comment": " Represents a position, whih can be static, absolute, relative, fixed or sticky.\nYou don't need to bother about it, since it is generated by `static`, `absolute`,\n`relative`, `fixed` or `sticky`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "absolute",
+        "comment": " Position the element as absolute, and requires coordinates.\n",
+        "type": "Helpers.Shared.Modifiers Position.Coordinates -> Position.Position"
+      },
+      {
+        "name": "all",
+        "comment": " Accepts a size, and modify the four positions.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Position.Coordinates"
+      },
+      {
+        "name": "bottom",
+        "comment": " Accepts a size, and modify the bottom position.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Position.Coordinates"
+      },
+      {
+        "name": "fixed",
+        "comment": " Position the element as fixed, and requires coordinates.\n",
+        "type": "Helpers.Shared.Modifiers Position.Coordinates -> Position.Position"
+      },
+      {
+        "name": "horizontal",
+        "comment": " Accepts a size, and modify both the top and bottom positions.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Position.Coordinates"
+      },
+      {
+        "name": "left",
+        "comment": " Accepts a size, and modify the left position.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Position.Coordinates"
+      },
+      {
+        "name": "positionToCouples",
+        "comment": " Compiles a `Position` to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Position.Position -> List ( String, String )"
+      },
+      {
+        "name": "relative",
+        "comment": " Position the element as relative, and requires coordinates.\n",
+        "type": "Helpers.Shared.Modifiers Position.Coordinates -> Position.Position"
+      },
+      {
+        "name": "right",
+        "comment": " Accepts a size, and modify the right position.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Position.Coordinates"
+      },
+      {
+        "name": "static",
+        "comment": " Position the element as static.\n",
+        "type": "Position.Position"
+      },
+      {
+        "name": "sticky",
+        "comment": " Position the element as sticky, and requires coordinates.\n",
+        "type": "Helpers.Shared.Modifiers Position.Coordinates -> Position.Position"
+      },
+      {
+        "name": "top",
+        "comment": " Accepts a size, and modify the top position.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Position.Coordinates"
+      },
+      {
+        "name": "vertical",
+        "comment": " Accepts a size, and modify both the left and right positions.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Position.Coordinates"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Overflow",
+    "comment": " Handles Overflow\n\n@docs FullOverflow\n@docs overflowX\n@docs overflowY\n@docs overflowXY\n@docs visible\n@docs hidden\n@docs auto\n@docs default\n@docs scroll\n@docs Overflow\n\n",
+    "aliases": [
+      {
+        "name": "FullOverflow",
+        "comment": " ",
+        "args": [],
+        "type": "Helpers.Vector.Vector (Maybe.Maybe Overflow.Overflow)"
+      }
+    ],
+    "types": [
+      {
+        "name": "Overflow",
+        "comment": " ",
+        "args": [],
+        "cases": [
+          [
+            "OverflowVisible",
+            []
+          ],
+          [
+            "OverflowHidden",
+            []
+          ],
+          [
+            "OverflowAuto",
+            []
+          ],
+          [
+            "OverflowScroll",
+            []
+          ]
+        ]
+      }
+    ],
+    "values": [
+      {
+        "name": "auto",
+        "comment": " auto overflow\n",
+        "type": "Overflow.Overflow"
+      },
+      {
+        "name": "default",
+        "comment": " ",
+        "type": "Helpers.Vector.Vector (Maybe.Maybe Overflow.Overflow)"
+      },
+      {
+        "name": "hidden",
+        "comment": " hidden overflow\n",
+        "type": "Overflow.Overflow"
+      },
+      {
+        "name": "overflowX",
+        "comment": " OverflowX to handle overflow X of an element\n",
+        "type": "Overflow.Overflow -> Helpers.Shared.Modifier Overflow.FullOverflow"
+      },
+      {
+        "name": "overflowXY",
+        "comment": " OverflowY to handle overflow XY of an element\n",
+        "type": "Overflow.Overflow -> Helpers.Shared.Modifier Overflow.FullOverflow"
+      },
+      {
+        "name": "overflowY",
+        "comment": " OverflowY to handle overflow Y of an element\n",
+        "type": "Overflow.Overflow -> Helpers.Shared.Modifier Overflow.FullOverflow"
+      },
+      {
+        "name": "scroll",
+        "comment": " scroll overflow\n",
+        "type": "Overflow.Overflow"
+      },
+      {
+        "name": "visible",
+        "comment": " always visible overflow)\n",
+        "type": "Overflow.Overflow"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Margin",
+    "comment": " Margin contains everything about margins rendering.\n\n\n# Types\n\n@docs Margin\n\n\n# Default margin\n\n@docs default\n\n\n# Margin setters\n\n@docs auto\n@docs width\n\n\n# Margin selectors\n\n@docs top\n@docs right\n@docs bottom\n@docs left\n@docs horizontal\n@docs vertical\n@docs all\n\n\n# Compilation\n\n@docs marginToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Margin",
+        "comment": " The `Margin` record contains everything about one margin side.\nYou probably won't use it as is, but instead using `Elegant.margin`\nwhich automatically generate an empty `Margin` record. You\ncan then use modifiers. I.E.\n\n    Elegant.margin\n        [ Margin.top <| Margin.width (px 30)\n        , Margin.vertical Margin.auto\n        ]\n\n",
+        "args": [],
+        "type": "Either.Either Helpers.Shared.SizeUnit Helpers.Shared.Auto"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "all",
+        "comment": " Accepts a margin modifier, and modify the four sides of the margin.\n",
+        "type": "Helpers.Shared.Modifier Margin.Margin -> Helpers.Shared.Modifier (Surrounded.Surrounded Margin.Margin)"
+      },
+      {
+        "name": "auto",
+        "comment": " Set the margin value to auto.\n",
+        "type": "Helpers.Shared.Modifier Margin.Margin"
+      },
+      {
+        "name": "bottom",
+        "comment": " Accepts a margin modifier, and modify the bottom side of the margin.\n",
+        "type": "Helpers.Shared.Modifier Margin.Margin -> Helpers.Shared.Modifier (Surrounded.Surrounded Margin.Margin)"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Margin` record, equal to auto.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.margin`.\n",
+        "type": "Margin.Margin"
+      },
+      {
+        "name": "horizontal",
+        "comment": " Accepts a margin modifier, and modify both the top and the bottom side of the margin.\n",
+        "type": "Helpers.Shared.Modifier Margin.Margin -> Helpers.Shared.Modifier (Surrounded.Surrounded Margin.Margin)"
+      },
+      {
+        "name": "left",
+        "comment": " Accepts a margin modifier, and modify the left side of the margin.\n",
+        "type": "Helpers.Shared.Modifier Margin.Margin -> Helpers.Shared.Modifier (Surrounded.Surrounded Margin.Margin)"
+      },
+      {
+        "name": "marginToCouples",
+        "comment": " Compiles a `Surrounded Margin` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Surrounded.Surrounded Margin.Margin -> List ( String, String )"
+      },
+      {
+        "name": "right",
+        "comment": " Accepts a margin modifier, and modify the right side of the margin.\n",
+        "type": "Helpers.Shared.Modifier Margin.Margin -> Helpers.Shared.Modifier (Surrounded.Surrounded Margin.Margin)"
+      },
+      {
+        "name": "top",
+        "comment": " Accepts a margin modifier, and modify the top side of the margin.\n",
+        "type": "Helpers.Shared.Modifier Margin.Margin -> Helpers.Shared.Modifier (Surrounded.Surrounded Margin.Margin)"
+      },
+      {
+        "name": "vertical",
+        "comment": " Accepts a margin modifier, and modify both the right and left side of the margin.\n",
+        "type": "Helpers.Shared.Modifier Margin.Margin -> Helpers.Shared.Modifier (Surrounded.Surrounded Margin.Margin)"
+      },
+      {
+        "name": "width",
+        "comment": " Set the margin value to the desired value.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Margin.Margin"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Outline",
+    "comment": " Outline contains everything about outline rendering.\n\n\n# Types\n\n@docs Outline\n@docs OutlineStyle\n\n\n# Default border\n\n@docs default\n\n\n# Border modifiers\n\n\n## Appearance\n\n@docs thickness\n@docs none\n@docs solid\n@docs dashed\n\n\n# Compilation\n\n@docs outlineToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Outline",
+        "comment": " The `Outline` record contains everything about one outline side.\nYou probably won't use it as is, but instead using `Elegant.outline`\nwhich automatically generate an empty `Outline` record. You\ncan then use modifiers. I.E.\n\n    Elegant.outline\n        [ Outline.solid\n        , Elegant.color Color.blue\n        ]\n\n",
+        "args": [],
+        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Helpers.Shared.SizeUnit , style : Maybe.Maybe Outline.OutlineStyle }"
+      }
+    ],
+    "types": [
+      {
+        "name": "OutlineStyle",
+        "comment": " Represents the possible styles of the outline.\nIt can be Solid or Dashed. They are created by `solid` and `dashed`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "dashed",
+        "comment": " Set the outline as dashed.\n",
+        "type": "Helpers.Shared.Modifier Outline.Outline"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Outline` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.outline`.\n",
+        "type": "Outline.Outline"
+      },
+      {
+        "name": "none",
+        "comment": " Set the outline to none.\n",
+        "type": "Helpers.Shared.Modifier Outline.Outline"
+      },
+      {
+        "name": "outlineToCouples",
+        "comment": " Compiles an `Outline` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Outline.Outline -> List ( String, String )"
+      },
+      {
+        "name": "solid",
+        "comment": " Set the outline as solid.\n",
+        "type": "Helpers.Shared.Modifier Outline.Outline"
+      },
+      {
+        "name": "thickness",
+        "comment": " Set the thickness of the outline.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Outline.Outline"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Grid",
+    "comment": "\n@docs align\n@docs alignItems\n@docs alignItemsToCouple\n@docs alignSelfToCouple\n@docs alignToCouple\n@docs alignToString\n@docs alignWrapper\n@docs auto\n@docs autofill\n@docs autofit\n@docs center\n@docs columns\n@docs end\n@docs fitContent\n@docs fractionOfAvailableSpace\n@docs gap\n@docs gridContainerCoordinateToCouples\n@docs gridContainerDetailsToCouples\n@docs gridItemCoordinateToCouples\n@docs gridItemDetailsToCouples\n@docs gutterToCouple\n@docs horizontal\n@docs maxContent\n@docs minContent\n@docs minmax\n@docs placement\n@docs placementToCouple\n@docs placementToString\n@docs size\n@docs sizeToCouple\n@docs sizeToString\n@docs repeat\n@docs repeatOptionToString\n@docs repeatableToString\n@docs rows\n@docs simple\n@docs sizeUnitVal\n@docs spaceAround\n@docs spaceBetween\n@docs spaceEvenly\n@docs spacingToString\n@docs span\n@docs start\n@docs stretch\n@docs template\n@docs templateToCouple\n@docs untilEndOfCoordinate\n@docs valTypeToString\n@docs vertical\n@docs viewWidth\n@docs GridItemDetails\n@docs GridItemCoordinate\n@docs GridContainerDetails\n@docs GridContainerCoordinate\n@docs GridItemSize\n@docs GridTemplate\n@docs Repeatable\n@docs ValType\n",
+    "aliases": [
+      {
+        "name": "GridContainerCoordinate",
+        "comment": " ",
+        "args": [],
+        "type": "{ gutter : Maybe.Maybe Helpers.Shared.SizeUnit , align : Maybe.Maybe Grid.Align , alignItems : Maybe.Maybe Grid.AlignItems , template : Maybe.Maybe Grid.GridTemplate }"
+      },
+      {
+        "name": "GridContainerDetails",
+        "comment": " ",
+        "args": [],
+        "type": "{ x : Maybe.Maybe Grid.GridContainerCoordinate , y : Maybe.Maybe Grid.GridContainerCoordinate }"
+      },
+      {
+        "name": "GridItemCoordinate",
+        "comment": " ",
+        "args": [],
+        "type": "{ placement : Maybe.Maybe Int , size : Maybe.Maybe Grid.GridItemSize , align : Maybe.Maybe Grid.Align }"
+      },
+      {
+        "name": "GridItemDetails",
+        "comment": " ",
+        "args": [],
+        "type": "{ x : Maybe.Maybe Grid.GridItemCoordinate , y : Maybe.Maybe Grid.GridItemCoordinate }"
+      },
+      {
+        "name": "GridTemplate",
+        "comment": " ",
+        "args": [],
+        "type": "List Grid.Repeatable"
+      }
+    ],
+    "types": [
+      {
+        "name": "GridItemSize",
+        "comment": " ",
+        "args": [],
+        "cases": [
+          [
+            "UntilEndOfCoordinate",
+            []
+          ],
+          [
+            "Span",
+            [
+              "Int"
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "Repeatable",
+        "comment": " ",
+        "args": [],
+        "cases": [
+          [
+            "Simple",
+            [
+              "Grid.ValType"
+            ]
+          ],
+          [
+            "Minmax",
+            [
+              "Grid.ValType",
+              "Grid.ValType"
+            ]
+          ],
+          [
+            "FitContent",
+            [
+              "Grid.ValType"
+            ]
+          ],
+          [
+            "Repeat",
+            [
+              "Grid.RepeatOption",
+              "List Helpers.Shared.SizeUnit"
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "ValType",
+        "comment": " ",
+        "args": [],
+        "cases": [
+          [
+            "SizeUnitVal",
+            [
+              "Helpers.Shared.SizeUnit"
+            ]
+          ],
+          [
+            "Fr",
+            [
+              "Int"
+            ]
+          ],
+          [
+            "Vw",
+            [
+              "Int"
+            ]
+          ],
+          [
+            "MinContent",
+            []
+          ],
+          [
+            "MaxContent",
+            []
+          ],
+          [
+            "Auto",
+            []
+          ]
+        ]
+      }
+    ],
+    "values": [
+      {
+        "name": "align",
+        "comment": " ",
+        "type": "Grid.Align -> Helpers.Shared.Modifier { a | align : Maybe.Maybe Grid.Align }"
+      },
+      {
+        "name": "alignItems",
+        "comment": " ",
+        "type": "Grid.AlignItems -> Helpers.Shared.Modifier Grid.GridContainerCoordinate"
+      },
+      {
+        "name": "alignItemsToCouple",
+        "comment": " ",
+        "type": "String -> Grid.AlignItems -> ( String, String )"
+      },
+      {
+        "name": "alignSelfToCouple",
+        "comment": " ",
+        "type": "String -> Grid.Align -> ( String, String )"
+      },
+      {
+        "name": "alignToCouple",
+        "comment": " ",
+        "type": "String -> Grid.Align -> ( String, String )"
+      },
+      {
+        "name": "alignToString",
+        "comment": " ",
+        "type": "Grid.Align -> String"
+      },
+      {
+        "name": "alignWrapper",
+        "comment": " ",
+        "type": "Grid.Align -> Grid.AlignItems"
+      },
+      {
+        "name": "auto",
+        "comment": " ",
+        "type": "Grid.ValType"
+      },
+      {
+        "name": "autofill",
+        "comment": " ",
+        "type": "Grid.RepeatOption"
+      },
+      {
+        "name": "autofit",
+        "comment": " ",
+        "type": "Grid.RepeatOption"
+      },
+      {
+        "name": "center",
+        "comment": " ",
+        "type": "Grid.Align"
+      },
+      {
+        "name": "columns",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Grid.GridContainerCoordinate -> Helpers.Shared.Modifier Grid.GridContainerDetails"
+      },
+      {
+        "name": "end",
+        "comment": " ",
+        "type": "Grid.Align"
+      },
+      {
+        "name": "fitContent",
+        "comment": " ",
+        "type": "Grid.ValType -> Grid.Repeatable"
+      },
+      {
+        "name": "fractionOfAvailableSpace",
+        "comment": " ",
+        "type": "Int -> Grid.ValType"
+      },
+      {
+        "name": "gap",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Grid.GridContainerCoordinate"
+      },
+      {
+        "name": "gridContainerCoordinateToCouples",
+        "comment": " ",
+        "type": "String -> String -> Grid.GridContainerCoordinate -> List ( String, String )"
+      },
+      {
+        "name": "gridContainerDetailsToCouples",
+        "comment": " ",
+        "type": "Grid.GridContainerDetails -> List ( String, String )"
+      },
+      {
+        "name": "gridItemCoordinateToCouples",
+        "comment": " ",
+        "type": "String -> String -> Grid.GridItemCoordinate -> List ( String, String )"
+      },
+      {
+        "name": "gridItemDetailsToCouples",
+        "comment": " ",
+        "type": "Grid.GridItemDetails -> List ( String, String )"
+      },
+      {
+        "name": "gutterToCouple",
+        "comment": " ",
+        "type": "String -> Helpers.Shared.SizeUnit -> ( String, String )"
+      },
+      {
+        "name": "horizontal",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Grid.GridItemCoordinate -> Helpers.Shared.Modifier Grid.GridItemDetails"
+      },
+      {
+        "name": "maxContent",
+        "comment": " ",
+        "type": "Grid.ValType"
+      },
+      {
+        "name": "minContent",
+        "comment": " ",
+        "type": "Grid.ValType"
+      },
+      {
+        "name": "minmax",
+        "comment": " ",
+        "type": "Grid.ValType -> Grid.ValType -> Grid.Repeatable"
+      },
+      {
+        "name": "placement",
+        "comment": " ",
+        "type": "Int -> Helpers.Shared.Modifier Grid.GridItemCoordinate"
+      },
+      {
+        "name": "placementToCouple",
+        "comment": " ",
+        "type": "String -> Int -> ( String, String )"
+      },
+      {
+        "name": "placementToString",
+        "comment": " ",
+        "type": "Int -> String"
+      },
+      {
+        "name": "repeat",
+        "comment": " ",
+        "type": "Grid.RepeatOption -> List Helpers.Shared.SizeUnit -> Grid.Repeatable"
+      },
+      {
+        "name": "repeatOptionToString",
+        "comment": " ",
+        "type": "Grid.RepeatOption -> String"
+      },
+      {
+        "name": "repeatableToString",
+        "comment": " ",
+        "type": "Grid.Repeatable -> String"
+      },
+      {
+        "name": "rows",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Grid.GridContainerCoordinate -> Helpers.Shared.Modifier Grid.GridContainerDetails"
+      },
+      {
+        "name": "simple",
+        "comment": " ",
+        "type": "Grid.ValType -> Grid.Repeatable"
+      },
+      {
+        "name": "size",
+        "comment": " ",
+        "type": "Grid.GridItemSize -> Helpers.Shared.Modifier Grid.GridItemCoordinate"
+      },
+      {
+        "name": "sizeToCouple",
+        "comment": " ",
+        "type": "String -> Grid.GridItemSize -> ( String, String )"
+      },
+      {
+        "name": "sizeToString",
+        "comment": " ",
+        "type": "Grid.GridItemSize -> String"
+      },
+      {
+        "name": "sizeUnitVal",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Grid.ValType"
+      },
+      {
+        "name": "spaceAround",
+        "comment": " ",
+        "type": "Grid.AlignItems"
+      },
+      {
+        "name": "spaceBetween",
+        "comment": " ",
+        "type": "Grid.AlignItems"
+      },
+      {
+        "name": "spaceEvenly",
+        "comment": " ",
+        "type": "Grid.AlignItems"
+      },
+      {
+        "name": "spacingToString",
+        "comment": " ",
+        "type": "Grid.Spacing -> String"
+      },
+      {
+        "name": "span",
+        "comment": " ",
+        "type": "Int -> Grid.GridItemSize"
+      },
+      {
+        "name": "start",
+        "comment": " ",
+        "type": "Grid.Align"
+      },
+      {
+        "name": "stretch",
+        "comment": " ",
+        "type": "Grid.Align"
+      },
+      {
+        "name": "template",
+        "comment": " ",
+        "type": "List Grid.Repeatable -> Helpers.Shared.Modifier Grid.GridContainerCoordinate"
+      },
+      {
+        "name": "templateToCouple",
+        "comment": " ",
+        "type": "String -> Grid.GridTemplate -> ( String, String )"
+      },
+      {
+        "name": "untilEndOfCoordinate",
+        "comment": " ",
+        "type": "Grid.GridItemSize"
+      },
+      {
+        "name": "valTypeToString",
+        "comment": " ",
+        "type": "Grid.ValType -> String"
+      },
+      {
+        "name": "vertical",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifiers Grid.GridItemCoordinate -> Helpers.Shared.Modifier Grid.GridItemDetails"
+      },
+      {
+        "name": "viewWidth",
+        "comment": " ",
+        "type": "Int -> Grid.ValType"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Flex",
+    "comment": " Flex handles everything related to the flex element.\n\n@docs FlexContainerDetails\n@docs FlexItemDetails\n@docs FlexDirection\n@docs FlexWrap\n@docs Align\n@docs JustifyContent\n\n\n## FlexDirection\n\n@docs direction\n@docs column\n@docs row\n\n\n## FlexWrap\n\n@docs wrap\n@docs noWrap\n\n\n## AlignItems / AlignSelf\n\n@docs align\n@docs alignXY\n@docs baseline\n@docs alignCenter\n@docs flexStart\n@docs flexEnd\n@docs inherit\n@docs initial\n@docs stretch\n\n\n## JustifyContent\n\n@docs justifyContent\n@docs spaceBetween\n@docs spaceAround\n@docs justifyContentCenter\n@docs justifyContentFlexStart\n@docs justifyContentFlexEnd\n\n\n## Positionning\n\n@docs topLeft\n@docs topCenter\n@docs topRight\n@docs centerLeft\n@docs center\n@docs centerRight\n@docs bottomLeft\n@docs bottomCenter\n@docs bottomRight\n\n\n## Flex\n\n@docs grow\n@docs shrink\n@docs basisAuto\n@docs basis\n@docs alignSelf\n\n@docs defaultFlexContainerDetails\n@docs defaultFlexItemDetails\n@docs flexContainerDetailsToCouples\n@docs flexItemDetailsToCouples\n\n",
+    "aliases": [
+      {
+        "name": "FlexContainerDetails",
+        "comment": " Contains all style which can be applied on a flex container.\nThis contains flex-direction, flex-wrap, align-items and justify-content.\n",
+        "args": [],
+        "type": "{ direction : Maybe.Maybe Flex.FlexDirection , wrap : Maybe.Maybe Flex.FlexWrap , align : Maybe.Maybe Flex.Align , justifyContent : Maybe.Maybe Flex.JustifyContent }"
+      },
+      {
+        "name": "FlexItemDetails",
+        "comment": " Contains all style which can be used on a flex item.\nThis contains flex-grow, flex-shrink, flex-basis and align-self.\n",
+        "args": [],
+        "type": "{ grow : Maybe.Maybe Int , shrink : Maybe.Maybe Int , basis : Maybe.Maybe (Either.Either Helpers.Shared.SizeUnit Helpers.Shared.Auto) , alignSelf : Maybe.Maybe Flex.Align }"
+      }
+    ],
+    "types": [
+      {
+        "name": "Align",
+        "comment": " Represents the alignment in flex.\nCan be baseline, center, flex-start, flex-end, inherit, initial or stretch.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "FlexDirection",
+        "comment": " Represents a flex direction.\nCan be column or row.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "FlexWrap",
+        "comment": " Represents a flex wrap.\nCan be wrap or no-wrap.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "JustifyContent",
+        "comment": " Represents the value of justify-content.\nCan be space-between, space-around or center.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "align",
+        "comment": " Accepts an Align, and modifies the flex container accordingly.\n",
+        "type": "Flex.Align -> Helpers.Shared.Modifier Flex.FlexContainerDetails"
+      },
+      {
+        "name": "alignCenter",
+        "comment": " Generates a center alignment.\n",
+        "type": "Flex.Align"
+      },
+      {
+        "name": "alignSelf",
+        "comment": " Accepts an align and modifies the flex item accordingly.\n",
+        "type": "Flex.Align -> Helpers.Shared.Modifier Flex.FlexItemDetails"
+      },
+      {
+        "name": "alignXY",
+        "comment": " ",
+        "type": "( Flex.Align, Flex.JustifyContent ) -> Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "baseline",
+        "comment": " Generates a baseline alignment.\n",
+        "type": "Flex.Align"
+      },
+      {
+        "name": "basis",
+        "comment": " Accepts a size and sets the flex-basis accordingly.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Flex.FlexItemDetails"
+      },
+      {
+        "name": "basisAuto",
+        "comment": " Sets the flex-basis as auto.\n",
+        "type": "Helpers.Shared.Modifier Flex.FlexItemDetails"
+      },
+      {
+        "name": "bottomCenter",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "bottomLeft",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "bottomRight",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "center",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "centerLeft",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "centerRight",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "column",
+        "comment": " Defines the flex direction column.\n",
+        "type": "Flex.FlexDirection"
+      },
+      {
+        "name": "defaultFlexContainerDetails",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails"
+      },
+      {
+        "name": "defaultFlexItemDetails",
+        "comment": " ",
+        "type": "Flex.FlexItemDetails"
+      },
+      {
+        "name": "direction",
+        "comment": " Accepts a flex-direction and modifies the flex container accordingly.\n",
+        "type": "Flex.FlexDirection -> Helpers.Shared.Modifier Flex.FlexContainerDetails"
+      },
+      {
+        "name": "flexContainerDetailsToCouples",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> List ( String, String )"
+      },
+      {
+        "name": "flexEnd",
+        "comment": " Generates a flex-end alignment.\n",
+        "type": "Flex.Align"
+      },
+      {
+        "name": "flexItemDetailsToCouples",
+        "comment": " ",
+        "type": "Flex.FlexItemDetails -> List ( String, String )"
+      },
+      {
+        "name": "flexStart",
+        "comment": " Generates a flex-start alignment.\n",
+        "type": "Flex.Align"
+      },
+      {
+        "name": "grow",
+        "comment": " Accepts an int and sets the flex-grow accordingly.\n",
+        "type": "Int -> Helpers.Shared.Modifier Flex.FlexItemDetails"
+      },
+      {
+        "name": "inherit",
+        "comment": " Generates a inherit alignment.\n",
+        "type": "Flex.Align"
+      },
+      {
+        "name": "initial",
+        "comment": " Generates a initial alignment.\n",
+        "type": "Flex.Align"
+      },
+      {
+        "name": "justifyContent",
+        "comment": " Accepts a justify-content and modifies the flex container accordingly.\n",
+        "type": "Flex.JustifyContent -> Helpers.Shared.Modifier Flex.FlexContainerDetails"
+      },
+      {
+        "name": "justifyContentCenter",
+        "comment": " Defines the justify-content center.\n",
+        "type": "Flex.JustifyContent"
+      },
+      {
+        "name": "justifyContentFlexEnd",
+        "comment": " Defines the justify-content flex-end.\n",
+        "type": "Flex.JustifyContent"
+      },
+      {
+        "name": "justifyContentFlexStart",
+        "comment": " Defines the justify-content flex-start.\n",
+        "type": "Flex.JustifyContent"
+      },
+      {
+        "name": "noWrap",
+        "comment": " Modifies the flex-wrap to no-wrap.\n",
+        "type": "Helpers.Shared.Modifier Flex.FlexContainerDetails"
+      },
+      {
+        "name": "row",
+        "comment": " Defines the flex direction row.\n",
+        "type": "Flex.FlexDirection"
+      },
+      {
+        "name": "shrink",
+        "comment": " Accepts an int and sets the flex-shrink accordingly.\n",
+        "type": "Int -> Helpers.Shared.Modifier Flex.FlexItemDetails"
+      },
+      {
+        "name": "spaceAround",
+        "comment": " Defines the justify-content space-around.\n",
+        "type": "Flex.JustifyContent"
+      },
+      {
+        "name": "spaceBetween",
+        "comment": " Defines the justify-content space-between.\n",
+        "type": "Flex.JustifyContent"
+      },
+      {
+        "name": "stretch",
+        "comment": " Generates a stretch alignment.\n",
+        "type": "Flex.Align"
+      },
+      {
+        "name": "topCenter",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "topLeft",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "topRight",
+        "comment": " ",
+        "type": "Flex.FlexContainerDetails -> Flex.FlexContainerDetails"
+      },
+      {
+        "name": "wrap",
+        "comment": " Modifies the flex-wrap to wrap.\n",
+        "type": "Helpers.Shared.Modifier Flex.FlexContainerDetails"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Dimensions",
+    "comment": "\n@docs width\n@docs height\n@docs square\n@docs minWidth\n@docs maxWidth\n@docs minHeight\n@docs maxHeight\n@docs Dimensions\n@docs defaultDimensions\n@docs dimensionsToCouples\n",
+    "aliases": [
+      {
+        "name": "Dimensions",
+        "comment": " The type behind the handling of (max-|min-|)width and (max-|min-|)height\n",
+        "args": [],
+        "type": "( Dimensions.DimensionAxis, Dimensions.DimensionAxis )"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "defaultDimensions",
+        "comment": " ",
+        "type": "( Dimensions.DimensionAxis, Dimensions.DimensionAxis )"
+      },
+      {
+        "name": "dimensionsToCouples",
+        "comment": " ",
+        "type": "Dimensions.Dimensions -> List ( String, String )"
+      },
+      {
+        "name": "height",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Dimensions.Dimensions"
+      },
+      {
+        "name": "maxHeight",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Dimensions.Dimensions"
+      },
+      {
+        "name": "maxWidth",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Dimensions.Dimensions"
+      },
+      {
+        "name": "minHeight",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Dimensions.Dimensions"
+      },
+      {
+        "name": "minWidth",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Dimensions.Dimensions"
+      },
+      {
+        "name": "square",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Dimensions.Dimensions"
+      },
+      {
+        "name": "width",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Dimensions.Dimensions"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Constants",
+    "comment": "\n@docs huge\n@docs large\n@docs medium\n@docs small\n@docs tiny\n@docs zero\n@docs alpha\n@docs beta\n@docs gamma\n@docs delta\n@docs epsilon\n@docs zeta\n@docs eta\n@docs theta\n@docs iota\n@docs kappa\n",
+    "aliases": [],
+    "types": [],
+    "values": [
+      {
+        "name": "alpha",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "beta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "delta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "epsilon",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "eta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "gamma",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "huge",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "iota",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "kappa",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "large",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "medium",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "small",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "theta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "tiny",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "zero",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "zeta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Border",
+    "comment": " Border contains everything about borders rendering.\n\n\n# Types\n\n@docs Border\n@docs BorderStyle\n\n\n# Default border\n\n@docs default\n\n\n# Border modifiers\n\n\n## Appearance\n\n@docs thickness\n@docs none\n@docs solid\n@docs dashed\n\n\n## Sides\n\n@docs top\n@docs bottom\n@docs left\n@docs right\n@docs horizontal\n@docs vertical\n@docs all\n\n\n# Compilation\n\n@docs borderToCouples\n\n\n# Sugar\n\n@docs full\n\n",
+    "aliases": [
+      {
+        "name": "Border",
+        "comment": " The `Border` record contains everything about one border side.\nYou probably won't use it as is, but instead using `Elegant.border`\nwhich automatically generate an empty `Border` record. You\ncan then use modifiers. I.E.\n\n    Elegant.border\n        [ Border.solid\n        , Border.color Color.blue\n        ]\n\n",
+        "args": [],
+        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Helpers.Shared.SizeUnit , style : Maybe.Maybe Border.BorderStyle }"
+      }
+    ],
+    "types": [
+      {
+        "name": "BorderStyle",
+        "comment": " Represents the possible styles of the border.\nIt can be Solid or Dashed. They are created by `solid` and `dashed`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "all",
+        "comment": " Accepts a list of border modifiers, and modify the four sides of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "borderToCouples",
+        "comment": " Compiles a `Surrounded Border` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Surrounded.Surrounded Border.Border -> List ( String, String )"
+      },
+      {
+        "name": "bottom",
+        "comment": " Accepts a list of border modifiers, and modify the bottom side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "dashed",
+        "comment": " Set the border as dashed.\n",
+        "type": "Helpers.Shared.Modifier Border.Border"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Border` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.border`.\n",
+        "type": "Border.Border"
+      },
+      {
+        "name": "full",
+        "comment": " Accepts a color modifier\n",
+        "type": "Color.Color -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "horizontal",
+        "comment": " Accepts a list of border modifiers, and modify both the top and the bottom side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "left",
+        "comment": " Accepts a list of border modifiers, and modify the left side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "none",
+        "comment": " Set the border to none.\n",
+        "type": "Helpers.Shared.Modifier Border.Border"
+      },
+      {
+        "name": "right",
+        "comment": " Accepts a list of border modifiers, and modify the right side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "solid",
+        "comment": " Set the border as solid.\n",
+        "type": "Helpers.Shared.Modifier Border.Border"
+      },
+      {
+        "name": "thickness",
+        "comment": " Set the thickness of the border.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Border.Border"
+      },
+      {
+        "name": "top",
+        "comment": " Accepts a list of border modifiers, and modify the top side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "vertical",
+        "comment": " Accepts a list of border modifiers, and modify both the right and left side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Cursor",
+    "comment": " Cursor contains everything about cursors rendering.\n\n\n# Types\n\n@docs Cursor\n\n\n# Cursor types\n\n@docs default\n@docs auto\n@docs cell\n@docs contextMenu\n@docs crosshair\n@docs grab\n@docs grabbing\n@docs help\n@docs move\n@docs noDrop\n@docs none\n@docs notAllowed\n@docs pointer\n@docs progress\n@docs text\n@docs verticalText\n@docs wait\n@docs zoomIn\n@docs zoomOut\n\n\n# Compilation\n\n@docs cursorToCouple\n\n",
+    "aliases": [],
+    "types": [
+      {
+        "name": "Cursor",
+        "comment": " The `Cursor` record contains everything about cursor.\nYou probably won't use it as is, but instead using `Elegant.cursor`.\nYou can provide one cursor type. They can be found [here](https://developer.mozilla.org/en/docs/Web/CSS/cursor).\n\n    Elegant.cursor Cursor.default\n\n",
+        "args": [],
+        "cases": [
+          [
+            "Auto",
+            []
+          ],
+          [
+            "Default",
+            []
+          ],
+          [
+            "None",
+            []
+          ],
+          [
+            "Pointer",
+            []
+          ],
+          [
+            "ContextMenu",
+            []
+          ],
+          [
+            "Help",
+            []
+          ],
+          [
+            "Progress",
+            []
+          ],
+          [
+            "Wait",
+            []
+          ],
+          [
+            "Cell",
+            []
+          ],
+          [
+            "Crosshair",
+            []
+          ],
+          [
+            "Text",
+            []
+          ],
+          [
+            "VerticalText",
+            []
+          ],
+          [
+            "Move",
+            []
+          ],
+          [
+            "NoDrop",
+            []
+          ],
+          [
+            "NotAllowed",
+            []
+          ],
+          [
+            "ZoomIn",
+            []
+          ],
+          [
+            "ZoomOut",
+            []
+          ],
+          [
+            "Grab",
+            []
+          ],
+          [
+            "Grabbing",
+            []
+          ]
+        ]
+      }
+    ],
+    "values": [
+      {
+        "name": "auto",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "cell",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "contextMenu",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "crosshair",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "cursorToCouple",
+        "comment": " Compiles a `Cursor` to the corresponding CSS tuple.\n",
+        "type": "Cursor.Cursor -> ( String, String )"
+      },
+      {
+        "name": "default",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "grab",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "grabbing",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "help",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "move",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "noDrop",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "none",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "notAllowed",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "pointer",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "progress",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "text",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "verticalText",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "wait",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "zoomIn",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "zoomOut",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Character",
+    "comment": " Character contains everything about characters rendering.\n\n\n# Types\n\n@docs Character\n@docs FontTilt\n@docs FontFamily\n@docs CustomFontFamily\n\n\n# Default Character\n\n@docs default\n\n\n# Modifiers\n\n\n## Weight\n\n@docs weight\n\n\n## Tilting\n\n@docs tiltNormal\n@docs italic\n@docs oblique\n\n\n## Size\n\n@docs size\n\n\n## Font Family\n\n@docs systemFont\n@docs customFont\n@docs fontFamily\n@docs fontFamilyInherit\n@docs fontFamilySansSerif\n\n\n# Compilation\n\n@docs characterToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Character",
+        "comment": " The Character record contains everything about characters rendering.\nYou probably won't use it as is, but instead using `Typography.character`\nwhich automatically generate an empty `Character` record. You can then use\nmodifiers. I.E.\n\n    Typography.characters\n        [ Typography.Character.weight 700\n        , Typography.Character.size (px 30)\n        ]\n\n",
+        "args": [],
+        "type": "{ weight : Maybe.Maybe Int , tilt : Maybe.Maybe Character.FontTilt , size : Maybe.Maybe Helpers.Shared.SizeUnit , family : Maybe.Maybe Character.FontFamily }"
+      }
+    ],
+    "types": [
+      {
+        "name": "CustomFontFamily",
+        "comment": " Represents the font family used to render characters.\nIt can be a system or a custom type. They are created by `systemFont` and `customFont`.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "FontFamily",
+        "comment": " Represents the possible fontFamily of the characters.\nIt can be Inherited from the parent, or customized.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "FontTilt",
+        "comment": " Represents the possible tilting of the characters.\nIt can be Normal, Italic, or Oblique. They are created by `uppercase`,\n`lowercase` and `capitalize`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "characterToCouples",
+        "comment": " Compiles a `Character` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Character.Character -> List ( String, String )"
+      },
+      {
+        "name": "customFont",
+        "comment": " Gives a custom font.\n",
+        "type": "String -> Character.CustomFontFamily"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Character` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Typography.character`.\n",
+        "type": "Character.Character"
+      },
+      {
+        "name": "fontFamily",
+        "comment": " Set the font family to the desired fonts. All fonts will be tried one by one\nuntil one is found either on the browser or user's OS. It is possible to use both\nsystem and custom fonts.\n",
+        "type": "List Character.CustomFontFamily -> Helpers.Shared.Modifier Character.Character"
+      },
+      {
+        "name": "fontFamilyInherit",
+        "comment": " Inherits the font from the parents. It is the default behavior of fontFamily.\n",
+        "type": "Helpers.Shared.Modifier Character.Character"
+      },
+      {
+        "name": "fontFamilySansSerif",
+        "comment": " Standard Sans Serif font family.\nInspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>\n",
+        "type": "Helpers.Shared.Modifier Character.Character"
+      },
+      {
+        "name": "italic",
+        "comment": " Renders the characters as italic.\n",
+        "type": "Helpers.Shared.Modifier Character.Character"
+      },
+      {
+        "name": "oblique",
+        "comment": " Renders the characters as oblique.\n",
+        "type": "Helpers.Shared.Modifier Character.Character"
+      },
+      {
+        "name": "size",
+        "comment": " Set the size of the characters to the desired value.\nCan be px, pt, vh, em or rem.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Character.Character"
+      },
+      {
+        "name": "systemFont",
+        "comment": " Gives a system font.\n",
+        "type": "String -> Character.CustomFontFamily"
+      },
+      {
+        "name": "tiltNormal",
+        "comment": " Cancels any tilting of the characters.\n",
+        "type": "Helpers.Shared.Modifier Character.Character"
+      },
+      {
+        "name": "weight",
+        "comment": " Changes the weight of the characters.\nValue is defined between 100 and 900 and default weight is equal to 400.\n",
+        "type": "Int -> Helpers.Shared.Modifier Character.Character"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Corner",
+    "comment": " Corner contains everything about corner radius (also called border radius in CSS).\n\n\n# Types\n\n@docs Corner\n@docs CornerSet\n\n\n# Default corner radius\n\n@docs default\n\n\n# Corner radius style\n\n@docs circular\n@docs elliptic\n\n\n# Corner radius selector\n\n@docs top\n@docs topRight\n@docs right\n@docs bottomRight\n@docs bottom\n@docs bottomLeft\n@docs left\n@docs topLeft\n@docs all\n\n\n# Compilation\n\n@docs cornerToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Corner",
+        "comment": " The `Corner` record contains everything about corner radius (also called border radius in CSS).\nYou probably won't use it as is, but instead using `Elegant.corner`\nwhich automatically generate an empty `Corner` record. You\ncan then use modifiers. I.E.\n\n    Elegant.corner\n        [ Corner.circular Corner.all (px 30) ]\n\n",
+        "args": [],
+        "type": "{ topLeft : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , topRight : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , bottomRight : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , bottomLeft : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) }"
+      }
+    ],
+    "types": [
+      {
+        "name": "CornerSet",
+        "comment": " Represents the possible selected corner(s).\nIt can be Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left, TopLeft or All.\nThey are created by `top`, `topRight`, `right`, `bottomRight`, `bottom`, `bottomLeft`,\n`left`, `topLeft` or `all`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "all",
+        "comment": " Select the four corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "bottom",
+        "comment": " Select the two bottom corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "bottomLeft",
+        "comment": " Select the bottom-left corner.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "bottomRight",
+        "comment": " Select the bottom-right corner.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "circular",
+        "comment": " Set the corner(s) to be round (the two angles are the same).\n",
+        "type": "Corner.CornerSet -> Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Corner.Corner"
+      },
+      {
+        "name": "cornerToCouples",
+        "comment": " Compiles a `Corner` record to the corresponding CSS tuples.\nCompiles only parts which are defined, ignoring `Nothing` fields.\n",
+        "type": "Corner.Corner -> List ( String, String )"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Corner` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.corner`.\n",
+        "type": "Corner.Corner"
+      },
+      {
+        "name": "elliptic",
+        "comment": " Set the corner(s) to be elliptic, i.e. you can specify two different values\nfor the corner(s).\n",
+        "type": "Corner.CornerSet -> Helpers.Shared.SizeUnit -> Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Corner.Corner"
+      },
+      {
+        "name": "left",
+        "comment": " Select the two left corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "right",
+        "comment": " Select the two right corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "top",
+        "comment": " Select the two top corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "topLeft",
+        "comment": " Select the top-left corner.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "topRight",
+        "comment": " Select the top-right corner.\n",
+        "type": "Corner.CornerSet"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Background",
+    "comment": " Background contains everything about background rendering: using photos or gradient,\nand positionning them on the page.\n\n\n# Types\n\n@docs Background\n@docs Image\n@docs BackgroundImage\n@docs Gradient\n@docs Angle\n@docs Degree\n@docs Radiant\n@docs ColorStop\n\n\n# Background creation\n\n@docs default\n@docs images\n@docs image\n@docs gradient\n@docs linear\n@docs radial\n\n\n# Background modifiers\n\n@docs intermediateColors\n@docs colorStop\n@docs at\n@docs degree\n@docs rad\n\n\n# Compilation\n\n@docs backgroundToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Background",
+        "comment": " The `Background` record contains everything about background rendering,\nincluding character rendering. You probably won't use it as is, but instead using\n`Box.background` which automatically generate an empty `Background` record. You\ncan then use modifiers. I.E.\n\n    Box.background\n        [ Elegant.color Color.white\n        , Background.images\n            [ Background.image \"/example.photo\" ]\n        ]\n\n",
+        "args": [],
+        "type": "{ color : Maybe.Maybe Color.Color , images : List Background.BackgroundImage }"
+      },
+      {
+        "name": "BackgroundImage",
+        "comment": " Represents a Background Image, i.e. an image in Background. Contrary to `Image`,\na `BackgroundImage` contains an image and a position. This position set the position of the image\non the background.\n",
+        "args": [],
+        "type": "{ image : Maybe.Maybe Background.Image , position : Maybe.Maybe (Helpers.Vector.Vector Helpers.Shared.SizeUnit) }"
+      },
+      {
+        "name": "ColorStop",
+        "comment": " Represents a CSS Color Stop, which contains a Color, and possibly a position.\nThis is automatically generated by `colorStop`.\n",
+        "args": [],
+        "type": "{ position : Maybe.Maybe Helpers.Shared.SizeUnit , color : Color.Color }"
+      },
+      {
+        "name": "Degree",
+        "comment": " Represents a degree.\n",
+        "args": [],
+        "type": "Float"
+      },
+      {
+        "name": "Radiant",
+        "comment": " Represents a radiant.\n",
+        "args": [],
+        "type": "Float"
+      }
+    ],
+    "types": [
+      {
+        "name": "Angle",
+        "comment": " Represents an angle. Can be either radiant or degree.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "Gradient",
+        "comment": " Defines a gradient, which can be either linear or radial. They are instanciated\nby the corresponding functions.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "Image",
+        "comment": " Represents an image in CSS. It can be an image, represented by a source url, or\na gradiant. They are instanciated by `image` (which instanciate an Image inside a\n`BackgroundImage`) or by `linear` or `radial`, instanciating a gradiant.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "at",
+        "comment": " Sets a position on both a gradient and a `BackgroundImage`.\n",
+        "type": "a -> { b | position : Maybe.Maybe a } -> { b | position : Maybe.Maybe a }"
+      },
+      {
+        "name": "backgroundToCouples",
+        "comment": " Compiles a `Background` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Background.Background -> List ( String, String )"
+      },
+      {
+        "name": "colorStop",
+        "comment": " Generates a CSS Color Stop from Color to use in gradients.\n",
+        "type": "Color.Color -> Background.ColorStop"
+      },
+      {
+        "name": "default",
+        "comment": " Generates an empty `Background`.\n",
+        "type": "Background.Background"
+      },
+      {
+        "name": "degree",
+        "comment": " Generates an angle in degree from Float.\n",
+        "type": "Float -> Background.Angle"
+      },
+      {
+        "name": "gradient",
+        "comment": " Accepts a gradient, and creates a `BackgroundImage`.\n",
+        "type": "Background.Gradient -> Background.BackgroundImage"
+      },
+      {
+        "name": "image",
+        "comment": " Accepts an Url, and returns a `BackgroundImage`. This image can be modified\nto add a position to it.\n",
+        "type": "String -> Background.BackgroundImage"
+      },
+      {
+        "name": "images",
+        "comment": " Modify the background rendering to add photos and gradients.\nIt modifies the images list in `Background`.\n\n    Background.images\n        [ Background.image \"/example.photo\" ]\n\n",
+        "type": "List Background.BackgroundImage -> Helpers.Shared.Modifier Background.Background"
+      },
+      {
+        "name": "intermediateColors",
+        "comment": " Sets multiples intermediate colors in a gradient.\nBy default, a gradient is created with two colors. This can be used to add\nmore colors.\n",
+        "type": "List Background.ColorStop -> Helpers.Shared.Modifier Background.Gradient"
+      },
+      {
+        "name": "linear",
+        "comment": " Creates a linear gradient. The angle, and two colors (one for starting color,\nthe second for the ending color) are required, and more colors can be added in the\ngradient using `intermediateColors`.\n",
+        "type": "Background.Angle -> Background.ColorStop -> Background.ColorStop -> Background.Gradient"
+      },
+      {
+        "name": "rad",
+        "comment": " Generates an angle in radiant from Float.\n",
+        "type": "Float -> Background.Angle"
+      },
+      {
+        "name": "radial",
+        "comment": " Creates a radial gradient. Two colors (one for starting color, the second\nfor the ending color) are required, and more colors can be added in the gradient\nusing `intermediateColors`.\n",
+        "type": "Background.ColorStop -> Background.ColorStop -> Background.Gradient"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "BodyBuilder.Events",
+    "comment": " This module entirely replaces Html.Events, providing a type-safer alternative.\nThis is designed to work with BodyBuilder.\nIt is not compatible with Html, though.\n\n@docs checkEventToHtmlEvent\n@docs focusEventToHtmlAttributes\n@docs inputEventToHtmlEvent\n@docs mouseEventsToHtmlAttributes\n@docs on\n@docs onBlur\n@docs OnBlurEvent\n@docs onBlurEventToHtmlAttributes\n@docs onCheck\n@docs OnCheckEvent\n@docs onClick\n@docs OnColorInputEvent\n@docs onDoubleClick\n@docs OnEvent\n@docs onEventToHtmlAttributes\n@docs onFocus\n@docs OnFocusEvent\n@docs onInput\n@docs OnIntInputEvent\n@docs onMouseDown\n@docs onMouseEnter\n@docs OnMouseEvents\n@docs OnMouseEventsInside\n@docs onMouseLeave\n@docs onMouseOut\n@docs onMouseOver\n@docs onMouseUp\n@docs OnStringInputEvent\n@docs onSubmit\n@docs OnSubmitEvent\n@docs submitEventToHtmlEvent\n\n",
+    "aliases": [
+      {
+        "name": "OnBlurEvent",
+        "comment": " ",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "{ a | onBlurEvent : Maybe.Maybe msg }"
+      },
+      {
+        "name": "OnCheckEvent",
+        "comment": " ",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "{ a | onCheckEvent : Maybe.Maybe (Bool -> msg) }"
+      },
+      {
+        "name": "OnColorInputEvent",
+        "comment": " ",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "BodyBuilder.Events.OnInputEvent Color.Color msg a"
+      },
+      {
+        "name": "OnEvent",
+        "comment": " ",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "{ a | onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) }"
+      },
+      {
+        "name": "OnFocusEvent",
+        "comment": " ",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "{ a | onFocusEvent : Maybe.Maybe msg }"
+      },
+      {
+        "name": "OnIntInputEvent",
+        "comment": " ",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "BodyBuilder.Events.OnInputEvent Int msg a"
+      },
+      {
+        "name": "OnMouseEvents",
+        "comment": " ",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "{ a | onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) }"
+      },
+      {
+        "name": "OnMouseEventsInside",
+        "comment": " ",
+        "args": [
+          "msg"
+        ],
+        "type": "{ click : Maybe.Maybe msg , doubleClick : Maybe.Maybe msg , mouseDown : Maybe.Maybe msg , mouseUp : Maybe.Maybe msg , mouseEnter : Maybe.Maybe msg , mouseLeave : Maybe.Maybe msg , mouseOver : Maybe.Maybe msg , mouseOut : Maybe.Maybe msg }"
+      },
+      {
+        "name": "OnStringInputEvent",
+        "comment": " ",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "BodyBuilder.Events.OnInputEvent String msg a"
+      },
+      {
+        "name": "OnSubmitEvent",
+        "comment": " ",
+        "args": [
+          "msg",
+          "a"
+        ],
+        "type": "{ a | onSubmitEvent : Maybe.Maybe msg }"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "checkEventToHtmlEvent",
+        "comment": " ",
+        "type": "BodyBuilder.Events.OnCheckEvent msg a -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "focusEventToHtmlAttributes",
+        "comment": " ",
+        "type": "msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "inputEventToHtmlEvent",
+        "comment": " ",
+        "type": "( Maybe.Maybe (a -> msg), String -> a ) -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "mouseEventsToHtmlAttributes",
+        "comment": " ",
+        "type": "BodyBuilder.Events.OnMouseEventsInside msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "on",
+        "comment": " ",
+        "type": "String -> Json.Decode.Decoder msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnEvent msg a)"
+      },
+      {
+        "name": "onBlur",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnBlurEvent msg a)"
+      },
+      {
+        "name": "onBlurEventToHtmlAttributes",
+        "comment": " ",
+        "type": "msg -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "onCheck",
+        "comment": " ",
+        "type": "(Bool -> msg) -> Helpers.Shared.Modifier (BodyBuilder.Events.OnCheckEvent msg a)"
+      },
+      {
+        "name": "onClick",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnMouseEvents msg a)"
+      },
+      {
+        "name": "onDoubleClick",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnMouseEvents msg a)"
+      },
+      {
+        "name": "onEventToHtmlAttributes",
+        "comment": " ",
+        "type": "( String, Json.Decode.Decoder msg ) -> List (Html.Attribute msg)"
+      },
+      {
+        "name": "onFocus",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnFocusEvent msg a)"
+      },
+      {
+        "name": "onInput",
+        "comment": " ",
+        "type": "(a -> msg) -> Helpers.Shared.Modifier (BodyBuilder.Events.OnInputEvent a msg b)"
+      },
+      {
+        "name": "onMouseDown",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnMouseEvents msg a)"
+      },
+      {
+        "name": "onMouseEnter",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnMouseEvents msg a)"
+      },
+      {
+        "name": "onMouseLeave",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnMouseEvents msg a)"
+      },
+      {
+        "name": "onMouseOut",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnMouseEvents msg a)"
+      },
+      {
+        "name": "onMouseOver",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnMouseEvents msg a)"
+      },
+      {
+        "name": "onMouseUp",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnMouseEvents msg a)"
+      },
+      {
+        "name": "onSubmit",
+        "comment": " ",
+        "type": "msg -> Helpers.Shared.Modifier (BodyBuilder.Events.OnSubmitEvent msg a)"
+      },
+      {
+        "name": "submitEventToHtmlEvent",
+        "comment": " ",
+        "type": "BodyBuilder.Events.OnSubmitEvent msg a -> List (Html.Attribute msg)"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  }
+]

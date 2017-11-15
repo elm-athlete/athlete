@@ -60,7 +60,8 @@ module Grid
         , ValType(..)
         )
 
-{-| @docs align
+{-|
+@docs align
 @docs alignItems
 @docs alignItemsToCouple
 @docs alignSelfToCouple
@@ -118,7 +119,6 @@ module Grid
 @docs GridTemplate
 @docs Repeatable
 @docs ValType
-@docs align
 -}
 
 import Helpers.Shared exposing (..)
