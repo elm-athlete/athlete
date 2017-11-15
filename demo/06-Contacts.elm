@@ -36,10 +36,10 @@ import Cursor
 import Border
 import Outline
 import Typography
-import Typography.Character as Character
+import Character
 import Constants
 import Padding
-import Display.Overflow as Overflow
+import Overflow
 import Position
 import Function
 import Flex

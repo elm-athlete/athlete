@@ -6,11 +6,6 @@ import BodyBuilder.Attributes as Attributes
 import Style
 import Function
 import Dimensions
-
-
--- import Function exposing (..)
--- import Color exposing (..)
-
 import Display
 import Box
 import Position
@@ -37,22 +32,3 @@ stickyView sectionStyle sectionName elements =
             [ text sectionName ]
         , node [] elements
         ]
-
-
-
--- invertableButton :
---     Color
---     -> Color
---     -> { a | style : StyleAttribute }
---     -> { a | style : StyleAttribute }
--- invertableButton bg fg =
---     [ style [ textColor bg, backgroundColor fg, button ]
---     , hoverStyle [ textColor fg, backgroundColor bg ]
---     ]
---         |> compose
---
---
--- button : Style -> Style
--- button =
---     [ cursorPointer ]
---         |> compose

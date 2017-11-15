@@ -26,14 +26,11 @@ import Cursor
 import Border
 import Outline
 import Typography
-import Typography.Character as Character
+import Character
 import Constants
 import Padding
 import Time exposing (Time)
 import Task
-import Date
-import Date exposing (Month(..))
-import Date.Extra as Date
 import Style
 import Json.Decode as Decode exposing (Decoder)
 
@@ -126,6 +123,7 @@ gray =
     Color.grayscale 0.9
 
 
+standardCellStyle : Elegant.Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
 standardCellStyle =
     style
         [ Style.block
@@ -256,6 +254,7 @@ minSalary model =
     (model |> monthlyBankDebt) * 3
 
 
+pad : Elegant.Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
 pad =
     style
         [ Style.block []

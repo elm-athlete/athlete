@@ -24,6 +24,8 @@ module Flex
         , spaceBetween
         , spaceAround
         , justifyContentCenter
+        , justifyContentFlexStart
+        , justifyContentFlexEnd
         , grow
         , shrink
         , basisAuto
@@ -46,13 +48,13 @@ module Flex
 
 {-| Flex handles everything related to the flex element.
 
-
 @docs FlexContainerDetails
 @docs FlexItemDetails
 @docs FlexDirection
 @docs FlexWrap
 @docs Align
 @docs JustifyContent
+
 
 ## FlexDirection
 
@@ -86,9 +88,12 @@ module Flex
 @docs spaceBetween
 @docs spaceAround
 @docs justifyContentCenter
+@docs justifyContentFlexStart
+@docs justifyContentFlexEnd
 
 
 ## Positionning
+
 @docs topLeft
 @docs topCenter
 @docs topRight
@@ -98,6 +103,7 @@ module Flex
 @docs bottomLeft
 @docs bottomCenter
 @docs bottomRight
+
 
 ## Flex
 
@@ -111,6 +117,7 @@ module Flex
 @docs defaultFlexItemDetails
 @docs flexContainerDetailsToCouples
 @docs flexItemDetailsToCouples
+
 -}
 
 import Either exposing (Either(..))
@@ -129,8 +136,7 @@ type alias FlexContainerDetails =
     }
 
 
-{-|
--}
+{-| -}
 defaultFlexContainerDetails : FlexContainerDetails
 defaultFlexContainerDetails =
     FlexContainerDetails Nothing Nothing Nothing Nothing
@@ -295,6 +301,20 @@ justifyContentCenter =
     JustifyContentCenter
 
 
+{-| Defines the justify-content flex-start.
+-}
+justifyContentFlexStart : JustifyContent
+justifyContentFlexStart =
+    JustifyContentFlexStart
+
+
+{-| Defines the justify-content flex-end.
+-}
+justifyContentFlexEnd : JustifyContent
+justifyContentFlexEnd =
+    JustifyContentFlexEnd
+
+
 {-| Contains all style which can be used on a flex item.
 This contains flex-grow, flex-shrink, flex-basis and align-self.
 -}
@@ -306,8 +326,7 @@ type alias FlexItemDetails =
     }
 
 
-{-|
--}
+{-| -}
 defaultFlexItemDetails : FlexItemDetails
 defaultFlexItemDetails =
     FlexItemDetails Nothing Nothing Nothing Nothing
@@ -383,78 +402,67 @@ alignToString align =
             "stretch"
 
 
-{-|
--}
+{-| -}
 alignXY : ( Align, JustifyContent ) -> FlexContainerDetails -> FlexContainerDetails
 alignXY ( x, y ) =
     align x >> justifyContent y
 
 
-{-|
--}
+{-| -}
 topLeft : FlexContainerDetails -> FlexContainerDetails
 topLeft =
     alignXY ( AlignFlexStart, JustifyContentFlexStart )
 
 
-{-|
--}
+{-| -}
 topCenter : FlexContainerDetails -> FlexContainerDetails
 topCenter =
     alignXY ( AlignCenter, JustifyContentFlexStart )
 
 
-{-|
--}
+{-| -}
 topRight : FlexContainerDetails -> FlexContainerDetails
 topRight =
     alignXY ( AlignFlexEnd, JustifyContentFlexStart )
 
 
-{-|
--}
+{-| -}
 centerLeft : FlexContainerDetails -> FlexContainerDetails
 centerLeft =
     alignXY ( AlignFlexStart, JustifyContentCenter )
 
 
-{-|
--}
+{-| -}
 center : FlexContainerDetails -> FlexContainerDetails
 center =
     alignXY ( AlignCenter, JustifyContentCenter )
 
 
-{-|
--}
+{-| -}
 centerRight : FlexContainerDetails -> FlexContainerDetails
 centerRight =
     alignXY ( AlignFlexEnd, JustifyContentCenter )
 
 
-{-|
--}
+{-| -}
 bottomLeft : FlexContainerDetails -> FlexContainerDetails
 bottomLeft =
     alignXY ( AlignFlexStart, JustifyContentFlexEnd )
 
 
-{-|
--}
+{-| -}
 bottomCenter : FlexContainerDetails -> FlexContainerDetails
 bottomCenter =
     alignXY ( AlignCenter, JustifyContentFlexEnd )
 
 
-{-|
--}
+{-| -}
 bottomRight : FlexContainerDetails -> FlexContainerDetails
 bottomRight =
     alignXY ( AlignFlexEnd, JustifyContentFlexEnd )
 
 
-{-|
--}
+{-| -}
 flexItemDetailsToCouples : FlexItemDetails -> List ( String, String )
 flexItemDetailsToCouples flexContainerDetails =
     [ unwrapToCouple .grow growToCouple
@@ -465,8 +473,7 @@ flexItemDetailsToCouples flexContainerDetails =
         |> List.concatMap (callOn flexContainerDetails)
 
 
-{-|
--}
+{-| -}
 flexContainerDetailsToCouples : FlexContainerDetails -> List ( String, String )
 flexContainerDetailsToCouples flexContainerDetails =
     [ unwrapToCouple .direction directionToCouple

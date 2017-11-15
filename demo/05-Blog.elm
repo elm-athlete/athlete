@@ -23,7 +23,7 @@ import Cursor
 import Border
 import Outline
 import Typography
-import Typography.Character as Character
+import Character
 import Style
 import Date exposing (Month(..))
 import Date.Extra as Date
@@ -140,6 +140,7 @@ textToHtml =
         (List.foldr (\e accu -> [ text e, br ] ++ accu) [])
 
 
+standardCellStyle : Elegant.Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
 standardCellStyle =
     style
         [ Style.block

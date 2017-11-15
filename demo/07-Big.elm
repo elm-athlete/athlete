@@ -6,7 +6,7 @@ import BodyBuilder exposing (node, text)
 import BodyBuilder.Attributes as Attributes
 import Box
 import Typography
-import Typography.Character
+import Character
 import Shadow
 import Border
 import Color exposing (Color)
@@ -18,7 +18,7 @@ import Outline
 import Background
 import Position
 import Display
-import Display.Overflow
+import Overflow
 import Dimensions
 import Style
 
@@ -33,8 +33,8 @@ main =
 mainStyle =
     [ Style.block
         [ Display.overflow
-            [ Display.Overflow.overflowX Display.Overflow.hidden
-            , Display.Overflow.overflowY Display.Overflow.visible
+            [ Overflow.overflowX Overflow.hidden
+            , Overflow.overflowY Overflow.visible
             ]
         , Display.dimensions
             [ Dimensions.width (px 30)
@@ -48,9 +48,9 @@ mainStyle =
         [ Box.typography
             [ Elegant.color Color.blue
             , Typography.character
-                [ Typography.Character.weight 900
-                , Typography.Character.size (px 100)
-                , Typography.Character.italic
+                [ Character.weight 900
+                , Character.size (px 100)
+                , Character.italic
                 ]
             ]
         , Box.padding

@@ -14,7 +14,7 @@ import Typography
 import Padding
 import Color
 import Color.Extra as Color
-import Typography.Character as Character
+import Character
 import Style
 
 
@@ -30,6 +30,7 @@ buttonStyle =
     ]
 
 
+counter : a -> Node Msg
 counter model =
     flex
         [ style
@@ -76,10 +77,7 @@ windowCentered content =
     Builder.flex
         [ style
             [ Style.block [ Display.dimensions [ Dimensions.height (vh 100) ] ]
-            , Style.flexContainerProperties
-                [ Flex.align Flex.center
-                , Flex.justifyContent Flex.justifyContentCenter
-                ]
+            , Style.flexContainerProperties [ Flex.center ]
             ]
         ]
         [ flexItem [ style [ Style.block [] ] ] [ content ] ]

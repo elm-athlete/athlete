@@ -842,6 +842,7 @@ gridXY content =
     }
 
 
+gridXAndY : a -> a -> { x : Maybe a, y : Maybe a }
 gridXAndY x y =
     { x = Just x
     , y = Just y
@@ -1134,6 +1135,12 @@ view model =
         ]
 
 
+item :
+    Elegant.Modifier Box.Box
+    -> ( Int, Int )
+    -> ( Grid.GridItemSize, Grid.GridItemSize )
+    -> List (Node msg)
+    -> B.GridItem msg
 item color ( x, y ) ( width, height ) =
     B.gridItem
         [ A.style
@@ -1268,6 +1275,11 @@ contentViewGridItem selectedId { tree, id } =
             []
 
 
+selection :
+    { c | attributes : { b | style : Elegant.CommonStyle } }
+    -> Int
+    -> Int
+    -> List (Elegant.Modifier (A.VisibleAttributesAndEvents Msg a))
 selection element id selectedId =
     ([ A.class [ Elegant.commonStyleToCss element.attributes.style ] ] ++ selectOrSelected id selectedId)
 
@@ -1415,6 +1427,11 @@ textEditor text id =
     B.inputText [ A.value text, E.onInput ChangeText ]
 
 
+whiteItem :
+    ( Int, Int )
+    -> ( Grid.GridItemSize, Grid.GridItemSize )
+    -> List (Node msg)
+    -> B.GridItem msg
 whiteItem =
     item (Box.backgroundColor (Color.white))
 
@@ -1871,11 +1888,13 @@ getColorFromElement tree =
     getPropertyFromStyle Color.black extractColorFromStyle tree
 
 
+getPropertyFromStyle : a -> (Elegant.CommonStyle -> Maybe a) -> Tree msg -> a
 getPropertyFromStyle default fun element =
     Maybe.withDefault default <|
         foldOnAttributes Nothing (fun << .style) element
 
 
+foldOnAttributes : a -> ({ style : Elegant.CommonStyle } -> a) -> Tree msg -> a
 foldOnAttributes default fun element =
     case element of
         Block { attributes } ->
@@ -1894,6 +1913,7 @@ foldOnAttributes default fun element =
             default
 
 
+foldOnChildren : a -> (List (Element msg) -> a) -> Tree msg -> a
 foldOnChildren default fun element =
     case element of
         Block { children } ->
@@ -1912,6 +1932,7 @@ foldOnChildren default fun element =
             default
 
 
+foldOnTagAndChildren : a -> (String -> List (Element msg) -> a) -> Tree msg -> a
 foldOnTagAndChildren default fun element =
     case element of
         Block { tag, children } ->

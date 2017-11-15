@@ -49,14 +49,14 @@ import Elegant exposing (SizeUnit, px, percent)
 import AnimationFrame
 import Time exposing (Time)
 import Display
-import Display.Overflow as Overflow
+import Overflow
 import Box
 import Shadow
 import Position
 import Typography
 import Padding
 import Cursor
-import Typography.Character
+import Character
 import Color
 import Flex
 import Dimensions
@@ -347,6 +347,10 @@ afterTransition history =
                 [ history.current ]
 
 
+overflowHiddenContainer :
+    Elegant.Modifiers (Attributes.FlexContainerAttributes msg)
+    -> List (FlexItem msg)
+    -> Node msg
 overflowHiddenContainer attributes content =
     flex
         ([ style
@@ -378,13 +382,13 @@ pageView insidePageView_ transition data page =
                     ]
                 ]
             ]
-          -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
+
+        -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
         ]
         [ insidePageView_ page data transition ]
 
 
-{-|
--}
+{-| -}
 pageWithHeader : Node msg -> Node msg -> Node msg
 pageWithHeader header page =
     flex
@@ -399,8 +403,7 @@ pageWithHeader header page =
         ]
 
 
-{-|
--}
+{-| -}
 mainElement : Node msg -> Node msg
 mainElement html =
     node
@@ -545,6 +548,10 @@ initHistoryAndData route data =
     }
 
 
+headerButtonStyle :
+    SizeUnit
+    -> Elegant.Modifier Display.BlockDetails
+    -> Elegant.Modifier (Attributes.FlexItemAttributes msg)
 headerButtonStyle width align =
     Attributes.style
         [ Style.flexItemProperties [ Flex.basis width ]
@@ -558,20 +565,23 @@ headerButtonStyle width align =
             [ Box.cursor Cursor.pointer
             , Box.typography
                 [ Typography.character
-                    [ Typography.Character.size (Elegant.px 12) ]
+                    [ Character.size (Elegant.px 12) ]
                 ]
             ]
         ]
 
 
+headerButtonStyleLeft : Elegant.Modifier (Attributes.FlexItemAttributes msg)
 headerButtonStyleLeft =
     headerButtonStyle (percent 30) (Display.alignment Display.left)
 
 
+headerButtonStyleCenter : Elegant.Modifier (FlexItemAttributes msg)
 headerButtonStyleCenter =
     headerButtonStyle (percent 40) Block.alignCenter
 
 
+headerButtonStyleRight : Elegant.Modifier (FlexItemAttributes msg)
 headerButtonStyleRight =
     headerButtonStyle (percent 30) (Display.alignment Display.right)
 

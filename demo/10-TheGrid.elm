@@ -47,13 +47,14 @@ example =
             , Style.box [ Box.backgroundColor Color.lightPurple ]
             ]
         ]
-        [ alignedCellWithPurpleBackground ( 0, 0 ) ( 2, 1 ) ( Flex.flexStart, Flex.flexEnd ) [ content "bottom left" ]
-        , alignedCellWithPurpleBackground ( 2, 0 ) ( 1, 2 ) Flex.center [ content "center" ]
-        , alignedCellWithPurpleBackground ( 1, 2 ) ( 2, 1 ) Flex.topRight [ content "top right" ]
-        , alignedCellWithPurpleBackground ( 0, 1 ) ( 1, 2 ) Flex.centerRight [ content "center right" ]
+        [ alignedCellWithPurpleBackground ( 0, 0 ) ( 2, 1 ) ( Flex.flexStart, Flex.justifyContentFlexEnd ) [ content "bottom left" ]
+        , alignedCellWithPurpleBackground ( 2, 0 ) ( 1, 2 ) ( Flex.alignCenter, Flex.justifyContentCenter ) [ content "center" ]
+        , alignedCellWithPurpleBackground ( 1, 2 ) ( 2, 1 ) ( Flex.flexEnd, Flex.justifyContentFlexStart ) [ content "top right" ]
+        , alignedCellWithPurpleBackground ( 0, 1 ) ( 1, 2 ) ( Flex.flexEnd, Flex.justifyContentCenter ) [ content "center right" ]
         ]
 
 
+content : String -> Node msg
 content str =
     Builder.div [ Attributes.style [ Style.box [ Box.backgroundColor Color.yellow, Box.paddingAll (px 24) ] ] ] [ Builder.text str ]
 

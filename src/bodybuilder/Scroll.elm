@@ -1,7 +1,6 @@
 module Scroll exposing (..)
 
 import BodyBuilder exposing (..)
-import Elegant exposing (textCenter, padding, SizeUnit(..), fontSize)
 import Json.Decode as Decode
 
 

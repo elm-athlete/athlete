@@ -3,10 +3,9 @@ module Main exposing (..)
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
 import Elegant exposing (px, Style)
-import Display
 import Box
 import Typography
-import Typography.Character as Character
+import Character
 import Style
 import Block
 
