@@ -1,4 +1,7 @@
-module Flex.Extra exposing (..)
+module Flex.Extra
+    exposing
+        ( alignedContent
+        )
 
 {-|
 @docs alignedContent

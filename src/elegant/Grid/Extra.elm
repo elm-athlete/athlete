@@ -1,4 +1,8 @@
-module Grid.Extra exposing (..)
+module Grid.Extra
+    exposing
+        ( alignedCell
+        , cell
+        )
 
 {-|
 @docs alignedCell
