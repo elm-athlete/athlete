@@ -1,5 +1,10 @@
 module Grid.Extra exposing (..)
 
+{-|
+@docs alignedCell
+@docs cell
+-}
+
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
 import Style
@@ -8,6 +13,9 @@ import Flex
 import Flex.Extra
 
 
+{-|
+a cell inside a grid with alignement of it's content
+-}
 alignedCell :
     List (Attributes.StyleModifier (Attributes.GridItemAttributes msg))
     -> ( Int, Int )
@@ -19,6 +27,9 @@ alignedCell cellStyle ( x, y ) ( width, height ) alignment content =
     cell cellStyle ( x, y ) ( width, height ) [ Flex.Extra.alignedContent alignment content ]
 
 
+{-|
+a cell inside a grid with beginning coordinates and size
+-}
 cell :
     List (Attributes.StyleModifier (Attributes.GridItemAttributes msg))
     -> ( Int, Int )
