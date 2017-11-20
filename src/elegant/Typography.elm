@@ -421,6 +421,7 @@ typographyToCouples typography =
     , unwrapToCouple .tilt tiltToCouple
     , unwrapToCouple .size sizeToCouple
     , unwrapToCouple .family familyToCouple
+    , unwrapToCouple .letterSpacing letterSpacingToCouple
     ]
         |> List.concatMap (callOn typography)
 
@@ -548,6 +549,11 @@ sizeToCouple val =
 familyToCouple : FontFamily -> ( String, String )
 familyToCouple fontFamily =
     ( "font-family", fontFamilyToString fontFamily )
+
+
+letterSpacingToCouple : SizeUnit -> ( String, String )
+letterSpacingToCouple value =
+    ( "letter-spacing", sizeUnitToString value )
 
 
 fontFamilyToString : FontFamily -> String
