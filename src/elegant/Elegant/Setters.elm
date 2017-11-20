@@ -664,3 +664,13 @@ setValue v o =
 setValueIn : { c | value : b } -> a -> { c | value : a }
 setValueIn =
     flip setValue
+
+
+setLetterSpacing : a -> { c | letterSpacing : b } -> { c | letterSpacing : a }
+setLetterSpacing v o =
+    { o | letterSpacing = v }
+
+
+setLetterSpacingIn : { c | letterSpacing : b } -> a -> { c | letterSpacing : a }
+setLetterSpacingIn =
+    flip setLetterSpacing

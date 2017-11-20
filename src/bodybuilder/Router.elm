@@ -56,7 +56,6 @@ import Position
 import Typography
 import Padding
 import Cursor
-import Character
 import Color
 import Flex
 import Dimensions
@@ -564,9 +563,7 @@ headerButtonStyle width align =
         , Style.box
             [ Box.cursor Cursor.pointer
             , Box.typography
-                [ Typography.character
-                    [ Character.size (Elegant.px 12) ]
-                ]
+                [ Typography.size (Elegant.px 12) ]
             ]
         ]
 

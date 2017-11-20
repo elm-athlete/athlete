@@ -14,7 +14,6 @@ import Typography
 import Padding
 import Color
 import Color.Extra as Color
-import Character
 import Style
 
 
@@ -23,7 +22,7 @@ buttonStyle =
     , Style.box
         [ Box.padding [ Padding.vertical Constants.zero ]
         , Box.border [ Border.all [ Border.thickness (px 0) ] ]
-        , Box.typography [ Typography.character [ Character.size (px 10) ] ]
+        , Box.typography [ Typography.size (px 10) ]
         , Box.background [ Elegant.color Color.transparent ]
         , Box.padding [ Padding.horizontal Constants.small ]
         ]
@@ -49,7 +48,7 @@ counter model =
                     [ Style.block [ Display.dimensions [ Dimensions.height (percent 100) ] ]
                     , Style.box
                         [ Box.padding [ Padding.all Constants.zero ]
-                        , Box.typography [ Typography.character [ Character.size (px 20) ] ]
+                        , Box.typography [ Typography.size (px 20) ]
                         , Box.border [ Border.all [ Border.thickness (px 0) ] ]
                         , Box.padding [ Padding.left Constants.small ]
                         ]

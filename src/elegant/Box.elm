@@ -114,7 +114,6 @@ import Color exposing (Color)
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 import Typography
-import Character
 import Padding
 import Border
 import Corner
@@ -443,13 +442,13 @@ marginAuto =
 {-| -}
 fontFamilySansSerif : Modifier Box
 fontFamilySansSerif =
-    typography [ Typography.character [ Character.fontFamilySansSerif ] ]
+    typography [ Typography.fontFamilySansSerif ]
 
 
 {-| -}
 systemFont : String -> Modifier Box
 systemFont font =
-    typography [ Typography.character [ Character.fontFamily [ Character.systemFont font ] ] ]
+    typography [ Typography.fontFamily [ Typography.systemFont font ] ]
 
 
 {-| -}

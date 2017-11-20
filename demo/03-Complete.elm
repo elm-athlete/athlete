@@ -103,7 +103,7 @@ customCounter title min max step val msg =
         [ h3
             [ boxStyle
                 [ Box.typography
-                    [ Typography.fontSize (px 14)
+                    [ Typography.size (px 14)
                     , Typography.uppercase
                     ]
                 ]
@@ -361,7 +361,7 @@ view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstr
                     [ Box.paddingVertical (px 75)
                     , Box.typography
                         [ Typography.uppercase
-                        , Typography.fontSize (px 64)
+                        , Typography.size (px 64)
                         , Typography.bold
                         ]
                     ]

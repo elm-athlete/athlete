@@ -23,7 +23,6 @@ import Cursor
 import Border
 import Outline
 import Typography
-import Character
 import Style
 import Date exposing (Month(..))
 import Date.Extra as Date
@@ -155,10 +154,8 @@ standardCellStyle =
                 ]
             , Box.outline [ Outline.none ]
             , Box.typography
-                [ Typography.character
-                    [ Character.fontFamilyInherit
-                    , Character.size Constants.zeta
-                    ]
+                [ Typography.fontFamilyInherit
+                , Typography.size Constants.zeta
                 ]
             , Box.padding [ Padding.all Constants.large ]
             , Box.background [ Elegant.color Color.white ]
@@ -203,10 +200,8 @@ view { history, data } =
             [ Style.block []
             , Style.box
                 [ Box.typography
-                    [ Typography.character
-                        [ Character.fontFamilySansSerif
-                        , Character.size Constants.zeta
-                        ]
+                    [ Typography.fontFamilySansSerif
+                    , Typography.size Constants.zeta
                     ]
                 ]
             ]

@@ -5,7 +5,6 @@ import BodyBuilder.Attributes as Attributes
 import Elegant exposing (px, Style)
 import Box
 import Typography
-import Character
 import Style
 import Block
 
@@ -29,15 +28,11 @@ view model =
             [ Attributes.style
                 [ Style.box
                     [ Box.typography
-                        [ Typography.character
-                            [ Character.size (px theFontSize) ]
-                        ]
+                        [ Typography.size (px theFontSize) ]
                     ]
                 , Style.box
                     [ Box.typography
-                        [ Typography.character
-                            [ Character.size (px (theFontSize + 5)) ]
-                        ]
+                        [ Typography.size (px (theFontSize + 5)) ]
                     ]
                     |> Style.pseudoClass "hover"
                 ]
