@@ -6,6 +6,7 @@ module Router
         , Transition
         , push
         , slideUp
+        , slideUpp
         , pageWithDefaultTransition
         , pageWithTransition
         , pageWithoutTransition
@@ -16,6 +17,16 @@ module Router
         , maybeTransitionSubscription
         , initHistoryAndData
         , pageWithHeader
+        , customTransition
+        , forward
+        , pageView
+        , customKind
+        , easeInOutt
+        , overflowHiddenContainer
+        , beforeTransition
+        , percentage
+        , getMaybeTransitionValue
+        , afterTransition
         )
 
 {-| Router based on BodyBuilder and Elegant implementing transitions between
@@ -31,9 +42,21 @@ pages and history (backward and forward)
 @docs initHistoryAndData
 @docs push
 @docs slideUp
+@docs slideUpp
+@docs forward
 @docs pageWithDefaultTransition
 @docs pageWithTransition
 @docs pageWithoutTransition
+@docs customTransition
+@docs easeInOutt
+@docs customKind
+@docs overflowHiddenContainer
+@docs pageView
+@docs beforeTransition
+@docs percentage
+@docs getMaybeTransitionValue
+@docs afterTransition
+
 
 @docs headerElement
 @docs pageWithHeader
@@ -69,17 +92,30 @@ type Easing
     | Linear
 
 
-type Kind
+type Kind route data msg
     = SlideRight
     | SlideUp
+    | CustomKind
+        (History route data msg
+         -> (Page route data msg -> data -> Maybe (Transition route data msg) -> Node msg)
+         -> data
+         -> Node msg
+        )
+
+
+{-|
+-}
+customKind : (History route data msg -> (Page route data msg -> data -> Maybe (Transition route data msg) -> Node msg) -> data -> Node msg) -> Kind route data msg
+customKind =
+    CustomKind
 
 
 {-| Transition between 2 pages
 -}
-type alias Transition =
+type alias Transition route data msg =
     { timer : Float
     , length : Float
-    , kind : Kind
+    , kind : Kind route data msg
     , direction : Direction
     , easing : Easing
     }
@@ -87,26 +123,44 @@ type alias Transition =
 
 {-| Page type handling transition
 -}
-type alias Page customRoute =
-    { maybeTransition : Maybe Transition
-    , route : customRoute
+type alias Page route data msg =
+    { maybeTransition : Maybe (Transition route data msg)
+    , route : route
     }
 
 
 {-| Generic History type handling current page, before pages, after pages
 and current transition
 -}
-type alias History route =
-    { before : List (Page route)
-    , current : Page route
-    , after : List (Page route)
-    , transition : Maybe Transition
+type alias History route data msg =
+    { before : List (Page route data msg)
+    , current : Page route data msg
+    , after : List (Page route data msg)
+    , transition : Maybe (Transition route data msg)
     }
 
 
 type Direction
     = Forward
     | Backward
+
+
+{-| -}
+forward : Direction
+forward =
+    Forward
+
+
+{-| -}
+easeInOutt : Easing
+easeInOutt =
+    EaseInOut
+
+
+{-| -}
+slideUpp : Kind route data msg
+slideUpp =
+    SlideUp
 
 
 {-| Standard History Messages type :
@@ -136,7 +190,8 @@ easeInOut t =
         -1 + (4 - 2 * t) * t
 
 
-getMaybeTransitionValue : Maybe Transition -> Float
+{-| -}
+getMaybeTransitionValue : Maybe (Transition route data msg) -> Float
 getMaybeTransitionValue maybeTransition =
     case maybeTransition of
         Nothing ->
@@ -146,7 +201,7 @@ getMaybeTransitionValue maybeTransition =
             transition |> getTransitionValue
 
 
-getTransitionValue : Transition -> Float
+getTransitionValue : Transition route data msg -> Float
 getTransitionValue { direction, timer, length, easing } =
     (case direction of
         Forward ->
@@ -165,7 +220,7 @@ getTransitionValue { direction, timer, length, easing } =
           )
 
 
-isRunning : Maybe Transition -> Bool
+isRunning : Maybe (Transition route data msg) -> Bool
 isRunning transition =
     case transition of
         Nothing ->
@@ -175,7 +230,7 @@ isRunning transition =
             transition.timer > 0
 
 
-timeDiff : Float -> Transition -> Transition
+timeDiff : Float -> Transition route data msg -> Transition route data msg
 timeDiff diff ({ timer } as transition) =
     let
         newTimer =
@@ -192,14 +247,15 @@ basicDuration =
     250
 
 
-customTransition : Float -> Kind -> Direction -> Easing -> Transition
+{-| -}
+customTransition : Float -> Kind route data msg -> Direction -> Easing -> Transition route data msg
 customTransition duration =
     Transition duration duration
 
 
 {-| push a page into history
 -}
-push : Page route -> History route -> History route
+push : Page route data msg -> History route data msg -> History route data msg
 push el ({ transition, before, current, after } as history) =
     if isRunning transition then
         history
@@ -222,7 +278,7 @@ oppositeDirection direction =
             Backward
 
 
-opposite : Maybe Transition -> Maybe Transition
+opposite : Maybe (Transition route data msg) -> Maybe (Transition route data msg)
 opposite maybeTransition =
     case maybeTransition of
         Nothing ->
@@ -236,33 +292,33 @@ opposite maybeTransition =
                 }
 
 
-defaultTransition : Maybe Transition
+defaultTransition : Maybe (Transition route data msg)
 defaultTransition =
     Just <| customTransition basicDuration SlideRight Forward EaseInOut
 
 
 {-| creates a page with the defaultTransition
 -}
-pageWithDefaultTransition : route -> Page route
+pageWithDefaultTransition : route -> Page route data msg
 pageWithDefaultTransition =
     Page defaultTransition
 
 
 {-| creates a page without any transition
 -}
-pageWithoutTransition : route -> Page route
+pageWithoutTransition : route -> Page route data msg
 pageWithoutTransition =
     Page Nothing
 
 
 {-| creates a page with a custom transition
 -}
-pageWithTransition : Transition -> route -> Page route
+pageWithTransition : Transition route data msg -> route -> Page route data msg
 pageWithTransition transition =
     Page (Just transition)
 
 
-pull : History route -> History route
+pull : History route data msg -> History route data msg
 pull ({ transition, before, current, after } as history) =
     if isRunning transition then
         history
@@ -282,7 +338,7 @@ pull ({ transition, before, current, after } as history) =
 
 {-| slideUp transition
 -}
-slideUp : Transition
+slideUp : Transition route data msg
 slideUp =
     customTransition basicDuration SlideUp Forward EaseInOut
 
@@ -297,7 +353,7 @@ putHeadInListIfExists list =
             [ head ]
 
 
-visiblePages : History route -> List (Page route)
+visiblePages : History route data msg -> List (Page route data msg)
 visiblePages { transition, before, current, after } =
     case transition of
         Nothing ->
@@ -312,6 +368,7 @@ visiblePages { transition, before, current, after } =
                     current :: putHeadInListIfExists after
 
 
+{-| -}
 percentage : Float -> SizeUnit
 percentage a =
     percent <| toFloat <| round <| 100 * a
@@ -321,7 +378,8 @@ percentage a =
 -- Heavily reduces the number of generated classes...
 
 
-beforeTransition : History route -> List (Page route)
+{-| -}
+beforeTransition : History route data msg -> List (Page route data msg)
 beforeTransition history =
     case history.transition of
         Nothing ->
@@ -334,7 +392,8 @@ beforeTransition history =
                 putHeadInListIfExists history.before
 
 
-afterTransition : History route -> List (Page route)
+{-| -}
+afterTransition : History route data msg -> List (Page route data msg)
 afterTransition history =
     case history.transition of
         Nothing ->
@@ -347,6 +406,7 @@ afterTransition history =
                 [ history.current ]
 
 
+{-| -}
 overflowHiddenContainer :
     Elegant.Modifiers (Attributes.FlexContainerAttributes msg)
     -> List (FlexItem msg)
@@ -365,9 +425,10 @@ overflowHiddenContainer attributes content =
         content
 
 
+{-| -}
 pageView :
-    (a -> b -> Maybe Transition -> Node msg)
-    -> Maybe Transition
+    (a -> b -> Maybe (Transition route data msg) -> Node msg)
+    -> Maybe (Transition route data msg)
     -> b
     -> a
     -> Node msg
@@ -422,8 +483,8 @@ mainElement html =
 the history and its own routing system
 -}
 historyView :
-    (Page route -> data -> Maybe Transition -> Node msg)
-    -> History route
+    (Page route data msg -> data -> Maybe (Transition route data msg) -> Node msg)
+    -> History route data msg
     -> data
     -> Node msg
 historyView insidePageView_ history data =
@@ -441,6 +502,9 @@ historyView insidePageView_ history data =
 
             Just transition ->
                 case transition.kind of
+                    CustomKind view_ ->
+                        view_ history insidePageView_ data
+
                     SlideUp ->
                         overflowHiddenContainer []
                             [ flexItem
@@ -501,7 +565,7 @@ maybeTransitionSubscription standardHistoryWrapper =
         >> Maybe.withDefault Sub.none
 
 
-initHistory : route -> History route
+initHistory : route -> History route data msg
 initHistory currentPage =
     { before = []
     , current = pageWithoutTransition currentPage
@@ -510,7 +574,7 @@ initHistory currentPage =
     }
 
 
-standardHandleHistory : StandardHistoryMsg -> History route -> History route
+standardHandleHistory : StandardHistoryMsg -> History route data msg -> History route data msg
 standardHandleHistory historyMsg history =
     case historyMsg of
         Back ->
@@ -534,14 +598,14 @@ standardHandleHistory historyMsg history =
 
 {-| handle model's history update using historyMsg
 -}
-handleStandardHistory : StandardHistoryMsg -> { a | history : History route } -> ( { a | history : History route }, Cmd msg )
+handleStandardHistory : StandardHistoryMsg -> { a | history : History route data msg } -> ( { a | history : History route data msg }, Cmd msg )
 handleStandardHistory historyMsg model =
     ( { model | history = standardHandleHistory historyMsg model.history }, Cmd.none )
 
 
 {-| initialize history and data based on the routing system
 -}
-initHistoryAndData : route -> data -> { history : History route, data : data }
+initHistoryAndData : route -> data -> { history : History route data msg, data : data }
 initHistoryAndData route data =
     { history = initHistory route
     , data = data
