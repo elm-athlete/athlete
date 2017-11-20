@@ -6,7 +6,8 @@ import BodyBuilder.Events as Events
 import Color exposing (..)
 import Color.Manipulate as Color
 import Function exposing (..)
-import Elegant exposing (SizeUnit, px, pt, percent, vh, Modifier, Modifiers)
+import Elegant exposing (SizeUnit, px, pt, percent, vh)
+import Modifiers exposing (..)
 import Constants
 import Elegant
 import Box

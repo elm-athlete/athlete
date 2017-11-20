@@ -90,6 +90,7 @@ import Overflow
 import Dimensions
 import Flex
 import Grid
+import Modifiers exposing (..)
 
 
 {-| Represents a box and contains all the style inside.

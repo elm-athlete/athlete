@@ -136,6 +136,7 @@ import Either exposing (Either(..))
 import Helpers.Shared exposing (..)
 import Helpers.Css
 import Elegant.Setters exposing (..)
+import Modifiers exposing (..)
 
 
 {-| The `Typography` record contains everything about fonts rendering,

@@ -124,6 +124,7 @@ import Cursor
 import Surrounded exposing (Surrounded)
 import Background
 import Position
+import Modifiers exposing (..)
 
 
 {-| Represents a box, handling the properties of blocks. They are automatically

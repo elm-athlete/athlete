@@ -1,8 +1,6 @@
 module Elegant
     exposing
-        ( Modifier
-        , Modifiers
-        , SizeUnit
+        ( SizeUnit
         , Style
         , CommonStyle
         , commonStyle
@@ -31,12 +29,10 @@ module Elegant
         )
 
 {-|
-@docs Modifier
 @docs CommonStyle
 @docs commonStyle
 @docs commonStyleToCss
 @docs commonStyleToStyle
-@docs Modifiers
 @docs SizeUnit
 @docs Style
 @docs classes
@@ -65,6 +61,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Helpers.Shared exposing (..)
 import Helpers.Style as CommonStyle
+import Modifiers exposing (..)
 import Display exposing (DisplayBox)
 import Elegant.Convert
 import Elegant.Setters exposing (..)
@@ -77,14 +74,12 @@ type Style
     = Style CommonStyle.Style
 
 
-{-|
--}
+{-| -}
 type alias CommonStyle =
     CommonStyle.Style
 
 
-{-|
--}
+{-| -}
 commonStyle :
     Maybe DisplayBox
     -> List CommonStyle.ScreenWidth
@@ -94,21 +89,10 @@ commonStyle =
     CommonStyle.Style
 
 
-{-|
--}
+{-| -}
 commonStyleToStyle : CommonStyle -> Style
 commonStyleToStyle =
     Style
-
-
-{-| -}
-type alias Modifiers a =
-    Helpers.Shared.Modifiers a
-
-
-{-| -}
-type alias Modifier a =
-    Helpers.Shared.Modifier a
 
 
 {-| -}
@@ -235,8 +219,7 @@ classes (Style style) =
 --         |> Elegant.Convert.stylesToCss
 
 
-{-|
--}
+{-| -}
 commonStyleToCss : CommonStyle -> String
 commonStyleToCss style =
     let

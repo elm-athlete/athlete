@@ -4,6 +4,7 @@ import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (style)
 import BodyBuilder.Events
 import Elegant exposing (SizeUnit, px, pt, percent, vh)
+import Modifiers exposing (..)
 import Color
 import Router
     exposing
@@ -122,7 +123,7 @@ gray =
     Color.grayscale 0.9
 
 
-standardCellStyle : Elegant.Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
+standardCellStyle : Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
 standardCellStyle =
     style
         [ Style.block
@@ -251,7 +252,7 @@ minSalary model =
     (model |> monthlyBankDebt) * 3
 
 
-pad : Elegant.Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
+pad : Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
 pad =
     style
         [ Style.block []
@@ -336,7 +337,7 @@ toPositiveInt i =
 
 {-| returns a background with a color
 -}
-backgroundColor : Color.Color -> Elegant.Modifier Box.Box
+backgroundColor : Color.Color -> Modifier Box.Box
 backgroundColor color =
     Box.background [ Elegant.color color ]
 

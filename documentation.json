@@ -1,5 +1,38 @@
 [
   {
+    "name": "Grid.Extra",
+    "comment": "\n@docs alignedCell\n@docs cell\n",
+    "aliases": [],
+    "types": [],
+    "values": [
+      {
+        "name": "alignedCell",
+        "comment": "\na cell inside a grid with alignement of it's content\n",
+        "type": "List (BodyBuilder.Attributes.StyleModifier (BodyBuilder.Attributes.GridItemAttributes msg)) -> ( Int, Int ) -> ( Int, Int ) -> ( Flex.Align, Flex.JustifyContent ) -> List (BodyBuilder.Node msg) -> BodyBuilder.GridItem msg"
+      },
+      {
+        "name": "cell",
+        "comment": "\na cell inside a grid with beginning coordinates and size\n",
+        "type": "List (BodyBuilder.Attributes.StyleModifier (BodyBuilder.Attributes.GridItemAttributes msg)) -> ( Int, Int ) -> ( Int, Int ) -> List (BodyBuilder.Node msg) -> BodyBuilder.GridItem msg"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Flex.Extra",
+    "comment": "\n@docs alignedContent\n",
+    "aliases": [],
+    "types": [],
+    "values": [
+      {
+        "name": "alignedContent",
+        "comment": "\nalignedContent is a way to align content inside a container.\n",
+        "type": "( Flex.Align, Flex.JustifyContent ) -> List (BodyBuilder.Node msg) -> BodyBuilder.Node msg"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
     "name": "Router",
     "comment": " Router based on BodyBuilder and Elegant implementing transitions between\npages and history (backward and forward)\n\n@docs History\n@docs StandardHistoryMsg\n@docs Page\n@docs Transition\n\n@docs handleStandardHistory\n@docs maybeTransitionSubscription\n@docs initHistoryAndData\n@docs push\n@docs slideUp\n@docs pageWithDefaultTransition\n@docs pageWithTransition\n@docs pageWithoutTransition\n\n@docs headerElement\n@docs pageWithHeader\n@docs headerButton\n@docs historyView\n\n",
     "aliases": [
@@ -470,7 +503,7 @@
   },
   {
     "name": "BodyBuilder.Attributes",
-    "comment": " This module entirely replaces Html.Attributes, providing a type-safer alternatives.\nThis is designed to work with BodyBuilder.\nIt is not compatible with Html.Attributes, though.\n\n@docs AAttributes\n@docs aAttributesToHtmlAttributes\n@docs AudioAttributes\n@docs audioAttributesToHtmlAttributes\n@docs autocomplete\n@docs BlockAttributes\n@docs BlockContainer\n@docs BoxContainer\n@docs ButtonAttributes\n@docs buttonAttributesToHtmlAttributes\n@docs checked\n@docs CheckedContainer\n@docs class\n@docs ColorValue\n@docs data\n@docs DataAttribute\n@docs defaultAAttributes\n@docs defaultAudioAttributes\n@docs defaultButtonAttributes\n@docs defaultFlexContainerAttributes\n@docs defaultFlexItemAttributes\n@docs defaultFlowAttributes\n@docs defaultGridContainerAttributes\n@docs defaultGridItemAttributes\n@docs defaultHeadingAttributes\n@docs defaultImgAttributes\n@docs defaultInputCheckboxAttributes\n@docs defaultInputColorAttributes\n@docs defaultInputFileAttributes\n@docs defaultInputHiddenAttributes\n@docs defaultInputNumberAttributes\n@docs defaultInputPasswordAttributes\n@docs defaultInputRadioAttributes\n@docs defaultInputRangeAttributes\n@docs defaultInputSubmitAttributes\n@docs defaultInputTextAttributes\n@docs defaultInputUrlAttributes\n@docs defaultNodeAttributes\n@docs defaultProgressAttributes\n@docs defaultScriptAttributes\n@docs defaultSelectAttributes\n@docs defaultStyleSelector\n@docs defaultTextareaAttributes\n@docs defaultUniversalAttributes\n@docs disabled\n@docs DisabledAttribute\n@docs disabledAttributeToHtmlAttributes\n@docs FlexContainerAttributes\n@docs flexContainerAttributesToHtmlAttributes\n@docs FlexContainerProperties\n@docs FlexItemAttributes\n@docs flexItemAttributesToHtmlAttributes\n@docs FlexItemProperties\n@docs FlowAttributes\n@docs flowAttributesToHtmlAttributes\n@docs GridContainerAttributes\n@docs gridContainerAttributesToHtmlAttributes\n@docs GridContainerProperties\n@docs GridItemAttributes\n@docs gridItemAttributesToHtmlAttributes\n@docs GridItemProperties\n@docs HeadingAttributes\n@docs headingAttributesToHtmlAttributes\n@docs height\n@docs href\n@docs HrefAttribute\n@docs id\n@docs ImgAttributes\n@docs imgAttributesToHtmlAttributes\n@docs InputAttributes\n@docs inputAttributesToHtmlAttributes\n@docs InputCheckboxAttributes\n@docs inputCheckboxAttributesToHtmlAttributes\n@docs InputColorAttributes\n@docs inputColorAttributesToHtmlAttributes\n@docs InputFileAttributes\n@docs inputFileAttributesToHtmlAttributes\n@docs InputHiddenAttributes\n@docs inputHiddenAttributesToHtmlAttributes\n@docs InputNumberAttributes\n@docs inputNumberAttributesToHtmlAttributes\n@docs InputPasswordAttributes\n@docs inputPasswordAttributesToHtmlAttributes\n@docs InputRadioAttributes\n@docs inputRadioAttributesToHtmlAttributes\n@docs InputRangeAttributes\n@docs inputRangeAttributesToHtmlAttributes\n@docs InputSubmitAttributes\n@docs inputSubmitAttributesToHtmlAttributes\n@docs InputTextAttributes\n@docs inputTextAttributesToHtmlAttributes\n@docs InputUrlAttributes\n@docs inputUrlAttributesToHtmlAttributes\n@docs inputVisibleToHtmlAttributes\n@docs IntValue\n@docs label\n@docs LabelAttributes\n@docs max\n@docs MaxAttribute\n@docs MaybeBlockContainer\n@docs MediaQuery\n@docs min\n@docs MinAttribute\n@docs name\n@docs NameAttribute\n@docs NodeAttributes\n@docs nodeAttributesToHtmlAttributes\n@docs placeholder\n@docs PlaceholderAttribute\n@docs Position\n@docs PositionAttribute\n@docs ProgressAttributes\n@docs progressAttributesToHtmlAttributes\n@docs rawStyle\n@docs rawStyleToHtmlAttributes\n@docs ScriptAttributes\n@docs scriptAttributesToHtmlAttributes\n@docs SelectAttributes\n@docs selectAttributesToHtmlAttributes\n@docs setClass\n@docs setId\n@docs setTabIndex\n@docs setTitle\n@docs setUniversal\n@docs setUniversalIn\n@docs setValueInUniversal\n@docs step\n@docs StepAttribute\n@docs StringValue\n@docs style\n@docs StyleModifier\n@docs StyleSelector\n@docs tabindex\n@docs target\n@docs TargetAttribute\n@docs TextareaAttributes\n@docs textareaAttributesToHtmlAttributes\n@docs title\n@docs TypeContainer\n@docs UniversalAttributes\n@docs universalAttributesToHtmlAttributes\n@docs UniversalContainer\n@docs value\n@docs ValueAttribute\n@docs VisibleAttributes\n@docs VisibleAttributesAndEvents\n@docs visibleAttributesToHtmlAttributes\n@docs width\n@docs WidthAttribute\n\n",
+    "comment": " This module entirely replaces Html.Attributes, providing a type-safer alternatives.\nThis is designed to work with BodyBuilder.\nIt is not compatible with Html.Attributes, though.\n\n@docs StyleSelector, defaultStyleSelector\n@docs MediaQuery\n@docs StyleModifier, style, rawStyle\n@docs AutocompleteAttribute, WidthAttribute\n@docs HeightAttribute\n@docs ValueAttribute\n@docs StepAttribute\n@docs MaxAttribute\n@docs MinAttribute\n@docs TargetAttribute\n@docs HrefAttribute\n@docs NameAttribute\n@docs DisabledAttribute\n@docs PlaceholderAttribute\n@docs DataAttribute, data\n@docs TypeContainer\n@docs BoxContainer\n@docs CheckedContainer\n@docs UniversalContainer, title, id, class, tabindex\n@docs MaybeBlockContainer\n@docs BlockContainer\n@docs FlexContainerProperties\n@docs FlexItemProperties\n@docs GridContainerProperties\n@docs GridItemProperties\n@docs VisibleAttributes, visibleAttributesToHtmlAttributes, rawStyleToHtmlAttributes\n@docs VisibleAttributesAndEvents\n@docs UniversalAttributes, defaultUniversalAttributes, universalAttributesToHtmlAttributes\n@docs NodeAttributes, defaultNodeAttributes, nodeAttributesToHtmlAttributes\n@docs BlockAttributes, width, height\n@docs HeadingAttributes, defaultHeadingAttributes, headingAttributesToHtmlAttributes\n@docs FlowAttributes, defaultFlowAttributes, flowAttributesToHtmlAttributes\n@docs FlexContainerAttributes, defaultFlexContainerAttributes, flexContainerAttributesToHtmlAttributes\n@docs FlexItemAttributes, defaultFlexItemAttributes, flexItemAttributesToHtmlAttributes\n@docs GridContainerAttributes, defaultGridContainerAttributes, gridContainerAttributesToHtmlAttributes\n@docs GridItemAttributes, defaultGridItemAttributes, gridItemAttributesToHtmlAttributes\n@docs ButtonAttributes, defaultButtonAttributes, buttonAttributesToHtmlAttributes\n@docs AAttributes, target, href, defaultAAttributes, aAttributesToHtmlAttributes\n@docs ImgAttributes, defaultImgAttributes, imgAttributesToHtmlAttributes\n@docs AudioAttributes, defaultAudioAttributes, audioAttributesToHtmlAttributes\n@docs ScriptAttributes, defaultScriptAttributes, scriptAttributesToHtmlAttributes\n@docs ProgressAttributes, defaultProgressAttributes, progressAttributesToHtmlAttributes\n@docs SelectAttributes, defaultSelectAttributes, selectAttributesToHtmlAttributes\n@docs LabelAttributes, label, PositionAttribute, Position\n@docs InputAttributes, value, disabled, name, disabledAttributeToHtmlAttributes, inputAttributesToHtmlAttributes, inputVisibleToHtmlAttributes\n@docs InputHiddenAttributes, name, defaultInputHiddenAttributes, inputHiddenAttributesToHtmlAttributes\n@docs InputPasswordAttributes, name, defaultInputPasswordAttributes, inputPasswordAttributesToHtmlAttributes\n@docs InputRangeAttributes, name, step, max, min, defaultInputRangeAttributes, inputRangeAttributesToHtmlAttributes\n@docs InputRadioAttributes, name, defaultInputRadioAttributes, inputRadioAttributesToHtmlAttributes\n@docs InputCheckboxAttributes, name, checked, defaultInputCheckboxAttributes, inputCheckboxAttributesToHtmlAttributes\n@docs InputTextAttributes, name, autocomplete, placeholder, defaultInputTextAttributes, inputTextAttributesToHtmlAttributes\n@docs InputSubmitAttributes, name, defaultInputSubmitAttributes, inputSubmitAttributesToHtmlAttributes\n@docs InputUrlAttributes, name, placeholder, defaultInputUrlAttributes, inputUrlAttributesToHtmlAttributes\n@docs InputNumberAttributes, name, step, max, min, defaultInputNumberAttributes, inputNumberAttributesToHtmlAttributes\n@docs InputColorAttributes, name, defaultInputColorAttributes, inputColorAttributesToHtmlAttributes\n@docs InputFileAttributes, name, defaultInputFileAttributes, inputFileAttributesToHtmlAttributes\n@docs TextareaAttributes, autocomplete, placeholder, defaultTextareaAttributes, textareaAttributesToHtmlAttributes\n\n",
     "aliases": [
       {
         "name": "AAttributes",
@@ -487,6 +520,14 @@
           "msg"
         ],
         "type": "{ onMouseEvents : Maybe.Maybe (BodyBuilder.Events.OnMouseEventsInside msg) , onEvent : Maybe.Maybe ( String, Json.Decode.Decoder msg ) , onBlurEvent : Maybe.Maybe msg , onFocusEvent : Maybe.Maybe msg , box : List ( Helpers.Shared.Modifiers Box.Box , BodyBuilder.Attributes.StyleSelector ) , universal : BodyBuilder.Attributes.UniversalAttributes , src : String , block : Maybe.Maybe (List ( Helpers.Shared.Modifiers Display.BlockDetails , BodyBuilder.Attributes.StyleSelector )) , rawStyle : Maybe.Maybe Elegant.Style }"
+      },
+      {
+        "name": "AutocompleteAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | autocomplete : Bool }"
       },
       {
         "name": "BlockAttributes",
@@ -527,14 +568,6 @@
           "a"
         ],
         "type": "{ a | checked : Bool }"
-      },
-      {
-        "name": "ColorValue",
-        "comment": " ",
-        "args": [
-          "a"
-        ],
-        "type": "BodyBuilder.Attributes.ValueAttribute Color.Color a"
       },
       {
         "name": "DataAttribute",
@@ -633,6 +666,14 @@
         "type": "BodyBuilder.Attributes.BlockAttributes msg"
       },
       {
+        "name": "HeightAttribute",
+        "comment": " ",
+        "args": [
+          "a"
+        ],
+        "type": "{ a | height : Maybe.Maybe Int }"
+      },
+      {
         "name": "HrefAttribute",
         "comment": " ",
         "args": [
@@ -704,7 +745,7 @@
       },
       {
         "name": "InputRadioAttributes",
-        "comment": " InputStringValueAttributes msg {}\n",
+        "comment": " ",
         "args": [
           "msg"
         ],
@@ -741,14 +782,6 @@
           "msg"
         ],
         "type": "BodyBuilder.Attributes.InputTextAttributes msg"
-      },
-      {
-        "name": "IntValue",
-        "comment": " ",
-        "args": [
-          "a"
-        ],
-        "type": "BodyBuilder.Attributes.ValueAttribute Int a"
       },
       {
         "name": "LabelAttributes",
@@ -845,14 +878,6 @@
           "a"
         ],
         "type": "{ a | step : Maybe.Maybe Int }"
-      },
-      {
-        "name": "StringValue",
-        "comment": " ",
-        "args": [
-          "a"
-        ],
-        "type": "BodyBuilder.Attributes.ValueAttribute String a"
       },
       {
         "name": "StyleModifier",
@@ -972,16 +997,7 @@
         "name": "Position",
         "comment": " ",
         "args": [],
-        "cases": [
-          [
-            "Before",
-            []
-          ],
-          [
-            "After",
-            []
-          ]
-        ]
+        "cases": []
       }
     ],
     "values": [
@@ -998,7 +1014,7 @@
       {
         "name": "autocomplete",
         "comment": " ",
-        "type": "a -> { c | autocomplete : b } -> { c | autocomplete : a }"
+        "type": "Bool -> Helpers.Shared.Modifier (BodyBuilder.Attributes.AutocompleteAttribute a)"
       },
       {
         "name": "buttonAttributesToHtmlAttributes",
@@ -1203,7 +1219,7 @@
       {
         "name": "height",
         "comment": " ",
-        "type": "a -> { c | height : b } -> { c | height : Maybe.Maybe a }"
+        "type": "Int -> Helpers.Shared.Modifier (BodyBuilder.Attributes.HeightAttribute a)"
       },
       {
         "name": "href",
@@ -1313,7 +1329,7 @@
       {
         "name": "placeholder",
         "comment": " ",
-        "type": "a -> { c | placeholder : b } -> { c | placeholder : Maybe.Maybe a }"
+        "type": "String -> Helpers.Shared.Modifier (BodyBuilder.Attributes.PlaceholderAttribute a)"
       },
       {
         "name": "progressAttributesToHtmlAttributes",
@@ -1339,41 +1355,6 @@
         "name": "selectAttributesToHtmlAttributes",
         "comment": " ",
         "type": "BodyBuilder.Attributes.SelectAttributes msg -> List (Html.Attribute msg)"
-      },
-      {
-        "name": "setClass",
-        "comment": " ",
-        "type": "List String -> { a | class : List String } -> { a | class : List String }"
-      },
-      {
-        "name": "setId",
-        "comment": " ",
-        "type": "String -> { a | id : Maybe.Maybe String } -> { a | id : Maybe.Maybe String }"
-      },
-      {
-        "name": "setTabIndex",
-        "comment": " ",
-        "type": "Int -> { a | tabindex : Maybe.Maybe Int } -> { a | tabindex : Maybe.Maybe Int }"
-      },
-      {
-        "name": "setTitle",
-        "comment": " ",
-        "type": "String -> { a | title : Maybe.Maybe String } -> { a | title : Maybe.Maybe String }"
-      },
-      {
-        "name": "setUniversal",
-        "comment": " ",
-        "type": "BodyBuilder.Attributes.UniversalAttributes -> { a | universal : BodyBuilder.Attributes.UniversalAttributes } -> { a | universal : BodyBuilder.Attributes.UniversalAttributes }"
-      },
-      {
-        "name": "setUniversalIn",
-        "comment": " ",
-        "type": "{ a | universal : BodyBuilder.Attributes.UniversalAttributes } -> BodyBuilder.Attributes.UniversalAttributes -> { a | universal : BodyBuilder.Attributes.UniversalAttributes }"
-      },
-      {
-        "name": "setValueInUniversal",
-        "comment": " ",
-        "type": "(a -> BodyBuilder.Attributes.UniversalAttributes -> BodyBuilder.Attributes.UniversalAttributes) -> a -> { c | universal : BodyBuilder.Attributes.UniversalAttributes } -> { c | universal : BodyBuilder.Attributes.UniversalAttributes }"
       },
       {
         "name": "step",
@@ -1413,7 +1394,7 @@
       {
         "name": "value",
         "comment": " ",
-        "type": "a -> { c | value : b } -> { c | value : Maybe.Maybe a }"
+        "type": "a -> { c | value : Maybe.Maybe a } -> { c | value : Maybe.Maybe a }"
       },
       {
         "name": "visibleAttributesToHtmlAttributes",
@@ -2053,250 +2034,6 @@
     "generated-with-elm-version": "0.18.0"
   },
   {
-    "name": "Typography",
-    "comment": " Typography contains everything about fonts and characters rendering.\n\n\n# Types\n\n@docs Typography\n@docs Capitalization\n@docs Decoration\n@docs WhiteSpaceWrap\n@docs UserSelect\n@docs Normal\n\n\n# Default typography\n\n@docs default\n\n\n# Typography modifiers\n\n\n## Characters rendering\n\n@docs character\n\n\n## Text Transformations\n\n@docs capitalize\n@docs lowercase\n@docs uppercase\n\n\n## Text Decorations\n\n@docs underline\n@docs lineThrough\n@docs noDecoration\n\n\n## Whitespace Management\n\n@docs whiteSpaceNoWrap\n\n\n## User Interactions\n\n@docs userSelect\n\n\n## Line Height\n\n@docs lineHeightNormal\n@docs lineHeight\n\n\n# Shortcuts\n\n@docs fontSize\n@docs bold\n\n\n# Compilation\n\n@docs typographyToCouples\n\n",
-    "aliases": [
-      {
-        "name": "Typography",
-        "comment": " The `Typography` record contains everything about fonts rendering,\nincluding character rendering. You probably won't use it as is, but instead using\n`Box.typography` which automatically generate an empty `Typography` record. You\ncan then use modifiers. I.E.\n\n    Box.typography\n        [ Typography.color Color.white\n        , Typography.italic\n        ]\n\n",
-        "args": [],
-        "type": "{ character : Maybe.Maybe Character.Character , capitalization : Maybe.Maybe Typography.Capitalization , decoration : Maybe.Maybe Typography.Decoration , color : Maybe.Maybe Color.Color , whiteSpaceWrap : Maybe.Maybe Typography.WhiteSpaceWrap , userSelect : Maybe.Maybe Typography.UserSelect , lineHeight : Maybe.Maybe (Either.Either Helpers.Shared.SizeUnit Typography.Normal) }"
-      },
-      {
-        "name": "UserSelect",
-        "comment": " Represents the interaction with the user. If set to `True`, the user\ncan interact with the text, i.e. can select it, copy and paste. If set to\n`False`, nothing can be done.\n",
-        "args": [],
-        "type": "Bool"
-      }
-    ],
-    "types": [
-      {
-        "name": "Capitalization",
-        "comment": " Represents the possible transformations of the text.\nIt can be Uppercase, Lowercase, or Capitalize. They are created by `uppercase`,\n`lowercase` and `capitalize`.\n",
-        "args": [],
-        "cases": []
-      },
-      {
-        "name": "Decoration",
-        "comment": " Represents the possible decorations of the text.\nIt can be None, Underline or LineThrough. They are created by `noDecoration`,\n`underline` and `lineThrough`.\n",
-        "args": [],
-        "cases": []
-      },
-      {
-        "name": "Normal",
-        "comment": " Value representing the 'normal' value in `line-height`.\n",
-        "args": [],
-        "cases": []
-      },
-      {
-        "name": "WhiteSpaceWrap",
-        "comment": " Represents the whitespaces management in the text.\nIt can be NoWrap, and created by `whiteSpaceNoWrap`.\n",
-        "args": [],
-        "cases": []
-      }
-    ],
-    "values": [
-      {
-        "name": "bold",
-        "comment": " ",
-        "type": "Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "capitalize",
-        "comment": " Capitalize the first letter in the text.\n'just an example' is transformed in 'Just an example'.\n",
-        "type": "Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "character",
-        "comment": " Modify the character rendering of the text. The characters options are in\n`Typography.Character`.\nIt creates a default empty `Character` record, modifies it according to the\nmodifiers, then set the resulting `Character` in Typography.\n\n    Typography.character\n        [ Typography.Character.weight 700\n        , Typography.Character.italic\n        ]\n\n",
-        "type": "Helpers.Shared.Modifiers Character.Character -> Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "default",
-        "comment": " Generate an empty `Typography` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Box.typography`.\n",
-        "type": "Typography.Typography"
-      },
-      {
-        "name": "fontSize",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "lineHeight",
-        "comment": " Set the lineHeight to the desired value. Can be px, pt, vh, em or rem.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "lineHeightNormal",
-        "comment": " Set the lineHeight property to respect the space defined by the User Agent of\nthe user's browser. It usually is 1.2em, but can vary.\n",
-        "type": "Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "lineThrough",
-        "comment": " Print a line through the text.\n",
-        "type": "Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "lowercase",
-        "comment": " Turn the entire text in lowercase.\n'JuST an ExAMPle' is transformed in 'just an example'.\n",
-        "type": "Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "noDecoration",
-        "comment": " Remove every decoration (underline or lineThrough) on the text.\n",
-        "type": "Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "typographyToCouples",
-        "comment": " Compiles a `Typography` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
-        "type": "Typography.Typography -> List ( String, String )"
-      },
-      {
-        "name": "underline",
-        "comment": " Underline the text.\n",
-        "type": "Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "uppercase",
-        "comment": " Turn the entire text in uppercase.\n'JuST an ExAMPle' is transformed in 'JUST AN EXAMPLE'.\n",
-        "type": "Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "userSelect",
-        "comment": " Allow or disallow user to interact with the text, i.e. select, copy, etc.\n",
-        "type": "Bool -> Helpers.Shared.Modifier Typography.Typography"
-      },
-      {
-        "name": "whiteSpaceNoWrap",
-        "comment": " Cancel the wrapping of the text on whitespaces. It forces text to stay on one line.\n",
-        "type": "Helpers.Shared.Modifier Typography.Typography"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
-    "name": "Shadow",
-    "comment": " Shadow contains everything about boxShadow.\n\n\n# Types\n\n@docs Shadow\n\n\n# Default box shadow\n\n@docs default\n\n\n# Shadow modifiers\n\n@docs inset\n@docs blurRadius\n@docs spreadRadius\n@docs offset\n@docs standard\n@docs plain\n@docs blurry\n\n\n# Compilation\n\n@docs boxShadowToCouple\n\n",
-    "aliases": [
-      {
-        "name": "Shadow",
-        "comment": " The Shadow record contains everything about box shadow.\nYou probably won't use it as is, but instead using `Elegant.boxShadow`\nwhich automatically generate an empty `Shadow` record. You\ncan then use modifiers. I.E.\n\n    Elegant.boxShadow\n        [ Shadow.inset True\n        , Shadow.spreadRadius (px 30)\n        ]\n\n",
-        "args": [],
-        "type": "{ inset : Bool , spreadRadius : Helpers.Shared.SizeUnit , blurRadius : Helpers.Shared.SizeUnit , color : Color.Color , offset : ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) }"
-      }
-    ],
-    "types": [],
-    "values": [
-      {
-        "name": "blurRadius",
-        "comment": " Set the blurRadius of the Shadow.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Shadow.Shadow"
-      },
-      {
-        "name": "blurry",
-        "comment": " Creates a plain boxShadow.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.SizeUnit -> Color.Color -> Helpers.Shared.Modifier Shadow.Shadow"
-      },
-      {
-        "name": "boxShadowToCouple",
-        "comment": " Compiles a `Shadow` record to the corresponding CSS tuple.\nCompiles only parts which are defined, ignoring `Nothing` fields.\n",
-        "type": "Shadow.Shadow -> ( String, String )"
-      },
-      {
-        "name": "default",
-        "comment": " Generate an empty `Shadow` record, with every field equal to Nothing except inset (to `False`) and offset (to `( 0, 0 )`).\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.boxShadow`.\n",
-        "type": "Shadow.Shadow"
-      },
-      {
-        "name": "inset",
-        "comment": " Set the inset of the Shadow.\n",
-        "type": "Bool -> Helpers.Shared.Modifier Shadow.Shadow"
-      },
-      {
-        "name": "offset",
-        "comment": " Set the offset of the Shadow.\n",
-        "type": "( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Helpers.Shared.Modifier Shadow.Shadow"
-      },
-      {
-        "name": "plain",
-        "comment": " Creates a plain boxShadow.\n",
-        "type": "( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Color.Color -> Helpers.Shared.Modifier Shadow.Shadow"
-      },
-      {
-        "name": "spreadRadius",
-        "comment": " Set the spreadRadius of the Shadow.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Shadow.Shadow"
-      },
-      {
-        "name": "standard",
-        "comment": " Defines a standard boxShadow.\n",
-        "type": "Helpers.Shared.SizeUnit -> Color.Color -> ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Helpers.Shared.Modifier Shadow.Shadow"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
-    "name": "Padding",
-    "comment": " Padding contains everything about paddings rendering.\n\n\n# Types\n\n@docs Padding\n\n\n# Default padding\n\n@docs default\n\n\n# Padding selectors\n\n@docs top\n@docs right\n@docs bottom\n@docs left\n@docs horizontal\n@docs vertical\n@docs all\n\n\n# Compilation\n\n@docs paddingToCouples\n\n",
-    "aliases": [
-      {
-        "name": "Padding",
-        "comment": " The `Padding` record contains everything about one padding side.\nYou probably won't use it as is, but instead using `Elegant.padding`\nwhich automatically generate an empty `Padding` record. You\ncan then use modifiers. I.E.\n\n    Elegant.padding\n        [ Padding.top <| Padding.width (px 30)\n        , Padding.vertical <| Padding.width (px 40)\n        ]\n\n",
-        "args": [],
-        "type": "Helpers.Shared.SizeUnit"
-      }
-    ],
-    "types": [],
-    "values": [
-      {
-        "name": "all",
-        "comment": " Accepts a padding modifier, and modify the four sides of the padding.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
-      },
-      {
-        "name": "bottom",
-        "comment": " Accepts a padding modifier, and modify the bottom side of the padding.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
-      },
-      {
-        "name": "default",
-        "comment": " Generate an empty `Padding` record, equal to 0 px.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.padding`.\n",
-        "type": "Padding.Padding"
-      },
-      {
-        "name": "horizontal",
-        "comment": " Accepts a padding modifier, and modify both the top and the bottom side of the padding.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
-      },
-      {
-        "name": "left",
-        "comment": " Accepts a padding modifier, and modify the left side of the padding.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
-      },
-      {
-        "name": "paddingToCouples",
-        "comment": " Compiles a `Surrounded Padding` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
-        "type": "Surrounded.Surrounded Padding.Padding -> List ( String, String )"
-      },
-      {
-        "name": "right",
-        "comment": " Accepts a padding modifier, and modify the right side of the padding.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
-      },
-      {
-        "name": "top",
-        "comment": " Accepts a padding modifier, and modify the top side of the padding.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
-      },
-      {
-        "name": "vertical",
-        "comment": " Accepts a padding modifier, and modify both the right and left side of the padding.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
     "name": "Position",
     "comment": " Position contains everything about position rendering.\n\n\n# Types\n\n@docs Position\n@docs Coordinates\n\n\n# Position selection\n\n@docs static\n@docs absolute\n@docs relative\n@docs fixed\n@docs sticky\n\n\n# Position modifiers\n\n@docs top\n@docs right\n@docs bottom\n@docs left\n@docs horizontal\n@docs vertical\n@docs all\n\n\n# Compilation\n\n@docs positionToCouples\n\n",
     "aliases": [
@@ -2380,6 +2117,366 @@
         "name": "vertical",
         "comment": " Accepts a size, and modify both the left and right positions.\n",
         "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Position.Coordinates"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Shadow",
+    "comment": " Shadow contains everything about boxShadow.\n\n\n# Types\n\n@docs Shadow\n\n\n# Default box shadow\n\n@docs default\n\n\n# Shadow modifiers\n\n@docs inset\n@docs blurRadius\n@docs spreadRadius\n@docs offset\n@docs standard\n@docs plain\n@docs blurry\n\n\n# Compilation\n\n@docs boxShadowToCouple\n\n",
+    "aliases": [
+      {
+        "name": "Shadow",
+        "comment": " The Shadow record contains everything about box shadow.\nYou probably won't use it as is, but instead using `Elegant.boxShadow`\nwhich automatically generate an empty `Shadow` record. You\ncan then use modifiers. I.E.\n\n    Elegant.boxShadow\n        [ Shadow.inset True\n        , Shadow.spreadRadius (px 30)\n        ]\n\n",
+        "args": [],
+        "type": "{ inset : Bool , spreadRadius : Helpers.Shared.SizeUnit , blurRadius : Helpers.Shared.SizeUnit , color : Color.Color , offset : ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) }"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "blurRadius",
+        "comment": " Set the blurRadius of the Shadow.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "blurry",
+        "comment": " Creates a plain boxShadow.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.SizeUnit -> Color.Color -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "boxShadowToCouple",
+        "comment": " Compiles a `Shadow` record to the corresponding CSS tuple.\nCompiles only parts which are defined, ignoring `Nothing` fields.\n",
+        "type": "Shadow.Shadow -> ( String, String )"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Shadow` record, with every field equal to Nothing except inset (to `False`) and offset (to `( 0, 0 )`).\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.boxShadow`.\n",
+        "type": "Shadow.Shadow"
+      },
+      {
+        "name": "inset",
+        "comment": " Set the inset of the Shadow.\n",
+        "type": "Bool -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "offset",
+        "comment": " Set the offset of the Shadow.\n",
+        "type": "( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "plain",
+        "comment": " Creates a plain boxShadow.\n",
+        "type": "( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Color.Color -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "spreadRadius",
+        "comment": " Set the spreadRadius of the Shadow.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Shadow.Shadow"
+      },
+      {
+        "name": "standard",
+        "comment": " Defines a standard boxShadow.\n",
+        "type": "Helpers.Shared.SizeUnit -> Color.Color -> ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Helpers.Shared.Modifier Shadow.Shadow"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Typography",
+    "comment": " Typography contains everything about fonts and characters rendering.\n\n\n# Types\n\n@docs Typography\n@docs Capitalization\n@docs Decoration\n@docs WhiteSpaceWrap\n@docs UserSelect\n@docs Normal\n@docs FontTilt\n@docs FontFamily\n@docs CustomFontFamily\n\n\n# Default typography\n\n@docs default\n\n\n# Typography modifiers\n\n\n## Text Transformations\n\n@docs capitalize\n@docs lowercase\n@docs uppercase\n\n\n## Text Decorations\n\n@docs underline\n@docs lineThrough\n@docs noDecoration\n\n\n## Whitespace Management\n\n@docs whiteSpaceNoWrap\n\n\n## User Interactions\n\n@docs userSelect\n\n\n## Line Height\n\n@docs lineHeightNormal\n@docs lineHeight\n\n\n## Weight\n\n@docs weight\n\n\n## Tilting\n\n@docs tiltNormal\n@docs italic\n@docs oblique\n\n\n## Size\n\n@docs size\n\n\n## Font Family\n\n@docs systemFont\n@docs customFont\n@docs fontFamily\n@docs fontFamilyInherit\n@docs fontFamilySansSerif\n\n\n## Letter Spacing\n\n@docs letterSpacing\n\n\n# Shortcuts\n\n@docs bold\n\n\n# Compilation\n\n@docs typographyToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Typography",
+        "comment": " The `Typography` record contains everything about fonts rendering,\nincluding character rendering. You probably won't use it as is, but instead using\n`Box.typography` which automatically generate an empty `Typography` record. You\ncan then use modifiers. I.E.\n\n    Box.typography\n        [ Typography.color Color.white\n        , Typography.italic\n        ]\n\n",
+        "args": [],
+        "type": "{ capitalization : Maybe.Maybe Typography.Capitalization , decoration : Maybe.Maybe Typography.Decoration , color : Maybe.Maybe Color.Color , whiteSpaceWrap : Maybe.Maybe Typography.WhiteSpaceWrap , userSelect : Maybe.Maybe Typography.UserSelect , lineHeight : Maybe.Maybe (Either.Either Helpers.Shared.SizeUnit Typography.Normal) , weight : Maybe.Maybe Int , tilt : Maybe.Maybe Typography.FontTilt , size : Maybe.Maybe Helpers.Shared.SizeUnit , family : Maybe.Maybe Typography.FontFamily , letterSpacing : Maybe.Maybe Helpers.Shared.SizeUnit }"
+      },
+      {
+        "name": "UserSelect",
+        "comment": " Represents the interaction with the user. If set to `True`, the user\ncan interact with the text, i.e. can select it, copy and paste. If set to\n`False`, nothing can be done.\n",
+        "args": [],
+        "type": "Bool"
+      }
+    ],
+    "types": [
+      {
+        "name": "Capitalization",
+        "comment": " Represents the possible transformations of the text.\nIt can be Uppercase, Lowercase, or Capitalize. They are created by `uppercase`,\n`lowercase` and `capitalize`.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "CustomFontFamily",
+        "comment": " Represents the font family used to render characters.\nIt can be a system or a custom type. They are created by `systemFont` and `customFont`.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "Decoration",
+        "comment": " Represents the possible decorations of the text.\nIt can be None, Underline or LineThrough. They are created by `noDecoration`,\n`underline` and `lineThrough`.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "FontFamily",
+        "comment": " Represents the possible fontFamily of the characters.\nIt can be Inherited from the parent, or customized.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "FontTilt",
+        "comment": " Represents the possible tilting of the characters.\nIt can be Normal, Italic, or Oblique. They are created by `uppercase`,\n`lowercase` and `capitalize`.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "Normal",
+        "comment": " Value representing the 'normal' value in `line-height`.\n",
+        "args": [],
+        "cases": []
+      },
+      {
+        "name": "WhiteSpaceWrap",
+        "comment": " Represents the whitespaces management in the text.\nIt can be NoWrap, and created by `whiteSpaceNoWrap`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "bold",
+        "comment": " ",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "capitalize",
+        "comment": " Capitalize the first letter in the text.\n'just an example' is transformed in 'Just an example'.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "customFont",
+        "comment": " Gives a custom font.\n",
+        "type": "String -> Typography.CustomFontFamily"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Typography` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Box.typography`.\n",
+        "type": "Typography.Typography"
+      },
+      {
+        "name": "fontFamily",
+        "comment": " Set the font family to the desired fonts. All fonts will be tried one by one\nuntil one is found either on the browser or user's OS. It is possible to use both\nsystem and custom fonts.\n",
+        "type": "List Typography.CustomFontFamily -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "fontFamilyInherit",
+        "comment": " Inherits the font from the parents. It is the default behavior of fontFamily.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "fontFamilySansSerif",
+        "comment": " Standard Sans Serif font family.\nInspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "italic",
+        "comment": " Renders the characters as italic.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "letterSpacing",
+        "comment": " Set the letter spacing of the typography.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "lineHeight",
+        "comment": " Set the lineHeight to the desired value. Can be px, pt, vh, em or rem.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "lineHeightNormal",
+        "comment": " Set the lineHeight property to respect the space defined by the User Agent of\nthe user's browser. It usually is 1.2em, but can vary.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "lineThrough",
+        "comment": " Print a line through the text.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "lowercase",
+        "comment": " Turn the entire text in lowercase.\n'JuST an ExAMPle' is transformed in 'just an example'.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "noDecoration",
+        "comment": " Remove every decoration (underline or lineThrough) on the text.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "oblique",
+        "comment": " Renders the characters as oblique.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "size",
+        "comment": " Set the size of the characters to the desired value.\nCan be px, pt, vh, em or rem.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "systemFont",
+        "comment": " Gives a system font.\n",
+        "type": "String -> Typography.CustomFontFamily"
+      },
+      {
+        "name": "tiltNormal",
+        "comment": " Cancels any tilting of the characters.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "typographyToCouples",
+        "comment": " Compiles a `Typography` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Typography.Typography -> List ( String, String )"
+      },
+      {
+        "name": "underline",
+        "comment": " Underline the text.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "uppercase",
+        "comment": " Turn the entire text in uppercase.\n'JuST an ExAMPle' is transformed in 'JUST AN EXAMPLE'.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "userSelect",
+        "comment": " Allow or disallow user to interact with the text, i.e. select, copy, etc.\n",
+        "type": "Bool -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "weight",
+        "comment": " Changes the weight of the characters.\nValue is defined between 100 and 900 and default weight is equal to 400.\n",
+        "type": "Int -> Helpers.Shared.Modifier Typography.Typography"
+      },
+      {
+        "name": "whiteSpaceNoWrap",
+        "comment": " Cancel the wrapping of the text on whitespaces. It forces text to stay on one line.\n",
+        "type": "Helpers.Shared.Modifier Typography.Typography"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Padding",
+    "comment": " Padding contains everything about paddings rendering.\n\n\n# Types\n\n@docs Padding\n\n\n# Default padding\n\n@docs default\n\n\n# Padding selectors\n\n@docs top\n@docs right\n@docs bottom\n@docs left\n@docs horizontal\n@docs vertical\n@docs all\n\n\n# Compilation\n\n@docs paddingToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Padding",
+        "comment": " The `Padding` record contains everything about one padding side.\nYou probably won't use it as is, but instead using `Elegant.padding`\nwhich automatically generate an empty `Padding` record. You\ncan then use modifiers. I.E.\n\n    Elegant.padding\n        [ Padding.top <| Padding.width (px 30)\n        , Padding.vertical <| Padding.width (px 40)\n        ]\n\n",
+        "args": [],
+        "type": "Helpers.Shared.SizeUnit"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "all",
+        "comment": " Accepts a padding modifier, and modify the four sides of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "bottom",
+        "comment": " Accepts a padding modifier, and modify the bottom side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Padding` record, equal to 0 px.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.padding`.\n",
+        "type": "Padding.Padding"
+      },
+      {
+        "name": "horizontal",
+        "comment": " Accepts a padding modifier, and modify both the top and the bottom side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "left",
+        "comment": " Accepts a padding modifier, and modify the left side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "paddingToCouples",
+        "comment": " Compiles a `Surrounded Padding` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Surrounded.Surrounded Padding.Padding -> List ( String, String )"
+      },
+      {
+        "name": "right",
+        "comment": " Accepts a padding modifier, and modify the right side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "top",
+        "comment": " Accepts a padding modifier, and modify the top side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      },
+      {
+        "name": "vertical",
+        "comment": " Accepts a padding modifier, and modify both the right and left side of the padding.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier (Surrounded.Surrounded Padding.Padding)"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Outline",
+    "comment": " Outline contains everything about outline rendering.\n\n\n# Types\n\n@docs Outline\n@docs OutlineStyle\n\n\n# Default border\n\n@docs default\n\n\n# Border modifiers\n\n\n## Appearance\n\n@docs thickness\n@docs none\n@docs solid\n@docs dashed\n\n\n# Compilation\n\n@docs outlineToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Outline",
+        "comment": " The `Outline` record contains everything about one outline side.\nYou probably won't use it as is, but instead using `Elegant.outline`\nwhich automatically generate an empty `Outline` record. You\ncan then use modifiers. I.E.\n\n    Elegant.outline\n        [ Outline.solid\n        , Elegant.color Color.blue\n        ]\n\n",
+        "args": [],
+        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Helpers.Shared.SizeUnit , style : Maybe.Maybe Outline.OutlineStyle }"
+      }
+    ],
+    "types": [
+      {
+        "name": "OutlineStyle",
+        "comment": " Represents the possible styles of the outline.\nIt can be Solid or Dashed. They are created by `solid` and `dashed`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "dashed",
+        "comment": " Set the outline as dashed.\n",
+        "type": "Helpers.Shared.Modifier Outline.Outline"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Outline` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.outline`.\n",
+        "type": "Outline.Outline"
+      },
+      {
+        "name": "none",
+        "comment": " Set the outline to none.\n",
+        "type": "Helpers.Shared.Modifier Outline.Outline"
+      },
+      {
+        "name": "outlineToCouples",
+        "comment": " Compiles an `Outline` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Outline.Outline -> List ( String, String )"
+      },
+      {
+        "name": "solid",
+        "comment": " Set the outline as solid.\n",
+        "type": "Helpers.Shared.Modifier Outline.Outline"
+      },
+      {
+        "name": "thickness",
+        "comment": " Set the thickness of the outline.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Outline.Outline"
       }
     ],
     "generated-with-elm-version": "0.18.0"
@@ -2531,59 +2628,6 @@
         "name": "width",
         "comment": " Set the margin value to the desired value.\n",
         "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Margin.Margin"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
-    "name": "Outline",
-    "comment": " Outline contains everything about outline rendering.\n\n\n# Types\n\n@docs Outline\n@docs OutlineStyle\n\n\n# Default border\n\n@docs default\n\n\n# Border modifiers\n\n\n## Appearance\n\n@docs thickness\n@docs none\n@docs solid\n@docs dashed\n\n\n# Compilation\n\n@docs outlineToCouples\n\n",
-    "aliases": [
-      {
-        "name": "Outline",
-        "comment": " The `Outline` record contains everything about one outline side.\nYou probably won't use it as is, but instead using `Elegant.outline`\nwhich automatically generate an empty `Outline` record. You\ncan then use modifiers. I.E.\n\n    Elegant.outline\n        [ Outline.solid\n        , Elegant.color Color.blue\n        ]\n\n",
-        "args": [],
-        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Helpers.Shared.SizeUnit , style : Maybe.Maybe Outline.OutlineStyle }"
-      }
-    ],
-    "types": [
-      {
-        "name": "OutlineStyle",
-        "comment": " Represents the possible styles of the outline.\nIt can be Solid or Dashed. They are created by `solid` and `dashed`.\n",
-        "args": [],
-        "cases": []
-      }
-    ],
-    "values": [
-      {
-        "name": "dashed",
-        "comment": " Set the outline as dashed.\n",
-        "type": "Helpers.Shared.Modifier Outline.Outline"
-      },
-      {
-        "name": "default",
-        "comment": " Generate an empty `Outline` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.outline`.\n",
-        "type": "Outline.Outline"
-      },
-      {
-        "name": "none",
-        "comment": " Set the outline to none.\n",
-        "type": "Helpers.Shared.Modifier Outline.Outline"
-      },
-      {
-        "name": "outlineToCouples",
-        "comment": " Compiles an `Outline` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
-        "type": "Outline.Outline -> List ( String, String )"
-      },
-      {
-        "name": "solid",
-        "comment": " Set the outline as solid.\n",
-        "type": "Helpers.Shared.Modifier Outline.Outline"
-      },
-      {
-        "name": "thickness",
-        "comment": " Set the thickness of the outline.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Outline.Outline"
       }
     ],
     "generated-with-elm-version": "0.18.0"
@@ -2967,6 +3011,376 @@
     "generated-with-elm-version": "0.18.0"
   },
   {
+    "name": "Constants",
+    "comment": "\n@docs huge\n@docs large\n@docs medium\n@docs small\n@docs tiny\n@docs zero\n@docs alpha\n@docs beta\n@docs gamma\n@docs delta\n@docs epsilon\n@docs zeta\n@docs eta\n@docs theta\n@docs iota\n@docs kappa\n",
+    "aliases": [],
+    "types": [],
+    "values": [
+      {
+        "name": "alpha",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "beta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "delta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "epsilon",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "eta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "gamma",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "huge",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "iota",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "kappa",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "large",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "medium",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "small",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "theta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "tiny",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "zero",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      },
+      {
+        "name": "zeta",
+        "comment": " ",
+        "type": "Helpers.Shared.SizeUnit"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Corner",
+    "comment": " Corner contains everything about corner radius (also called border radius in CSS).\n\n\n# Types\n\n@docs Corner\n@docs CornerSet\n\n\n# Default corner radius\n\n@docs default\n\n\n# Corner radius style\n\n@docs circular\n@docs elliptic\n\n\n# Corner radius selector\n\n@docs top\n@docs topRight\n@docs right\n@docs bottomRight\n@docs bottom\n@docs bottomLeft\n@docs left\n@docs topLeft\n@docs all\n\n\n# Compilation\n\n@docs cornerToCouples\n\n",
+    "aliases": [
+      {
+        "name": "Corner",
+        "comment": " The `Corner` record contains everything about corner radius (also called border radius in CSS).\nYou probably won't use it as is, but instead using `Elegant.corner`\nwhich automatically generate an empty `Corner` record. You\ncan then use modifiers. I.E.\n\n    Elegant.corner\n        [ Corner.circular Corner.all (px 30) ]\n\n",
+        "args": [],
+        "type": "{ topLeft : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , topRight : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , bottomRight : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , bottomLeft : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) }"
+      }
+    ],
+    "types": [
+      {
+        "name": "CornerSet",
+        "comment": " Represents the possible selected corner(s).\nIt can be Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left, TopLeft or All.\nThey are created by `top`, `topRight`, `right`, `bottomRight`, `bottom`, `bottomLeft`,\n`left`, `topLeft` or `all`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "all",
+        "comment": " Select the four corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "bottom",
+        "comment": " Select the two bottom corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "bottomLeft",
+        "comment": " Select the bottom-left corner.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "bottomRight",
+        "comment": " Select the bottom-right corner.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "circular",
+        "comment": " Set the corner(s) to be round (the two angles are the same).\n",
+        "type": "Corner.CornerSet -> Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Corner.Corner"
+      },
+      {
+        "name": "cornerToCouples",
+        "comment": " Compiles a `Corner` record to the corresponding CSS tuples.\nCompiles only parts which are defined, ignoring `Nothing` fields.\n",
+        "type": "Corner.Corner -> List ( String, String )"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Corner` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.corner`.\n",
+        "type": "Corner.Corner"
+      },
+      {
+        "name": "elliptic",
+        "comment": " Set the corner(s) to be elliptic, i.e. you can specify two different values\nfor the corner(s).\n",
+        "type": "Corner.CornerSet -> Helpers.Shared.SizeUnit -> Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Corner.Corner"
+      },
+      {
+        "name": "left",
+        "comment": " Select the two left corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "right",
+        "comment": " Select the two right corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "top",
+        "comment": " Select the two top corners.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "topLeft",
+        "comment": " Select the top-left corner.\n",
+        "type": "Corner.CornerSet"
+      },
+      {
+        "name": "topRight",
+        "comment": " Select the top-right corner.\n",
+        "type": "Corner.CornerSet"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Cursor",
+    "comment": " Cursor contains everything about cursors rendering.\n\n\n# Types\n\n@docs Cursor\n\n\n# Cursor types\n\n@docs default\n@docs auto\n@docs cell\n@docs contextMenu\n@docs crosshair\n@docs grab\n@docs grabbing\n@docs help\n@docs move\n@docs noDrop\n@docs none\n@docs notAllowed\n@docs pointer\n@docs progress\n@docs text\n@docs verticalText\n@docs wait\n@docs zoomIn\n@docs zoomOut\n\n\n# Compilation\n\n@docs cursorToCouple\n\n",
+    "aliases": [],
+    "types": [
+      {
+        "name": "Cursor",
+        "comment": " The `Cursor` record contains everything about cursor.\nYou probably won't use it as is, but instead using `Elegant.cursor`.\nYou can provide one cursor type. They can be found [here](https://developer.mozilla.org/en/docs/Web/CSS/cursor).\n\n    Elegant.cursor Cursor.default\n\n",
+        "args": [],
+        "cases": [
+          [
+            "Auto",
+            []
+          ],
+          [
+            "Default",
+            []
+          ],
+          [
+            "None",
+            []
+          ],
+          [
+            "Pointer",
+            []
+          ],
+          [
+            "ContextMenu",
+            []
+          ],
+          [
+            "Help",
+            []
+          ],
+          [
+            "Progress",
+            []
+          ],
+          [
+            "Wait",
+            []
+          ],
+          [
+            "Cell",
+            []
+          ],
+          [
+            "Crosshair",
+            []
+          ],
+          [
+            "Text",
+            []
+          ],
+          [
+            "VerticalText",
+            []
+          ],
+          [
+            "Move",
+            []
+          ],
+          [
+            "NoDrop",
+            []
+          ],
+          [
+            "NotAllowed",
+            []
+          ],
+          [
+            "ZoomIn",
+            []
+          ],
+          [
+            "ZoomOut",
+            []
+          ],
+          [
+            "Grab",
+            []
+          ],
+          [
+            "Grabbing",
+            []
+          ]
+        ]
+      }
+    ],
+    "values": [
+      {
+        "name": "auto",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "cell",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "contextMenu",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "crosshair",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "cursorToCouple",
+        "comment": " Compiles a `Cursor` to the corresponding CSS tuple.\n",
+        "type": "Cursor.Cursor -> ( String, String )"
+      },
+      {
+        "name": "default",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "grab",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "grabbing",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "help",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "move",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "noDrop",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "none",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "notAllowed",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "pointer",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "progress",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "text",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "verticalText",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "wait",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "zoomIn",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      },
+      {
+        "name": "zoomOut",
+        "comment": " ",
+        "type": "Cursor.Cursor"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
     "name": "Flex",
     "comment": " Flex handles everything related to the flex element.\n\n@docs FlexContainerDetails\n@docs FlexItemDetails\n@docs FlexDirection\n@docs FlexWrap\n@docs Align\n@docs JustifyContent\n\n\n## FlexDirection\n\n@docs direction\n@docs column\n@docs row\n\n\n## FlexWrap\n\n@docs wrap\n@docs noWrap\n\n\n## AlignItems / AlignSelf\n\n@docs align\n@docs alignXY\n@docs baseline\n@docs alignCenter\n@docs flexStart\n@docs flexEnd\n@docs inherit\n@docs initial\n@docs stretch\n\n\n## JustifyContent\n\n@docs justifyContent\n@docs spaceBetween\n@docs spaceAround\n@docs justifyContentCenter\n@docs justifyContentFlexStart\n@docs justifyContentFlexEnd\n\n\n## Positionning\n\n@docs topLeft\n@docs topCenter\n@docs topRight\n@docs centerLeft\n@docs center\n@docs centerRight\n@docs bottomLeft\n@docs bottomCenter\n@docs bottomRight\n\n\n## Flex\n\n@docs grow\n@docs shrink\n@docs basisAuto\n@docs basis\n@docs alignSelf\n\n@docs defaultFlexContainerDetails\n@docs defaultFlexItemDetails\n@docs flexContainerDetailsToCouples\n@docs flexItemDetailsToCouples\n\n",
     "aliases": [
@@ -3260,564 +3674,6 @@
         "name": "width",
         "comment": " ",
         "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Dimensions.Dimensions"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
-    "name": "Constants",
-    "comment": "\n@docs huge\n@docs large\n@docs medium\n@docs small\n@docs tiny\n@docs zero\n@docs alpha\n@docs beta\n@docs gamma\n@docs delta\n@docs epsilon\n@docs zeta\n@docs eta\n@docs theta\n@docs iota\n@docs kappa\n",
-    "aliases": [],
-    "types": [],
-    "values": [
-      {
-        "name": "alpha",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "beta",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "delta",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "epsilon",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "eta",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "gamma",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "huge",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "iota",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "kappa",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "large",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "medium",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "small",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "theta",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "tiny",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "zero",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      },
-      {
-        "name": "zeta",
-        "comment": " ",
-        "type": "Helpers.Shared.SizeUnit"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
-    "name": "Border",
-    "comment": " Border contains everything about borders rendering.\n\n\n# Types\n\n@docs Border\n@docs BorderStyle\n\n\n# Default border\n\n@docs default\n\n\n# Border modifiers\n\n\n## Appearance\n\n@docs thickness\n@docs none\n@docs solid\n@docs dashed\n\n\n## Sides\n\n@docs top\n@docs bottom\n@docs left\n@docs right\n@docs horizontal\n@docs vertical\n@docs all\n\n\n# Compilation\n\n@docs borderToCouples\n\n\n# Sugar\n\n@docs full\n\n",
-    "aliases": [
-      {
-        "name": "Border",
-        "comment": " The `Border` record contains everything about one border side.\nYou probably won't use it as is, but instead using `Elegant.border`\nwhich automatically generate an empty `Border` record. You\ncan then use modifiers. I.E.\n\n    Elegant.border\n        [ Border.solid\n        , Border.color Color.blue\n        ]\n\n",
-        "args": [],
-        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Helpers.Shared.SizeUnit , style : Maybe.Maybe Border.BorderStyle }"
-      }
-    ],
-    "types": [
-      {
-        "name": "BorderStyle",
-        "comment": " Represents the possible styles of the border.\nIt can be Solid or Dashed. They are created by `solid` and `dashed`.\n",
-        "args": [],
-        "cases": []
-      }
-    ],
-    "values": [
-      {
-        "name": "all",
-        "comment": " Accepts a list of border modifiers, and modify the four sides of the border.\n",
-        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
-      },
-      {
-        "name": "borderToCouples",
-        "comment": " Compiles a `Surrounded Border` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
-        "type": "Surrounded.Surrounded Border.Border -> List ( String, String )"
-      },
-      {
-        "name": "bottom",
-        "comment": " Accepts a list of border modifiers, and modify the bottom side of the border.\n",
-        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
-      },
-      {
-        "name": "dashed",
-        "comment": " Set the border as dashed.\n",
-        "type": "Helpers.Shared.Modifier Border.Border"
-      },
-      {
-        "name": "default",
-        "comment": " Generate an empty `Border` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.border`.\n",
-        "type": "Border.Border"
-      },
-      {
-        "name": "full",
-        "comment": " Accepts a color modifier\n",
-        "type": "Color.Color -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
-      },
-      {
-        "name": "horizontal",
-        "comment": " Accepts a list of border modifiers, and modify both the top and the bottom side of the border.\n",
-        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
-      },
-      {
-        "name": "left",
-        "comment": " Accepts a list of border modifiers, and modify the left side of the border.\n",
-        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
-      },
-      {
-        "name": "none",
-        "comment": " Set the border to none.\n",
-        "type": "Helpers.Shared.Modifier Border.Border"
-      },
-      {
-        "name": "right",
-        "comment": " Accepts a list of border modifiers, and modify the right side of the border.\n",
-        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
-      },
-      {
-        "name": "solid",
-        "comment": " Set the border as solid.\n",
-        "type": "Helpers.Shared.Modifier Border.Border"
-      },
-      {
-        "name": "thickness",
-        "comment": " Set the thickness of the border.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Border.Border"
-      },
-      {
-        "name": "top",
-        "comment": " Accepts a list of border modifiers, and modify the top side of the border.\n",
-        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
-      },
-      {
-        "name": "vertical",
-        "comment": " Accepts a list of border modifiers, and modify both the right and left side of the border.\n",
-        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
-    "name": "Cursor",
-    "comment": " Cursor contains everything about cursors rendering.\n\n\n# Types\n\n@docs Cursor\n\n\n# Cursor types\n\n@docs default\n@docs auto\n@docs cell\n@docs contextMenu\n@docs crosshair\n@docs grab\n@docs grabbing\n@docs help\n@docs move\n@docs noDrop\n@docs none\n@docs notAllowed\n@docs pointer\n@docs progress\n@docs text\n@docs verticalText\n@docs wait\n@docs zoomIn\n@docs zoomOut\n\n\n# Compilation\n\n@docs cursorToCouple\n\n",
-    "aliases": [],
-    "types": [
-      {
-        "name": "Cursor",
-        "comment": " The `Cursor` record contains everything about cursor.\nYou probably won't use it as is, but instead using `Elegant.cursor`.\nYou can provide one cursor type. They can be found [here](https://developer.mozilla.org/en/docs/Web/CSS/cursor).\n\n    Elegant.cursor Cursor.default\n\n",
-        "args": [],
-        "cases": [
-          [
-            "Auto",
-            []
-          ],
-          [
-            "Default",
-            []
-          ],
-          [
-            "None",
-            []
-          ],
-          [
-            "Pointer",
-            []
-          ],
-          [
-            "ContextMenu",
-            []
-          ],
-          [
-            "Help",
-            []
-          ],
-          [
-            "Progress",
-            []
-          ],
-          [
-            "Wait",
-            []
-          ],
-          [
-            "Cell",
-            []
-          ],
-          [
-            "Crosshair",
-            []
-          ],
-          [
-            "Text",
-            []
-          ],
-          [
-            "VerticalText",
-            []
-          ],
-          [
-            "Move",
-            []
-          ],
-          [
-            "NoDrop",
-            []
-          ],
-          [
-            "NotAllowed",
-            []
-          ],
-          [
-            "ZoomIn",
-            []
-          ],
-          [
-            "ZoomOut",
-            []
-          ],
-          [
-            "Grab",
-            []
-          ],
-          [
-            "Grabbing",
-            []
-          ]
-        ]
-      }
-    ],
-    "values": [
-      {
-        "name": "auto",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "cell",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "contextMenu",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "crosshair",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "cursorToCouple",
-        "comment": " Compiles a `Cursor` to the corresponding CSS tuple.\n",
-        "type": "Cursor.Cursor -> ( String, String )"
-      },
-      {
-        "name": "default",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "grab",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "grabbing",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "help",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "move",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "noDrop",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "none",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "notAllowed",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "pointer",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "progress",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "text",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "verticalText",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "wait",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "zoomIn",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      },
-      {
-        "name": "zoomOut",
-        "comment": " ",
-        "type": "Cursor.Cursor"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
-    "name": "Character",
-    "comment": " Character contains everything about characters rendering.\n\n\n# Types\n\n@docs Character\n@docs FontTilt\n@docs FontFamily\n@docs CustomFontFamily\n\n\n# Default Character\n\n@docs default\n\n\n# Modifiers\n\n\n## Weight\n\n@docs weight\n\n\n## Tilting\n\n@docs tiltNormal\n@docs italic\n@docs oblique\n\n\n## Size\n\n@docs size\n\n\n## Font Family\n\n@docs systemFont\n@docs customFont\n@docs fontFamily\n@docs fontFamilyInherit\n@docs fontFamilySansSerif\n\n\n# Compilation\n\n@docs characterToCouples\n\n",
-    "aliases": [
-      {
-        "name": "Character",
-        "comment": " The Character record contains everything about characters rendering.\nYou probably won't use it as is, but instead using `Typography.character`\nwhich automatically generate an empty `Character` record. You can then use\nmodifiers. I.E.\n\n    Typography.characters\n        [ Typography.Character.weight 700\n        , Typography.Character.size (px 30)\n        ]\n\n",
-        "args": [],
-        "type": "{ weight : Maybe.Maybe Int , tilt : Maybe.Maybe Character.FontTilt , size : Maybe.Maybe Helpers.Shared.SizeUnit , family : Maybe.Maybe Character.FontFamily }"
-      }
-    ],
-    "types": [
-      {
-        "name": "CustomFontFamily",
-        "comment": " Represents the font family used to render characters.\nIt can be a system or a custom type. They are created by `systemFont` and `customFont`.\n",
-        "args": [],
-        "cases": []
-      },
-      {
-        "name": "FontFamily",
-        "comment": " Represents the possible fontFamily of the characters.\nIt can be Inherited from the parent, or customized.\n",
-        "args": [],
-        "cases": []
-      },
-      {
-        "name": "FontTilt",
-        "comment": " Represents the possible tilting of the characters.\nIt can be Normal, Italic, or Oblique. They are created by `uppercase`,\n`lowercase` and `capitalize`.\n",
-        "args": [],
-        "cases": []
-      }
-    ],
-    "values": [
-      {
-        "name": "characterToCouples",
-        "comment": " Compiles a `Character` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
-        "type": "Character.Character -> List ( String, String )"
-      },
-      {
-        "name": "customFont",
-        "comment": " Gives a custom font.\n",
-        "type": "String -> Character.CustomFontFamily"
-      },
-      {
-        "name": "default",
-        "comment": " Generate an empty `Character` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Typography.character`.\n",
-        "type": "Character.Character"
-      },
-      {
-        "name": "fontFamily",
-        "comment": " Set the font family to the desired fonts. All fonts will be tried one by one\nuntil one is found either on the browser or user's OS. It is possible to use both\nsystem and custom fonts.\n",
-        "type": "List Character.CustomFontFamily -> Helpers.Shared.Modifier Character.Character"
-      },
-      {
-        "name": "fontFamilyInherit",
-        "comment": " Inherits the font from the parents. It is the default behavior of fontFamily.\n",
-        "type": "Helpers.Shared.Modifier Character.Character"
-      },
-      {
-        "name": "fontFamilySansSerif",
-        "comment": " Standard Sans Serif font family.\nInspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>\n",
-        "type": "Helpers.Shared.Modifier Character.Character"
-      },
-      {
-        "name": "italic",
-        "comment": " Renders the characters as italic.\n",
-        "type": "Helpers.Shared.Modifier Character.Character"
-      },
-      {
-        "name": "oblique",
-        "comment": " Renders the characters as oblique.\n",
-        "type": "Helpers.Shared.Modifier Character.Character"
-      },
-      {
-        "name": "size",
-        "comment": " Set the size of the characters to the desired value.\nCan be px, pt, vh, em or rem.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Character.Character"
-      },
-      {
-        "name": "systemFont",
-        "comment": " Gives a system font.\n",
-        "type": "String -> Character.CustomFontFamily"
-      },
-      {
-        "name": "tiltNormal",
-        "comment": " Cancels any tilting of the characters.\n",
-        "type": "Helpers.Shared.Modifier Character.Character"
-      },
-      {
-        "name": "weight",
-        "comment": " Changes the weight of the characters.\nValue is defined between 100 and 900 and default weight is equal to 400.\n",
-        "type": "Int -> Helpers.Shared.Modifier Character.Character"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
-    "name": "Corner",
-    "comment": " Corner contains everything about corner radius (also called border radius in CSS).\n\n\n# Types\n\n@docs Corner\n@docs CornerSet\n\n\n# Default corner radius\n\n@docs default\n\n\n# Corner radius style\n\n@docs circular\n@docs elliptic\n\n\n# Corner radius selector\n\n@docs top\n@docs topRight\n@docs right\n@docs bottomRight\n@docs bottom\n@docs bottomLeft\n@docs left\n@docs topLeft\n@docs all\n\n\n# Compilation\n\n@docs cornerToCouples\n\n",
-    "aliases": [
-      {
-        "name": "Corner",
-        "comment": " The `Corner` record contains everything about corner radius (also called border radius in CSS).\nYou probably won't use it as is, but instead using `Elegant.corner`\nwhich automatically generate an empty `Corner` record. You\ncan then use modifiers. I.E.\n\n    Elegant.corner\n        [ Corner.circular Corner.all (px 30) ]\n\n",
-        "args": [],
-        "type": "{ topLeft : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , topRight : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , bottomRight : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , bottomLeft : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) }"
-      }
-    ],
-    "types": [
-      {
-        "name": "CornerSet",
-        "comment": " Represents the possible selected corner(s).\nIt can be Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left, TopLeft or All.\nThey are created by `top`, `topRight`, `right`, `bottomRight`, `bottom`, `bottomLeft`,\n`left`, `topLeft` or `all`.\n",
-        "args": [],
-        "cases": []
-      }
-    ],
-    "values": [
-      {
-        "name": "all",
-        "comment": " Select the four corners.\n",
-        "type": "Corner.CornerSet"
-      },
-      {
-        "name": "bottom",
-        "comment": " Select the two bottom corners.\n",
-        "type": "Corner.CornerSet"
-      },
-      {
-        "name": "bottomLeft",
-        "comment": " Select the bottom-left corner.\n",
-        "type": "Corner.CornerSet"
-      },
-      {
-        "name": "bottomRight",
-        "comment": " Select the bottom-right corner.\n",
-        "type": "Corner.CornerSet"
-      },
-      {
-        "name": "circular",
-        "comment": " Set the corner(s) to be round (the two angles are the same).\n",
-        "type": "Corner.CornerSet -> Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Corner.Corner"
-      },
-      {
-        "name": "cornerToCouples",
-        "comment": " Compiles a `Corner` record to the corresponding CSS tuples.\nCompiles only parts which are defined, ignoring `Nothing` fields.\n",
-        "type": "Corner.Corner -> List ( String, String )"
-      },
-      {
-        "name": "default",
-        "comment": " Generate an empty `Corner` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.corner`.\n",
-        "type": "Corner.Corner"
-      },
-      {
-        "name": "elliptic",
-        "comment": " Set the corner(s) to be elliptic, i.e. you can specify two different values\nfor the corner(s).\n",
-        "type": "Corner.CornerSet -> Helpers.Shared.SizeUnit -> Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Corner.Corner"
-      },
-      {
-        "name": "left",
-        "comment": " Select the two left corners.\n",
-        "type": "Corner.CornerSet"
-      },
-      {
-        "name": "right",
-        "comment": " Select the two right corners.\n",
-        "type": "Corner.CornerSet"
-      },
-      {
-        "name": "top",
-        "comment": " Select the two top corners.\n",
-        "type": "Corner.CornerSet"
-      },
-      {
-        "name": "topLeft",
-        "comment": " Select the top-left corner.\n",
-        "type": "Corner.CornerSet"
-      },
-      {
-        "name": "topRight",
-        "comment": " Select the top-right corner.\n",
-        "type": "Corner.CornerSet"
       }
     ],
     "generated-with-elm-version": "0.18.0"
@@ -4141,6 +3997,99 @@
         "name": "submitEventToHtmlEvent",
         "comment": " ",
         "type": "BodyBuilder.Events.OnSubmitEvent msg a -> List (Html.Attribute msg)"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Border",
+    "comment": " Border contains everything about borders rendering.\n\n\n# Types\n\n@docs Border\n@docs BorderStyle\n\n\n# Default border\n\n@docs default\n\n\n# Border modifiers\n\n\n## Appearance\n\n@docs thickness\n@docs none\n@docs solid\n@docs dashed\n\n\n## Sides\n\n@docs top\n@docs bottom\n@docs left\n@docs right\n@docs horizontal\n@docs vertical\n@docs all\n\n\n# Compilation\n\n@docs borderToCouples\n\n\n# Sugar\n\n@docs full\n\n",
+    "aliases": [
+      {
+        "name": "Border",
+        "comment": " The `Border` record contains everything about one border side.\nYou probably won't use it as is, but instead using `Elegant.border`\nwhich automatically generate an empty `Border` record. You\ncan then use modifiers. I.E.\n\n    Elegant.border\n        [ Border.solid\n        , Border.color Color.blue\n        ]\n\n",
+        "args": [],
+        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Helpers.Shared.SizeUnit , style : Maybe.Maybe Border.BorderStyle }"
+      }
+    ],
+    "types": [
+      {
+        "name": "BorderStyle",
+        "comment": " Represents the possible styles of the border.\nIt can be Solid or Dashed. They are created by `solid` and `dashed`.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "all",
+        "comment": " Accepts a list of border modifiers, and modify the four sides of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "borderToCouples",
+        "comment": " Compiles a `Surrounded Border` record to the corresponding CSS list of tuples.\nCompiles only styles which are defined, ignoring `Nothing` fields.\n",
+        "type": "Surrounded.Surrounded Border.Border -> List ( String, String )"
+      },
+      {
+        "name": "bottom",
+        "comment": " Accepts a list of border modifiers, and modify the bottom side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "dashed",
+        "comment": " Set the border as dashed.\n",
+        "type": "Helpers.Shared.Modifier Border.Border"
+      },
+      {
+        "name": "default",
+        "comment": " Generate an empty `Border` record, with every field equal to Nothing.\nYou are free to use it as you wish, but it is instanciated automatically by `Elegant.border`.\n",
+        "type": "Border.Border"
+      },
+      {
+        "name": "full",
+        "comment": " Accepts a color modifier\n",
+        "type": "Color.Color -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "horizontal",
+        "comment": " Accepts a list of border modifiers, and modify both the top and the bottom side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "left",
+        "comment": " Accepts a list of border modifiers, and modify the left side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "none",
+        "comment": " Set the border to none.\n",
+        "type": "Helpers.Shared.Modifier Border.Border"
+      },
+      {
+        "name": "right",
+        "comment": " Accepts a list of border modifiers, and modify the right side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "solid",
+        "comment": " Set the border as solid.\n",
+        "type": "Helpers.Shared.Modifier Border.Border"
+      },
+      {
+        "name": "thickness",
+        "comment": " Set the thickness of the border.\n",
+        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Border.Border"
+      },
+      {
+        "name": "top",
+        "comment": " Accepts a list of border modifiers, and modify the top side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
+      },
+      {
+        "name": "vertical",
+        "comment": " Accepts a list of border modifiers, and modify both the right and left side of the border.\n",
+        "type": "Helpers.Shared.Modifiers Border.Border -> Helpers.Shared.Modifier (Surrounded.Surrounded Border.Border)"
       }
     ],
     "generated-with-elm-version": "0.18.0"

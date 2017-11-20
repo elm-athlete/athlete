@@ -34,7 +34,8 @@
         "Position",
         "Router",
         "Style",
-        "Typography"
+        "Typography",
+        "Modifiers"
     ],
     "native-modules": true,
     "dependencies": {

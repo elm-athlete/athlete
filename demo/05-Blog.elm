@@ -12,6 +12,7 @@ import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
 import Finders exposing (..)
 import Elegant exposing (SizeUnit, px, pt, percent, vh)
+import Modifiers exposing (..)
 import Padding
 import Constants
 import Elegant

@@ -69,15 +69,7 @@ sizeUnitToString val =
             concatNumberWithString x "rem"
 
 
-type alias Modifier a =
-    a -> a
-
-
-type alias Modifiers a =
-    List (Modifier a)
-
-
-modifiedElementOrNothing : a -> Modifiers a -> Maybe a
+modifiedElementOrNothing : a -> List (a -> a) -> Maybe a
 modifiedElementOrNothing default modifiers =
     if List.isEmpty modifiers then
         Nothing

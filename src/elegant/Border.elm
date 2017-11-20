@@ -69,6 +69,7 @@ import Color exposing (Color)
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 import Surrounded exposing (Surrounded)
+import Modifiers exposing (..)
 
 
 {-| The `Border` record contains everything about one border side.

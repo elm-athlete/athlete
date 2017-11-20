@@ -27,6 +27,7 @@ module Dimensions
 
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
+import Modifiers exposing (..)
 
 
 {-| The type behind the handling of (max-|min-|)width and (max-|min-|)height

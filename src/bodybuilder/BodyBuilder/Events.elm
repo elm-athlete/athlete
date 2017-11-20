@@ -77,6 +77,7 @@ import Json.Decode exposing (Decoder)
 import Color exposing (Color)
 import Helpers.Shared exposing (..)
 import BodyBuilder.Setters exposing (..)
+import Modifiers exposing (..)
 
 
 defaultOnMouseEvents : OnMouseEventsInside msg

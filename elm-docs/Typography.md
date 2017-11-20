@@ -10,7 +10,7 @@ Typography contains everything about fonts and characters rendering.
 ### **type alias Typography**
 ```elm
 type alias Typography  =  
-    { character : Maybe Character , capitalization : Maybe Typography.Capitalization , decoration : Maybe Typography.Decoration , color : Maybe Color , whiteSpaceWrap : Maybe Typography.WhiteSpaceWrap , userSelect : Maybe Typography.UserSelect , lineHeight : Maybe (Either Helpers.Shared.SizeUnit Typography.Normal) }
+    { capitalization : Maybe Typography.Capitalization , decoration : Maybe Typography.Decoration , color : Maybe Color , whiteSpaceWrap : Maybe Typography.WhiteSpaceWrap , userSelect : Maybe Typography.UserSelect , lineHeight : Maybe (Either Helpers.Shared.SizeUnit Typography.Normal) , weight : Maybe Int , tilt : Maybe Typography.FontTilt , size : Maybe Helpers.Shared.SizeUnit , family : Maybe Typography.FontFamily , letterSpacing : Maybe Helpers.Shared.SizeUnit }
 ```
 
 The `Typography` record contains everything about fonts rendering,
@@ -76,6 +76,37 @@ type Normal
 ```
 
 Value representing the 'normal' value in `line-height`.
+- [FontTilt](#fonttilt)
+
+### **type FontTilt**
+```elm
+type FontTilt   
+    = 
+```
+
+Represents the possible tilting of the characters.
+It can be Normal, Italic, or Oblique. They are created by `uppercase`,
+`lowercase` and `capitalize`.
+- [FontFamily](#fontfamily)
+
+### **type FontFamily**
+```elm
+type FontFamily   
+    = 
+```
+
+Represents the possible fontFamily of the characters.
+It can be Inherited from the parent, or customized.
+- [CustomFontFamily](#customfontfamily)
+
+### **type CustomFontFamily**
+```elm
+type CustomFontFamily   
+    = 
+```
+
+Represents the font family used to render characters.
+It can be a system or a custom type. They are created by `systemFont` and `customFont`.
 
 
 # Default typography
@@ -92,28 +123,6 @@ You are free to use it as you wish, but it is instanciated automatically by `Box
 
 
 # Typography modifiers
-
-
-## Characters rendering
-
-- [character](#character)
-
-### **character**
-```elm
-character : Helpers.Shared.Modifiers Character -> Helpers.Shared.Modifier Typography
-```
-
-Modify the character rendering of the text. The characters options are in
-`Typography.Character`.
-It creates a default empty `Character` record, modifies it according to the
-modifiers, then set the resulting `Character` in Typography.
-
-```elm
-Typography.character
-    [ Typography.Character.weight 700
-    , Typography.Character.italic
-    ]
-```
 
 
 ## Text Transformations
@@ -220,15 +229,120 @@ lineHeight : Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography
 Set the lineHeight to the desired value. Can be px, pt, vh, em or rem.
 
 
-# Shortcuts
+## Weight
 
-- [fontSize](#fontsize)
+- [weight](#weight)
 
-### **fontSize**
+### **weight**
 ```elm
-fontSize : Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography
+weight : Int -> Helpers.Shared.Modifier Typography
 ```
 
+Changes the weight of the characters.
+Value is defined between 100 and 900 and default weight is equal to 400.
+
+
+## Tilting
+
+- [tiltNormal](#tiltnormal)
+
+### **tiltNormal**
+```elm
+tiltNormal : Helpers.Shared.Modifier Typography
+```
+
+Cancels any tilting of the characters.
+- [italic](#italic)
+
+### **italic**
+```elm
+italic : Helpers.Shared.Modifier Typography
+```
+
+Renders the characters as italic.
+- [oblique](#oblique)
+
+### **oblique**
+```elm
+oblique : Helpers.Shared.Modifier Typography
+```
+
+Renders the characters as oblique.
+
+
+## Size
+
+- [size](#size)
+
+### **size**
+```elm
+size : Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography
+```
+
+Set the size of the characters to the desired value.
+Can be px, pt, vh, em or rem.
+
+
+## Font Family
+
+- [systemFont](#systemfont)
+
+### **systemFont**
+```elm
+systemFont : String -> Typography.CustomFontFamily
+```
+
+Gives a system font.
+- [customFont](#customfont)
+
+### **customFont**
+```elm
+customFont : String -> Typography.CustomFontFamily
+```
+
+Gives a custom font.
+- [fontFamily](#fontfamily-1)
+
+### **fontFamily**
+```elm
+fontFamily : List Typography.CustomFontFamily -> Helpers.Shared.Modifier Typography
+```
+
+Set the font family to the desired fonts. All fonts will be tried one by one
+until one is found either on the browser or user's OS. It is possible to use both
+system and custom fonts.
+- [fontFamilyInherit](#fontfamilyinherit)
+
+### **fontFamilyInherit**
+```elm
+fontFamilyInherit : Helpers.Shared.Modifier Typography
+```
+
+Inherits the font from the parents. It is the default behavior of fontFamily.
+- [fontFamilySansSerif](#fontfamilysansserif)
+
+### **fontFamilySansSerif**
+```elm
+fontFamilySansSerif : Helpers.Shared.Modifier Typography
+```
+
+Standard Sans Serif font family.
+Inspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>
+
+
+## Letter Spacing
+
+- [letterSpacing](#letterspacing)
+
+### **letterSpacing**
+```elm
+letterSpacing : Helpers.Shared.SizeUnit -> Helpers.Shared.Modifier Typography
+```
+
+Set the letter spacing of the typography.
+
+
+# Shortcuts
 
 - [bold](#bold)
 

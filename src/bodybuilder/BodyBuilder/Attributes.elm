@@ -1,158 +1,212 @@
-module BodyBuilder.Attributes exposing (..)
+module BodyBuilder.Attributes
+    exposing
+        ( StyleSelector
+        , defaultStyleSelector
+        , MediaQuery(..)
+        , StyleModifier
+        , style
+        , rawStyle
+        , AutocompleteAttribute
+        , WidthAttribute
+        , HeightAttribute
+        , ValueAttribute
+        , StepAttribute
+        , MaxAttribute
+        , MinAttribute
+        , TargetAttribute
+        , HrefAttribute
+        , NameAttribute
+        , DisabledAttribute
+        , MaybeBlockContainer
+        , BlockContainer
+        , PlaceholderAttribute
+        , PositionAttribute
+        , DataAttribute
+        , TypeContainer
+        , BoxContainer
+        , CheckedContainer
+        , UniversalContainer
+        , FlexContainerProperties
+        , FlexItemProperties
+        , GridContainerProperties
+        , GridItemProperties
+        , Position
+        , VisibleAttributes
+        , VisibleAttributesAndEvents
+        , InputPasswordAttributes
+        , InputRangeAttributes
+        , SelectAttributes
+        , UniversalAttributes
+        , FlowAttributes
+        , NodeAttributes
+        , FlexContainerAttributes
+        , FlexItemAttributes
+        , GridContainerAttributes
+        , GridItemAttributes
+        , BlockAttributes
+        , HeadingAttributes
+        , ButtonAttributes
+        , AAttributes
+        , TextareaAttributes
+        , ImgAttributes
+        , AudioAttributes
+        , ProgressAttributes
+        , ScriptAttributes
+        , InputAttributes
+        , InputHiddenAttributes
+        , LabelAttributes
+        , InputRadioAttributes
+        , InputCheckboxAttributes
+        , InputTextAttributes
+        , InputTelAttributes
+        , InputSubmitAttributes
+        , InputUrlAttributes
+        , InputNumberAttributes
+        , InputColorAttributes
+        , InputFileAttributes
+        , label
+        , value
+        , title
+        , id
+        , class
+        , tabindex
+        , disabled
+        , target
+        , href
+        , name
+        , width
+        , height
+        , data
+        , autocomplete
+        , placeholder
+        , step
+        , max
+        , min
+        , checked
+        , defaultUniversalAttributes
+        , defaultFlowAttributes
+        , defaultNodeAttributes
+        , defaultFlexContainerAttributes
+        , defaultGridContainerAttributes
+        , defaultHeadingAttributes
+        , defaultFlexItemAttributes
+        , defaultGridItemAttributes
+        , defaultButtonAttributes
+        , defaultAAttributes
+        , defaultTextareaAttributes
+        , defaultImgAttributes
+        , defaultAudioAttributes
+        , defaultProgressAttributes
+        , defaultScriptAttributes
+        , defaultInputHiddenAttributes
+        , defaultInputTextAttributes
+        , defaultInputTelAttributes
+        , defaultInputNumberAttributes
+        , defaultInputColorAttributes
+        , defaultInputCheckboxAttributes
+        , defaultInputFileAttributes
+        , defaultInputPasswordAttributes
+        , defaultInputRadioAttributes
+        , defaultInputRangeAttributes
+        , defaultInputSubmitAttributes
+        , defaultInputUrlAttributes
+        , defaultSelectAttributes
+        , universalAttributesToHtmlAttributes
+        , visibleAttributesToHtmlAttributes
+        , rawStyleToHtmlAttributes
+        , flowAttributesToHtmlAttributes
+        , nodeAttributesToHtmlAttributes
+        , flexContainerAttributesToHtmlAttributes
+        , flexItemAttributesToHtmlAttributes
+        , gridContainerAttributesToHtmlAttributes
+        , gridItemAttributesToHtmlAttributes
+        , headingAttributesToHtmlAttributes
+        , disabledAttributeToHtmlAttributes
+        , buttonAttributesToHtmlAttributes
+        , aAttributesToHtmlAttributes
+        , textareaAttributesToHtmlAttributes
+        , imgAttributesToHtmlAttributes
+        , audioAttributesToHtmlAttributes
+        , progressAttributesToHtmlAttributes
+        , scriptAttributesToHtmlAttributes
+        , inputAttributesToHtmlAttributes
+        , inputHiddenAttributesToHtmlAttributes
+        , inputVisibleToHtmlAttributes
+        , inputTextAttributesToHtmlAttributes
+        , inputNumberAttributesToHtmlAttributes
+        , inputColorAttributesToHtmlAttributes
+        , inputCheckboxAttributesToHtmlAttributes
+        , inputFileAttributesToHtmlAttributes
+        , inputPasswordAttributesToHtmlAttributes
+        , inputRadioAttributesToHtmlAttributes
+        , inputRangeAttributesToHtmlAttributes
+        , inputSubmitAttributesToHtmlAttributes
+        , inputUrlAttributesToHtmlAttributes
+        , selectAttributesToHtmlAttributes
+        )
 
 {-| This module entirely replaces Html.Attributes, providing a type-safer alternatives.
 This is designed to work with BodyBuilder.
 It is not compatible with Html.Attributes, though.
 
-@docs AAttributes
-@docs aAttributesToHtmlAttributes
-@docs AudioAttributes
-@docs audioAttributesToHtmlAttributes
-@docs autocomplete
-@docs BlockAttributes
-@docs BlockContainer
-@docs BoxContainer
-@docs ButtonAttributes
-@docs buttonAttributesToHtmlAttributes
-@docs checked
-@docs CheckedContainer
-@docs class
-@docs ColorValue
-@docs data
-@docs DataAttribute
-@docs defaultAAttributes
-@docs defaultAudioAttributes
-@docs defaultButtonAttributes
-@docs defaultFlexContainerAttributes
-@docs defaultFlexItemAttributes
-@docs defaultFlowAttributes
-@docs defaultGridContainerAttributes
-@docs defaultGridItemAttributes
-@docs defaultHeadingAttributes
-@docs defaultImgAttributes
-@docs defaultInputCheckboxAttributes
-@docs defaultInputColorAttributes
-@docs defaultInputFileAttributes
-@docs defaultInputHiddenAttributes
-@docs defaultInputNumberAttributes
-@docs defaultInputPasswordAttributes
-@docs defaultInputRadioAttributes
-@docs defaultInputRangeAttributes
-@docs defaultInputSubmitAttributes
-@docs defaultInputTextAttributes
-@docs defaultInputUrlAttributes
-@docs defaultNodeAttributes
-@docs defaultProgressAttributes
-@docs defaultScriptAttributes
-@docs defaultSelectAttributes
-@docs defaultStyleSelector
-@docs defaultTextareaAttributes
-@docs defaultUniversalAttributes
-@docs disabled
-@docs DisabledAttribute
-@docs disabledAttributeToHtmlAttributes
-@docs FlexContainerAttributes
-@docs flexContainerAttributesToHtmlAttributes
-@docs FlexContainerProperties
-@docs FlexItemAttributes
-@docs flexItemAttributesToHtmlAttributes
-@docs FlexItemProperties
-@docs FlowAttributes
-@docs flowAttributesToHtmlAttributes
-@docs GridContainerAttributes
-@docs gridContainerAttributesToHtmlAttributes
-@docs GridContainerProperties
-@docs GridItemAttributes
-@docs gridItemAttributesToHtmlAttributes
-@docs GridItemProperties
-@docs HeadingAttributes
-@docs headingAttributesToHtmlAttributes
-@docs height
-@docs href
-@docs HrefAttribute
-@docs id
-@docs ImgAttributes
-@docs imgAttributesToHtmlAttributes
-@docs InputAttributes
-@docs inputAttributesToHtmlAttributes
-@docs InputCheckboxAttributes
-@docs inputCheckboxAttributesToHtmlAttributes
-@docs InputColorAttributes
-@docs inputColorAttributesToHtmlAttributes
-@docs InputFileAttributes
-@docs inputFileAttributesToHtmlAttributes
-@docs InputHiddenAttributes
-@docs inputHiddenAttributesToHtmlAttributes
-@docs InputNumberAttributes
-@docs inputNumberAttributesToHtmlAttributes
-@docs InputPasswordAttributes
-@docs inputPasswordAttributesToHtmlAttributes
-@docs InputRadioAttributes
-@docs inputRadioAttributesToHtmlAttributes
-@docs InputRangeAttributes
-@docs inputRangeAttributesToHtmlAttributes
-@docs InputSubmitAttributes
-@docs inputSubmitAttributesToHtmlAttributes
-@docs InputTextAttributes
-@docs inputTextAttributesToHtmlAttributes
-@docs InputUrlAttributes
-@docs inputUrlAttributesToHtmlAttributes
-@docs inputVisibleToHtmlAttributes
-@docs IntValue
-@docs label
-@docs LabelAttributes
-@docs max
-@docs MaxAttribute
-@docs MaybeBlockContainer
+@docs StyleSelector, defaultStyleSelector
 @docs MediaQuery
-@docs min
-@docs MinAttribute
-@docs name
-@docs NameAttribute
-@docs NodeAttributes
-@docs nodeAttributesToHtmlAttributes
-@docs placeholder
-@docs PlaceholderAttribute
-@docs Position
-@docs PositionAttribute
-@docs ProgressAttributes
-@docs progressAttributesToHtmlAttributes
-@docs rawStyle
-@docs rawStyleToHtmlAttributes
-@docs ScriptAttributes
-@docs scriptAttributesToHtmlAttributes
-@docs SelectAttributes
-@docs selectAttributesToHtmlAttributes
-@docs setClass
-@docs setId
-@docs setTabIndex
-@docs setTitle
-@docs setUniversal
-@docs setUniversalIn
-@docs setValueInUniversal
-@docs step
-@docs StepAttribute
-@docs StringValue
-@docs style
-@docs StyleModifier
-@docs StyleSelector
-@docs tabindex
-@docs target
-@docs TargetAttribute
-@docs TextareaAttributes
-@docs textareaAttributesToHtmlAttributes
-@docs title
-@docs TypeContainer
-@docs UniversalAttributes
-@docs universalAttributesToHtmlAttributes
-@docs UniversalContainer
-@docs value
+@docs StyleModifier, style, rawStyle
+@docs AutocompleteAttribute, WidthAttribute
+@docs HeightAttribute
 @docs ValueAttribute
-@docs VisibleAttributes
+@docs StepAttribute
+@docs MaxAttribute
+@docs MinAttribute
+@docs TargetAttribute
+@docs HrefAttribute
+@docs NameAttribute
+@docs DisabledAttribute
+@docs PlaceholderAttribute
+@docs DataAttribute, data
+@docs TypeContainer
+@docs BoxContainer
+@docs CheckedContainer
+@docs UniversalContainer, title, id, class, tabindex
+@docs MaybeBlockContainer
+@docs BlockContainer
+@docs FlexContainerProperties
+@docs FlexItemProperties
+@docs GridContainerProperties
+@docs GridItemProperties
+@docs VisibleAttributes, visibleAttributesToHtmlAttributes, rawStyleToHtmlAttributes
 @docs VisibleAttributesAndEvents
-@docs visibleAttributesToHtmlAttributes
-@docs width
-@docs WidthAttribute
+@docs UniversalAttributes, defaultUniversalAttributes, universalAttributesToHtmlAttributes
+@docs NodeAttributes, defaultNodeAttributes, nodeAttributesToHtmlAttributes
+@docs BlockAttributes, width, height
+@docs HeadingAttributes, defaultHeadingAttributes, headingAttributesToHtmlAttributes
+@docs FlowAttributes, defaultFlowAttributes, flowAttributesToHtmlAttributes
+@docs FlexContainerAttributes, defaultFlexContainerAttributes, flexContainerAttributesToHtmlAttributes
+@docs FlexItemAttributes, defaultFlexItemAttributes, flexItemAttributesToHtmlAttributes
+@docs GridContainerAttributes, defaultGridContainerAttributes, gridContainerAttributesToHtmlAttributes
+@docs GridItemAttributes, defaultGridItemAttributes, gridItemAttributesToHtmlAttributes
+@docs ButtonAttributes, defaultButtonAttributes, buttonAttributesToHtmlAttributes
+@docs AAttributes, target, href, defaultAAttributes, aAttributesToHtmlAttributes
+@docs ImgAttributes, defaultImgAttributes, imgAttributesToHtmlAttributes
+@docs AudioAttributes, defaultAudioAttributes, audioAttributesToHtmlAttributes
+@docs ScriptAttributes, defaultScriptAttributes, scriptAttributesToHtmlAttributes
+@docs ProgressAttributes, defaultProgressAttributes, progressAttributesToHtmlAttributes
+@docs SelectAttributes, defaultSelectAttributes, selectAttributesToHtmlAttributes
+@docs LabelAttributes, label, PositionAttribute, Position
+@docs InputAttributes, value, disabled, name, disabledAttributeToHtmlAttributes, inputAttributesToHtmlAttributes, inputVisibleToHtmlAttributes
+@docs InputHiddenAttributes, name, defaultInputHiddenAttributes, inputHiddenAttributesToHtmlAttributes
+@docs InputPasswordAttributes, name, defaultInputPasswordAttributes, inputPasswordAttributesToHtmlAttributes
+@docs InputRangeAttributes, name, step, max, min, defaultInputRangeAttributes, inputRangeAttributesToHtmlAttributes
+@docs InputRadioAttributes, name, defaultInputRadioAttributes, inputRadioAttributesToHtmlAttributes
+@docs InputCheckboxAttributes, name, checked, defaultInputCheckboxAttributes, inputCheckboxAttributesToHtmlAttributes
+@docs InputTextAttributes, name, autocomplete, placeholder, defaultInputTextAttributes, inputTextAttributesToHtmlAttributes
+@docs InputTelAttributes, defaultInputTelAttributes
+@docs InputSubmitAttributes, name, defaultInputSubmitAttributes, inputSubmitAttributesToHtmlAttributes
+@docs InputUrlAttributes, name, placeholder, defaultInputUrlAttributes, inputUrlAttributesToHtmlAttributes
+@docs InputNumberAttributes, name, step, max, min, defaultInputNumberAttributes, inputNumberAttributesToHtmlAttributes
+@docs InputColorAttributes, name, defaultInputColorAttributes, inputColorAttributesToHtmlAttributes
+@docs InputFileAttributes, name, defaultInputFileAttributes, inputFileAttributesToHtmlAttributes
+@docs TextareaAttributes, autocomplete, placeholder, defaultTextareaAttributes, textareaAttributesToHtmlAttributes
 
 -}
 
@@ -170,6 +224,8 @@ import Flex
 import BodyBuilder.Shared as Shared
 import Grid
 import Elegant
+import BodyBuilder.Setters exposing (..)
+import Modifiers exposing (..)
 
 
 {-| -}
@@ -216,20 +272,6 @@ type alias ValueAttribute b a =
     { a | value : Maybe b }
 
 
-
---
--- {-| -}
--- type alias TitleAttribute a =
---     { a | title : Maybe String }
---
---
--- {-| -}
--- type alias IdAttribute a =
---     { a | id : Maybe String }
---
---
-
-
 {-| -}
 type alias StepAttribute a =
     { a | step : Maybe Int }
@@ -245,29 +287,9 @@ type alias MinAttribute a =
     { a | min : Maybe Int }
 
 
-
---
--- {-| -}
--- type alias ClassAttribute a =
---     { a | class : List String }
---
---
--- {-| -}
--- type alias TabindexAttribute a =
---     { a | tabindex : Maybe Int }
---
---
--- {-| -}
-
-
 {-| -}
 type alias TargetAttribute a =
     { a | target : Maybe String }
-
-
-
---
---
 
 
 {-| -}
@@ -285,23 +307,9 @@ type alias WidthAttribute a =
     { a | width : Maybe Int }
 
 
-
---
--- {-| -}
--- type alias HeightAttribute a =
---     { a | height : Maybe Int }
---
---
--- {-| -}
--- type alias SrcAttribute a =
---     { a | src : String }
---
---
--- {-| -}
--- type alias AltAttribute a =
---     { a | alt : String }
---
---
+{-| -}
+type alias HeightAttribute a =
+    { a | height : Maybe Int }
 
 
 {-| -}
@@ -319,10 +327,9 @@ type alias BlockContainer a =
     { a | block : List ( Modifiers BlockDetails, StyleSelector ) }
 
 
-
--- {-| -}
--- type alias AutocompleteAttribute a =
---     { a | autocomplete : Bool }
+{-| -}
+type alias AutocompleteAttribute a =
+    { a | autocomplete : Bool }
 
 
 {-| -}
@@ -582,24 +589,6 @@ type alias HeadingAttributes msg =
     BlockAttributes msg
 
 
-
--- MaybeBlockContainer (DisabledAttribute (VisibleAttributesAndEvents msg a))
--- {-| -}
--- type alias ButtonAttributesBase msg a =
---     { a
---         | disabled : Bool
---         , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
---         , onMouseEvents : Maybe (OnMouseEventsInside msg)
---         , onEvent : Maybe ( String, Decoder msg )
---         , onBlurEvent : Maybe msg
---         , onFocusEvent : Maybe msg
---         , box : List ( Modifiers Box.Box, StyleSelector )
---         , universal : UniversalAttributes
---         , rawStyle : Maybe Elegant.Style
---     }
--- ButtonAttributesBase msg {}
-
-
 {-| -}
 type alias ButtonAttributes msg =
     { disabled : Bool
@@ -612,10 +601,6 @@ type alias ButtonAttributes msg =
     , universal : UniversalAttributes
     , rawStyle : Maybe Elegant.Style
     }
-
-
-
--- MaybeBlockContainer (TargetAttribute (HrefAttribute (FlowAttributes msg)))
 
 
 {-| -}
@@ -634,12 +619,6 @@ type alias AAttributes msg =
 
 
 {-| -}
-
-
-
--- MaybeBlockContainer (OnStringInputEvent msg (NameAttribute (StringValue (FlowAttributes msg))))
-
-
 type alias TextareaAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
     , onEvent : Maybe ( String, Decoder msg )
@@ -657,12 +636,6 @@ type alias TextareaAttributes msg =
 
 
 {-| -}
-
-
-
--- MaybeBlockContainer (HeightAttribute (WidthAttribute (AltAttribute (SrcAttribute (FlowAttributes msg)))))
-
-
 type alias ImgAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
     , onEvent : Maybe ( String, Decoder msg )
@@ -680,12 +653,6 @@ type alias ImgAttributes msg =
 
 
 {-| -}
-
-
-
--- MaybeBlockContainer (SrcAttribute (FlowAttributes msg))
-
-
 type alias AudioAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
     , onEvent : Maybe ( String, Decoder msg )
@@ -700,12 +667,6 @@ type alias AudioAttributes msg =
 
 
 {-| -}
-
-
-
--- MaybeBlockContainer (FlowAttributes msg)
-
-
 type alias ProgressAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
     , onEvent : Maybe ( String, Decoder msg )
@@ -716,10 +677,6 @@ type alias ProgressAttributes msg =
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
     }
-
-
-
--- DataAttribute (SrcAttribute (FlowAttributes msg))
 
 
 {-| -}
@@ -736,29 +693,14 @@ type alias ScriptAttributes msg =
     }
 
 
-
--- NameAttribute (TypeContainer a)
-
-
 {-| -}
 type alias InputAttributes a =
     { a | type_ : String, name : Maybe String }
 
 
-
--- {-| -}
--- type alias LabelAttributes msg =
---     MaybeBlockContainer (PositionAttribute (FlowAttributes msg))
--- UniversalContainer (TypeContainer (InputAttributes (StringValue {})))
-
-
 {-| -}
 type alias InputHiddenAttributes =
     { name : Maybe String, type_ : String, value : Maybe String, universal : UniversalAttributes }
-
-
-
--- MaybeBlockContainer (PositionAttribute (FlowAttributes msg))
 
 
 {-| -}
@@ -775,46 +717,7 @@ type alias LabelAttributes msg =
     }
 
 
-
--- {-| This code should be simplified with the later, but it's very faster without the function calls
--- VisibleAttributesAndEvents msg (InputAttributes a)
--- -}
---
---
---
--- type alias InputVisibleAttributes msg a =
---     { a
---         | name : Maybe String
---         , type_ : String
---         , universal : UniversalAttributes
---         , box : List ( Modifiers Box.Box, StyleSelector )
---         , onMouseEvents : Maybe (OnMouseEventsInside msg)
---         , onEvent : Maybe ( String, Decoder msg )
---         , onBlurEvent : Maybe msg
---         , onFocusEvent : Maybe msg
---         , label : Maybe (Shared.Label msg)
---         , rawStyle : Maybe Elegant.Style
---     }
--- {-| StringValue (InputVisibleAttributes msg a)
--- -}
--- type alias InputStringValueAttributes msg a =
---     { a
---         | name : Maybe String
---         , type_ : String
---         , universal : UniversalAttributes
---         , box : List ( Modifiers Box.Box, StyleSelector )
---         , onMouseEvents : Maybe (OnMouseEventsInside msg)
---         , onEvent : Maybe ( String, Decoder msg )
---         , onBlurEvent : Maybe msg
---         , onFocusEvent : Maybe msg
---         , value : Maybe String
---         , label : Maybe (Shared.Label msg)
---     }
---
-
-
-{-| InputStringValueAttributes msg {}
--}
+{-| -}
 type alias InputRadioAttributes msg =
     { name : Maybe String
     , type_ : String
@@ -832,12 +735,6 @@ type alias InputRadioAttributes msg =
 
 
 {-| -}
-
-
-
--- MaybeBlockContainer (CheckedContainer (OnCheckEvent msg (InputStringValueAttributes msg {})))
-
-
 type alias InputCheckboxAttributes msg =
     { name : Maybe String
     , type_ : String
@@ -854,12 +751,6 @@ type alias InputCheckboxAttributes msg =
     , onCheckEvent : Maybe (Bool -> msg)
     , rawStyle : Maybe Elegant.Style
     }
-
-
-
--- MaybeBlockContainer (AutocompleteAttribute (PlaceholderAttribute (OnStringInputEvent msg (InputStringValueAttributes msg a))))
--- type alias InputTextAttributesBase msg a =
--- InputTextAttributesBase msg {}
 
 
 {-| -}
@@ -884,12 +775,11 @@ type alias InputTextAttributes msg =
 
 
 {-| -}
+type alias InputTelAttributes msg =
+    InputTextAttributes msg
 
 
-
--- ValueAttribute String (OnSubmitEvent msg (ButtonAttributesBase msg (TypeContainer { label : Maybe (Shared.Label msg) })))
-
-
+{-| -}
 type alias InputSubmitAttributes msg =
     { label : Maybe (Shared.Label msg)
     , type_ : String
@@ -912,12 +802,6 @@ type alias InputUrlAttributes msg =
 
 
 {-| -}
-
-
-
--- MaybeBlockContainer (StepAttribute (MaxAttribute (MinAttribute (OnIntInputEvent msg (IntValue (InputVisibleAttributes msg {}))))))
-
-
 type alias InputNumberAttributes msg =
     { name : Maybe String
     , type_ : String
@@ -941,12 +825,6 @@ type alias InputNumberAttributes msg =
 
 
 {-| -}
-
-
-
--- MaybeBlockContainer (OnColorInputEvent msg (ColorValue (InputVisibleAttributes msg {})))
-
-
 type alias InputColorAttributes msg =
     { name : Maybe String
     , type_ : String
@@ -966,12 +844,6 @@ type alias InputColorAttributes msg =
 
 
 {-| -}
-
-
-
--- MaybeBlockContainer (InputVisibleAttributes msg {})
-
-
 type alias InputFileAttributes msg =
     { name : Maybe String
     , type_ : String
@@ -994,12 +866,11 @@ label content record =
 
 
 {-| -}
-value : a -> { c | value : b } -> { c | value : Maybe a }
-value val attrs =
-    { attrs | value = Just val }
+value : a -> { c | value : Maybe a } -> { c | value : Maybe a }
+value =
+    setValue
 
 
-{-| -}
 setUniversal :
     UniversalAttributes
     -> { a | universal : UniversalAttributes }
@@ -1008,7 +879,6 @@ setUniversal val attrs =
     { attrs | universal = val }
 
 
-{-| -}
 setUniversalIn :
     { a | universal : UniversalAttributes }
     -> UniversalAttributes
@@ -1017,7 +887,6 @@ setUniversalIn =
     flip setUniversal
 
 
-{-| -}
 setValueInUniversal :
     (a -> UniversalAttributes -> UniversalAttributes)
     -> a
@@ -1051,30 +920,6 @@ class =
 tabindex : Int -> Modifier { a | universal : UniversalAttributes }
 tabindex =
     setValueInUniversal setTabIndex
-
-
-{-| -}
-setTitle : String -> { a | title : Maybe String } -> { a | title : Maybe String }
-setTitle val attrs =
-    { attrs | title = Just val }
-
-
-{-| -}
-setTabIndex : Int -> { a | tabindex : Maybe Int } -> { a | tabindex : Maybe Int }
-setTabIndex val attrs =
-    { attrs | tabindex = Just val }
-
-
-{-| -}
-setId : String -> { a | id : Maybe String } -> { a | id : Maybe String }
-setId val attrs =
-    { attrs | id = Just val }
-
-
-{-| -}
-setClass : List String -> { a | class : List String } -> { a | class : List String }
-setClass val attrs =
-    { attrs | class = val }
 
 
 {-| -}
@@ -1262,8 +1107,8 @@ headingAttributesToHtmlAttributes =
 
 {-| -}
 disabled : Modifier (DisabledAttribute a)
-disabled attrs =
-    { attrs | disabled = True }
+disabled =
+    setDisabled True
 
 
 {-| -}
@@ -1298,14 +1143,14 @@ buttonAttributesToHtmlAttributes buttonAttributes =
 
 {-| -}
 target : String -> Modifier (TargetAttribute a)
-target val attrs =
-    { attrs | target = Just val }
+target =
+    setTarget
 
 
 {-| -}
 href : String -> Modifier (HrefAttribute a)
-href val attrs =
-    { attrs | href = Just val }
+href =
+    setHref
 
 
 {-| -}
@@ -1336,8 +1181,8 @@ aAttributesToHtmlAttributes attributes =
 
 {-| -}
 name : String -> Modifier (NameAttribute a)
-name val attrs =
-    { attrs | name = Just val }
+name =
+    setName
 
 
 {-| -}
@@ -1371,14 +1216,14 @@ textareaAttributesToHtmlAttributes attributes =
 
 {-| -}
 width : Int -> Modifier (WidthAttribute a)
-width val attrs =
-    { attrs | width = Just val }
+width =
+    setWidth
 
 
 {-| -}
-height : a -> { c | height : b } -> { c | height : Maybe a }
-height val attrs =
-    { attrs | height = Just val }
+height : Int -> Modifier (HeightAttribute a)
+height =
+    setHeight
 
 
 {-| -}
@@ -1519,15 +1364,15 @@ inputVisibleToHtmlAttributes attributes =
 
 
 {-| -}
-autocomplete : a -> { c | autocomplete : b } -> { c | autocomplete : a }
-autocomplete val attrs =
-    { attrs | autocomplete = val }
+autocomplete : Bool -> Modifier (AutocompleteAttribute a)
+autocomplete =
+    setAutocomplete
 
 
 {-| -}
-placeholder : a -> { c | placeholder : b } -> { c | placeholder : Maybe a }
-placeholder val attrs =
-    { attrs | placeholder = Just val }
+placeholder : String -> Modifier (PlaceholderAttribute a)
+placeholder =
+    setPlaceholder
 
 
 {-| -}
@@ -1565,26 +1410,48 @@ inputTextAttributesToHtmlAttributes attributes =
            )
 
 
+{-| -}
+defaultInputTelAttributes : InputTelAttributes msg
+defaultInputTelAttributes =
+    { universal = defaultUniversalAttributes
+    , box = []
+    , block = Nothing
+    , label = Nothing
+    , name = Nothing
+    , type_ = "tel"
+    , value = Nothing
+    , onMouseEvents = Nothing
+    , onInputEvent = Nothing
+    , fromStringInput = identity
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , placeholder = Nothing
+    , autocomplete = True
+    , rawStyle = Nothing
+    }
+
+
 
 -- From HERE
 
 
 {-| -}
 step : Int -> Modifier (StepAttribute a)
-step val attrs =
-    { attrs | step = Just val }
+step =
+    setStep
 
 
 {-| -}
 max : Int -> Modifier (MaxAttribute a)
-max val attrs =
-    { attrs | max = Just val }
+max =
+    setMax
 
 
 {-| -}
 min : Int -> Modifier (MinAttribute a)
-min val attrs =
-    { attrs | min = Just val }
+min =
+    setMin
 
 
 {-| -}
@@ -1654,8 +1521,8 @@ inputColorAttributesToHtmlAttributes attributes =
 
 {-| -}
 checked : Bool -> Modifier (InputCheckboxAttributes msg)
-checked val attrs =
-    { attrs | checked = val }
+checked =
+    setChecked
 
 
 {-| -}

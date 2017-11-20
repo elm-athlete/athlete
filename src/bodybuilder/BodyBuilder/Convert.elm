@@ -1,6 +1,5 @@
 module BodyBuilder.Convert exposing (..)
 
-import Helpers.Shared exposing (Modifiers)
 import BodyBuilder.Setters exposing (..)
 import Elegant
 import Display
@@ -12,6 +11,7 @@ import Maybe.Extra
 import Function
 import Flex
 import Grid
+import Modifiers exposing (..)
 
 
 type alias StyleComponents =

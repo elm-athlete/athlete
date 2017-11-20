@@ -70,6 +70,7 @@ import Helpers.Vector exposing (Vector)
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 import Helpers.Css
+import Modifiers exposing (..)
 
 
 {-| The `Background` record contains everything about background rendering,
