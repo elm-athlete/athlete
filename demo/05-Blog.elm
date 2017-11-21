@@ -18,6 +18,7 @@ import Elegant
 import Color
 import Display
 import Dimensions
+import Corner
 import Box
 import Cursor
 import Border
@@ -164,6 +165,7 @@ standardCellStyle =
                     , Character.size Constants.zeta
                     ]
                 ]
+            , Box.corner [ Corner.circular Corner.all (px 0) ]
             , Box.padding [ Padding.all Constants.large ]
             , Box.background [ Elegant.color Color.white ]
             ]
