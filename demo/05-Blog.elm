@@ -27,8 +27,6 @@ import Character
 import Style
 import Date exposing (Month(..))
 import Date.Extra as Date
-import Flex
-import Position
 import Router
     exposing
         ( History
@@ -56,7 +54,7 @@ type alias Data =
 
 
 type alias MyHistory =
-    History Route Data Msg
+    History Route Msg
 
 
 type alias Model =
@@ -87,61 +85,11 @@ type alias Blogpost =
     }
 
 
-customTransitionVie :
-    { after : List (Page route data msg)
-    , before : List (Page route data msg)
-    , current : Page route data msg
-    , transition : Maybe (Transition route data msg)
-    }
-    ->
-        (Page route data msg
-         -> a
-         -> Maybe (Transition route data msg)
-         -> Node msg
-        )
-    -> a
-    -> Node msg
-customTransitionVie history insidePageView_ data =
-    Router.overflowHiddenContainer []
-        [ flexItem
-            [ style
-                [ Style.block []
-                , Style.flexItemProperties [ Flex.basis (percent 100) ]
-                ]
-            ]
-            (List.map (Router.pageView insidePageView_ history.transition data) (history |> Router.beforeTransition))
-        , flexItem
-            [ style
-                [ Style.block [ Display.dimensions [ Dimensions.width (percent 100) ] ]
-                , Style.flexItemProperties [ Flex.basis (percent 100) ]
-                , Style.box
-                    [ Box.position <|
-                        Position.absolute <|
-                            [ Position.bottom <|
-                                Router.percentage ((Router.getMaybeTransitionValue <| history.transition) - 1)
-                            ]
-                    ]
-                ]
-            ]
-            (List.map (Router.pageView insidePageView_ history.transition data) (history |> Router.afterTransition))
-        ]
-
-
 handleHistory : HistoryMsg -> MyHistory -> MyHistory
 handleHistory route history =
     case route of
         BlogpostShow id ->
-            history
-                |> push
-                    (Router.pageWithTransition
-                        (Router.customTransition
-                            250
-                            (Router.customKind customTransitionVie)
-                            Router.forward
-                            Router.easeInOutt
-                        )
-                        (BlogpostsShow id)
-                    )
+            history |> push (Router.pageWithDefaultTransition (BlogpostsShow id))
 
 
 gray : Color.Color
@@ -238,22 +186,18 @@ blogpostsShow id blogposts =
     node [] [ showView { maybeBlogpost = (blogposts |> find_by .id id) } ]
 
 
-insidePageView : Page Route Data Msg -> Data -> Maybe (Transition Route Data Msg) -> Node Msg
-insidePageView page data transition =
-    let
-        blogposts =
-            data.blogposts
-    in
-        case page.route of
-            BlogpostsIndex ->
-                blogpostsIndex blogposts
+pageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> Node Msg
+pageView { blogposts } { route } transition =
+    case route of
+        BlogpostsIndex ->
+            blogpostsIndex blogposts
 
-            BlogpostsShow id ->
-                blogpostsShow id blogposts
+        BlogpostsShow id ->
+            blogpostsShow id blogposts
 
 
 view : Model -> Node Msg
-view { history, data } =
+view ({ history, data } as model) =
     node
         [ style
             [ Style.block []
@@ -267,7 +211,7 @@ view { history, data } =
                 ]
             ]
         ]
-        [ historyView insidePageView history data ]
+        [ historyView (pageView data) history ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

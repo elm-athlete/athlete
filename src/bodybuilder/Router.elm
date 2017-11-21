@@ -4,9 +4,9 @@ module Router
         , StandardHistoryMsg(Back)
         , Page
         , Transition
+        , PageView
         , push
         , slideUp
-        , slideUpp
         , pageWithDefaultTransition
         , pageWithTransition
         , pageWithoutTransition
@@ -21,12 +21,13 @@ module Router
         , forward
         , pageView
         , customKind
-        , easeInOutt
+        , easeInOut
         , overflowHiddenContainer
         , beforeTransition
         , percentage
         , getMaybeTransitionValue
         , afterTransition
+        , visiblePages
         )
 
 {-| Router based on BodyBuilder and Elegant implementing transitions between
@@ -36,19 +37,19 @@ pages and history (backward and forward)
 @docs StandardHistoryMsg
 @docs Page
 @docs Transition
+@docs PageView
 
 @docs handleStandardHistory
 @docs maybeTransitionSubscription
 @docs initHistoryAndData
 @docs push
 @docs slideUp
-@docs slideUpp
 @docs forward
 @docs pageWithDefaultTransition
 @docs pageWithTransition
 @docs pageWithoutTransition
 @docs customTransition
-@docs easeInOutt
+@docs easeInOut
 @docs customKind
 @docs overflowHiddenContainer
 @docs pageView
@@ -56,7 +57,7 @@ pages and history (backward and forward)
 @docs percentage
 @docs getMaybeTransitionValue
 @docs afterTransition
-
+@docs visiblePages
 
 @docs headerElement
 @docs pageWithHeader
@@ -92,30 +93,27 @@ type Easing
     | Linear
 
 
-type Kind route data msg
-    = SlideRight
-    | SlideUp
-    | CustomKind
-        (History route data msg
-         -> (Page route data msg -> data -> Maybe (Transition route data msg) -> Node msg)
-         -> data
+type Kind route msg
+    = CustomKind
+        (History route msg
+         -> (Page route msg -> Maybe (Transition route msg) -> Node msg)
          -> Node msg
         )
 
 
 {-|
 -}
-customKind : (History route data msg -> (Page route data msg -> data -> Maybe (Transition route data msg) -> Node msg) -> data -> Node msg) -> Kind route data msg
+customKind : (History route msg -> (Page route msg -> Maybe (Transition route msg) -> Node msg) -> Node msg) -> Kind route msg
 customKind =
     CustomKind
 
 
 {-| Transition between 2 pages
 -}
-type alias Transition route data msg =
+type alias Transition route msg =
     { timer : Float
     , length : Float
-    , kind : Kind route data msg
+    , kind : Kind route msg
     , direction : Direction
     , easing : Easing
     }
@@ -123,8 +121,8 @@ type alias Transition route data msg =
 
 {-| Page type handling transition
 -}
-type alias Page route data msg =
-    { maybeTransition : Maybe (Transition route data msg)
+type alias Page route msg =
+    { maybeTransition : Maybe (Transition route msg)
     , route : route
     }
 
@@ -132,12 +130,20 @@ type alias Page route data msg =
 {-| Generic History type handling current page, before pages, after pages
 and current transition
 -}
-type alias History route data msg =
-    { before : List (Page route data msg)
-    , current : Page route data msg
-    , after : List (Page route data msg)
-    , transition : Maybe (Transition route data msg)
+type alias History route msg =
+    { before : List (Page route msg)
+    , current : Page route msg
+    , after : List (Page route msg)
+    , transition : Maybe (Transition route msg)
     }
+
+
+{-|
+-}
+type alias PageView route msg =
+    Page route msg
+    -> Maybe (Transition route msg)
+    -> Node msg
 
 
 type Direction
@@ -152,15 +158,9 @@ forward =
 
 
 {-| -}
-easeInOutt : Easing
-easeInOutt =
+easeInOut : Easing
+easeInOut =
     EaseInOut
-
-
-{-| -}
-slideUpp : Kind route data msg
-slideUpp =
-    SlideUp
 
 
 {-| Standard History Messages type :
@@ -176,14 +176,14 @@ easingFun : Easing -> Float -> Float
 easingFun easing =
     case easing of
         EaseInOut ->
-            easeInOut
+            easeInOutFun
 
         Linear ->
             identity
 
 
-easeInOut : Float -> Float
-easeInOut t =
+easeInOutFun : Float -> Float
+easeInOutFun t =
     if t < 0.5 then
         2 * t * t
     else
@@ -191,7 +191,7 @@ easeInOut t =
 
 
 {-| -}
-getMaybeTransitionValue : Maybe (Transition route data msg) -> Float
+getMaybeTransitionValue : Maybe (Transition route msg) -> Float
 getMaybeTransitionValue maybeTransition =
     case maybeTransition of
         Nothing ->
@@ -201,7 +201,7 @@ getMaybeTransitionValue maybeTransition =
             transition |> getTransitionValue
 
 
-getTransitionValue : Transition route data msg -> Float
+getTransitionValue : Transition route msg -> Float
 getTransitionValue { direction, timer, length, easing } =
     (case direction of
         Forward ->
@@ -220,7 +220,7 @@ getTransitionValue { direction, timer, length, easing } =
           )
 
 
-isRunning : Maybe (Transition route data msg) -> Bool
+isRunning : Maybe (Transition route msg) -> Bool
 isRunning transition =
     case transition of
         Nothing ->
@@ -230,7 +230,7 @@ isRunning transition =
             transition.timer > 0
 
 
-timeDiff : Float -> Transition route data msg -> Transition route data msg
+timeDiff : Float -> Transition route msg -> Transition route msg
 timeDiff diff ({ timer } as transition) =
     let
         newTimer =
@@ -248,14 +248,14 @@ basicDuration =
 
 
 {-| -}
-customTransition : Float -> Kind route data msg -> Direction -> Easing -> Transition route data msg
+customTransition : Float -> Kind route msg -> Direction -> Easing -> Transition route msg
 customTransition duration =
     Transition duration duration
 
 
 {-| push a page into history
 -}
-push : Page route data msg -> History route data msg -> History route data msg
+push : Page route msg -> History route msg -> History route msg
 push el ({ transition, before, current, after } as history) =
     if isRunning transition then
         history
@@ -278,7 +278,7 @@ oppositeDirection direction =
             Backward
 
 
-opposite : Maybe (Transition route data msg) -> Maybe (Transition route data msg)
+opposite : Maybe (Transition route msg) -> Maybe (Transition route msg)
 opposite maybeTransition =
     case maybeTransition of
         Nothing ->
@@ -292,33 +292,33 @@ opposite maybeTransition =
                 }
 
 
-defaultTransition : Maybe (Transition route data msg)
+defaultTransition : Maybe (Transition route msg)
 defaultTransition =
-    Just <| customTransition basicDuration SlideRight Forward EaseInOut
+    Just <| customTransition basicDuration (customKind slideLeftView) Forward EaseInOut
 
 
 {-| creates a page with the defaultTransition
 -}
-pageWithDefaultTransition : route -> Page route data msg
+pageWithDefaultTransition : route -> Page route msg
 pageWithDefaultTransition =
     Page defaultTransition
 
 
 {-| creates a page without any transition
 -}
-pageWithoutTransition : route -> Page route data msg
+pageWithoutTransition : route -> Page route msg
 pageWithoutTransition =
     Page Nothing
 
 
 {-| creates a page with a custom transition
 -}
-pageWithTransition : Transition route data msg -> route -> Page route data msg
+pageWithTransition : Transition route msg -> route -> Page route msg
 pageWithTransition transition =
     Page (Just transition)
 
 
-pull : History route data msg -> History route data msg
+pull : History route msg -> History route msg
 pull ({ transition, before, current, after } as history) =
     if isRunning transition then
         history
@@ -338,9 +338,9 @@ pull ({ transition, before, current, after } as history) =
 
 {-| slideUp transition
 -}
-slideUp : Transition route data msg
+slideUp : Transition route msg
 slideUp =
-    customTransition basicDuration SlideUp Forward EaseInOut
+    customTransition basicDuration (customKind slideUpView) Forward EaseInOut
 
 
 putHeadInListIfExists : List a -> List a
@@ -353,7 +353,9 @@ putHeadInListIfExists list =
             [ head ]
 
 
-visiblePages : History route data msg -> List (Page route data msg)
+{-|
+-}
+visiblePages : History route msg -> List (Page route msg)
 visiblePages { transition, before, current, after } =
     case transition of
         Nothing ->
@@ -379,7 +381,7 @@ percentage a =
 
 
 {-| -}
-beforeTransition : History route data msg -> List (Page route data msg)
+beforeTransition : History route msg -> List (Page route msg)
 beforeTransition history =
     case history.transition of
         Nothing ->
@@ -393,7 +395,7 @@ beforeTransition history =
 
 
 {-| -}
-afterTransition : History route data msg -> List (Page route data msg)
+afterTransition : History route msg -> List (Page route msg)
 afterTransition history =
     case history.transition of
         Nothing ->
@@ -427,12 +429,11 @@ overflowHiddenContainer attributes content =
 
 {-| -}
 pageView :
-    (a -> b -> Maybe (Transition route data msg) -> Node msg)
-    -> Maybe (Transition route data msg)
-    -> b
+    (a -> Maybe (Transition route msg) -> Node msg)
+    -> Maybe (Transition route msg)
     -> a
     -> Node msg
-pageView insidePageView_ transition data page =
+pageView insidePageView_ transition page =
     node
         [ Attributes.style
             [ Style.block
@@ -446,7 +447,7 @@ pageView insidePageView_ transition data page =
 
         -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
         ]
-        [ insidePageView_ page data transition ]
+        [ insidePageView_ page transition ]
 
 
 {-| -}
@@ -479,15 +480,76 @@ mainElement html =
         ]
 
 
+slideUpView : History route msg -> PageView route msg -> Node msg
+slideUpView history insidePageView_ =
+    overflowHiddenContainer []
+        [ flexItem
+            [ style
+                [ Style.block []
+                , Style.flexItemProperties [ Flex.basis (percent 100) ]
+                ]
+            ]
+            (List.map (pageView insidePageView_ history.transition) (history |> beforeTransition))
+        , flexItem
+            [ style
+                [ Style.block [ Display.dimensions [ Dimensions.width (percent 100) ] ]
+                , Style.flexItemProperties [ Flex.basis (percent 100) ]
+                , Style.box
+                    [ Box.position <|
+                        Position.absolute <|
+                            [ Position.bottom <|
+                                percentage ((getMaybeTransitionValue <| history.transition) - 1)
+                            ]
+                    ]
+                ]
+            ]
+            (List.map (pageView insidePageView_ history.transition) (history |> afterTransition))
+        ]
+
+
+slideLeftView :
+    History route msg
+    -> PageView route msg
+    -> Node msg
+slideLeftView history insidePageView_ =
+    let
+        visiblePages_ =
+            visiblePages history
+    in
+        overflowHiddenContainer
+            [ style
+                [ Style.block
+                    [ Display.dimensions [ Dimensions.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
+                , Style.box
+                    [ Box.position
+                        (Position.relative
+                            ([ Position.right (percentage (getMaybeTransitionValue history.transition)) ])
+                        )
+                    ]
+                ]
+            ]
+            (List.map
+                (BodyBuilder.flexItem
+                    [ Attributes.style
+                        [ Style.flexItemProperties
+                            [ Flex.basis (percent 100)
+                            ]
+                        ]
+                    ]
+                    << List.singleton
+                )
+                (List.map (pageView insidePageView_ history.transition) visiblePages_)
+            )
+
+
 {-| display the current possible transition from one page to the other using
 the history and its own routing system
 -}
 historyView :
-    (Page route data msg -> data -> Maybe (Transition route data msg) -> Node msg)
-    -> History route data msg
-    -> data
+    (Page route msg -> Maybe (Transition route msg) -> Node msg)
+    -> History route msg
     -> Node msg
-historyView insidePageView_ history data =
+historyView insidePageView_ history =
     let
         visiblePages_ =
             visiblePages history
@@ -497,64 +559,13 @@ historyView insidePageView_ history data =
                 overflowHiddenContainer []
                     [ flexItem
                         [ Attributes.style [ Style.flexItemProperties [ Flex.basis (percent 100) ] ] ]
-                        [ pageView insidePageView_ Nothing data history.current ]
+                        [ pageView insidePageView_ Nothing history.current ]
                     ]
 
             Just transition ->
                 case transition.kind of
                     CustomKind view_ ->
-                        view_ history insidePageView_ data
-
-                    SlideUp ->
-                        overflowHiddenContainer []
-                            [ flexItem
-                                [ style
-                                    [ Style.block []
-                                    , Style.flexItemProperties [ Flex.basis (percent 100) ]
-                                    ]
-                                ]
-                                (List.map (pageView insidePageView_ history.transition data) (history |> beforeTransition))
-                            , flexItem
-                                [ style
-                                    [ Style.block [ Display.dimensions [ Dimensions.width (percent 100) ] ]
-                                    , Style.flexItemProperties [ Flex.basis (percent 100) ]
-                                    , Style.box
-                                        [ Box.position <|
-                                            Position.absolute <|
-                                                [ Position.bottom <|
-                                                    percentage ((getMaybeTransitionValue <| history.transition) - 1)
-                                                ]
-                                        ]
-                                    ]
-                                ]
-                                (List.map (pageView insidePageView_ history.transition data) (history |> afterTransition))
-                            ]
-
-                    SlideRight ->
-                        overflowHiddenContainer
-                            [ style
-                                [ Style.block
-                                    [ Display.dimensions [ Dimensions.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
-                                , Style.box
-                                    [ Box.position
-                                        (Position.relative
-                                            ([ Position.right (percentage (getMaybeTransitionValue history.transition)) ])
-                                        )
-                                    ]
-                                ]
-                            ]
-                            (List.map
-                                (BodyBuilder.flexItem
-                                    [ Attributes.style
-                                        [ Style.flexItemProperties
-                                            [ Flex.basis (percent 100)
-                                            ]
-                                        ]
-                                    ]
-                                    << List.singleton
-                                )
-                                (List.map (pageView insidePageView_ history.transition data) visiblePages_)
-                            )
+                        view_ history insidePageView_
 
 
 {-| maybe transition subscription
@@ -565,7 +576,7 @@ maybeTransitionSubscription standardHistoryWrapper =
         >> Maybe.withDefault Sub.none
 
 
-initHistory : route -> History route data msg
+initHistory : route -> History route msg
 initHistory currentPage =
     { before = []
     , current = pageWithoutTransition currentPage
@@ -574,7 +585,7 @@ initHistory currentPage =
     }
 
 
-standardHandleHistory : StandardHistoryMsg -> History route data msg -> History route data msg
+standardHandleHistory : StandardHistoryMsg -> History route msg -> History route msg
 standardHandleHistory historyMsg history =
     case historyMsg of
         Back ->
@@ -598,14 +609,14 @@ standardHandleHistory historyMsg history =
 
 {-| handle model's history update using historyMsg
 -}
-handleStandardHistory : StandardHistoryMsg -> { a | history : History route data msg } -> ( { a | history : History route data msg }, Cmd msg )
+handleStandardHistory : StandardHistoryMsg -> { a | history : History route msg } -> ( { a | history : History route msg }, Cmd msg )
 handleStandardHistory historyMsg model =
     ( { model | history = standardHandleHistory historyMsg model.history }, Cmd.none )
 
 
 {-| initialize history and data based on the routing system
 -}
-initHistoryAndData : route -> data -> { history : History route data msg, data : data }
+initHistoryAndData : route -> data -> { history : History route msg, data : data }
 initHistoryAndData route data =
     { history = initHistory route
     , data = data

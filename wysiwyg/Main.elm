@@ -1247,7 +1247,7 @@ creationView model =
 contentView : Model -> Node Msg
 contentView { element, selectedId } =
     B.grid [ A.style [ S.block [ Block.fullHeight ], S.box [ Box.background [ Background.images [ Background.image "/transparent.png" ] ] ] ] ]
-        [ B.gridItem []
+        [ B.gridItem [ A.style [ S.block [ Block.overflowHidden ] ] ]
             [ B.div []
                 [ contentViewEl selectedId element ]
             ]
