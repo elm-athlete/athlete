@@ -19,6 +19,7 @@ import Elegant
 import Color
 import Display
 import Dimensions
+import Corner
 import Box
 import Cursor
 import Border
@@ -53,8 +54,12 @@ type alias Data =
     }
 
 
+type alias MyHistory =
+    History Route Msg
+
+
 type alias Model =
-    { history : History Route
+    { history : MyHistory
     , data : Data
     }
 
@@ -81,11 +86,11 @@ type alias Blogpost =
     }
 
 
-handleHistory : HistoryMsg -> History Route -> History Route
+handleHistory : HistoryMsg -> MyHistory -> MyHistory
 handleHistory route history =
     case route of
         BlogpostShow id ->
-            history |> push (pageWithDefaultTransition (BlogpostsShow id))
+            history |> push (Router.pageWithDefaultTransition (BlogpostsShow id))
 
 
 gray : Color.Color
@@ -158,6 +163,7 @@ standardCellStyle =
                 [ Typography.fontFamilyInherit
                 , Typography.size Constants.zeta
                 ]
+            , Box.corner [ Corner.circular Corner.all (px 0) ]
             , Box.padding [ Padding.all Constants.large ]
             , Box.background [ Elegant.color Color.white ]
             ]
@@ -180,22 +186,18 @@ blogpostsShow id blogposts =
     node [] [ showView { maybeBlogpost = (blogposts |> find_by .id id) } ]
 
 
-insidePageView : Page Route -> Data -> Maybe Transition -> Node Msg
-insidePageView page data transition =
-    let
-        blogposts =
-            data.blogposts
-    in
-        case page.route of
-            BlogpostsIndex ->
-                blogpostsIndex blogposts
+pageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> Node Msg
+pageView { blogposts } { route } transition =
+    case route of
+        BlogpostsIndex ->
+            blogpostsIndex blogposts
 
-            BlogpostsShow id ->
-                blogpostsShow id blogposts
+        BlogpostsShow id ->
+            blogpostsShow id blogposts
 
 
 view : Model -> Node Msg
-view { history, data } =
+view ({ history, data } as model) =
     node
         [ style
             [ Style.block []
@@ -207,10 +209,10 @@ view { history, data } =
                 ]
             ]
         ]
-        [ historyView insidePageView history data ]
+        [ historyView (pageView data) history ]
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         HistoryMsgWrapper historyMsg ->
@@ -247,7 +249,7 @@ initData =
     { blogposts = initBlogposts }
 
 
-init : { data : Data, history : History Route }
+init : { data : Data, history : MyHistory }
 init =
     initHistoryAndData BlogpostsIndex initData
 
