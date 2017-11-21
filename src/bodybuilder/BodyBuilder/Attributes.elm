@@ -860,9 +860,21 @@ type alias InputFileAttributes msg =
 
 
 {-| -}
-label : List (Html msg) -> { c | label : Maybe (Shared.Label msg) } -> { c | label : Maybe (Shared.Label msg) }
-label content record =
-    { record | label = Just (Shared.label <| \input -> Html.label [] (input :: content)) }
+label : Position -> List (Html msg) -> { c | label : Maybe (Shared.Label msg) } -> { c | label : Maybe (Shared.Label msg) }
+label position content record =
+    { record
+        | label =
+            Just <|
+                Shared.label <|
+                    \input ->
+                        Html.label [] <|
+                            case position of
+                                Before ->
+                                    content ++ [ input ]
+
+                                After ->
+                                    input :: content
+    }
 
 
 {-| -}

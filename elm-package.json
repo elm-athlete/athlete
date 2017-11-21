@@ -35,7 +35,8 @@
         "Router",
         "Style",
         "Typography",
-        "Modifiers"
+        "Modifiers",
+        "Surrounded"
     ],
     "native-modules": true,
     "dependencies": {

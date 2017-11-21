@@ -1,4 +1,33 @@
-module Surrounded exposing (..)
+module Surrounded
+    exposing
+        ( Surrounded
+        , all
+        , bottom
+        , default
+        , horizontal
+        , left
+        , right
+        , surroundedToCouples
+        , top
+        , vertical
+        , applyModifiersOnDefault
+        )
+
+{-| Generic module for surrounded values.
+
+@docs Surrounded
+@docs all
+@docs bottom
+@docs default
+@docs horizontal
+@docs left
+@docs right
+@docs surroundedToCouples
+@docs top
+@docs vertical
+@docs applyModifiersOnDefault
+
+-}
 
 import Function
 import List.Extra
@@ -7,6 +36,7 @@ import Elegant.Setters exposing (..)
 import Modifiers exposing (..)
 
 
+{-| -}
 type alias Surrounded surroundType =
     { top : Maybe surroundType
     , right : Maybe surroundType
@@ -15,6 +45,7 @@ type alias Surrounded surroundType =
     }
 
 
+{-| -}
 default : Surrounded a
 default =
     Surrounded Nothing Nothing Nothing Nothing
@@ -44,28 +75,33 @@ left default =
     getModifyAndSet .left setLeftIn default
 
 
+{-| -}
 horizontal : a -> Modifiers a -> Modifier (Surrounded a)
 horizontal default modifiers =
     left default modifiers >> right default modifiers
 
 
+{-| -}
 vertical : a -> Modifiers a -> Modifier (Surrounded a)
 vertical default modifiers =
     top default modifiers >> bottom default modifiers
 
 
+{-| -}
 all : a -> Modifiers a -> Modifier (Surrounded a)
 all default modifiers =
     vertical default modifiers
         >> horizontal default modifiers
 
 
+{-| -}
 applyModifiersOnDefault : Modifiers (Surrounded a) -> Surrounded a
 applyModifiersOnDefault modifiers =
     default
         |> Function.compose modifiers
 
 
+{-| -}
 surroundedToCouples :
     Maybe String
     -> (a -> List ( String, String ))
