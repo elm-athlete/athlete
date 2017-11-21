@@ -4,6 +4,7 @@ import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (style)
 import BodyBuilder.Events
 import Elegant exposing (SizeUnit, px, pt, percent, vh)
+import Modifiers exposing (..)
 import Color
 import Router
     exposing
@@ -26,7 +27,6 @@ import Cursor
 import Border
 import Outline
 import Typography
-import Character
 import Constants
 import Padding
 import Time exposing (Time)
@@ -123,7 +123,7 @@ gray =
     Color.grayscale 0.9
 
 
-standardCellStyle : Elegant.Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
+standardCellStyle : Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
 standardCellStyle =
     style
         [ Style.block
@@ -138,10 +138,8 @@ standardCellStyle =
                 ]
             , Box.outline [ Outline.none ]
             , Box.typography
-                [ Typography.character
-                    [ Character.fontFamilyInherit
-                    , Character.size Constants.zeta
-                    ]
+                [ Typography.fontFamilyInherit
+                , Typography.size Constants.zeta
                 ]
             , Box.paddingAll Constants.large
             , Box.background [ Elegant.color Color.white ]
@@ -254,7 +252,7 @@ minSalary model =
     (model |> monthlyBankDebt) * 3
 
 
-pad : Elegant.Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
+pad : Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
 pad =
     style
         [ Style.block []
@@ -339,7 +337,7 @@ toPositiveInt i =
 
 {-| returns a background with a color
 -}
-backgroundColor : Color.Color -> Elegant.Modifier Box.Box
+backgroundColor : Color.Color -> Modifier Box.Box
 backgroundColor color =
     Box.background [ Elegant.color color ]
 
@@ -475,10 +473,8 @@ view { history, data } =
             [ Style.block []
             , Style.box
                 [ Box.typography
-                    [ Typography.character
-                        [ Character.fontFamilySansSerif
-                        , Character.size Constants.zeta
-                        ]
+                    [ Typography.fontFamilySansSerif
+                    , Typography.size Constants.zeta
                     ]
                 ]
             ]

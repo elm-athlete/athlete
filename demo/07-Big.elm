@@ -6,7 +6,6 @@ import BodyBuilder exposing (node, text)
 import BodyBuilder.Attributes as Attributes
 import Box
 import Typography
-import Character
 import Shadow
 import Border
 import Color exposing (Color)
@@ -47,11 +46,9 @@ mainStyle =
     , Style.box
         [ Box.typography
             [ Elegant.color Color.blue
-            , Typography.character
-                [ Character.weight 900
-                , Character.size (px 100)
-                , Character.italic
-                ]
+            , Typography.weight 900
+            , Typography.size (px 100)
+            , Typography.italic
             ]
         , Box.padding
             [ Padding.all (px 30) ]

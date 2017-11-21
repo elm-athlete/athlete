@@ -44,6 +44,7 @@ module Padding
 
 import Surrounded exposing (Surrounded)
 import Helpers.Shared exposing (..)
+import Modifiers exposing (..)
 
 
 {-| The `Padding` record contains everything about one padding side.

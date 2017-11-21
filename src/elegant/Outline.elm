@@ -44,6 +44,7 @@ module Outline
 import Color exposing (Color)
 import Elegant.Setters exposing (..)
 import Helpers.Shared exposing (..)
+import Modifiers exposing (..)
 
 
 {-| The `Outline` record contains everything about one outline side.

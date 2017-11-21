@@ -70,6 +70,7 @@ import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
 import Elegant exposing (SizeUnit, px, percent)
+import Modifiers exposing (..)
 import AnimationFrame
 import Time exposing (Time)
 import Display
@@ -80,7 +81,6 @@ import Position
 import Typography
 import Padding
 import Cursor
-import Character
 import Color
 import Flex
 import Dimensions
@@ -410,7 +410,7 @@ afterTransition history =
 
 {-| -}
 overflowHiddenContainer :
-    Elegant.Modifiers (Attributes.FlexContainerAttributes msg)
+    Modifiers (Attributes.FlexContainerAttributes msg)
     -> List (FlexItem msg)
     -> Node msg
 overflowHiddenContainer attributes content =
@@ -625,8 +625,8 @@ initHistoryAndData route data =
 
 headerButtonStyle :
     SizeUnit
-    -> Elegant.Modifier Display.BlockDetails
-    -> Elegant.Modifier (Attributes.FlexItemAttributes msg)
+    -> Modifier Display.BlockDetails
+    -> Modifier (Attributes.FlexItemAttributes msg)
 headerButtonStyle width align =
     Attributes.style
         [ Style.flexItemProperties [ Flex.basis width ]
@@ -639,24 +639,22 @@ headerButtonStyle width align =
         , Style.box
             [ Box.cursor Cursor.pointer
             , Box.typography
-                [ Typography.character
-                    [ Character.size (Elegant.px 12) ]
-                ]
+                [ Typography.size (Elegant.px 12) ]
             ]
         ]
 
 
-headerButtonStyleLeft : Elegant.Modifier (Attributes.FlexItemAttributes msg)
+headerButtonStyleLeft : Modifier (Attributes.FlexItemAttributes msg)
 headerButtonStyleLeft =
     headerButtonStyle (percent 30) (Display.alignment Display.left)
 
 
-headerButtonStyleCenter : Elegant.Modifier (FlexItemAttributes msg)
+headerButtonStyleCenter : Modifier (FlexItemAttributes msg)
 headerButtonStyleCenter =
     headerButtonStyle (percent 40) Block.alignCenter
 
 
-headerButtonStyleRight : Elegant.Modifier (FlexItemAttributes msg)
+headerButtonStyleRight : Modifier (FlexItemAttributes msg)
 headerButtonStyleRight =
     headerButtonStyle (percent 30) (Display.alignment Display.right)
 

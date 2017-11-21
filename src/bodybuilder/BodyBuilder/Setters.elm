@@ -157,3 +157,88 @@ setMediaBlock modifiers ({ block } as record) =
 setMediaBox : a -> { b | box : Maybe a } -> { b | box : Maybe a }
 setMediaBox modifiers ({ box } as record) =
     { record | box = Just modifiers }
+
+
+setTitle : b -> { a | title : Maybe b } -> { a | title : Maybe b }
+setTitle val attrs =
+    { attrs | title = Just val }
+
+
+setTabIndex : b -> { a | tabindex : Maybe b } -> { a | tabindex : Maybe b }
+setTabIndex val attrs =
+    { attrs | tabindex = Just val }
+
+
+setId : b -> { a | id : Maybe b } -> { a | id : Maybe b }
+setId val attrs =
+    { attrs | id = Just val }
+
+
+setClass : List b -> { a | class : List b } -> { a | class : List b }
+setClass val attrs =
+    { attrs | class = val }
+
+
+setValue : a -> { c | value : Maybe a } -> { c | value : Maybe a }
+setValue val attrs =
+    { attrs | value = Just val }
+
+
+setDisabled : a -> { c | disabled : a } -> { c | disabled : a }
+setDisabled val attrs =
+    { attrs | disabled = val }
+
+
+setTarget : a -> { c | target : Maybe a } -> { c | target : Maybe a }
+setTarget val attrs =
+    { attrs | target = Just val }
+
+
+setHref : a -> { c | href : Maybe a } -> { c | href : Maybe a }
+setHref val attrs =
+    { attrs | href = Just val }
+
+
+setName : a -> { c | name : Maybe a } -> { c | name : Maybe a }
+setName val attrs =
+    { attrs | name = Just val }
+
+
+setWidth : a -> { c | width : Maybe a } -> { c | width : Maybe a }
+setWidth val attrs =
+    { attrs | width = Just val }
+
+
+setHeight : a -> { c | height : Maybe a } -> { c | height : Maybe a }
+setHeight val attrs =
+    { attrs | height = Just val }
+
+
+setAutocomplete : a -> { c | autocomplete : a } -> { c | autocomplete : a }
+setAutocomplete val attrs =
+    { attrs | autocomplete = val }
+
+
+setPlaceholder : a -> { c | placeholder : Maybe a } -> { c | placeholder : Maybe a }
+setPlaceholder val attrs =
+    { attrs | placeholder = Just val }
+
+
+setStep : a -> { c | step : Maybe a } -> { c | step : Maybe a }
+setStep val attrs =
+    { attrs | step = Just val }
+
+
+setMax : a -> { c | max : Maybe a } -> { c | max : Maybe a }
+setMax val attrs =
+    { attrs | max = Just val }
+
+
+setMin : a -> { c | min : Maybe a } -> { c | min : Maybe a }
+setMin val attrs =
+    { attrs | min = Just val }
+
+
+setChecked : a -> { c | checked : a } -> { c | checked : a }
+setChecked val attrs =
+    { attrs | checked = val }

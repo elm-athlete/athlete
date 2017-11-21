@@ -36,7 +36,6 @@ import Cursor
 import Border
 import Outline
 import Typography
-import Character
 import Constants
 import Padding
 import Overflow
@@ -111,10 +110,8 @@ titleView contact =
                     ]
                 , Box.outline [ Outline.none ]
                 , Box.typography
-                    [ Typography.character
-                        [ Character.fontFamilyInherit
-                        , Character.size Constants.zeta
-                        ]
+                    [ Typography.fontFamilyInherit
+                    , Typography.size Constants.zeta
                     ]
                 , Box.padding [ Padding.all Constants.large ]
                 , Box.background [ Elegant.color Color.white ]
@@ -130,7 +127,7 @@ commonButtonStyleBox : List (Box.Box -> Box.Box)
 commonButtonStyleBox =
     [ Box.padding [ Padding.all Constants.medium ]
     , Box.cursor Cursor.pointer
-    , Box.typography [ Typography.character [ Character.size Constants.medium ] ]
+    , Box.typography [ Typography.size Constants.medium ]
     ]
 
 
@@ -323,10 +320,8 @@ view { history, data } =
             [ Style.block []
             , Style.box
                 [ Box.typography
-                    [ Typography.character
-                        [ Character.fontFamilySansSerif
-                        , Character.size Constants.zeta
-                        ]
+                    [ Typography.fontFamilySansSerif
+                    , Typography.size Constants.zeta
                     ]
                 ]
             ]

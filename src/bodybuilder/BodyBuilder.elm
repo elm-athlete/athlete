@@ -55,14 +55,15 @@ module BodyBuilder
 This also manages inlining styling through Elegant.
 It is perfectly compatible with Html, though.
 
-- [Types](#types)
-  - [Elements](#elements-types)
-  - [Attributes](#attributes)
-- [Elements](#elements)
-  - [Special](#special)
-  - [Inline](#inline)
-  - [Block](#block)
-- [Program](#program)
+  - [Types](#types)
+      - [Elements](#elements-types)
+      - [Attributes](#attributes)
+  - [Elements](#elements)
+      - [Special](#special)
+      - [Inline](#inline)
+      - [Block](#block)
+  - [Program](#program)
+
 
 # Types
 
@@ -118,6 +119,7 @@ import Function
 import Flex exposing (FlexContainerDetails)
 import Display
 import Grid
+import Modifiers exposing (..)
 
 
 {-| The main type of BodyBuilder. It is an alias to Html, in order to keep
@@ -543,7 +545,7 @@ what you wrote.
 inputTel : Modifiers (InputTextAttributes msg) -> Node msg
 inputTel =
     inputAndLabel
-        BodyBuilder.Attributes.defaultInputTextAttributes
+        BodyBuilder.Attributes.defaultInputTelAttributes
         BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
 
 

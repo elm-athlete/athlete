@@ -6,8 +6,10 @@ module Typography
         , WhiteSpaceWrap
         , UserSelect
         , Normal
+        , FontTilt
+        , FontFamily
+        , CustomFontFamily
         , default
-        , character
         , capitalize
         , lowercase
         , uppercase
@@ -16,10 +18,20 @@ module Typography
         , noDecoration
         , whiteSpaceNoWrap
         , userSelect
+        , weight
+        , tiltNormal
+        , italic
+        , oblique
+        , size
+        , systemFont
+        , customFont
+        , fontFamily
+        , fontFamilyInherit
+        , fontFamilySansSerif
         , lineHeightNormal
         , lineHeight
+        , letterSpacing
         , typographyToCouples
-        , fontSize
         , bold
         )
 
@@ -34,6 +46,9 @@ module Typography
 @docs WhiteSpaceWrap
 @docs UserSelect
 @docs Normal
+@docs FontTilt
+@docs FontFamily
+@docs CustomFontFamily
 
 
 # Default typography
@@ -42,11 +57,6 @@ module Typography
 
 
 # Typography modifiers
-
-
-## Characters rendering
-
-@docs character
 
 
 ## Text Transformations
@@ -79,9 +89,39 @@ module Typography
 @docs lineHeight
 
 
+## Weight
+
+@docs weight
+
+
+## Tilting
+
+@docs tiltNormal
+@docs italic
+@docs oblique
+
+
+## Size
+
+@docs size
+
+
+## Font Family
+
+@docs systemFont
+@docs customFont
+@docs fontFamily
+@docs fontFamilyInherit
+@docs fontFamilySansSerif
+
+
+## Letter Spacing
+
+@docs letterSpacing
+
+
 # Shortcuts
 
-@docs fontSize
 @docs bold
 
 
@@ -91,12 +131,12 @@ module Typography
 
 -}
 
-import Function
 import Color exposing (Color)
 import Either exposing (Either(..))
-import Character as Character exposing (Character)
 import Helpers.Shared exposing (..)
+import Helpers.Css
 import Elegant.Setters exposing (..)
+import Modifiers exposing (..)
 
 
 {-| The `Typography` record contains everything about fonts rendering,
@@ -111,13 +151,17 @@ can then use modifiers. I.E.
 
 -}
 type alias Typography =
-    { character : Maybe Character
-    , capitalization : Maybe Capitalization
+    { capitalization : Maybe Capitalization
     , decoration : Maybe Decoration
     , color : Maybe Color
     , whiteSpaceWrap : Maybe WhiteSpaceWrap
     , userSelect : Maybe UserSelect
     , lineHeight : Maybe (Either SizeUnit Normal)
+    , weight : Maybe Int
+    , tilt : Maybe FontTilt
+    , size : Maybe SizeUnit
+    , family : Maybe FontFamily
+    , letterSpacing : Maybe SizeUnit
     }
 
 
@@ -126,7 +170,7 @@ You are free to use it as you wish, but it is instanciated automatically by `Box
 -}
 default : Typography
 default =
-    Typography Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+    Typography Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 
 {-| Represents the possible transformations of the text.
@@ -168,26 +212,6 @@ type alias UserSelect =
 -}
 type Normal
     = Normal
-
-
-{-| Modify the character rendering of the text. The characters options are in
-`Typography.Character`.
-It creates a default empty `Character` record, modifies it according to the
-modifiers, then set the resulting `Character` in Typography.
-
-    Typography.character
-        [ Typography.Character.weight 700
-        , Typography.Character.italic
-        ]
-
--}
-character : Modifiers Character -> Modifier Typography
-character modifiers typo =
-    typo.character
-        |> Maybe.withDefault Character.default
-        |> Function.compose modifiers
-        |> Just
-        |> setCharacterIn typo
 
 
 {-| Capitalize the first letter in the text.
@@ -264,6 +288,125 @@ lineHeight =
     setLineHeight << Just << Left
 
 
+{-| Represents the possible tilting of the characters.
+It can be Normal, Italic, or Oblique. They are created by `uppercase`,
+`lowercase` and `capitalize`.
+-}
+type FontTilt
+    = FontTiltNormal
+    | FontTiltItalic
+    | FontTiltOblique
+
+
+{-| Represents the font family used to render characters.
+It can be a system or a custom type. They are created by `systemFont` and `customFont`.
+-}
+type CustomFontFamily
+    = SystemFont String
+    | CustomFont String
+
+
+{-| Gives a system font.
+-}
+systemFont : String -> CustomFontFamily
+systemFont =
+    SystemFont
+
+
+{-| Gives a custom font.
+-}
+customFont : String -> CustomFontFamily
+customFont =
+    CustomFont
+
+
+{-| Represents the possible fontFamily of the characters.
+It can be Inherited from the parent, or customized.
+-}
+type FontFamily
+    = FontFamilyInherit
+    | FontFamilyCustom (List CustomFontFamily)
+
+
+{-| Changes the weight of the characters.
+Value is defined between 100 and 900 and default weight is equal to 400.
+-}
+weight : Int -> Modifier Typography
+weight =
+    setWeight << Just
+
+
+{-| Cancels any tilting of the characters.
+-}
+tiltNormal : Modifier Typography
+tiltNormal =
+    setTilt <| Just FontTiltNormal
+
+
+{-| Renders the characters as italic.
+-}
+italic : Modifier Typography
+italic =
+    setTilt <| Just FontTiltItalic
+
+
+{-| Renders the characters as oblique.
+-}
+oblique : Modifier Typography
+oblique =
+    setTilt <| Just FontTiltOblique
+
+
+{-| Set the size of the characters to the desired value.
+Can be px, pt, vh, em or rem.
+-}
+size : SizeUnit -> Modifier Typography
+size =
+    setSize << Just
+
+
+{-| Set the font family to the desired fonts. All fonts will be tried one by one
+until one is found either on the browser or user's OS. It is possible to use both
+system and custom fonts.
+-}
+fontFamily : List CustomFontFamily -> Modifier Typography
+fontFamily =
+    setFamily << Just << FontFamilyCustom
+
+
+{-| Inherits the font from the parents. It is the default behavior of fontFamily.
+-}
+fontFamilyInherit : Modifier Typography
+fontFamilyInherit =
+    setFamily <| Just FontFamilyInherit
+
+
+{-| Standard Sans Serif font family.
+Inspired from <https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/>
+-}
+fontFamilySansSerif : Modifier Typography
+fontFamilySansSerif =
+    setFamily <|
+        Just <|
+            FontFamilyCustom
+                [ SystemFont "-apple-system"
+                , SystemFont "system-ui"
+                , SystemFont "BlinkMacSystemFont"
+                , CustomFont "Segoe UI"
+                , CustomFont "Roboto"
+                , CustomFont "Helvetica Neue"
+                , CustomFont "Arial"
+                , SystemFont "sans-serif"
+                ]
+
+
+{-| Set the letter spacing of the typography.
+-}
+letterSpacing : SizeUnit -> Modifier Typography
+letterSpacing value =
+    setLetterSpacing <| Just value
+
+
 {-| Compiles a `Typography` record to the corresponding CSS list of tuples.
 Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
@@ -275,14 +418,13 @@ typographyToCouples typography =
     , unwrapToCouple .whiteSpaceWrap whiteSpaceToCouples
     , unwrapToCouple .userSelect userSelectToCouples
     , unwrapToCouple .lineHeight lineHeightToCouples
+    , unwrapToCouple .weight weightToCouple
+    , unwrapToCouple .tilt tiltToCouple
+    , unwrapToCouple .size sizeToCouple
+    , unwrapToCouple .family familyToCouple
+    , unwrapToCouple .letterSpacing letterSpacingToCouple
     ]
         |> List.concatMap (callOn typography)
-        |> List.append
-            (typography
-                |> unwrapToCouples
-                    .character
-                    Character.characterToCouples
-            )
 
 
 
@@ -290,15 +432,9 @@ typographyToCouples typography =
 
 
 {-| -}
-fontSize : SizeUnit -> Modifier Typography
-fontSize size =
-    character [ Character.size size ]
-
-
-{-| -}
 bold : Modifier Typography
 bold =
-    character [ Character.weight 900 ]
+    weight 900
 
 
 
@@ -381,3 +517,63 @@ lineHeightToString normalSizeUnitEither =
 
         Right _ ->
             "normal"
+
+
+weightToCouple : Int -> ( String, String )
+weightToCouple int =
+    ( "font-weight", toString int )
+
+
+tiltToCouple : FontTilt -> ( String, String )
+tiltToCouple fontTilt =
+    ( "font-style", fontStyleToString fontTilt )
+
+
+fontStyleToString : FontTilt -> String
+fontStyleToString val =
+    case val of
+        FontTiltNormal ->
+            "normal"
+
+        FontTiltItalic ->
+            "italic"
+
+        FontTiltOblique ->
+            "oblique"
+
+
+sizeToCouple : SizeUnit -> ( String, String )
+sizeToCouple val =
+    ( "font-size", sizeUnitToString val )
+
+
+familyToCouple : FontFamily -> ( String, String )
+familyToCouple fontFamily =
+    ( "font-family", fontFamilyToString fontFamily )
+
+
+letterSpacingToCouple : SizeUnit -> ( String, String )
+letterSpacingToCouple value =
+    ( "letter-spacing", sizeUnitToString value )
+
+
+fontFamilyToString : FontFamily -> String
+fontFamilyToString val =
+    case val of
+        FontFamilyInherit ->
+            "inherit"
+
+        FontFamilyCustom fontList ->
+            fontList
+                |> List.map extractFontName
+                |> String.join ", "
+
+
+extractFontName : CustomFontFamily -> String
+extractFontName customFont =
+    case customFont of
+        CustomFont fontName ->
+            Helpers.Css.surroundWithQuotes fontName
+
+        SystemFont fontName ->
+            fontName

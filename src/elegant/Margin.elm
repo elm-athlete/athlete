@@ -53,6 +53,7 @@ module Margin
 import Either exposing (Either(..))
 import Helpers.Shared exposing (..)
 import Surrounded exposing (Surrounded)
+import Modifiers exposing (..)
 
 
 {-| The `Margin` record contains everything about one margin side.

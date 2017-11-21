@@ -122,6 +122,7 @@ module Grid
 -}
 
 import Helpers.Shared exposing (..)
+import Modifiers exposing (..)
 
 
 type Align

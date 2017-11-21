@@ -28,7 +28,7 @@ module Overflow
 -}
 
 import Helpers.Vector exposing (Vector)
-import Helpers.Shared exposing (..)
+import Modifiers exposing (..)
 
 
 {-| -}

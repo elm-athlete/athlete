@@ -46,6 +46,7 @@ import Color exposing (Color)
 import Color.Convert
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
+import Modifiers exposing (..)
 
 
 {-| The Shadow record contains everything about box shadow.

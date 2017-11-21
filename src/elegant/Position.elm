@@ -54,6 +54,7 @@ module Position
 
 import Helpers.Shared exposing (..)
 import Surrounded exposing (Surrounded)
+import Modifiers exposing (..)
 
 
 {-| Represents a position, whih can be static, absolute, relative, fixed or sticky.

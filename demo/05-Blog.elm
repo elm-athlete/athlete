@@ -12,6 +12,7 @@ import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
 import Finders exposing (..)
 import Elegant exposing (SizeUnit, px, pt, percent, vh)
+import Modifiers exposing (..)
 import Padding
 import Constants
 import Elegant
@@ -24,7 +25,6 @@ import Cursor
 import Border
 import Outline
 import Typography
-import Character
 import Style
 import Date exposing (Month(..))
 import Date.Extra as Date
@@ -160,10 +160,8 @@ standardCellStyle =
                 ]
             , Box.outline [ Outline.none ]
             , Box.typography
-                [ Typography.character
-                    [ Character.fontFamilyInherit
-                    , Character.size Constants.zeta
-                    ]
+                [ Typography.fontFamilyInherit
+                , Typography.size Constants.zeta
                 ]
             , Box.corner [ Corner.circular Corner.all (px 0) ]
             , Box.padding [ Padding.all Constants.large ]
@@ -205,10 +203,8 @@ view ({ history, data } as model) =
             [ Style.block []
             , Style.box
                 [ Box.typography
-                    [ Typography.character
-                        [ Character.fontFamilySansSerif
-                        , Character.size Constants.zeta
-                        ]
+                    [ Typography.fontFamilySansSerif
+                    , Typography.size Constants.zeta
                     ]
                 ]
             ]

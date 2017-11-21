@@ -22,11 +22,11 @@ module Style exposing (..)
 
 import BodyBuilder.Attributes exposing (..)
 import BodyBuilder.Setters exposing (..)
-import Helpers.Shared exposing (..)
 import Box
 import Display
 import Flex
 import Grid
+import Modifiers exposing (..)
 
 
 {-| -}

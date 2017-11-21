@@ -4,6 +4,7 @@ import Function
 import List.Extra
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
+import Modifiers exposing (..)
 
 
 type alias Surrounded surroundType =

@@ -123,6 +123,7 @@ module Flex
 import Either exposing (Either(..))
 import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
+import Modifiers exposing (..)
 
 
 {-| Contains all style which can be applied on a flex container.
