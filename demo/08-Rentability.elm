@@ -68,7 +68,7 @@ type Route
 
 
 type alias Model =
-    { history : History Route
+    { history : History Route Msg
     , data : Data
     }
 
@@ -102,7 +102,7 @@ type alias MarkdownString =
     String
 
 
-handleHistory : HistoryMsg -> History Route -> History Route
+handleHistory : HistoryMsg -> History Route Msg -> History Route Msg
 handleHistory route history =
     case route of
         AppartmentShowMsg id ->
@@ -443,8 +443,8 @@ appartmentsNew draftAppartment =
         )
 
 
-insidePageView : Router.Page Route -> Data -> Maybe Router.Transition -> Node Msg
-insidePageView page data transition =
+insidePageView : Data -> Router.Page Route Msg -> Maybe (Router.Transition Route Msg) -> Node Msg
+insidePageView data page transition =
     let
         appartments =
             data.appartments
@@ -479,7 +479,7 @@ view { history, data } =
                 ]
             ]
         ]
-        [ Router.historyView insidePageView history data ]
+        [ Router.historyView (insidePageView data) history ]
 
 
 updateAppartmentAttributesBasedOnMsg : UpdateAppartmentMsg -> AppartmentAttributes -> AppartmentAttributes
