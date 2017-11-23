@@ -39,6 +39,7 @@ toElegantStyle :
     -> List Elegant.Style
 toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers blockModifiers boxModifiers =
     let
+        computedFlexContainerDetails : Maybe (List ( Attributes.StyleSelector, Flex.FlexContainerDetails ))
         computedFlexContainerDetails =
             flexModifiers
                 |> Maybe.map
@@ -46,6 +47,7 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
                         (Flex.FlexContainerDetails Nothing Nothing Nothing Nothing)
                     )
 
+        computedFlexItemDetails : Maybe (List ( Attributes.StyleSelector, Flex.FlexItemDetails ))
         computedFlexItemDetails =
             flexItemModifiers
                 |> Maybe.map
@@ -53,6 +55,7 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
                         (Flex.FlexItemDetails Nothing Nothing Nothing Nothing)
                     )
 
+        computedGridContainerDetails : Maybe (List ( Attributes.StyleSelector, Grid.GridContainerDetails ))
         computedGridContainerDetails =
             gridModifiers
                 |> Maybe.map
@@ -60,6 +63,7 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
                         (Grid.GridContainerDetails Nothing Nothing)
                     )
 
+        computedGridItemDetails : Maybe (List ( Attributes.StyleSelector, Grid.GridItemDetails ))
         computedGridItemDetails =
             gridItemModifiers
                 |> Maybe.map
@@ -67,6 +71,7 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
                         (Grid.GridItemDetails Nothing Nothing)
                     )
 
+        computedBlockDetails : Maybe (List ( Attributes.StyleSelector, Display.BlockDetails ))
         computedBlockDetails =
             blockModifiers
                 |> Maybe.map
@@ -74,9 +79,11 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
                         (Display.BlockDetails Nothing Nothing Nothing Nothing Nothing)
                     )
 
+        computedBoxDetails : List ( Attributes.StyleSelector, Box.Box )
         computedBoxDetails =
             boxModifiers |> (groupByStyleSelectorAndCompute (Box.default))
 
+        key : String
         key =
             ( computedFlexContainerDetails
             , computedFlexItemDetails
