@@ -83,7 +83,6 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
         computedBoxDetails =
             boxModifiers |> (groupByStyleSelectorAndCompute (Box.default))
 
-        key : String
         key =
             ( computedFlexContainerDetails
             , computedFlexItemDetails
@@ -92,7 +91,6 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
             , computedBlockDetails
             , computedBoxDetails
             )
-                |> toString
     in
         Native.BodyBuilder.fetchDisplayStyle key
             |> Maybe.withDefault

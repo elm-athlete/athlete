@@ -135,7 +135,7 @@ computeAtomicClass : AtomicClass -> String
 computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } as atomicClass) =
     let
         classHash =
-            toString atomicClass
+            atomicClass
     in
         case Native.Elegant.fetchAtomicClass classHash of
             Nothing ->
