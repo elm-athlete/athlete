@@ -6,7 +6,8 @@ import BodyBuilder.Events as E
 import Style as S
 import Constants as C
 import Color exposing (Color)
-import Elegant exposing (px, vh, percent, Modifiers, Modifier)
+import Elegant exposing (px, vh, percent)
+import Modifiers exposing (Modifiers, Modifier)
 import Shadow
 import Box
 import Block
@@ -139,33 +140,33 @@ addChildToElement ({ tree } as parent) child =
 
 
 changeGridItemPlacementXOfCurrentElement : Int -> Model -> Model
-changeGridItemPlacementXOfCurrentElement placement =
-    changeStyleOfSelectedElement (updateGridItemInStyle (updateGridItemPlacementX placement))
+changeGridItemPlacementXOfCurrentElement =
+    changeStyleOfSelectedElement << updateGridItemInStyle << updateGridItemPlacementX
 
 
 changeGridItemPlacementYOfCurrentElement : Int -> Model -> Model
-changeGridItemPlacementYOfCurrentElement placement =
-    changeStyleOfSelectedElement (updateGridItemInStyle (updateGridItemPlacementY placement))
+changeGridItemPlacementYOfCurrentElement =
+    changeStyleOfSelectedElement << updateGridItemInStyle << updateGridItemPlacementY
 
 
 toggleGridItemPlacementXOfCurrentElement : Bool -> Model -> Model
-toggleGridItemPlacementXOfCurrentElement value =
-    changeStyleOfSelectedElement (updateGridItemInStyle (toggleGridItemPlacementX value))
+toggleGridItemPlacementXOfCurrentElement =
+    changeStyleOfSelectedElement << updateGridItemInStyle << toggleGridItemPlacementX
 
 
 toggleGridItemPlacementYOfCurrentElement : Bool -> Model -> Model
-toggleGridItemPlacementYOfCurrentElement value =
-    changeStyleOfSelectedElement (updateGridItemInStyle (toggleGridItemPlacementY value))
+toggleGridItemPlacementYOfCurrentElement =
+    changeStyleOfSelectedElement << updateGridItemInStyle << toggleGridItemPlacementY
 
 
 changeGridItemSizeXOfCurrentElement : Int -> Model -> Model
-changeGridItemSizeXOfCurrentElement size =
-    changeStyleOfSelectedElement (updateGridItemInStyle (updateGridItemSizeX size))
+changeGridItemSizeXOfCurrentElement =
+    changeStyleOfSelectedElement << updateGridItemInStyle << updateGridItemSizeX
 
 
 changeGridItemSizeYOfCurrentElement : Int -> Model -> Model
-changeGridItemSizeYOfCurrentElement size =
-    changeStyleOfSelectedElement (updateGridItemInStyle (updateGridItemSizeY size))
+changeGridItemSizeYOfCurrentElement =
+    changeStyleOfSelectedElement << updateGridItemInStyle << updateGridItemSizeY
 
 
 changeStyleOfSelectedElement : (Elegant.CommonStyle -> Elegant.CommonStyle) -> Model -> Model
@@ -195,28 +196,28 @@ addColumnInGrid =
 
 
 changeGridColumnSizeOfCurrentElement : Int -> Int -> Model -> Model
-changeGridColumnSizeOfCurrentElement columnNumber size =
-    changeGridContainerStyleOfSelectedElement (updateGridContainerToResizeColumn columnNumber size)
+changeGridColumnSizeOfCurrentElement columnNumber =
+    changeGridContainerStyleOfSelectedElement << updateGridContainerToResizeColumn columnNumber
 
 
 changeGridRowSizeOfCurrentElement : Int -> Int -> Model -> Model
-changeGridRowSizeOfCurrentElement rowNumber size =
-    changeGridContainerStyleOfSelectedElement (updateGridContainerToResizeRow rowNumber size)
+changeGridRowSizeOfCurrentElement rowNumber =
+    changeGridContainerStyleOfSelectedElement << updateGridContainerToResizeRow rowNumber
 
 
 changeGridColumnUnitOfCurrentElement : Int -> String -> Model -> Model
-changeGridColumnUnitOfCurrentElement columnNumber unit =
-    changeGridContainerStyleOfSelectedElement (updateGridContainerToChangeUnitColumn columnNumber unit)
+changeGridColumnUnitOfCurrentElement columnNumber =
+    changeGridContainerStyleOfSelectedElement << updateGridContainerToChangeUnitColumn columnNumber
 
 
 changeGridRowUnitOfCurrentElement : Int -> String -> Model -> Model
-changeGridRowUnitOfCurrentElement rowNumber unit =
-    changeGridContainerStyleOfSelectedElement (updateGridContainerToChangeUnitRow rowNumber unit)
+changeGridRowUnitOfCurrentElement rowNumber =
+    changeGridContainerStyleOfSelectedElement << updateGridContainerToChangeUnitRow rowNumber
 
 
 addRowInGrid : Model -> Model
 addRowInGrid =
-    changeGridContainerStyleOfSelectedElement (updateGridContainerToAddRow)
+    changeGridContainerStyleOfSelectedElement updateGridContainerToAddRow
 
 
 updateGridContainer :
@@ -1136,7 +1137,7 @@ view model =
 
 
 item :
-    Elegant.Modifier Box.Box
+    Modifier Box.Box
     -> ( Int, Int )
     -> ( Grid.GridItemSize, Grid.GridItemSize )
     -> List (Node msg)
@@ -1279,7 +1280,7 @@ selection :
     { c | attributes : { b | style : Elegant.CommonStyle } }
     -> Int
     -> Int
-    -> List (Elegant.Modifier (A.VisibleAttributesAndEvents Msg a))
+    -> List (Modifier (A.VisibleAttributesAndEvents Msg a))
 selection element id selectedId =
     ([ A.class [ Elegant.commonStyleToCss element.attributes.style ] ] ++ selectOrSelected id selectedId)
 
