@@ -10,6 +10,7 @@ module Shadow
         , plain
         , blurry
         , boxShadowToCouple
+        , color
         )
 
 {-| Shadow contains everything about boxShadow.
@@ -34,7 +35,7 @@ module Shadow
 @docs standard
 @docs plain
 @docs blurry
-
+@docs color
 
 # Compilation
 
@@ -82,6 +83,13 @@ default =
 inset : Bool -> Modifier Shadow
 inset =
     setInset
+
+
+{-| Set the inset of the Shadow.
+-}
+color : Color -> Modifier Shadow
+color =
+    setColor
 
 
 {-| Set the spreadRadius of the Shadow.

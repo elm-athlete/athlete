@@ -33,6 +33,7 @@ module Typography
         , letterSpacing
         , typographyToCouples
         , bold
+        , color
         )
 
 {-| Typography contains everything about fonts and characters rendering.
@@ -58,6 +59,8 @@ module Typography
 
 # Typography modifiers
 
+## Color
+@docs color
 
 ## Text Transformations
 
@@ -113,7 +116,6 @@ module Typography
 @docs fontFamily
 @docs fontFamilyInherit
 @docs fontFamilySansSerif
-
 
 ## Letter Spacing
 
@@ -286,6 +288,13 @@ lineHeightNormal =
 lineHeight : SizeUnit -> Modifier Typography
 lineHeight =
     setLineHeight << Just << Left
+
+
+{-| Set the color of the typography
+-}
+color : Color -> Modifier Typography
+color =
+    setColor << Just
 
 
 {-| Represents the possible tilting of the characters.
