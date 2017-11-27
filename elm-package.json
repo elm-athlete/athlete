@@ -1,5 +1,5 @@
 {
-    "version": "11.1.0",
+    "version": "12.0.0",
     "summary": "Framework for inline CSS",
     "repository": "https://github.com/elm-bodybuilder/elegant.git",
     "license": "MIT",
@@ -47,10 +47,10 @@
         "elm-community/maybe-extra": "4.0.0 <= v < 5.0.0",
         "elm-lang/animation-frame": "1.0.1 <= v < 2.0.0",
         "elm-lang/core": "5.0.0 <= v < 6.0.0",
+        "elm-lang/dom": "1.1.1 <= v < 2.0.0",
         "elm-lang/html": "2.0.0 <= v < 3.0.0",
         "elm-lang/virtual-dom": "2.0.4 <= v < 3.0.0",
         "elm-lang/window": "1.0.1 <= v < 2.0.0",
-        "elm-lang/dom": "1.1.1 <= v < 2.0.0",
         "eskimoblood/elm-color-extra": "5.0.0 <= v < 6.0.0",
         "fredcy/elm-parseint": "2.0.0 <= v < 3.0.0",
         "justinmimbs/elm-date-extra": "2.0.3 <= v < 3.0.0",
