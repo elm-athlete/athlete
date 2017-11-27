@@ -75,7 +75,7 @@ type alias Model =
 
 type HistoryMsg
     = AppartmentShowMsg Int
-    | AppartmentEditMsg Int
+    | AppartmentEditMsg Int String
     | AppartmentNewMsg
     | AppartmentsIndexEditMsg
 
@@ -108,8 +108,12 @@ handleHistory route history =
         AppartmentShowMsg id ->
             history |> Router.push (Router.pageWithDefaultTransition (AppartmentsShow id))
 
-        AppartmentEditMsg id ->
-            history |> Router.push (Router.pageWithTransition (Router.slideUp) (AppartmentsEdit id))
+        AppartmentEditMsg id idToFocusOn ->
+            history
+                |> Router.push
+                    (Router.pageWithTransition (Router.slideUp) (AppartmentsEdit id)
+                        |> Router.focusedElement idToFocusOn
+                    )
 
         AppartmentNewMsg ->
             history |> Router.push (Router.pageWithTransition (Router.slideUp) AppartmentsNew)
@@ -184,7 +188,7 @@ showView data =
                 (Router.headerElement
                     { left = Router.headerButton (StandardHistoryWrapper Router.Back) "← BACK"
                     , center = title appartment.attributes.title
-                    , right = Router.headerButton (HistoryMsgWrapper (AppartmentEditMsg appartment.id)) "Edit"
+                    , right = Router.headerButton (HistoryMsgWrapper (AppartmentEditMsg appartment.id collocNumberId)) "Edit"
                     }
                 )
                 (appartmentBodyView appartment)
@@ -279,6 +283,10 @@ totalMonthlyRent { collocs, monthlyRent } =
     monthlyRent * collocs
 
 
+collocNumberId =
+    "collocNumber"
+
+
 appartmentEditBodyView : Appartment -> Node Msg
 appartmentEditBodyView ({ attributes } as appartment) =
     node []
@@ -304,6 +312,7 @@ appartmentEditBodyView ({ attributes } as appartment) =
             , inputNumber
                 [ Attributes.value (attributes.collocs)
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateCollocs)
+                , Attributes.id collocNumberId
                 ]
             ]
         , node [ pad ]
@@ -710,7 +719,7 @@ initData =
 
 init : Model
 init =
-    Router.initHistoryAndData AppartmentsIndex initData
+    Router.initHistoryAndData AppartmentsIndex initData StandardHistoryWrapper
 
 
 main : Program Basics.Never Model Msg

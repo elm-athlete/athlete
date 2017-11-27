@@ -28,6 +28,7 @@ module Router
         , getMaybeTransitionValue
         , afterTransition
         , visiblePages
+        , focusedElement
         )
 
 {-| Router based on BodyBuilder and Elegant implementing transitions between
@@ -58,6 +59,7 @@ pages and history (backward and forward)
 @docs getMaybeTransitionValue
 @docs afterTransition
 @docs visiblePages
+@docs focusedElement
 
 @docs headerElement
 @docs pageWithHeader
@@ -86,6 +88,8 @@ import Flex
 import Dimensions
 import Block
 import Style
+import Dom
+import Task
 
 
 type Easing
@@ -122,7 +126,8 @@ type alias Transition route msg =
 {-| Page type handling transition
 -}
 type alias Page route msg =
-    { maybeTransition : Maybe (Transition route msg)
+    { maybeFocusedId : Maybe String
+    , maybeTransition : Maybe (Transition route msg)
     , route : route
     }
 
@@ -135,7 +140,15 @@ type alias History route msg =
     , current : Page route msg
     , after : List (Page route msg)
     , transition : Maybe (Transition route msg)
+    , maybeAlreadyFocused : Maybe Bool
+    , standardHistoryWrapper : StandardHistoryMsg -> msg
     }
+
+
+type TransitionWrapper route msg
+    = InProgress (Transition route msg)
+    | Finished
+    | NoTransition
 
 
 {-|
@@ -170,6 +183,7 @@ Back to handle back buttons
 type StandardHistoryMsg
     = Tick Time
     | Back
+    | FocusMsg (Result Dom.Error ())
 
 
 easingFun : Easing -> Float -> Float
@@ -265,6 +279,7 @@ push el ({ transition, before, current, after } as history) =
             , current = el
             , after = []
             , transition = el.maybeTransition
+            , maybeAlreadyFocused = Maybe.map (always False) (el.maybeFocusedId)
         }
 
 
@@ -297,25 +312,37 @@ defaultTransition =
     Just <| customTransition basicDuration (customKind slideLeftView) Forward EaseInOut
 
 
+pageWithoutIdToFocusOn : Maybe (Transition route msg) -> route -> Page route msg
+pageWithoutIdToFocusOn =
+    Page Nothing
+
+
 {-| creates a page with the defaultTransition
 -}
 pageWithDefaultTransition : route -> Page route msg
 pageWithDefaultTransition =
-    Page defaultTransition
+    pageWithoutIdToFocusOn defaultTransition
 
 
 {-| creates a page without any transition
 -}
 pageWithoutTransition : route -> Page route msg
 pageWithoutTransition =
-    Page Nothing
+    pageWithoutIdToFocusOn Nothing
 
 
 {-| creates a page with a custom transition
 -}
 pageWithTransition : Transition route msg -> route -> Page route msg
 pageWithTransition transition =
-    Page (Just transition)
+    pageWithoutIdToFocusOn (Just transition)
+
+
+{-|
+-}
+focusedElement : String -> Page route msg -> Page route msg
+focusedElement idElement page =
+    { page | maybeFocusedId = Just idElement }
 
 
 pull : History route msg -> History route msg
@@ -576,12 +603,14 @@ maybeTransitionSubscription standardHistoryWrapper =
         >> Maybe.withDefault Sub.none
 
 
-initHistory : route -> History route msg
-initHistory currentPage =
+initHistory : route -> (StandardHistoryMsg -> msg) -> History route msg
+initHistory currentPage standardHistoryMsg =
     { before = []
     , current = pageWithoutTransition currentPage
     , after = []
     , transition = Nothing
+    , maybeAlreadyFocused = Nothing
+    , standardHistoryWrapper = standardHistoryMsg
     }
 
 
@@ -590,6 +619,14 @@ standardHandleHistory historyMsg history =
     case historyMsg of
         Back ->
             history |> pull
+
+        FocusMsg result ->
+            case result of
+                Ok _ ->
+                    { history | maybeAlreadyFocused = Just True }
+
+                Err _ ->
+                    history
 
         Tick diff ->
             case history.transition of
@@ -611,14 +648,30 @@ standardHandleHistory historyMsg history =
 -}
 handleStandardHistory : StandardHistoryMsg -> { a | history : History route msg } -> ( { a | history : History route msg }, Cmd msg )
 handleStandardHistory historyMsg model =
-    ( { model | history = standardHandleHistory historyMsg model.history }, Cmd.none )
+    ( { model | history = standardHandleHistory historyMsg model.history }
+    , case model.history.maybeAlreadyFocused of
+        Nothing ->
+            Cmd.none
+
+        Just alreadyFocused ->
+            case alreadyFocused of
+                True ->
+                    Cmd.none
+
+                False ->
+                    model.history.current.maybeFocusedId
+                        |> Maybe.withDefault ""
+                        |> Debug.log "avec du texte"
+                        |> Dom.focus
+                        |> Task.attempt (FocusMsg >> model.history.standardHistoryWrapper)
+    )
 
 
 {-| initialize history and data based on the routing system
 -}
-initHistoryAndData : route -> data -> { history : History route msg, data : data }
-initHistoryAndData route data =
-    { history = initHistory route
+initHistoryAndData : route -> data -> (StandardHistoryMsg -> msg) -> { history : History route msg, data : data }
+initHistoryAndData route data standardHistoryWrapper =
+    { history = initHistory route standardHistoryWrapper
     , data = data
     }
 
