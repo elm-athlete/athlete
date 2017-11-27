@@ -78,7 +78,6 @@ import Time exposing (Time)
 import Display
 import Overflow
 import Box
-import Shadow
 import Position
 import Typography
 import Padding
@@ -140,7 +139,7 @@ type alias History route msg =
     , current : Page route msg
     , after : List (Page route msg)
     , transition : Maybe (Transition route msg)
-    , maybeAlreadyFocused : Maybe Bool
+    , currentPageHasFocusElement : Bool
     , standardHistoryWrapper : StandardHistoryMsg -> msg
     }
 
@@ -279,7 +278,7 @@ push el ({ transition, before, current, after } as history) =
             , current = el
             , after = []
             , transition = el.maybeTransition
-            , maybeAlreadyFocused = Maybe.map (always False) (el.maybeFocusedId)
+            , currentPageHasFocusElement = Maybe.withDefault False (Maybe.map (always True) (el.maybeFocusedId))
         }
 
 
@@ -465,14 +464,7 @@ pageView insidePageView_ transition page =
         [ Attributes.style
             [ Style.block
                 [ Display.dimensions [ Dimensions.width (percent 100) ] ]
-            , Style.box
-                [ Box.boxShadow
-                    [ Shadow.standard (px 1) (Color.rgba 1 1 1 0.5) ( px 2, px 2 )
-                    ]
-                ]
             ]
-
-        -- , Elegant.boxShadowCenteredBlurry (Px 5) (Color.grayscale <| abs <| getMaybeTransitionValue <| transition)
         ]
         [ insidePageView_ page transition ]
 
@@ -577,30 +569,27 @@ historyView :
     -> History route msg
     -> Node msg
 historyView insidePageView_ history =
-    let
-        visiblePages_ =
-            visiblePages history
-    in
-        case history.transition of
-            Nothing ->
-                overflowHiddenContainer []
-                    [ flexItem
-                        [ Attributes.style [ Style.flexItemProperties [ Flex.basis (percent 100) ] ] ]
-                        [ pageView insidePageView_ Nothing history.current ]
-                    ]
+    case history.transition of
+        Nothing ->
+            overflowHiddenContainer []
+                [ flexItem
+                    [ Attributes.style [ Style.flexItemProperties [ Flex.basis (percent 100) ] ] ]
+                    [ pageView insidePageView_ Nothing history.current ]
+                ]
 
-            Just transition ->
-                case transition.kind of
-                    CustomKind view_ ->
-                        view_ history insidePageView_
+        Just transition ->
+            case transition.kind of
+                CustomKind view_ ->
+                    view_ history insidePageView_
 
 
 {-| maybe transition subscription
 -}
-maybeTransitionSubscription : (StandardHistoryMsg -> msg) -> Maybe a -> Sub msg
-maybeTransitionSubscription standardHistoryWrapper =
-    Maybe.map (\transition -> AnimationFrame.diffs <| (standardHistoryWrapper << Tick))
-        >> Maybe.withDefault Sub.none
+maybeTransitionSubscription : History route msg -> Sub msg
+maybeTransitionSubscription { standardHistoryWrapper, transition } =
+    transition
+        |> Maybe.map (\transition -> AnimationFrame.diffs (standardHistoryWrapper << Tick))
+        |> Maybe.withDefault Sub.none
 
 
 initHistory : route -> (StandardHistoryMsg -> msg) -> History route msg
@@ -609,62 +598,67 @@ initHistory currentPage standardHistoryMsg =
     , current = pageWithoutTransition currentPage
     , after = []
     , transition = Nothing
-    , maybeAlreadyFocused = Nothing
+    , currentPageHasFocusElement = False
     , standardHistoryWrapper = standardHistoryMsg
     }
 
 
-standardHandleHistory : StandardHistoryMsg -> History route msg -> History route msg
+updateIdentity : model -> ( model, Cmd msg )
+updateIdentity model =
+    model ! []
+
+
+standardHandleHistory : StandardHistoryMsg -> History route msg -> ( History route msg, Cmd msg )
 standardHandleHistory historyMsg history =
     case historyMsg of
         Back ->
-            history |> pull
+            history
+                |> pull
+                |> updateIdentity
 
         FocusMsg result ->
-            case result of
-                Ok _ ->
-                    { history | maybeAlreadyFocused = Just True }
-
-                Err _ ->
-                    history
+            updateIdentity <|
+                history
 
         Tick diff ->
-            case history.transition of
-                Nothing ->
-                    history
+            focusChoosenElement history <|
+                case history.transition of
+                    Nothing ->
+                        history
 
-                Just transition ->
-                    let
-                        newTransition =
-                            (transition |> timeDiff diff)
-                    in
-                        if newTransition.timer > 0 then
-                            { history | transition = Just newTransition }
-                        else
-                            { history | transition = Nothing }
+                    Just transition ->
+                        let
+                            newTransition =
+                                (transition |> timeDiff diff)
+                        in
+                            if newTransition.timer > 0 then
+                                { history | transition = Just newTransition }
+                            else
+                                { history | transition = Nothing }
+
+
+focusChoosenElement : History route msg -> model -> ( model, Cmd msg )
+focusChoosenElement history model =
+    ( model
+    , case history.currentPageHasFocusElement of
+        False ->
+            Cmd.none
+
+        True ->
+            history.current.maybeFocusedId
+                |> Maybe.withDefault ""
+                |> Dom.focus
+                |> Task.attempt (FocusMsg >> history.standardHistoryWrapper)
+    )
 
 
 {-| handle model's history update using historyMsg
 -}
 handleStandardHistory : StandardHistoryMsg -> { a | history : History route msg } -> ( { a | history : History route msg }, Cmd msg )
-handleStandardHistory historyMsg model =
-    ( { model | history = standardHandleHistory historyMsg model.history }
-    , case model.history.maybeAlreadyFocused of
-        Nothing ->
-            Cmd.none
-
-        Just alreadyFocused ->
-            case alreadyFocused of
-                True ->
-                    Cmd.none
-
-                False ->
-                    model.history.current.maybeFocusedId
-                        |> Maybe.withDefault ""
-                        |> Debug.log "avec du texte"
-                        |> Dom.focus
-                        |> Task.attempt (FocusMsg >> model.history.standardHistoryWrapper)
-    )
+handleStandardHistory historyMsg ({ history } as model) =
+    history
+        |> standardHandleHistory historyMsg
+        |> \( history, cmds ) -> { model | history = history } ! [ cmds ]
 
 
 {-| initialize history and data based on the routing system

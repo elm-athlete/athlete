@@ -659,7 +659,7 @@ decodeData =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Router.maybeTransitionSubscription StandardHistoryWrapper model.history.transition
+        [ Router.maybeTransitionSubscription model.history
         , fetchData decodeData UpdateData
         ]
 
