@@ -56,7 +56,7 @@ type alias Data =
 
 
 type alias Model =
-    { history : History Route
+    { history : History Route Msg
     , data : Data
     }
 
@@ -81,7 +81,7 @@ type alias Contact =
     }
 
 
-handleHistory : HistoryMsg -> History Route -> History Route
+handleHistory : HistoryMsg -> History Route Msg -> History Route Msg
 handleHistory route history =
     case route of
         ContactShow id ->
@@ -299,8 +299,8 @@ contactsShow id contacts =
     node [] [ showView contactBodyView { maybeContact = (contacts |> find_by .id id) } ]
 
 
-insidePageView : Page Route -> Data -> Maybe Transition -> Node Msg
-insidePageView page data transition =
+insidePageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> Node Msg
+insidePageView data page transition =
     let
         contacts =
             data.contacts
@@ -326,10 +326,10 @@ view { history, data } =
                 ]
             ]
         ]
-        [ historyView insidePageView history data ]
+        [ historyView (insidePageView data) history ]
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         HistoryMsgWrapper historyMsg ->
@@ -341,7 +341,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    maybeTransitionSubscription StandardHistoryWrapper model.history.transition
+    maybeTransitionSubscription model.history
 
 
 initContacts : List Contact
@@ -400,9 +400,9 @@ initData =
     { contacts = initContacts }
 
 
-init : { data : Data, history : History Route }
+init : { data : Data, history : History Route Msg }
 init =
-    initHistoryAndData ContactsIndex initData
+    initHistoryAndData ContactsIndex initData StandardHistoryWrapper
 
 
 main : Program Basics.Never Model Msg

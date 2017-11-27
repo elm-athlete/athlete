@@ -145,7 +145,7 @@ textToHtml =
         (List.foldr (\e accu -> [ text e, br ] ++ accu) [])
 
 
-standardCellStyle : Elegant.Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
+standardCellStyle : Modifiers.Modifier (Attributes.BoxContainer (Attributes.MaybeBlockContainer a))
 standardCellStyle =
     style
         [ Style.block
@@ -224,7 +224,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    maybeTransitionSubscription StandardHistoryWrapper model.history.transition
+    maybeTransitionSubscription model.history
 
 
 initBlogposts : List Blogpost
@@ -251,7 +251,7 @@ initData =
 
 init : { data : Data, history : MyHistory }
 init =
-    initHistoryAndData BlogpostsIndex initData
+    initHistoryAndData BlogpostsIndex initData StandardHistoryWrapper
 
 
 main : Program Basics.Never Model Msg
