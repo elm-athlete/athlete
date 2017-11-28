@@ -90,6 +90,7 @@ import Block
 import Style
 import Dom
 import Task
+import Native.BodyBuilder
 
 
 type Easing
@@ -660,7 +661,7 @@ focusChoosenElement history model =
         True ->
             history.current.maybeFocusedId
                 |> Maybe.withDefault ""
-                |> Dom.focus
+                |> Native.BodyBuilder.focusWithoutScroll
                 |> Task.attempt (FocusMsg >> history.standardHistoryWrapper)
     )
 
