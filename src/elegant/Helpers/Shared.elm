@@ -34,6 +34,7 @@ type SizeUnit
     | Pt Int
     | Percent Float
     | Vh Float
+    | Vw Float
     | Em Float
     | Rem Float
 
@@ -61,6 +62,9 @@ sizeUnitToString val =
 
         Vh x ->
             concatNumberWithString x "vh"
+
+        Vw x ->
+            concatNumberWithString x "vw"
 
         Em x ->
             concatNumberWithString x "em"

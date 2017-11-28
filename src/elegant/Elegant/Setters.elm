@@ -126,9 +126,24 @@ setShadow v o =
     { o | boxShadow = v }
 
 
+setTransform : c -> { b | transform : a } -> { b | transform : c }
+setTransform v o =
+    { o | transform = v }
+
+
+setTranslate : a -> { c | translate : b } -> { c | translate : a }
+setTranslate v o =
+    { o | translate = v }
+
+
 setShadowIn : { b | boxShadow : a } -> c -> { b | boxShadow : c }
 setShadowIn =
     flip setShadow
+
+
+setTransformIn : { b | transform : a } -> c -> { b | transform : c }
+setTransformIn =
+    flip setTransform
 
 
 setCapitalization : c -> { b | capitalization : a } -> { b | capitalization : c }

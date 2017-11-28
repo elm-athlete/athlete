@@ -36,6 +36,7 @@ module Box
         , paddingRight
         , paddingBottom
         , paddingLeft
+        , transform
         , shadowCenteredBlurry
         , marginAuto
         , fontFamilySansSerif
@@ -70,6 +71,7 @@ It contains only modifiers, and they can be found in the respective modules.
 @docs position
 @docs typography
 @docs visibility
+@docs transform
 @docs zIndex
 
 
@@ -124,6 +126,7 @@ import Cursor
 import Surrounded exposing (Surrounded)
 import Background
 import Position
+import Transform
 import Modifiers exposing (..)
 
 
@@ -151,6 +154,7 @@ type alias Box =
     , position : Maybe Position.Position
     , typography : Maybe Typography.Typography
     , visibility : Maybe Visibility
+    , transform : Maybe Transform.Transform
     , zIndex : Maybe Int
     }
 
@@ -160,6 +164,7 @@ type alias Box =
 default : Box
 default =
     Box
+        Nothing
         Nothing
         Nothing
         Nothing
@@ -195,6 +200,13 @@ background =
 border : Modifiers (Surrounded Border.Border) -> Modifier Box
 border =
     getModifyAndSet .border setBorderIn Surrounded.default
+
+
+{-| Accepts a list of modifiers for the `transform` and modifies the Box accordingly.
+-}
+transform : Modifiers Transform.Transform -> Modifier Box
+transform =
+    getModifyAndSet .transform setTransformIn Transform.default
 
 
 {-| Accepts a list of modifiers for the `Shadow` and modifies the Box accordingly.
@@ -291,6 +303,7 @@ boxToCouples box =
     , unwrapToCouple .zIndex zIndexToCouple
     , unwrapToCouple .cursor Cursor.cursorToCouple
     , unwrapToCouple .boxShadow Shadow.boxShadowToCouple
+    , unwrapToCouples .transform Transform.transformToCouples
     , unwrapToCouples .background Background.backgroundToCouples
     , unwrapToCouples .typography Typography.typographyToCouples
     , unwrapToCouples .border Border.borderToCouples

@@ -25,6 +25,7 @@ module Elegant
         , toCommonStyle
         , toInlineStyles
         , vh
+        , vw
         , withScreenWidth
         )
 
@@ -54,6 +55,7 @@ module Elegant
 @docs toCommonStyle
 @docs toInlineStyles
 @docs vh
+@docs vw
 @docs withScreenWidth
 -}
 
@@ -283,6 +285,12 @@ vh =
 
 
 {-| -}
+vw : Float -> SizeUnit
+vw =
+    Vw
+
+
+{-| -}
 em : Float -> SizeUnit
 em =
     Em
@@ -311,6 +319,9 @@ opposite unit =
 
         Vh a ->
             Vh -a
+
+        Vw a ->
+            Vw -a
 
         Em a ->
             Em -a

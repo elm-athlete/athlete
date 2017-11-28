@@ -85,6 +85,7 @@ import Cursor
 import Color
 import Flex
 import Dimensions
+import Transform
 import Block
 import Style
 import Dom
@@ -397,9 +398,9 @@ visiblePages { transition, before, current, after } =
 
 
 {-| -}
-percentage : Float -> SizeUnit
+percentage : Float -> Float
 percentage a =
-    percent <| toFloat <| round <| 100 * a
+    toFloat <| round <| 100 * a
 
 
 
@@ -501,29 +502,37 @@ mainElement html =
 
 slideUpView : History route msg -> PageView route msg -> Node msg
 slideUpView history insidePageView_ =
-    overflowHiddenContainer []
-        [ flexItem
+    let
+        visiblePages_ =
+            visiblePages history
+    in
+        overflowHiddenContainer
             [ style
-                [ Style.block []
-                , Style.flexItemProperties [ Flex.basis (percent 100) ]
+                [ Style.block
+                    [ Display.dimensions [ Dimensions.height <| Elegant.vh <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
+                , Style.box
+                    [ Box.transform
+                        [ Transform.translateY (Elegant.vh <| percentage (0 - getMaybeTransitionValue history.transition))
+                        ]
+                    ]
+                , Style.flexContainerProperties [ Flex.direction Flex.column ]
                 ]
             ]
-            (List.map (pageView insidePageView_ history.transition) (history |> beforeTransition))
-        , flexItem
-            [ style
-                [ Style.block [ Display.dimensions [ Dimensions.width (percent 100) ] ]
-                , Style.flexItemProperties [ Flex.basis (percent 100) ]
-                , Style.box
-                    [ Box.position <|
-                        Position.absolute <|
-                            [ Position.bottom <|
-                                percentage ((getMaybeTransitionValue <| history.transition) - 1)
-                            ]
+            [ flexItem
+                [ style
+                    [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
+                    , Style.flexItemProperties [ Flex.basis (percent 100) ]
                     ]
                 ]
+                (List.map (pageView insidePageView_ history.transition) (history |> beforeTransition))
+            , flexItem
+                [ style
+                    [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
+                    , Style.flexItemProperties [ Flex.basis (percent 100) ]
+                    ]
+                ]
+                (List.map (pageView insidePageView_ history.transition) (history |> afterTransition))
             ]
-            (List.map (pageView insidePageView_ history.transition) (history |> afterTransition))
-        ]
 
 
 slideLeftView :
@@ -538,12 +547,16 @@ slideLeftView history insidePageView_ =
         overflowHiddenContainer
             [ style
                 [ Style.block
-                    [ Display.dimensions [ Dimensions.width <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
+                    [ Display.dimensions [ Dimensions.width <| Elegant.vw <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
                 , Style.box
-                    [ Box.position
-                        (Position.relative
-                            ([ Position.right (percentage (getMaybeTransitionValue history.transition)) ])
-                        )
+                    [ Box.transform
+                        [ Transform.translateX (Elegant.vw <| percentage (0 - getMaybeTransitionValue history.transition))
+                        ]
+
+                    -- , Box.position
+                    -- (Position.relative
+                    --     ([ Position.right (percentage (getMaybeTransitionValue history.transition)) ])
+                    -- )
                     ]
                 ]
             ]
