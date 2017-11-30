@@ -1,59 +1,38 @@
-🚨🚨THIS IS EXPERIMENTAL.🚨🚨
+# DEPRECATED
 
-We are trying to make this package reliable, and for all we know it is, but we haven't used it nearly enough to know for sure. Use are your own risk. If you do discover problems please let us know, it would be really useful.
+This package now uses native code in its new version to ensure lightning fast performance! Try to use [the latest version published directly on GitHub](https://github.com/elm-bodybuilder/elegant)! It's way better, better typed checked, including a full featured router for your applications, and continually improved!
 
-# Elegant + BodyBuilder
+# Table of Contents
 
-Elm library to write type safe html (BodyBuilder), with inline styles compiled to CSS (Elegant) under the hood. You can find an example [here](https://elm-bodybuilder.github.io/elegant/).
+- [What is Elegant and BodyBuilder?](#what-is-elegant-and-bodybuilder?)
+- [What differences with Elm CSS and HTML?](#what-differences-with-elm-css-and-html?)
+- [It's awesome! How can I get it?](#it-s-awesome!-how-can-i-get-it?)
+- [I need help! Can you help me?](#i-need-help!-can-you-help-me?)
+- [It's the better package I've ever used! What can I do to help you?](#it-s-the-better-package-i've-ever-used!-what-can-i-do-to-help-you?)
 
-# Why should I use Elegant + Bodybuilder, and how it compares to elm-css ?
+# What is Elegant and BodyBuilder?
 
-Elegant takes the approach of removing on purpose the css abstraction from the developer, but it uses css under the hood to style elements.
+Elegant provides a safe way to write style on HTML elements without having to worry dealing with CSS. It allows you to write inline styling directly on elements. Those styles are computed, and converted in CSS under the hood, allowing to enjoy the full power of CSS without dealing with its inherent problems (cascading for example).<br>
+BodyBuilder provides an abstract, type-safe way to write web applications! It abstracts HTML to facilitates the use of inline styles, type checks the attributes, and deals with HTML for you!
 
-When I create a bodybuilder div with the style `textCenter`, bodybuilder goes all over the bodybuilder tree and get all the styles, and then compiles them into a single style node on top of the generated html with the class `.text-center` with the value `text-align: center;`. In the resulting html, we then have `<div class="text-center"></div>`.
+# What differences with Elm CSS and HTML?
 
-The css is totally dynamic, and is only here to style the generated html.
+Elegant and BodyBuilder take another approach: while Elm CSS provides nice way to write CSS directly in Elm to add it into your project, Elegant removes entirely CSS! The whole package uses inline styling for everything, while maintaining a `VirtualCss` handling all dirty CSS details for you. Just focus on your needs, write your application, write your styles and your done! Elegant takes care of the styles for you! By abstracting HTML, BodyBuilder allows you to focus on your application, without having to worry on all the HTML details.
 
-We could say it's a virtual css object model. We don't write css, we only write inline style, and for performance and capabilities of css, we use css.
+If you are looking for an abstraction over CSS, look at [`rtfeldman/elm-css`](http://package.elm-lang.org/packages/rtfeldman/elm-css/latest). This is exactly what you are looking for.
 
-🚨 If you are looking for an abstraction over css, look at elm-css, they do it very well.
+# It's awesome! How can I get it?
 
-For us, css is an abstraction of the past, and we don't need it anymore.
+It's easy as pie to get your version! Just use [`panosoft/elm-grove`](https://github.com/panosoft/elm-grove) or [`gdotdesign/elm-install`](https://github.com/gdotdesign/elm-github-install)!<br>
+But you can also clone [`elm-bodybuilder/elegant-template`](https://github.com/elm-bodybuilder/elegant-template) to get started right away!
 
-BodyBuilder is also an abstraction over elm-html that makes html creation Type Safe.
+# I need help! Can you help me?
 
-What we mean by that is that if you write something like `h1 [href "https://google.com"] [text "google"]`, it doesn't compile, because h1 is not a `a` element.
+Don't worry, we're on [Slack](https://elmlang.herokuapp.com/)! And we have a dedicated channel `#bodybuilder` just for this! We would be so happy to help you and to see you join us! Just come say hi!<br>
+You should check [the official repo too](https://github.com/elm-bodybuilder/elegant). There are at least 10 examples to help you understand how it works! And [the documentation](https://github.com/elm-bodybuilder/elegant/tree/master/elm-docs) is on the repo too! What are you waiting for? 😉
 
-BodyBuilder also prevent html mistakes, like putting `button` inside `a`.
+# It's the better package I've ever used! What can I do to help you?
 
-But the most impressive thing of BodyBuilder is that it allows the use of elegant.
+First, thanks!
 
-Look at the demo folder for more impressive elegant and bodybuilder demos.
-
-# How ?
-
-```elm
-import BodyBuilder exposing (..)
-import Elegant exposing (textCenter)
-
-
-view model =
-    div [ style [ textCenter ] ] [ text "I'm Elegantly styled by css, but my style is set inline" ]
-
-
-main : Program Basics.Never number msg
-main =
-    program
-        { init = ( 0, Cmd.none )
-        , update = (\msg model -> ( model, Cmd.none ))
-        , subscriptions = always Sub.none
-        , view = view
-        }
-
-```
-
-# Next steps
-
-Implement these things in Elegant + Bodybuilder
-https://www.w3schools.com/howto/tryhow_css_parallax_demo.htm
-https://codepen.io/joeaugie/pen/RWbPzo
+If you need to help us, you can do plenty of things: we need documentation, tutorials, help for newcomers, detailed examples, and even performance improvements! Feel free to send us a Pull Request!
