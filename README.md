@@ -4,11 +4,11 @@ This package now uses native code in its new version to ensure lightning fast pe
 
 # Table of Contents
 
-- [What is Elegant and BodyBuilder?](#what-is-elegant-and-bodybuilder?)
-- [What differences with Elm CSS and HTML?](#what-differences-with-elm-css-and-html?)
-- [It's awesome! How can I get it?](#it-s-awesome!-how-can-i-get-it?)
-- [I need help! Can you help me?](#i-need-help!-can-you-help-me?)
-- [It's the better package I've ever used! What can I do to help you?](#it-s-the-better-package-i've-ever-used!-what-can-i-do-to-help-you?)
+- [What is Elegant and BodyBuilder?](#what-is-elegant-and-bodybuilder)
+- [What differences with Elm CSS and HTML?](#what-differences-with-elm-css-and-html)
+- [It's awesome! How can I get it?](#its-awesome-how-can-i-get-it)
+- [I need help! Can you help me?](#i-need-help-can-you-help-me)
+- [It's the better package I've ever used! What can I do to help you?](#its-the-better-package-ive-ever-used-what-can-i-do-to-help-you)
 
 # What is Elegant and BodyBuilder?
 
