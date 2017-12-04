@@ -1,5 +1,5 @@
 {
-    "version": "12.0.0",
+    "version": "12.1.0",
     "summary": "Framework for inline CSS",
     "repository": "https://github.com/elm-bodybuilder/elegant.git",
     "license": "MIT",
