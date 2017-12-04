@@ -35,6 +35,7 @@
         "Router",
         "Style",
         "Typography",
+        "Transform",
         "Modifiers",
         "Surrounded"
     ],

@@ -15,7 +15,6 @@ module Transform
 
 @docs Transform
 
-
 # Default transform
 
 @docs default
@@ -29,7 +28,7 @@ module Transform
 
 # Compilation
 
-@docs translateToCouple
+@docs transformToCouples
 
 -}
 

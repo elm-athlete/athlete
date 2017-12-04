@@ -113,7 +113,6 @@ import Html.Attributes
 import BodyBuilder.Attributes exposing (..)
 import BodyBuilder.Convert
 import BodyBuilder.Shared as Shared
-import Helpers.Shared exposing (..)
 import Elegant
 import Function
 import Flex exposing (FlexContainerDetails)
