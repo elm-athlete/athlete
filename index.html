@@ -16390,11 +16390,11 @@ var _elm_bodybuilder$elegant$Native_BodyBuilder = (function() {
     addEventListener: function() {},
     removeEventListener: function() {}
   };
-  
+
   var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
   var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
   var doc = (typeof document !== 'undefined') ? document : fakeNode;
-  
+
   var rAF = typeof requestAnimationFrame !== 'undefined'
 	        ? requestAnimationFrame
 	        : function(callback) { callback(); };
@@ -16404,7 +16404,7 @@ var _elm_bodybuilder$elegant$Native_BodyBuilder = (function() {
     return function(eventName, decoder, toTask)
     {
       return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-  
+
         function performTask(event)
         {
           var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
@@ -16413,9 +16413,9 @@ var _elm_bodybuilder$elegant$Native_BodyBuilder = (function() {
             _elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
           }
         }
-  
+
         node.addEventListener(eventName, performTask);
-  
+
         return function()
         {
           node.removeEventListener(eventName, performTask);
