@@ -1,0 +1,10 @@
+elm-make demo/01-Simplest.elm --output=simplest/index.html
+elm-make demo/02-Simple.elm --output=simple/index.html
+elm-make demo/03-Complete.elm --output=complete/index.html
+elm-make demo/04-Counter.elm --output=counter/index.html
+elm-make demo/05-Blog.elm --output=blog/index.html
+elm-make demo/06-Contacts.elm --output=contacts/index.html
+elm-make demo/07-Big.elm --output=big/index.html
+elm-make demo/08-Rentability.elm --output=rentability/index.html
+elm-make demo/09-Slider.elm --output=slider/index.html
+elm-make demo/10-TheGrid.elm --output=grid/index.html
