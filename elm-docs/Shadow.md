@@ -112,10 +112,11 @@ can then use modifiers. I.E.
 
 ```elm
 Elegant.boxShadow
-    [ Shadow.inset True
-    , Shadow.spreadRadius (px 30)
-    ]
 ```
+
+        [ Shadow.inset True
+        , Shadow.spreadRadius (px 30)
+        ]
 
 
 # Default box shadow

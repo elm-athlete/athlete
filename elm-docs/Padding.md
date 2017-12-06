@@ -20,10 +20,11 @@ can then use modifiers. I.E.
 
 ```elm
 Elegant.padding
-    [ Padding.top <| Padding.width (px 30)
-    , Padding.vertical <| Padding.width (px 40)
-    ]
 ```
+
+        [ Padding.top <| Padding.width (px 30)
+        , Padding.vertical <| Padding.width (px 40)
+        ]
 
 
 # Default padding

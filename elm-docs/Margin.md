@@ -20,10 +20,11 @@ can then use modifiers. I.E.
 
 ```elm
 Elegant.margin
-    [ Margin.top <| Margin.width (px 30)
-    , Margin.vertical Margin.auto
-    ]
 ```
+
+        [ Margin.top <| Margin.width (px 30)
+        , Margin.vertical Margin.auto
+        ]
 
 
 # Default margin

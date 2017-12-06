@@ -20,8 +20,9 @@ can then use modifiers. I.E.
 
 ```elm
 Elegant.corner
-    [ Corner.circular Corner.all (px 30) ]
 ```
+
+        [ Corner.circular Corner.all (px 30) ]
 - [CornerSet](#cornerset)
 
 ### **type CornerSet**

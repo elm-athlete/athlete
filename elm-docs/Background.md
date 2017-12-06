@@ -40,11 +40,12 @@ can then use modifiers. I.E.
 
 ```elm
 Box.background
-    [ Elegant.color Color.white
-    , Background.images
-        [ Background.image "/example.photo" ]
-    ]
 ```
+
+        [ Elegant.color Color.white
+        , Background.images
+            [ Background.image "/example.photo" ]
+        ]
 - [Image](#image)
 
 ### **type Image**
@@ -169,8 +170,9 @@ It modifies the images list in `Background`.
 
 ```elm
 Background.images
-    [ Background.image "/example.photo" ]
 ```
+
+        [ Background.image "/example.photo" ]
 - [image](#image-1)
 
 ### **image**

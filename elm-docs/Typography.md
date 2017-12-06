@@ -20,10 +20,11 @@ can then use modifiers. I.E.
 
 ```elm
 Box.typography
-    [ Typography.color Color.white
-    , Typography.italic
-    ]
 ```
+
+        [ Typography.color Color.white
+        , Typography.italic
+        ]
 - [Capitalization](#capitalization)
 
 ### **type Capitalization**

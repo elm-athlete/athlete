@@ -20,10 +20,11 @@ can then use modifiers. I.E.
 
 ```elm
 Elegant.outline
-    [ Outline.solid
-    , Elegant.color Color.blue
-    ]
 ```
+
+        [ Outline.solid
+        , Elegant.color Color.blue
+        ]
 - [OutlineStyle](#outlinestyle)
 
 ### **type OutlineStyle**

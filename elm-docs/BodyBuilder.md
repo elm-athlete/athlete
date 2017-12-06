@@ -5,18 +5,12 @@ This also manages inlining styling through Elegant.
 It is perfectly compatible with Html, though.
 
   - [Types](#types)
-```elm
-  - [Elements](#elements-types)
-  - [Attributes](#attributes)
-```
-
+      - [Elements](#elements-types)
+      - [Attributes](#attributes)
   - [Elements](#elements)
-```elm
-  - [Special](#special)
-  - [Inline](#inline)
-  - [Block](#block)
-```
-
+      - [Special](#special)
+      - [Inline](#inline)
+      - [Block](#block)
   - [Program](#program)
 
 
@@ -362,13 +356,14 @@ and are forced to return a Node.
 ```elm
 textOrNone : Maybe String -> Node msg
 textOrNone value =
-    case value of
-        Nothing ->
-            BodyBuilder.none
-
-        Just content ->
-            BodyBuilder.text content
 ```
+
+        case value of
+            Nothing ->
+                BodyBuilder.none
+
+            Just content ->
+                BodyBuilder.text content
 
 ---
 
@@ -384,11 +379,12 @@ can contains the specific styling of the flexChildren.
 ```elm
 flexElement : Node msg
 flexElement =
-    BodyBuilder.flex []
-        [ BodyBuilder.flexItem []
-            [ Html.text "I'm inside a flex-item!" ]
-        ]
 ```
+
+        BodyBuilder.flex []
+            [ BodyBuilder.flexItem []
+                [ Html.text "I'm inside a flex-item!" ]
+            ]
 
 ---
 
@@ -404,11 +400,12 @@ can contains the specific styling of the gridChildren.
 ```elm
 gridElement : Node msg
 gridElement =
-    BodyBuilder.grid []
-        [ BodyBuilder.gridItem []
-            [ Html.text "I'm inside a grid-item!" ]
-        ]
 ```
+
+        BodyBuilder.grid []
+            [ BodyBuilder.gridItem []
+                [ Html.text "I'm inside a grid-item!" ]
+            ]
 
 ---
 
@@ -424,12 +421,13 @@ constituted of to String: the value and the content. It can also be selected, or
 ```elm
 selectElement : Node msg
 selectElement =
-    BodyBuilder.select []
-        [ BodyBuilder.option "Paris" "We're in Paris!" True
-        , BodyBuilder.option "London" "We're in London!" False
-        , BodyBuilder.option "Berlin" "We're in Berlin!" False
-        ]
 ```
+
+        BodyBuilder.select []
+            [ BodyBuilder.option "Paris" "We're in Paris!" True
+            , BodyBuilder.option "London" "We're in London!" False
+            , BodyBuilder.option "Berlin" "We're in Berlin!" False
+            ]
 
 ---
 
@@ -486,14 +484,18 @@ what you wrote.
 ```elm
 inlineElement : Node msg
 inlineElement =
-    -- This produces an inline node in the DOM.
-    BodyBuilder.node [] []
+```
 
+        -- This produces an inline node in the DOM.
+        BodyBuilder.node [] []
+
+```elm
 blockElement : Node msg
 blockElement =
-    -- This produces a block node in the DOM.
-    BodyBuilder.node [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block node in the DOM.
+        BodyBuilder.node [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -522,14 +524,18 @@ what you wrote.
 ```elm
 inlineFlex : Node msg
 inlineFlex =
-    -- This produces an inline flex in the DOM.
-    BodyBuilder.flex [] []
+```
 
+        -- This produces an inline flex in the DOM.
+        BodyBuilder.flex [] []
+
+```elm
 blockFlex : Node msg
 blockFlex =
-    -- This produces a block flex in the DOM.
-    BodyBuilder.flex [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block flex in the DOM.
+        BodyBuilder.flex [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -547,14 +553,18 @@ what you wrote.
 ```elm
 inlineGrid : Node msg
 inlineGrid =
-    -- This produces an inline grid in the DOM.
-    BodyBuilder.grid [] []
+```
 
+        -- This produces an inline grid in the DOM.
+        BodyBuilder.grid [] []
+
+```elm
 blockGrid : Node msg
 blockGrid =
-    -- This produces a block grid in the DOM.
-    BodyBuilder.grid [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block grid in the DOM.
+        BodyBuilder.grid [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -572,14 +582,18 @@ what you wrote.
 ```elm
 inlineLink : Node msg
 inlineLink =
-    -- This produces an inline a in the DOM.
-    BodyBuilder.a [] []
+```
 
+        -- This produces an inline a in the DOM.
+        BodyBuilder.a [] []
+
+```elm
 blockLink : Node msg
 blockLink =
-    -- This produces a block a in the DOM.
-    BodyBuilder.a [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block a in the DOM.
+        BodyBuilder.a [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -597,14 +611,18 @@ what you wrote.
 ```elm
 inlineButton : Node msg
 inlineButton =
-    -- This produces an inline button in the DOM.
-    BodyBuilder.button [] []
+```
 
+        -- This produces an inline button in the DOM.
+        BodyBuilder.button [] []
+
+```elm
 blockButton : Node msg
 blockButton =
-    -- This produces a block button in the DOM.
-    BodyBuilder.button [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block button in the DOM.
+        BodyBuilder.button [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -622,14 +640,18 @@ what you wrote.
 ```elm
 inlineImage : Node msg
 inlineImage =
-    -- This produces an inline img in the DOM.
-    BodyBuilder.img [] []
+```
 
+        -- This produces an inline img in the DOM.
+        BodyBuilder.img [] []
+
+```elm
 blockImage : Node msg
 blockImage =
-    -- This produces a block img in the DOM.
-    BodyBuilder.img [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block img in the DOM.
+        BodyBuilder.img [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -647,14 +669,18 @@ what you wrote.
 ```elm
 inlineAudio : Node msg
 inlineAudio =
-    -- This produces an inline audio in the DOM.
-    BodyBuilder.audio [] []
+```
 
+        -- This produces an inline audio in the DOM.
+        BodyBuilder.audio [] []
+
+```elm
 blockAudio : Node msg
 blockAudio =
-    -- This produces a block audio in the DOM.
-    BodyBuilder.audio [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block audio in the DOM.
+        BodyBuilder.audio [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -672,14 +698,18 @@ what you wrote.
 ```elm
 inlineColorInput : Node msg
 inlineColorInput =
-    -- This produces an inline color input in the DOM.
-    BodyBuilder.inputColor [] []
+```
 
+        -- This produces an inline color input in the DOM.
+        BodyBuilder.inputColor [] []
+
+```elm
 blockColorInput : Node msg
 blockColorInput =
-    -- This produces a block color input in the DOM.
-    BodyBuilder.inputColor [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block color input in the DOM.
+        BodyBuilder.inputColor [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -697,14 +727,18 @@ what you wrote.
 ```elm
 inlineFileInput : Node msg
 inlineFileInput =
-    -- This produces an inline file input in the DOM.
-    BodyBuilder.inputFile [] []
+```
 
+        -- This produces an inline file input in the DOM.
+        BodyBuilder.inputFile [] []
+
+```elm
 blockFileInput : Node msg
 blockFileInput =
-    -- This produces a block file input in the DOM.
-    BodyBuilder.inputFile [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block file input in the DOM.
+        BodyBuilder.inputFile [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -719,9 +753,10 @@ Generates an hidden input in the DOM. An hidden input is not displayed in the DO
 ```elm
 hiddenInput : Node msg
 hiddenInput =
-    -- This produces an hidden input in the DOM.
-    BodyBuilder.inputHidden []
 ```
+
+        -- This produces an hidden input in the DOM.
+        BodyBuilder.inputHidden []
 
 ---
 
@@ -739,14 +774,18 @@ what you wrote.
 ```elm
 inlineNumberInput : Node msg
 inlineNumberInput =
-    -- This produces an inline number input in the DOM.
-    BodyBuilder.inputNumber [] []
+```
 
+        -- This produces an inline number input in the DOM.
+        BodyBuilder.inputNumber [] []
+
+```elm
 blockNumberInput : Node msg
 blockNumberInput =
-    -- This produces a block number input in the DOM.
-    BodyBuilder.inputNumber [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block number input in the DOM.
+        BodyBuilder.inputNumber [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -764,14 +803,18 @@ what you wrote.
 ```elm
 inlineCheckboxInput : Node msg
 inlineCheckboxInput =
-    -- This produces an inline checkbox input in the DOM.
-    BodyBuilder.inputCheckbox [] []
+```
 
+        -- This produces an inline checkbox input in the DOM.
+        BodyBuilder.inputCheckbox [] []
+
+```elm
 blockCheckboxInput : Node msg
 blockCheckboxInput =
-    -- This produces a block checkbox input in the DOM.
-    BodyBuilder.inputCheckbox [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block checkbox input in the DOM.
+        BodyBuilder.inputCheckbox [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -789,14 +832,18 @@ what you wrote.
 ```elm
 inlinePasswordInput : Node msg
 inlinePasswordInput =
-    -- This produces an inline password input in the DOM.
-    BodyBuilder.inputPassword [] []
+```
 
+        -- This produces an inline password input in the DOM.
+        BodyBuilder.inputPassword [] []
+
+```elm
 blockPasswordInput : Node msg
 blockPasswordInput =
-    -- This produces a block password input in the DOM.
-    BodyBuilder.inputPassword [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block password input in the DOM.
+        BodyBuilder.inputPassword [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -814,14 +861,18 @@ what you wrote.
 ```elm
 inlineRadioInput : Node msg
 inlineRadioInput =
-    -- This produces an inline radio input in the DOM.
-    BodyBuilder.inputRadio [] []
+```
 
+        -- This produces an inline radio input in the DOM.
+        BodyBuilder.inputRadio [] []
+
+```elm
 blockRadioInput : Node msg
 blockRadioInput =
-    -- This produces a block radio input in the DOM.
-    BodyBuilder.inputRadio [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block radio input in the DOM.
+        BodyBuilder.inputRadio [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -839,14 +890,18 @@ what you wrote.
 ```elm
 inlineRangeInput : Node msg
 inlineRangeInput =
-    -- This produces an inline range input in the DOM.
-    BodyBuilder.inputRange [] []
+```
 
+        -- This produces an inline range input in the DOM.
+        BodyBuilder.inputRange [] []
+
+```elm
 blockRangeInput : Node msg
 blockRangeInput =
-    -- This produces a block range input in the DOM.
-    BodyBuilder.inputRange [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block range input in the DOM.
+        BodyBuilder.inputRange [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -864,14 +919,18 @@ what you wrote.
 ```elm
 inlineSubmitInput : Node msg
 inlineSubmitInput =
-    -- This produces an inline submit input in the DOM.
-    BodyBuilder.inputSubmit [] []
+```
 
+        -- This produces an inline submit input in the DOM.
+        BodyBuilder.inputSubmit [] []
+
+```elm
 blockSubmitInput : Node msg
 blockSubmitInput =
-    -- This produces a block submit input in the DOM.
-    BodyBuilder.inputSubmit [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block submit input in the DOM.
+        BodyBuilder.inputSubmit [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -889,14 +948,18 @@ what you wrote.
 ```elm
 inlineTelInput : Node msg
 inlineTelInput =
-    -- This produces an inline tel input in the DOM.
-    BodyBuilder.inputTel [] []
+```
 
+        -- This produces an inline tel input in the DOM.
+        BodyBuilder.inputTel [] []
+
+```elm
 blockTelInput : Node msg
 blockTelInput =
-    -- This produces a block tel input in the DOM.
-    BodyBuilder.inputTel [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block tel input in the DOM.
+        BodyBuilder.inputTel [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -914,14 +977,18 @@ what you wrote.
 ```elm
 inlineTextInput : Node msg
 inlineTextInput =
-    -- This produces an inline text input in the DOM.
-    BodyBuilder.inputText [] []
+```
 
+        -- This produces an inline text input in the DOM.
+        BodyBuilder.inputText [] []
+
+```elm
 blockTextInput : Node msg
 blockTextInput =
-    -- This produces a block text input in the DOM.
-    BodyBuilder.inputText [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block text input in the DOM.
+        BodyBuilder.inputText [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -939,14 +1006,18 @@ what you wrote.
 ```elm
 inlineUrlInput : Node msg
 inlineUrlInput =
-    -- This produces an inline url input in the DOM.
-    BodyBuilder.inputUrl [] []
+```
 
+        -- This produces an inline url input in the DOM.
+        BodyBuilder.inputUrl [] []
+
+```elm
 blockUrlInput : Node msg
 blockUrlInput =
-    -- This produces a block url input in the DOM.
-    BodyBuilder.inputUrl [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block url input in the DOM.
+        BodyBuilder.inputUrl [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -964,14 +1035,18 @@ what you wrote.
 ```elm
 inlineProgress : Node msg
 inlineProgress =
-    -- This produces an inline progress in the DOM.
-    BodyBuilder.progress [] []
+```
 
+        -- This produces an inline progress in the DOM.
+        BodyBuilder.progress [] []
+
+```elm
 blockProgress : Node msg
 blockProgress =
-    -- This produces a block progress in the DOM.
-    BodyBuilder.progress [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block progress in the DOM.
+        BodyBuilder.progress [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -989,14 +1064,18 @@ what you wrote.
 ```elm
 inlineSelect : Node msg
 inlineSelect =
-    -- This produces an inline select in the DOM.
-    BodyBuilder.select [] []
+```
 
+        -- This produces an inline select in the DOM.
+        BodyBuilder.select [] []
+
+```elm
 blockSelect : Node msg
 blockSelect =
-    -- This produces a block select in the DOM.
-    BodyBuilder.select [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block select in the DOM.
+        BodyBuilder.select [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 ---
 
@@ -1014,14 +1093,18 @@ what you wrote.
 ```elm
 inlineTextarea : Node msg
 inlineTextarea =
-    -- This produces an inline textarea in the DOM.
-    BodyBuilder.textarea [] []
+```
 
+        -- This produces an inline textarea in the DOM.
+        BodyBuilder.textarea [] []
+
+```elm
 blockTextarea : Node msg
 blockTextarea =
-    -- This produces a block textarea in the DOM.
-    BodyBuilder.textarea [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 ```
+
+        -- This produces a block textarea in the DOM.
+        BodyBuilder.textarea [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
 
 
 ## Block
@@ -1132,10 +1215,11 @@ You can add custom block style on it, but can't turn it inline.
 ```elm
 title : Node msg
 title =
-    BodyBuilder.h1
-        [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
-        [ Html.text "I'm inside a title!" ]
 ```
+
+        BodyBuilder.h1
+            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
+            [ Html.text "I'm inside a title!" ]
 
 ---
 
@@ -1151,10 +1235,11 @@ You can add custom block style on it, but can't turn it inline.
 ```elm
 title : Node msg
 title =
-    BodyBuilder.h2
-        [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
-        [ Html.text "I'm inside a title!" ]
 ```
+
+        BodyBuilder.h2
+            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
+            [ Html.text "I'm inside a title!" ]
 
 ---
 
@@ -1170,10 +1255,11 @@ You can add custom block style on it, but can't turn it inline.
 ```elm
 title : Node msg
 title =
-    BodyBuilder.h3
-        [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
-        [ Html.text "I'm inside a title!" ]
 ```
+
+        BodyBuilder.h3
+            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
+            [ Html.text "I'm inside a title!" ]
 
 ---
 
@@ -1189,10 +1275,11 @@ You can add custom block style on it, but can't turn it inline.
 ```elm
 title : Node msg
 title =
-    BodyBuilder.h4
-        [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
-        [ Html.text "I'm inside a title!" ]
 ```
+
+        BodyBuilder.h4
+            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
+            [ Html.text "I'm inside a title!" ]
 
 ---
 
@@ -1208,10 +1295,11 @@ You can add custom block style on it, but can't turn it inline.
 ```elm
 title : Node msg
 title =
-    BodyBuilder.h5
-        [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
-        [ Html.text "I'm inside a title!" ]
 ```
+
+        BodyBuilder.h5
+            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
+            [ Html.text "I'm inside a title!" ]
 
 ---
 
@@ -1227,10 +1315,11 @@ You can add custom block style on it, but can't turn it inline.
 ```elm
 title : Node msg
 title =
-    BodyBuilder.h6
-        [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
-        [ Html.text "I'm inside a title!" ]
 ```
+
+        BodyBuilder.h6
+            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
+            [ Html.text "I'm inside a title!" ]
 
 ---
 
@@ -1246,10 +1335,11 @@ You can add custom block style on it, but can't turn it inline.
 ```elm
 title : Node msg
 title =
-    BodyBuilder.p
-        [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
-        [ Html.text "I'm inside a paragrah!" ]
 ```
+
+        BodyBuilder.p
+            [ BodyBuilder.Attributes.style [ Style.blockProperties [] ] ]
+            [ Html.text "I'm inside a paragrah!" ]
 
 
 # Program

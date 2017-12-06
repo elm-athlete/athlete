@@ -132,10 +132,11 @@ in respective modules.
 
 ```elm
 Elegant.displayBlock []
-    [ Box.cursor Cursor.default
-    -- You can use any Box functions here to add custom style...
-    ]
 ```
+
+        [ Box.cursor Cursor.default
+        -- You can use any Box functions here to add custom style...
+        ]
 - [Visibility](#visibility)
 
 ### **type Visibility**

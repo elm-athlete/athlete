@@ -20,10 +20,11 @@ can then use modifiers. I.E.
 
 ```elm
 Elegant.border
-    [ Border.solid
-    , Border.color Color.blue
-    ]
 ```
+
+        [ Border.solid
+        , Border.color Color.blue
+        ]
 - [BorderStyle](#borderstyle)
 
 ### **type BorderStyle**
