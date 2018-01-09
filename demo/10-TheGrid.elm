@@ -21,7 +21,7 @@ example : Node msg
 example =
     Builder.grid
         [ Attributes.style
-            [ Style.block [ Block.height (percent 100) ]
+            [ Style.block [ Block.height (vh 100) ]
             , Style.gridContainerProperties
                 [ Grid.columns
                     [ Grid.template
