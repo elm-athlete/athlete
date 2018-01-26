@@ -136,6 +136,11 @@ setTranslate v o =
     { o | translate = v }
 
 
+setRotate : a -> { c | rotate : b } -> { c | rotate : a }
+setRotate v o =
+    { o | rotate = v }
+
+
 setShadowIn : { b | boxShadow : a } -> c -> { b | boxShadow : c }
 setShadowIn =
     flip setShadow

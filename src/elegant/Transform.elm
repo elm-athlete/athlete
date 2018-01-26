@@ -6,6 +6,9 @@ module Transform
         , translateY
         , translateZ
         , transformToCouples
+        , rotateX
+        , rotateY
+        , rotateZ
         )
 
 {-| Transform contains everything about css transformations : translate, rotate and scale.
@@ -25,6 +28,9 @@ module Transform
 @docs translateX
 @docs translateY
 @docs translateZ
+@docs rotateX
+@docs rotateY
+@docs rotateZ
 
 # Compilation
 
@@ -54,8 +60,8 @@ can then use modifiers. I.E.
 -}
 type alias Transform =
     { translate : Triplet (Maybe SizeUnit)
+    , rotate : Triplet (Maybe Angle)
 
-    -- , rotate : Triplet Angle
     -- , scale : Triplet Scale
     }
 
@@ -65,7 +71,7 @@ You are free to use it as you wish, but it is instanciated automatically by `Box
 -}
 default : Transform
 default =
-    Transform ( Nothing, Nothing, Nothing )
+    Transform ( Nothing, Nothing, Nothing ) ( Nothing, Nothing, Nothing )
 
 
 {-| Set the translateX of the Transform.
@@ -95,7 +101,34 @@ translateZ a transform =
             setTranslate ( x, y, Just a ) transform
 
 
-{-| Compiles a `Translate` record to the corresponding CSS tuple.
+{-| Set the rotateX of the Transform.
+-}
+rotateX : Angle -> Modifier Transform
+rotateX a transform =
+    case transform.rotate of
+        ( x, y, z ) ->
+            setRotate ( Just a, y, z ) transform
+
+
+{-| Set the rotateY of the Transform.
+-}
+rotateY : Angle -> Modifier Transform
+rotateY a transform =
+    case transform.rotate of
+        ( x, y, z ) ->
+            setRotate ( x, Just a, z ) transform
+
+
+{-| Set the translateZ of the Transform.
+-}
+rotateZ : Angle -> Modifier Transform
+rotateZ a transform =
+    case transform.rotate of
+        ( x, y, z ) ->
+            setRotate ( x, y, Just a ) transform
+
+
+{-| Compiles a `Transform` record to the corresponding CSS tuple.
 Compiles only parts which are defined, ignoring `Nothing` fields.
 -}
 transformToCouples : Transform -> List ( String, String )
@@ -118,6 +151,17 @@ translateCoordinateToString ( coord, val ) =
             ]
 
 
+rotateCoordinateToString : ( String, Maybe Angle ) -> List String
+rotateCoordinateToString ( coord, val ) =
+    case val of
+        Nothing ->
+            []
+
+        Just val ->
+            [ "rotate" ++ coord ++ "(" ++ (angleToString val) ++ ")"
+            ]
+
+
 translateToStringList : Triplet (Maybe SizeUnit) -> List String
 translateToStringList ( maybeX, maybeY, maybeZ ) =
     [ ( "X", maybeX )
@@ -128,9 +172,20 @@ translateToStringList ( maybeX, maybeY, maybeZ ) =
             translateCoordinateToString
 
 
+rotateToStringList : Triplet (Maybe Angle) -> List String
+rotateToStringList ( maybeX, maybeY, maybeZ ) =
+    [ ( "X", maybeX )
+    , ( "Y", maybeY )
+    , ( "Z", maybeZ )
+    ]
+        |> List.concatMap
+            rotateCoordinateToString
+
+
 transformToString : Transform -> String
-transformToString { translate } =
-    ([ translateToStringList translate
+transformToString { translate, rotate } =
+    ([ rotateToStringList rotate
+     , translateToStringList translate
      ]
         |> List.concat
         |> String.join " "

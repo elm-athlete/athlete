@@ -43,9 +43,52 @@ type Auto
     = Auto
 
 
+{-| Represents an angle. Can be either radiant or degree.
+-}
+type Angle
+    = Rad Radiant
+    | Deg Degree
+
+
+{-| Represents a radiant.
+-}
+type alias Radiant =
+    Float
+
+
+{-| Represents a degree.
+-}
+type alias Degree =
+    Float
+
+
+{-| Generates an angle in radiant from Float.
+-}
+rad : Float -> Angle
+rad =
+    Rad
+
+
+{-| Generates an angle in degree from Float.
+-}
+degree : Float -> Angle
+degree =
+    Deg
+
+
 concatNumberWithString : number -> String -> String
 concatNumberWithString number str =
     (number |> toString) ++ str
+
+
+angleToString : Angle -> String
+angleToString angle =
+    case angle of
+        Rad a ->
+            concatNumberWithString a "rad"
+
+        Deg a ->
+            concatNumberWithString a "deg"
 
 
 sizeUnitToString : SizeUnit -> String

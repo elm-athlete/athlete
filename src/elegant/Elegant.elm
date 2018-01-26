@@ -15,6 +15,8 @@ module Elegant
         , pt
         , px
         , rem
+        , deg
+        , rad
         , screenWidthBetween
         , screenWidthGE
         , screenWidthLE
@@ -37,6 +39,8 @@ module Elegant
 @docs SizeUnit
 @docs Style
 @docs classes
+@docs deg
+@docs rad
 @docs color
 @docs em
 @docs emptyStyle
@@ -300,6 +304,18 @@ em =
 rem : Float -> SizeUnit
 rem =
     Rem
+
+
+{-| -}
+deg : Float -> Angle
+deg =
+    Deg
+
+
+{-| -}
+rad : Float -> Angle
+rad =
+    Rad
 
 
 {-| Calculate the opposite of a size unit value.
