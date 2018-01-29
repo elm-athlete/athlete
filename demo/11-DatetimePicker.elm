@@ -31,7 +31,7 @@ type Msg
 type alias Model =
     { maybeDrag : Maybe Drag
     , rotation : Float
-    , movement : Float
+    , speed : Float
     }
 
 
@@ -53,13 +53,13 @@ update msg model =
                 newRotation =
                     case model.maybeDrag of
                         Just drag ->
-                            xy.y - drag.current.y |> toFloat
+                            model.rotation - (xy.y - drag.current.y |> toFloat)
 
                         Nothing ->
                             model.rotation
             in
                 ( { model
-                    | rotation = model.rotation - newRotation
+                    | rotation = newRotation
                     , maybeDrag =
                         (Maybe.map
                             (\drag ->
@@ -78,22 +78,23 @@ update msg model =
                 newRotation =
                     case model.maybeDrag of
                         Just drag ->
-                            xy.y - drag.current.y |> toFloat
+                            model.rotation - (xy.y - drag.current.y |> toFloat)
 
                         Nothing ->
                             model.rotation
 
-                newMovement =
+                newSpeed =
                     case model.maybeDrag of
                         Just drag ->
                             xy.y - drag.current.y |> toFloat
 
                         Nothing ->
-                            model.movement
+                            model.speed
             in
                 ( { model
-                    | rotation = model.rotation - newRotation
+                    | rotation = newRotation
                     , maybeDrag = Nothing
+                    , speed = newSpeed
                   }
                 , Cmd.none
                 )
@@ -101,19 +102,19 @@ update msg model =
         Tick _ ->
             let
                 newRotation =
-                    model.rotation + model.movement
+                    model.rotation + model.speed
 
-                newMovement =
-                    if (model.movement < 0) then
-                        (model.movement + 1)
-                    else if (model.movement > 0) then
-                        (model.movement - 1)
+                newSpeed =
+                    if (model.speed < 0) then
+                        (model.speed + 1)
+                    else if (model.speed > 0) then
+                        (model.speed - 1)
                     else
                         0
             in
                 ( { model
                     | rotation = newRotation
-                    , movement = newMovement
+                    , speed = newSpeed
                   }
                 , Cmd.none
                 )
@@ -277,7 +278,7 @@ subscriptions model =
                 ]
 
             Nothing ->
-                if (model.movement /= 0) then
+                if (model.speed /= 0) then
                     [ Time.every (Time.millisecond * 17) Tick ]
                 else
                     []
