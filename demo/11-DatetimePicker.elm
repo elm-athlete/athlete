@@ -18,12 +18,105 @@ import Padding
 import Typography
 import Json.Decode as Decode
 import Mouse
+import Time
 
 
 type Msg
     = DragStart Mouse.Position
     | DragAt Mouse.Position
     | DragEnd Mouse.Position
+    | Tick Time.Time
+
+
+type alias Model =
+    { maybeDrag : Maybe Drag
+    , rotation : Float
+    , movement : Float
+    }
+
+
+type alias Drag =
+    { start : Mouse.Position
+    , current : Mouse.Position
+    , travelledDistance : Int
+    }
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        DragStart xy ->
+            ( { model | maybeDrag = Just (Drag xy xy 0) }, Cmd.none )
+
+        DragAt xy ->
+            let
+                newRotation =
+                    case model.maybeDrag of
+                        Just drag ->
+                            xy.y - drag.current.y |> toFloat
+
+                        Nothing ->
+                            model.rotation
+            in
+                ( { model
+                    | rotation = model.rotation - newRotation
+                    , maybeDrag =
+                        (Maybe.map
+                            (\drag ->
+                                Drag drag.start
+                                    xy
+                                    (drag.travelledDistance + 1)
+                            )
+                            model.maybeDrag
+                        )
+                  }
+                , Cmd.none
+                )
+
+        DragEnd xy ->
+            let
+                newRotation =
+                    case model.maybeDrag of
+                        Just drag ->
+                            xy.y - drag.current.y |> toFloat
+
+                        Nothing ->
+                            model.rotation
+
+                newMovement =
+                    case model.maybeDrag of
+                        Just drag ->
+                            xy.y - drag.current.y |> toFloat
+
+                        Nothing ->
+                            model.movement
+            in
+                ( { model
+                    | rotation = model.rotation - newRotation
+                    , maybeDrag = Nothing
+                  }
+                , Cmd.none
+                )
+
+        Tick _ ->
+            let
+                newRotation =
+                    model.rotation + model.movement
+
+                newMovement =
+                    if (model.movement < 0) then
+                        (model.movement + 1)
+                    else if (model.movement > 0) then
+                        (model.movement - 1)
+                    else
+                        0
+            in
+                ( { model
+                    | rotation = newRotation
+                    , movement = newMovement
+                  }
+                , Cmd.none
+                )
 
 
 alignedCellWithPurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( Flex.Align, Flex.JustifyContent ) -> List (Node msg) -> Builder.GridItem msg
@@ -109,8 +202,8 @@ rotatedDiv angle text height translationZ =
         [ Builder.text text ]
 
 
-carousel : List String -> Int -> List (Node msg)
-carousel list height =
+carousel : List String -> Int -> Float -> List (Node msg)
+carousel list height rotation =
     let
         length =
             List.length list - 1
@@ -120,6 +213,7 @@ carousel list height =
                 (rotatedDiv
                     (-((i |> toFloat) + ((length |> toFloat) / 2))
                         * (360 / (length |> toFloat))
+                        + (rotation / 2)
                     )
                 )
                     e
@@ -129,7 +223,7 @@ carousel list height =
             list
 
 
-view : a -> Node msg
+view : Model -> Node Msg
 view model =
     Builder.div
         [ Attributes.style
@@ -168,28 +262,33 @@ view model =
                 , "27 janvier 2017"
                 ]
                 116
+                model.rotation
             )
         ]
 
 
+subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        (case model.drag of
+        (case model.maybeDrag of
             Just drag ->
                 [ Mouse.moves DragAt
                 , Mouse.ups (DragEnd)
                 ]
 
             Nothing ->
-                []
+                if (model.movement /= 0) then
+                    [ Time.every (Time.millisecond * 17) Tick ]
+                else
+                    []
         )
 
 
-main : Program Basics.Never Model msg
+main : Program Basics.Never Model Msg
 main =
     Builder.program
-        { init = ( Nothing, Cmd.none )
-        , update = (\msg model -> ( model, Cmd.none ))
+        { init = ( Model Nothing 0 0, Cmd.none )
+        , update = update
         , subscriptions = subscriptions
         , view = view
         }
