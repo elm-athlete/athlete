@@ -9,6 +9,10 @@ module Transform
         , rotateX
         , rotateY
         , rotateZ
+        , backfaceVisibilityHidden
+        , backfaceVisibilityVisible
+        , preserve3d
+        , perspective
         )
 
 {-| Transform contains everything about css transformations : translate, rotate and scale.
@@ -31,6 +35,10 @@ module Transform
 @docs rotateX
 @docs rotateY
 @docs rotateZ
+@docs backfaceVisibilityHidden
+@docs backfaceVisibilityVisible
+@docs preserve3d
+@docs perspective
 
 # Compilation
 
@@ -61,9 +69,24 @@ can then use modifiers. I.E.
 type alias Transform =
     { translate : Triplet (Maybe SizeUnit)
     , rotate : Triplet (Maybe Angle)
+    , backfaceVisibility : Maybe BackfaceVisibility
+    , transformStyle : Maybe TransformStyle
+    , perspective : Maybe SizeUnit
 
     -- , scale : Triplet Scale
     }
+
+
+type TransformStyle
+    = Flat
+    | Preserve3d
+
+
+{-| Change the perspective of a scene
+-}
+perspective : SizeUnit -> Transform -> Transform
+perspective a transform =
+    { transform | perspective = Just a }
 
 
 {-| Generate an empty `Translate` record, with every field equal to Nothing.
@@ -71,7 +94,7 @@ You are free to use it as you wish, but it is instanciated automatically by `Box
 -}
 default : Transform
 default =
-    Transform ( Nothing, Nothing, Nothing ) ( Nothing, Nothing, Nothing )
+    Transform ( Nothing, Nothing, Nothing ) ( Nothing, Nothing, Nothing ) Nothing Nothing Nothing
 
 
 {-| Set the translateX of the Transform.
@@ -133,7 +156,11 @@ Compiles only parts which are defined, ignoring `Nothing` fields.
 -}
 transformToCouples : Transform -> List ( String, String )
 transformToCouples transform =
-    [ ( "transform", transformToString transform ) ]
+    [ ( "transform", transformToString transform )
+    ]
+        ++ unwrapToCouple .backfaceVisibility backfaceVisibilityToCouple transform
+        ++ unwrapToCouple .transformStyle transformStyleToCouple transform
+        ++ unwrapToCouple .perspective perspectiveToCouple transform
 
 
 
@@ -190,3 +217,64 @@ transformToString { translate, rotate } =
         |> List.concat
         |> String.join " "
     )
+
+
+type BackfaceVisibility
+    = BackfaceVisible
+    | BackfaceHidden
+
+
+{-| in a (css) 3d rendered scene, we hide back facing elements.
+-}
+backfaceVisibilityHidden : Transform -> Transform
+backfaceVisibilityHidden =
+    setBackfaceVisibility (Just BackfaceHidden)
+
+
+{-| in a (css) 3d rendered scene, we show back facing elements.
+-}
+backfaceVisibilityVisible : Transform -> Transform
+backfaceVisibilityVisible =
+    setBackfaceVisibility (Just BackfaceVisible)
+
+
+backfaceVisibilityToString : BackfaceVisibility -> String
+backfaceVisibilityToString val =
+    case val of
+        BackfaceVisible ->
+            "visible"
+
+        BackfaceHidden ->
+            "hidden"
+
+
+backfaceVisibilityToCouple : BackfaceVisibility -> ( String, String )
+backfaceVisibilityToCouple =
+    (,) "backface-visibility" << backfaceVisibilityToString
+
+
+{-| in a (css) 3d rendered scene, we hide back facing elements.
+-}
+preserve3d : Transform -> Transform
+preserve3d =
+    setTransformStyle (Just Preserve3d)
+
+
+transformStyleToString : TransformStyle -> String
+transformStyleToString val =
+    case val of
+        Preserve3d ->
+            "preserve-3d"
+
+        Flat ->
+            "flat"
+
+
+transformStyleToCouple : TransformStyle -> ( String, String )
+transformStyleToCouple =
+    (,) "transform-style" << transformStyleToString
+
+
+perspectiveToCouple : SizeUnit -> ( String, String )
+perspectiveToCouple =
+    (,) "perspective" << sizeUnitToString
