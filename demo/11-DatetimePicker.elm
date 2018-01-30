@@ -15,6 +15,7 @@ import Typography
 import Json.Decode as Decode
 import Mouse
 import Time
+import Constants
 
 
 type Msg
@@ -158,13 +159,22 @@ carousel list height rotation =
         length =
             List.length list
     in
-        Builder.div []
+        Builder.div
+            [ Attributes.style
+                [ Style.box
+                    [ Box.transform
+                        [ Transform.rotateX (deg (rotation / 2))
+                        , Transform.preserve3d
+                        , Transform.origin ( Constants.zero, px ((toFloat height) / 2 |> round), Constants.zero )
+                        ]
+                    ]
+                ]
+            ]
             (List.indexedMap
                 (\i e ->
                     (rotatedDiv
-                        (-((i |> toFloat) + ((length |> toFloat) / 2))
+                        (-(((i |> toFloat)) + ((length |> toFloat) / 2))
                             * (360 / (length |> toFloat))
-                            + (rotation / 2)
                         )
                     )
                         e

@@ -146,6 +146,11 @@ setTranslate v o =
     { o | translate = v }
 
 
+setOrigin : a -> { c | origin : b } -> { c | origin : a }
+setOrigin v o =
+    { o | origin = v }
+
+
 setRotate : a -> { c | rotate : b } -> { c | rotate : a }
 setRotate v o =
     { o | rotate = v }

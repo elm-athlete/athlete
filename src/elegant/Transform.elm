@@ -9,6 +9,7 @@ module Transform
         , rotateX
         , rotateY
         , rotateZ
+        , origin
         , backfaceVisibilityHidden
         , backfaceVisibilityVisible
         , preserve3d
@@ -35,6 +36,7 @@ module Transform
 @docs rotateX
 @docs rotateY
 @docs rotateZ
+@docs origin
 @docs backfaceVisibilityHidden
 @docs backfaceVisibilityVisible
 @docs preserve3d
@@ -69,6 +71,7 @@ can then use modifiers. I.E.
 type alias Transform =
     { translate : Triplet (Maybe SizeUnit)
     , rotate : Triplet (Maybe Angle)
+    , origin : Maybe (Triplet SizeUnit)
     , backfaceVisibility : Maybe BackfaceVisibility
     , transformStyle : Maybe TransformStyle
     , perspective : Maybe SizeUnit
@@ -94,7 +97,14 @@ You are free to use it as you wish, but it is instanciated automatically by `Box
 -}
 default : Transform
 default =
-    Transform ( Nothing, Nothing, Nothing ) ( Nothing, Nothing, Nothing ) Nothing Nothing Nothing
+    Transform ( Nothing, Nothing, Nothing ) ( Nothing, Nothing, Nothing ) Nothing Nothing Nothing Nothing
+
+
+{-| Set the origin of the Transform.
+-}
+origin : ( SizeUnit, SizeUnit, SizeUnit ) -> Modifier Transform
+origin coordinates =
+    setOrigin (Just coordinates)
 
 
 {-| Set the translateX of the Transform.
@@ -161,6 +171,7 @@ transformToCouples transform =
         ++ unwrapToCouple .backfaceVisibility backfaceVisibilityToCouple transform
         ++ unwrapToCouple .transformStyle transformStyleToCouple transform
         ++ unwrapToCouple .perspective perspectiveToCouple transform
+        ++ unwrapToCouple .origin originToCouple transform
 
 
 
@@ -278,3 +289,15 @@ transformStyleToCouple =
 perspectiveToCouple : SizeUnit -> ( String, String )
 perspectiveToCouple =
     (,) "perspective" << sizeUnitToString
+
+
+originToString : ( SizeUnit, SizeUnit, SizeUnit ) -> String
+originToString ( x, y, z ) =
+    [ x, y, z ]
+        |> List.map sizeUnitToString
+        |> String.join " "
+
+
+originToCouple : ( SizeUnit, SizeUnit, SizeUnit ) -> ( String, String )
+originToCouple =
+    (,) "transform-origin" << originToString
