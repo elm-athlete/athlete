@@ -14,81 +14,95 @@ import Padding
 import Typography
 import Json.Decode as Decode
 import Mouse
-import Time
 import Constants
 
 
 type Msg
-    = DragStart Mouse.Position
-    | DragAt Mouse.Position
-    | DragEnd Mouse.Position
+    = TouchStart Mouse.Position
+    | TouchAt Mouse.Position
+    | TouchEnd Mouse.Position
 
 
 type alias Model =
-    { maybeDrag :
-        Maybe
-            { start : Int
-            , current : Int
-            }
+    { maybeTouch : Maybe Touch
     , yPosition : Int
     }
 
 
-
--- { maybeDrag : Maybe Drag
--- , rotation : Float
--- , speed : Float
--- }
--- type alias Drag =
---     { start : Mouse.Position
---     , current : Mouse.Position
---     , travelledDistance : Int
---     }
+type alias Touch =
+    { yStart : Int
+    , yCurrent : Int
+    }
 
 
-updateCurrentY y maybeDrag =
-    case maybeDrag of
-        Nothing ->
-            Nothing
-
-        Just drag ->
-            Just { drag | current = y }
+initTouch : Int -> Touch
+initTouch y =
+    Touch y y
 
 
-getYPosition maybeDrag yPosition =
-    case maybeDrag of
+interpolateYPosition : Model -> Int
+interpolateYPosition { maybeTouch, yPosition } =
+    case maybeTouch of
         Nothing ->
             yPosition
 
-        Just drag ->
-            yPosition - (drag.current - drag.start)
+        Just touch ->
+            yPosition - (touch.yCurrent - touch.yStart)
 
 
-dragAt y model =
-    { model | maybeDrag = updateCurrentY y model.maybeDrag }
+updateMaybeTouch : a -> { c | maybeTouch : b } -> { c | maybeTouch : a }
+updateMaybeTouch b a =
+    { a | maybeTouch = b }
 
 
-dragEnd y model =
-    { model | maybeDrag = Nothing, yPosition = getYPosition model.maybeDrag model.yPosition }
+updateYPosition : a -> { c | yPosition : b } -> { c | yPosition : a }
+updateYPosition b a =
+    { a | yPosition = b }
+
+
+touchStart : Int -> Model -> Model
+touchStart y =
+    updateMaybeTouch (Just (initTouch y))
+
+
+updateCurrentY : Int -> Maybe Touch -> Maybe Touch
+updateCurrentY yCurrent maybeTouch =
+    case maybeTouch of
+        Nothing ->
+            Nothing
+
+        Just touch ->
+            Just { touch | yCurrent = yCurrent }
+
+
+touchMove : Int -> Model -> Model
+touchMove yCurrent model =
+    model
+        |> updateMaybeTouch (updateCurrentY yCurrent model.maybeTouch)
+
+
+touchEnd : Int -> Model -> Model
+touchEnd y model =
+    model
+        |> updateMaybeTouch Nothing
+        |> updateYPosition (interpolateYPosition model)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        DragStart { y } ->
-            ( { model | maybeDrag = Just { start = y, current = y } }, Cmd.none )
+        TouchStart { y } ->
+            ( model |> touchStart y, Cmd.none )
 
-        DragAt { y } ->
-            ( model |> dragAt y, Cmd.none )
+        TouchAt { y } ->
+            ( model |> touchMove y, Cmd.none )
 
-        DragEnd { y } ->
-            ( model |> dragEnd y, Cmd.none )
+        TouchEnd { y } ->
+            ( model |> touchEnd y, Cmd.none )
 
 
 rotatedDiv : Float -> String -> Int -> Elegant.SizeUnit -> Node msg
 rotatedDiv angle text height translationZ =
-    --   height: 116px;
-    --   line-height: 116px;
     Builder.div
         [ Attributes.style
             [ Style.blockProperties
@@ -119,10 +133,6 @@ rotatedDiv angle text height translationZ =
             ]
         ]
         [ Builder.text text ]
-
-
-rotation model =
-    model.yPosition
 
 
 carousel : List String -> Int -> Float -> Node msg
@@ -168,7 +178,7 @@ view model =
                     ]
                 ]
             ]
-        , Events.on "mousedown" (Decode.map DragStart Mouse.position)
+        , Events.on "mousedown" (Decode.map TouchStart Mouse.position)
         ]
         [ Builder.div
             [ Attributes.style
@@ -196,7 +206,7 @@ view model =
                 , "27 janvier 2017"
                 ]
                 116
-                (rotation model |> toFloat)
+                (interpolateYPosition model |> toFloat)
             ]
         ]
 
@@ -204,10 +214,10 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        (case model.maybeDrag of
-            Just drag ->
-                [ Mouse.moves DragAt
-                , Mouse.ups (DragEnd)
+        (case model.maybeTouch of
+            Just touch ->
+                [ Mouse.moves TouchAt
+                , Mouse.ups TouchEnd
                 ]
 
             Nothing ->
