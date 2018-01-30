@@ -29,9 +29,22 @@ prependUnderscore =
     (++) "_"
 
 
+replaceFloatDotByUnderscore : String -> String
+replaceFloatDotByUnderscore =
+    String.map
+        (\c ->
+            if c == '.' then
+                '_'
+            else
+                c
+        )
+
+
 cssValidName : String -> String
-cssValidName =
-    String.filter isValidInCssName
+cssValidName str =
+    str
+        |> replaceFloatDotByUnderscore
+        |> String.filter isValidInCssName
 
 
 surroundWith : String -> String -> String -> String
