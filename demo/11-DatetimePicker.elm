@@ -3,15 +3,11 @@ module DatetimePicker exposing (..)
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Events as Events
-import Color exposing (Color)
 import Elegant exposing (px, vh, percent, Style, deg)
 import Border
 import Style
-import Grid
-import Grid.Extra
 import Box
 import Block
-import Flex
 import Transform
 import Position
 import Padding
@@ -120,53 +116,6 @@ update msg model =
                 )
 
 
-alignedCellWithPurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( Flex.Align, Flex.JustifyContent ) -> List (Node msg) -> Builder.GridItem msg
-alignedCellWithPurpleBackground =
-    Grid.Extra.alignedCell [ Style.box [ Box.backgroundColor Color.purple ] ]
-
-
-example : Node msg
-example =
-    Builder.grid
-        [ Attributes.style
-            [ Style.block [ Block.height (vh 100) ]
-            , Style.gridContainerProperties
-                [ Grid.columns
-                    [ Grid.template
-                        [ Grid.simple (Grid.fractionOfAvailableSpace 1)
-                        , Grid.simple (Grid.fractionOfAvailableSpace 1)
-                        , Grid.simple (Grid.fractionOfAvailableSpace 1)
-                        ]
-                    , Grid.gap (px 30)
-                    , Grid.align Grid.stretch
-                    , Grid.alignItems (Grid.alignWrapper Grid.center)
-                    ]
-                , Grid.rows
-                    [ Grid.template
-                        [ Grid.simple (Grid.fractionOfAvailableSpace 1)
-                        , Grid.simple (Grid.fractionOfAvailableSpace 1)
-                        , Grid.simple (Grid.fractionOfAvailableSpace 1)
-                        ]
-                    , Grid.gap (px 30)
-                    , Grid.align Grid.stretch
-                    , Grid.alignItems (Grid.alignWrapper Grid.center)
-                    ]
-                ]
-            , Style.box [ Box.backgroundColor Color.lightPurple ]
-            ]
-        ]
-        [ alignedCellWithPurpleBackground ( 0, 0 ) ( 1, 1 ) ( Flex.flexEnd, Flex.justifyContentFlexStart ) [ content "bottom left" ]
-        , alignedCellWithPurpleBackground ( 2, 0 ) ( 1, 2 ) ( Flex.alignCenter, Flex.justifyContentCenter ) [ content "center" ]
-        , alignedCellWithPurpleBackground ( 1, 2 ) ( 2, 1 ) ( Flex.flexStart, Flex.justifyContentFlexEnd ) [ content "top right" ]
-        , alignedCellWithPurpleBackground ( 0, 1 ) ( 1, 2 ) ( Flex.alignCenter, Flex.justifyContentFlexEnd ) [ content "center right" ]
-        ]
-
-
-content : String -> Node msg
-content str =
-    Builder.div [ Attributes.style [ Style.box [ Box.backgroundColor Color.yellow, Box.paddingAll (px 24) ] ] ] [ Builder.text str ]
-
-
 rotatedDiv : Float -> String -> Int -> Elegant.SizeUnit -> Node msg
 rotatedDiv angle text height translationZ =
     --   height: 116px;
@@ -203,25 +152,27 @@ rotatedDiv angle text height translationZ =
         [ Builder.text text ]
 
 
-carousel : List String -> Int -> Float -> List (Node msg)
+carousel : List String -> Int -> Float -> Node msg
 carousel list height rotation =
     let
         length =
-            List.length list - 1
+            List.length list
     in
-        List.indexedMap
-            (\i e ->
-                (rotatedDiv
-                    (-((i |> toFloat) + ((length |> toFloat) / 2))
-                        * (360 / (length |> toFloat))
-                        + (rotation / 2)
+        Builder.div []
+            (List.indexedMap
+                (\i e ->
+                    (rotatedDiv
+                        (-((i |> toFloat) + ((length |> toFloat) / 2))
+                            * (360 / (length |> toFloat))
+                            + (rotation / 2)
+                        )
                     )
+                        e
+                        height
+                        (px (Basics.round (((height |> toFloat) / 2) / Basics.tan (Basics.pi / (length |> toFloat)))))
                 )
-                    e
-                    height
-                    (px (Basics.round (((height |> toFloat) / 2) / Basics.tan (Basics.pi / (length |> toFloat)))))
+                list
             )
-            list
 
 
 view : Model -> Node Msg
@@ -251,7 +202,7 @@ view model =
                     ]
                 ]
             ]
-            (carousel
+            [ carousel
                 [ "19 janvier 2017"
                 , "20 janvier 2017"
                 , "21 janvier 2017"
@@ -264,7 +215,7 @@ view model =
                 ]
                 116
                 model.rotation
-            )
+            ]
         ]
 
 
