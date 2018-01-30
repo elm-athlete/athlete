@@ -24,9 +24,19 @@ type Msg
 
 
 type alias Model =
-    { maybeTouch : Maybe Touch
+    { holdable : Holdable
     , yPosition : Int
+    , ySpeed : Int
     }
+
+
+type alias YSpeed =
+    Int
+
+
+type Holdable
+    = Hold Touch
+    | Release YSpeed
 
 
 type alias Touch =
@@ -41,18 +51,18 @@ initTouch y =
 
 
 interpolateYPosition : Model -> Int
-interpolateYPosition { maybeTouch, yPosition } =
-    case maybeTouch of
-        Nothing ->
-            yPosition
-
-        Just touch ->
+interpolateYPosition { holdable, yPosition } =
+    case holdable of
+        Hold touch ->
             yPosition - (touch.yCurrent - touch.yStart)
 
+        _ ->
+            yPosition
 
-updateMaybeTouch : a -> { c | maybeTouch : b } -> { c | maybeTouch : a }
-updateMaybeTouch b a =
-    { a | maybeTouch = b }
+
+updateHoldable : a -> { c | holdable : b } -> { c | holdable : a }
+updateHoldable b a =
+    { a | holdable = b }
 
 
 updateYPosition : a -> { c | yPosition : b } -> { c | yPosition : a }
@@ -62,29 +72,29 @@ updateYPosition b a =
 
 touchStart : Int -> Model -> Model
 touchStart =
-    updateMaybeTouch << Just << initTouch
+    updateHoldable << Hold << initTouch
 
 
-updateCurrentY : Int -> Maybe Touch -> Maybe Touch
-updateCurrentY yCurrent maybeTouch =
-    case maybeTouch of
-        Nothing ->
-            Nothing
+updateCurrentY : Int -> Holdable -> Holdable
+updateCurrentY yCurrent holdable =
+    case holdable of
+        Hold touch ->
+            Hold { touch | yCurrent = yCurrent }
 
-        Just touch ->
-            Just { touch | yCurrent = yCurrent }
+        _ ->
+            Hold (initTouch yCurrent)
 
 
 touchMove : Int -> Model -> Model
 touchMove yCurrent model =
     model
-        |> updateMaybeTouch (updateCurrentY yCurrent model.maybeTouch)
+        |> updateHoldable (updateCurrentY yCurrent model.holdable)
 
 
 touchEnd : Int -> Model -> Model
 touchEnd y model =
     model
-        |> updateMaybeTouch Nothing
+        |> updateHoldable (Release model.ySpeed)
         |> updateYPosition (interpolateYPosition model)
 
 
@@ -214,13 +224,13 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        (case model.maybeTouch of
-            Just touch ->
+        (case model.holdable of
+            Hold touch ->
                 [ Mouse.moves TouchAt
                 , Mouse.ups TouchEnd
                 ]
 
-            Nothing ->
+            Release speed ->
                 []
         )
 
@@ -228,7 +238,7 @@ subscriptions model =
 main : Program Basics.Never Model Msg
 main =
     Builder.program
-        { init = ( Model Nothing 0, Cmd.none )
+        { init = ( Model (Release 0) 0 0, Cmd.none )
         , update = update
         , subscriptions = subscriptions
         , view = view
