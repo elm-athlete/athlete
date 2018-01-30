@@ -61,8 +61,8 @@ updateYPosition b a =
 
 
 touchStart : Int -> Model -> Model
-touchStart y =
-    updateMaybeTouch (Just (initTouch y))
+touchStart =
+    updateMaybeTouch << Just << initTouch
 
 
 updateCurrentY : Int -> Maybe Touch -> Maybe Touch
@@ -143,28 +143,43 @@ carousel list height rotation =
     in
         Builder.div
             [ Attributes.style
-                [ Style.box
+                [ Style.blockProperties
+                    [ Block.width (px 300)
+                    , Block.height (px height)
+                    ]
+                , Style.box
                     [ Box.transform
-                        [ Transform.rotateX (deg (rotation / 2))
-                        , Transform.preserve3d
-                        , Transform.origin ( Constants.zero, px ((toFloat height) / 2 |> round), Constants.zero )
+                        [ Transform.preserve3d
+                        , Transform.perspective (px 1000)
                         ]
                     ]
                 ]
             ]
-            (List.indexedMap
-                (\i e ->
-                    (rotatedDiv
-                        (-(((i |> toFloat)) + ((length |> toFloat) / 2))
-                            * (360 / (length |> toFloat))
+            [ Builder.div
+                [ Attributes.style
+                    [ Style.box
+                        [ Box.transform
+                            [ Transform.rotateX (deg (rotation / 2))
+                            , Transform.preserve3d
+                            , Transform.origin ( Constants.zero, px ((toFloat height) / 2 |> round), Constants.zero )
+                            ]
+                        ]
+                    ]
+                ]
+                (List.indexedMap
+                    (\i e ->
+                        (rotatedDiv
+                            (-(((i |> toFloat)) + ((length |> toFloat) / 2))
+                                * (360 / (length |> toFloat))
+                            )
                         )
+                            e
+                            height
+                            (px (Basics.round (((height |> toFloat) / 2) / Basics.tan (Basics.pi / (length |> toFloat)))))
                     )
-                        e
-                        height
-                        (px (Basics.round (((height |> toFloat) / 2) / Basics.tan (Basics.pi / (length |> toFloat)))))
+                    list
                 )
-                list
-            )
+            ]
 
 
 view : Model -> Node Msg
@@ -180,34 +195,19 @@ view model =
             ]
         , Events.on "mousedown" (Decode.map TouchStart Mouse.position)
         ]
-        [ Builder.div
-            [ Attributes.style
-                [ Style.blockProperties
-                    [ Block.width (px 300)
-                    , Block.height (px 116)
-                    ]
-                , Style.box
-                    [ Box.transform
-                        [ Transform.preserve3d
-                        , Transform.perspective (px 1000)
-                        ]
-                    ]
-                ]
+        [ carousel
+            [ "19 janvier 2017"
+            , "20 janvier 2017"
+            , "21 janvier 2017"
+            , "22 janvier 2017"
+            , "23 janvier 2017"
+            , "24 janvier 2017"
+            , "25 janvier 2017"
+            , "26 janvier 2017"
+            , "27 janvier 2017"
             ]
-            [ carousel
-                [ "19 janvier 2017"
-                , "20 janvier 2017"
-                , "21 janvier 2017"
-                , "22 janvier 2017"
-                , "23 janvier 2017"
-                , "24 janvier 2017"
-                , "25 janvier 2017"
-                , "26 janvier 2017"
-                , "27 janvier 2017"
-                ]
-                116
-                (interpolateYPosition model |> toFloat)
-            ]
+            116
+            (interpolateYPosition model |> toFloat)
         ]
 
 
