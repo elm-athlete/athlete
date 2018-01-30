@@ -22,99 +22,67 @@ type Msg
     = DragStart Mouse.Position
     | DragAt Mouse.Position
     | DragEnd Mouse.Position
-    | Tick Time.Time
 
 
 type alias Model =
-    { maybeDrag : Maybe Drag
-    , rotation : Float
-    , speed : Float
+    { maybeDrag :
+        Maybe
+            { start : Int
+            , current : Int
+            }
+    , yPosition : Int
     }
 
 
-type alias Drag =
-    { start : Mouse.Position
-    , current : Mouse.Position
-    , travelledDistance : Int
-    }
+
+-- { maybeDrag : Maybe Drag
+-- , rotation : Float
+-- , speed : Float
+-- }
+-- type alias Drag =
+--     { start : Mouse.Position
+--     , current : Mouse.Position
+--     , travelledDistance : Int
+--     }
+
+
+updateCurrentY y maybeDrag =
+    case maybeDrag of
+        Nothing ->
+            Nothing
+
+        Just drag ->
+            Just { drag | current = y }
+
+
+getYPosition maybeDrag yPosition =
+    case maybeDrag of
+        Nothing ->
+            yPosition
+
+        Just drag ->
+            yPosition - (drag.current - drag.start)
+
+
+dragAt y model =
+    { model | maybeDrag = updateCurrentY y model.maybeDrag }
+
+
+dragEnd y model =
+    { model | maybeDrag = Nothing, yPosition = getYPosition model.maybeDrag model.yPosition }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        DragStart xy ->
-            ( { model | maybeDrag = Just (Drag xy xy 0) }, Cmd.none )
+        DragStart { y } ->
+            ( { model | maybeDrag = Just { start = y, current = y } }, Cmd.none )
 
-        DragAt xy ->
-            let
-                newRotation =
-                    case model.maybeDrag of
-                        Just drag ->
-                            model.rotation - (xy.y - drag.current.y |> toFloat)
+        DragAt { y } ->
+            ( model |> dragAt y, Cmd.none )
 
-                        Nothing ->
-                            model.rotation
-            in
-                ( { model
-                    | rotation = newRotation
-                    , maybeDrag =
-                        (Maybe.map
-                            (\drag ->
-                                Drag drag.start
-                                    xy
-                                    (drag.travelledDistance + 1)
-                            )
-                            model.maybeDrag
-                        )
-                  }
-                , Cmd.none
-                )
-
-        DragEnd xy ->
-            let
-                newRotation =
-                    case model.maybeDrag of
-                        Just drag ->
-                            model.rotation - (xy.y - drag.current.y |> toFloat)
-
-                        Nothing ->
-                            model.rotation
-
-                newSpeed =
-                    case model.maybeDrag of
-                        Just drag ->
-                            xy.y - drag.current.y |> toFloat
-
-                        Nothing ->
-                            model.speed
-            in
-                ( { model
-                    | rotation = newRotation
-                    , maybeDrag = Nothing
-                    , speed = newSpeed
-                  }
-                , Cmd.none
-                )
-
-        Tick _ ->
-            let
-                newRotation =
-                    model.rotation + model.speed
-
-                newSpeed =
-                    if (model.speed < 0) then
-                        (model.speed + 1)
-                    else if (model.speed > 0) then
-                        (model.speed - 1)
-                    else
-                        0
-            in
-                ( { model
-                    | rotation = newRotation
-                    , speed = newSpeed
-                  }
-                , Cmd.none
-                )
+        DragEnd { y } ->
+            ( model |> dragEnd y, Cmd.none )
 
 
 rotatedDiv : Float -> String -> Int -> Elegant.SizeUnit -> Node msg
@@ -151,6 +119,10 @@ rotatedDiv angle text height translationZ =
             ]
         ]
         [ Builder.text text ]
+
+
+rotation model =
+    model.yPosition
 
 
 carousel : List String -> Int -> Float -> Node msg
@@ -224,7 +196,7 @@ view model =
                 , "27 janvier 2017"
                 ]
                 116
-                model.rotation
+                (rotation model |> toFloat)
             ]
         ]
 
@@ -239,17 +211,14 @@ subscriptions model =
                 ]
 
             Nothing ->
-                if (model.speed /= 0) then
-                    [ Time.every (Time.millisecond * 17) Tick ]
-                else
-                    []
+                []
         )
 
 
 main : Program Basics.Never Model Msg
 main =
     Builder.program
-        { init = ( Model Nothing 0 0, Cmd.none )
+        { init = ( Model Nothing 0, Cmd.none )
         , update = update
         , subscriptions = subscriptions
         , view = view
