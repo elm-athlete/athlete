@@ -140,10 +140,11 @@ rotatedDiv angle text height translationZ =
                 , Box.typography
                     [ Typography.size (px 20)
                     , Typography.lineHeight (px height)
+                    , Typography.userSelect (False)
                     ]
                 , Box.border
                     [ Border.all
-                        [ Border.thickness (px 1)
+                        [ Border.thickness (px 3)
                         , Border.solid
                         ]
                     ]
