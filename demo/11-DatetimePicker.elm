@@ -22,19 +22,18 @@ import Time
 type Msg
     = TouchStart Mouse.Position
     | TouchAt Mouse.Position
-    | TouchEnd Mouse.Position
+    | TouchEnd Touch Mouse.Position
     | NewTime Time.Time
 
 
 type alias Model =
     { holdable : Holdable
     , yPosition : Int
-    , ySpeed : Int
     }
 
 
 type alias YSpeed =
-    Int
+    Float
 
 
 type Holdable
@@ -45,12 +44,13 @@ type Holdable
 type alias Touch =
     { yStart : Int
     , yCurrent : Int
+    , maybeLastTimes : Maybe ( Time.Time, Time.Time )
     }
 
 
 initTouch : Int -> Touch
 initTouch y =
-    Touch y y
+    Touch y y (Nothing)
 
 
 interpolateYPosition : Model -> Int
@@ -80,12 +80,14 @@ touchStart =
 
 updateCurrentY : Int -> Holdable -> Holdable
 updateCurrentY yCurrent holdable =
-    case holdable of
-        Hold touch ->
-            Hold { touch | yCurrent = yCurrent }
+    Hold
+        (case holdable of
+            Hold touch ->
+                { touch | yCurrent = yCurrent }
 
-        _ ->
-            Hold (initTouch yCurrent)
+            _ ->
+                (initTouch yCurrent)
+        )
 
 
 touchMove : Int -> Model -> Model
@@ -94,18 +96,46 @@ touchMove yCurrent model =
         |> updateHoldable (updateCurrentY yCurrent model.holdable)
 
 
-touchEnd : Int -> Model -> Model
-touchEnd y model =
+touchEnd : Touch -> Int -> Model -> Model
+touchEnd lastTouch y model =
+    let
+        ySpeed =
+            case lastTouch.maybeLastTimes of
+                Nothing ->
+                    0
+
+                Just ( oldTime, lastTime ) ->
+                    (toFloat (y - lastTouch.yCurrent)) / (lastTime - oldTime)
+    in
+        model
+            |> updateHoldable (Release ySpeed)
+            |> updateYPosition (interpolateYPosition model)
+
+
+changeSpeed : Time.Time -> YSpeed -> Model -> Model
+changeSpeed newTime ySpeed model =
+    { model | yPosition = model.yPosition - (round ySpeed) }
+        |> updateHoldable (Release (ySpeed * 0.99))
+
+
+createOrChangeLastTimes : Time.Time -> Touch -> Model -> Model
+createOrChangeLastTimes newTime touch model =
     model
-        |> updateHoldable (Release model.ySpeed)
-        |> updateYPosition (interpolateYPosition model)
+        |> updateHoldable
+            (Hold
+                { touch
+                    | maybeLastTimes =
+                        Just
+                            (case touch.maybeLastTimes of
+                                Nothing ->
+                                    ( newTime, newTime )
 
+                                Just ( oldTime, lastTime ) ->
+                                    ( lastTime, newTime )
+                            )
+                }
+            )
 
-changeSpeed : Time.Time -> Model -> Model
-changeSpeed newTime model =
-    {model | oldSpeed = model.speed}
-    {model | speed = {time = newTime, speed = }}
-    {model | oldYSpeed = ySpeed = newTime - model.}
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -116,11 +146,21 @@ update msg model =
         TouchAt { y } ->
             ( model |> touchMove y, Cmd.none )
 
-        TouchEnd { y } ->
-            ( model |> touchEnd y, Cmd.none )
+        TouchEnd touch { y } ->
+            ( model |> touchEnd touch y, Cmd.none )
 
         NewTime time ->
-            (model |> changeSpeed time, Cmd.none)
+            ( model
+                |> (case model.holdable of
+                        Hold touch ->
+                            createOrChangeLastTimes time touch
+
+                        Release ySpeed ->
+                            changeSpeed time ySpeed
+                   )
+            , Cmd.none
+            )
+
 
 rotatedDiv : Float -> String -> Int -> Elegant.SizeUnit -> Node msg
 rotatedDiv angle text height translationZ =
@@ -239,18 +279,23 @@ subscriptions model =
         (case model.holdable of
             Hold touch ->
                 [ Mouse.moves TouchAt
-                , Mouse.ups TouchEnd
+                , Mouse.ups (TouchEnd touch)
+                , AnimationFrame.times NewTime
                 ]
 
             Release speed ->
-                [  ]
-        ) ++ [AnimationFrame.times NewTime]
+                (if (speed /= 0) then
+                    [ AnimationFrame.times NewTime ]
+                 else
+                    []
+                )
+        )
 
 
 main : Program Basics.Never Model Msg
 main =
     Builder.program
-        { init = ( Model (Release 0) 0 0, Cmd.none )
+        { init = ( Model (Release 0) 0, Cmd.none )
         , update = update
         , subscriptions = subscriptions
         , view = view
