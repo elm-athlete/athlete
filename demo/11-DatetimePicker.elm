@@ -15,12 +15,15 @@ import Typography
 import Json.Decode as Decode
 import Mouse
 import Constants
+import AnimationFrame
+import Time
 
 
 type Msg
     = TouchStart Mouse.Position
     | TouchAt Mouse.Position
     | TouchEnd Mouse.Position
+    | NewTime Time.Time
 
 
 type alias Model =
@@ -98,6 +101,12 @@ touchEnd y model =
         |> updateYPosition (interpolateYPosition model)
 
 
+changeSpeed : Time.Time -> Model -> Model
+changeSpeed newTime model =
+    {model | oldSpeed = model.speed}
+    {model | speed = {time = newTime, speed = }}
+    {model | oldYSpeed = ySpeed = newTime - model.}
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -110,6 +119,8 @@ update msg model =
         TouchEnd { y } ->
             ( model |> touchEnd y, Cmd.none )
 
+        NewTime time ->
+            (model |> changeSpeed time, Cmd.none)
 
 rotatedDiv : Float -> String -> Int -> Elegant.SizeUnit -> Node msg
 rotatedDiv angle text height translationZ =
@@ -231,8 +242,8 @@ subscriptions model =
                 ]
 
             Release speed ->
-                []
-        )
+                [  ]
+        ) ++ [AnimationFrame.times NewTime]
 
 
 main : Program Basics.Never Model Msg
