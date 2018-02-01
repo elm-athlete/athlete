@@ -2,9 +2,7 @@ module DatetimePicker exposing (..)
 
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Events as Events
 import Elegant exposing (px, vh, percent, Style, deg)
-import Border
 import Style
 import Box
 import Block
@@ -12,19 +10,19 @@ import Transform
 import Position
 import Padding
 import Typography
-import Json.Decode as Decode
-import Mouse
 import Constants
 import AnimationFrame
 import Time
 import Task
 import List.Extra
+import SingleTouch
+import Touch as T
 
 
 type Msg
-    = TouchStart Mouse.Position
-    | TouchAt Touch Mouse.Position
-    | TouchEnd Touch Mouse.Position
+    = TouchStart T.Coordinates
+    | TouchAt Touch T.Coordinates
+    | TouchEnd Touch T.Coordinates
     | NewTime Time.Time
     | OnTime Touch Time.Time
 
@@ -56,7 +54,7 @@ getTime touch =
 
 type alias Model =
     { holdable : Holdable
-    , yPosition : Int
+    , yPosition : Float
     }
 
 
@@ -66,22 +64,22 @@ type alias YSpeed =
 
 type Holdable
     = Hold Touch
-    | Release YSpeed
+    | Release ( Time.Time, YSpeed )
 
 
 type alias Touch =
-    { yStart : Int
-    , yCurrent : Int
-    , lastYPositions : List ( Int, Time.Time )
+    { yStart : Float
+    , yCurrent : Float
+    , lastYPositions : List ( Float, Time.Time )
     }
 
 
-initTouch : Int -> Touch
+initTouch : Float -> Touch
 initTouch y =
     Touch y y []
 
 
-interpolateYPosition : Model -> Int
+interpolateYPosition : Model -> Float
 interpolateYPosition { holdable, yPosition } =
     case holdable of
         Hold touch ->
@@ -101,12 +99,12 @@ updateYPosition b a =
     { a | yPosition = b }
 
 
-touchStart : Int -> Model -> Model
+touchStart : Float -> Model -> Model
 touchStart =
     updateHoldable << Hold << initTouch
 
 
-updateCurrentY : Int -> Holdable -> Holdable
+updateCurrentY : Float -> Holdable -> Holdable
 updateCurrentY yCurrent holdable =
     Hold
         (case holdable of
@@ -118,7 +116,7 @@ updateCurrentY yCurrent holdable =
         )
 
 
-touchMove : Touch -> Int -> Model -> Model
+touchMove : Touch -> Float -> Model -> Model
 touchMove lastTouch yCurrent model =
     model
         |> updateHoldable (updateCurrentY yCurrent model.holdable)
@@ -128,25 +126,26 @@ touchMove lastTouch yCurrent model =
 -- |> updateTime Time.now
 
 
-touchEnd : Touch -> Int -> Model -> Model
+touchEnd : Touch -> Float -> Model -> Model
 touchEnd lastTouch y model =
     let
-        ySpeed =
+        timeAndSpeed =
             case lastTouch.lastYPositions of
                 [] ->
-                    0
+                    ( 0, 0 )
 
                 [ e ] ->
-                    0
+                    ( 0, 0 )
 
                 ( lastYPosition, lastTime ) :: l ->
-                    case (List.Extra.last l) of
+                    case List.Extra.last l of
                         Just ( oldYPosition, oldTime ) ->
-                            (toFloat (lastYPosition - oldYPosition)) / (lastTime - oldTime)
+                            ( lastTime, 2 * (lastYPosition - oldYPosition) / (lastTime - oldTime) )
 
                         Nothing ->
-                            0
+                            ( 0, 0 )
 
+        --
         -- (if (List.length touch.lastYPositions) <= 10 then
         --     newTime :: touch.lastYPositions
         --  else
@@ -159,14 +158,14 @@ touchEnd lastTouch y model =
         -- )
     in
         model
-            |> updateHoldable (Release ySpeed)
+            |> updateHoldable (Release timeAndSpeed)
             |> updateYPosition (interpolateYPosition model)
 
 
-changeSpeed : Time.Time -> YSpeed -> Model -> Model
-changeSpeed newTime ySpeed model =
-    { model | yPosition = model.yPosition - (round ySpeed) }
-        |> updateHoldable (Release (ySpeed * 0.99))
+applyAndChangeSpeed : Time.Time -> Time.Time -> YSpeed -> Model -> Model
+applyAndChangeSpeed lastTime newTime ySpeed model =
+    { model | yPosition = model.yPosition - (ySpeed * (newTime - lastTime)) }
+        |> updateHoldable (Release ( newTime, ySpeed * (0.99 ^ ((round (newTime - lastTime)) % 17 |> toFloat)) ))
 
 
 createOrChangeLastPositions : Time.Time -> Touch -> Model -> Model
@@ -175,18 +174,10 @@ createOrChangeLastPositions newTime touch model =
         |> updateHoldable
             (Hold
                 { touch
-                    | lastYPositions = addAndDropIfLimit 10 ( touch.yCurrent, newTime ) touch.lastYPositions
-
-                    -- (if (List.length touch.lastYPositions) <= 10 then
-                    --     newTime :: touch.lastYPositions
-                    --  else
-                    --     case (List.Extra.init touch.lastYPositions) of
-                    --         Just lastYPositionsPoped ->
-                    --             newTime :: lastYPositionsPoped
-                    --
-                    --         Nothing ->
-                    --             [ newTime ]
-                    -- )
+                    | lastYPositions =
+                        addAndDropIfLimit 5
+                            ( touch.yCurrent, newTime )
+                            touch.lastYPositions
                 }
             )
 
@@ -194,14 +185,14 @@ createOrChangeLastPositions newTime touch model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        TouchStart { y } ->
-            ( model |> touchStart y, Cmd.none )
+        TouchStart { clientY } ->
+            ( model |> touchStart clientY, Cmd.none )
 
-        TouchAt touch { y } ->
-            ( model |> touchMove touch y, getTime touch )
+        TouchAt touch { clientY } ->
+            ( model |> touchMove touch clientY, getTime touch )
 
-        TouchEnd touch { y } ->
-            ( model |> touchEnd touch y, getTime touch )
+        TouchEnd touch { clientY } ->
+            ( model |> touchEnd touch clientY, getTime touch )
 
         OnTime touch time ->
             ( model
@@ -209,8 +200,8 @@ update msg model =
                         Hold touch ->
                             createOrChangeLastPositions time touch
 
-                        Release ySpeed ->
-                            changeSpeed time ySpeed
+                        Release ( lastTime, ySpeed ) ->
+                            applyAndChangeSpeed lastTime time ySpeed
                    )
             , Cmd.none
             )
@@ -220,8 +211,8 @@ update msg model =
                 Hold touch ->
                     model
 
-                Release ySpeed ->
-                    changeSpeed time ySpeed model
+                Release ( lastTime, ySpeed ) ->
+                    applyAndChangeSpeed lastTime time ySpeed model
             , Cmd.none
             )
 
@@ -245,12 +236,6 @@ rotatedDiv angle text height translationZ =
                     [ Typography.size (px 20)
                     , Typography.lineHeight (px height)
                     , Typography.userSelect (False)
-                    ]
-                , Box.border
-                    [ Border.all
-                        [ Border.thickness (px 3)
-                        , Border.solid
-                        ]
                     ]
                 , Box.position <|
                     Position.absolute
@@ -311,7 +296,7 @@ carousel list height rotation =
 view : Model -> Node Msg
 view model =
     Builder.div
-        [ Attributes.style
+        ([ Attributes.style
             [ Style.box
                 [ Box.padding
                     [ Padding.left (px 200)
@@ -319,8 +304,18 @@ view model =
                     ]
                 ]
             ]
-        , Events.on "mousedown" (Decode.map TouchStart Mouse.position)
-        ]
+         , Attributes.rawAttribute <| SingleTouch.onStart TouchStart
+         ]
+            ++ (case model.holdable of
+                    Hold touch ->
+                        [ Attributes.rawAttribute <| SingleTouch.onMove (TouchAt touch)
+                        , Attributes.rawAttribute <| SingleTouch.onEnd (TouchEnd touch)
+                        ]
+
+                    Release ( timeTime, ySpeed ) ->
+                        []
+               )
+        )
         [ carousel
             [ "19 janvier 2017"
             , "20 janvier 2017"
@@ -333,7 +328,7 @@ view model =
             , "27 janvier 2017"
             ]
             116
-            (interpolateYPosition model |> toFloat)
+            (interpolateYPosition model)
         ]
 
 
@@ -342,23 +337,20 @@ subscriptions model =
     Sub.batch
         (case model.holdable of
             Hold touch ->
-                [ Mouse.moves (TouchAt touch)
-                , Mouse.ups (TouchEnd touch)
-                ]
+                []
 
-            Release speed ->
-                (if ((truncate speed) /= 0) then
+            Release ( time, speed ) ->
+                if (speed < -0.05 || speed > 0.05) then
                     [ AnimationFrame.times NewTime ]
-                 else
+                else
                     []
-                )
         )
 
 
 main : Program Basics.Never Model Msg
 main =
     Builder.program
-        { init = ( Model (Release 0) 0, Cmd.none )
+        { init = ( Model (Release ( 0, 0 )) 0, Cmd.none )
         , update = update
         , subscriptions = subscriptions
         , view = view

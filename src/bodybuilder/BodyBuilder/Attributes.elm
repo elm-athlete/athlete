@@ -6,6 +6,7 @@ module BodyBuilder.Attributes
         , StyleModifier
         , style
         , rawStyle
+        , rawAttribute
         , AutocompleteAttribute
         , WidthAttribute
         , HeightAttribute
@@ -152,6 +153,7 @@ It is not compatible with Html.Attributes, though.
 @docs StyleSelector, defaultStyleSelector
 @docs MediaQuery
 @docs StyleModifier, style, rawStyle
+@docs rawAttribute
 @docs AutocompleteAttribute, WidthAttribute
 @docs HeightAttribute
 @docs ValueAttribute
@@ -265,6 +267,12 @@ style styles =
 rawStyle : a -> { c | rawStyle : b } -> { c | rawStyle : Maybe a }
 rawStyle theStyle attrs =
     { attrs | rawStyle = Just theStyle }
+
+
+{-| -}
+rawAttribute : a -> { c | rawAttributes : List a } -> { c | rawAttributes : List a }
+rawAttribute theAttr attrs =
+    { attrs | rawAttributes = theAttr :: attrs.rawAttributes }
 
 
 {-| -}
@@ -429,6 +437,7 @@ type alias VisibleAttributesAndEvents msg a =
         , box : List ( Modifiers Box.Box, StyleSelector )
         , universal : UniversalAttributes
         , rawStyle : Maybe Elegant.Style
+        , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -454,6 +463,7 @@ type alias SelectAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     , onInputEvent : Maybe (String -> msg)
     , fromStringInput : String -> String
     }
@@ -478,6 +488,7 @@ type alias FlowAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -492,6 +503,7 @@ type alias NodeAttributes msg =
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -510,6 +522,7 @@ type alias FlexContainerAttributes msg =
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -528,6 +541,7 @@ type alias FlexItemAttributes msg =
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -546,6 +560,7 @@ type alias GridContainerAttributes msg =
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -564,6 +579,7 @@ type alias GridItemAttributes msg =
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -581,6 +597,7 @@ type alias BlockAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -600,6 +617,7 @@ type alias ButtonAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -615,6 +633,7 @@ type alias AAttributes msg =
     , target : Maybe String
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -632,6 +651,7 @@ type alias TextareaAttributes msg =
     , name : Maybe String
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -649,6 +669,7 @@ type alias ImgAttributes msg =
     , height : Maybe Int
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -663,6 +684,7 @@ type alias AudioAttributes msg =
     , src : String
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -676,6 +698,7 @@ type alias ProgressAttributes msg =
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -690,6 +713,7 @@ type alias ScriptAttributes msg =
     , src : String
     , data : List ( String, String )
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -714,6 +738,7 @@ type alias LabelAttributes msg =
     , position : Position
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -731,6 +756,7 @@ type alias InputRadioAttributes msg =
     , block : Maybe (List ( Modifiers Display.BlockDetails, StyleSelector ))
     , label : Maybe (Shared.Label msg)
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -750,6 +776,7 @@ type alias InputCheckboxAttributes msg =
     , checked : Bool
     , onCheckEvent : Maybe (Bool -> msg)
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -771,6 +798,7 @@ type alias InputTextAttributes msg =
     , fromStringInput : String -> String
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -793,6 +821,7 @@ type alias InputSubmitAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     }
 
 
@@ -813,6 +842,7 @@ type alias InputNumberAttributes msg =
     , onFocusEvent : Maybe msg
     , label : Maybe (Shared.Label msg)
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     , value : Maybe Int
     , onInputEvent : Maybe (Int -> msg)
     , fromStringInput : String -> Int
@@ -836,6 +866,7 @@ type alias InputColorAttributes msg =
     , onFocusEvent : Maybe msg
     , label : Maybe (Shared.Label msg)
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     , value : Maybe Color
     , onInputEvent : Maybe (Color -> msg)
     , fromStringInput : String -> Color
@@ -855,6 +886,7 @@ type alias InputFileAttributes msg =
     , onFocusEvent : Maybe msg
     , label : Maybe (Shared.Label msg)
     , rawStyle : Maybe Elegant.Style
+    , rawAttributes : List (Html.Attribute msg)
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     }
 
@@ -965,6 +997,7 @@ defaultFlowAttributes =
     , box = []
     , universal = defaultUniversalAttributes
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -979,6 +1012,7 @@ visibleAttributesToHtmlAttributes visibleAttributes =
     , unwrapEmptyList rawStyleToHtmlAttributes << .rawStyle
     ]
         |> List.concatMap (callOn visibleAttributes)
+        |> flip List.append visibleAttributes.rawAttributes
 
 
 {-| -}
@@ -1004,6 +1038,7 @@ defaultNodeAttributes =
     , universal = defaultUniversalAttributes
     , block = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1019,6 +1054,7 @@ defaultFlexContainerAttributes =
     , block = Nothing
     , flexContainerProperties = [ ( [], defaultStyleSelector ) ]
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1034,6 +1070,7 @@ defaultGridContainerAttributes =
     , block = Nothing
     , gridContainerProperties = [ ( [], defaultStyleSelector ) ]
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1048,6 +1085,7 @@ defaultHeadingAttributes =
     , universal = defaultUniversalAttributes
     , block = [ ( [], defaultStyleSelector ) ]
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1063,6 +1101,7 @@ defaultFlexItemAttributes =
     , universal = defaultUniversalAttributes
     , flexItemProperties = []
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1078,6 +1117,7 @@ defaultGridItemAttributes =
     , universal = defaultUniversalAttributes
     , gridItemProperties = []
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1141,6 +1181,7 @@ defaultButtonAttributes =
     , block = Nothing
     , universal = defaultUniversalAttributes
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1178,6 +1219,7 @@ defaultAAttributes =
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1212,6 +1254,7 @@ defaultTextareaAttributes =
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1253,6 +1296,7 @@ defaultImgAttributes alt src =
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1284,6 +1328,7 @@ defaultAudioAttributes =
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1304,6 +1349,7 @@ defaultProgressAttributes =
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1331,6 +1377,7 @@ defaultScriptAttributes =
     , onFocusEvent = Nothing
     , data = []
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1406,6 +1453,7 @@ defaultInputTextAttributes =
     , placeholder = Nothing
     , autocomplete = True
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1441,6 +1489,7 @@ defaultInputTelAttributes =
     , placeholder = Nothing
     , autocomplete = True
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1486,6 +1535,7 @@ defaultInputNumberAttributes =
     , step = Nothing
     , block = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     , disabled = False
     }
 
@@ -1520,6 +1570,7 @@ defaultInputColorAttributes =
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1554,6 +1605,7 @@ defaultInputCheckboxAttributes =
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1580,6 +1632,7 @@ defaultInputFileAttributes =
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1608,6 +1661,7 @@ defaultInputPasswordAttributes =
     , placeholder = Nothing
     , autocomplete = True
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1632,6 +1686,7 @@ defaultInputRadioAttributes =
     , onFocusEvent = Nothing
     , block = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1663,6 +1718,7 @@ defaultInputRangeAttributes =
     , step = Nothing
     , block = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     , disabled = False
     }
 
@@ -1688,6 +1744,7 @@ defaultInputSubmitAttributes =
     , onBlurEvent = Nothing
     , onFocusEvent = Nothing
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1721,6 +1778,7 @@ defaultInputUrlAttributes =
     , placeholder = Nothing
     , autocomplete = True
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
@@ -1744,6 +1802,7 @@ defaultSelectAttributes =
     , onInputEvent = Nothing
     , fromStringInput = identity
     , rawStyle = Nothing
+    , rawAttributes = []
     }
 
 
