@@ -17,13 +17,41 @@ import Mouse
 import Constants
 import AnimationFrame
 import Time
+import Task
+import List.Extra
 
 
 type Msg
     = TouchStart Mouse.Position
-    | TouchAt Mouse.Position
+    | TouchAt Touch Mouse.Position
     | TouchEnd Touch Mouse.Position
     | NewTime Time.Time
+    | OnTime Touch Time.Time
+
+
+addAndDropIfLimit : Int -> a -> List a -> List a
+addAndDropIfLimit limit e list =
+    addAndDropIfLimitCounter limit 1 list
+        |> (::) e
+
+
+addAndDropIfLimitCounter : Int -> Int -> List a -> List a
+addAndDropIfLimitCounter limit count list =
+    case list of
+        [] ->
+            []
+
+        x :: xs ->
+            if count >= limit then
+                []
+            else
+                addAndDropIfLimitCounter limit (count + 1) xs
+                    |> (::) x
+
+
+getTime : Touch -> Cmd Msg
+getTime touch =
+    Task.perform (OnTime touch) Time.now
 
 
 type alias Model =
@@ -44,13 +72,13 @@ type Holdable
 type alias Touch =
     { yStart : Int
     , yCurrent : Int
-    , maybeLastTimes : Maybe ( Time.Time, Time.Time )
+    , lastYPositions : List ( Int, Time.Time )
     }
 
 
 initTouch : Int -> Touch
 initTouch y =
-    Touch y y (Nothing)
+    Touch y y []
 
 
 interpolateYPosition : Model -> Int
@@ -90,22 +118,45 @@ updateCurrentY yCurrent holdable =
         )
 
 
-touchMove : Int -> Model -> Model
-touchMove yCurrent model =
+touchMove : Touch -> Int -> Model -> Model
+touchMove lastTouch yCurrent model =
     model
         |> updateHoldable (updateCurrentY yCurrent model.holdable)
+
+
+
+-- |> updateTime Time.now
 
 
 touchEnd : Touch -> Int -> Model -> Model
 touchEnd lastTouch y model =
     let
         ySpeed =
-            case lastTouch.maybeLastTimes of
-                Nothing ->
+            case lastTouch.lastYPositions of
+                [] ->
                     0
 
-                Just ( oldTime, lastTime ) ->
-                    (toFloat (y - lastTouch.yCurrent)) / (lastTime - oldTime)
+                [ e ] ->
+                    0
+
+                ( lastYPosition, lastTime ) :: l ->
+                    case (List.Extra.last l) of
+                        Just ( oldYPosition, oldTime ) ->
+                            (toFloat (lastYPosition - oldYPosition)) / (lastTime - oldTime)
+
+                        Nothing ->
+                            0
+
+        -- (if (List.length touch.lastYPositions) <= 10 then
+        --     newTime :: touch.lastYPositions
+        --  else
+        --     case (List.Extra.init touch.lastYPositions) of
+        --         Just lastYPositionsPoped ->
+        --             newTime :: lastYPositionsPoped
+        --
+        --         Nothing ->
+        --             [ newTime ]
+        -- )
     in
         model
             |> updateHoldable (Release ySpeed)
@@ -118,21 +169,24 @@ changeSpeed newTime ySpeed model =
         |> updateHoldable (Release (ySpeed * 0.99))
 
 
-createOrChangeLastTimes : Time.Time -> Touch -> Model -> Model
-createOrChangeLastTimes newTime touch model =
+createOrChangeLastPositions : Time.Time -> Touch -> Model -> Model
+createOrChangeLastPositions newTime touch model =
     model
         |> updateHoldable
             (Hold
                 { touch
-                    | maybeLastTimes =
-                        Just
-                            (case touch.maybeLastTimes of
-                                Nothing ->
-                                    ( newTime, newTime )
+                    | lastYPositions = addAndDropIfLimit 10 ( touch.yCurrent, newTime ) touch.lastYPositions
 
-                                Just ( oldTime, lastTime ) ->
-                                    ( lastTime, newTime )
-                            )
+                    -- (if (List.length touch.lastYPositions) <= 10 then
+                    --     newTime :: touch.lastYPositions
+                    --  else
+                    --     case (List.Extra.init touch.lastYPositions) of
+                    --         Just lastYPositionsPoped ->
+                    --             newTime :: lastYPositionsPoped
+                    --
+                    --         Nothing ->
+                    --             [ newTime ]
+                    -- )
                 }
             )
 
@@ -143,21 +197,31 @@ update msg model =
         TouchStart { y } ->
             ( model |> touchStart y, Cmd.none )
 
-        TouchAt { y } ->
-            ( model |> touchMove y, Cmd.none )
+        TouchAt touch { y } ->
+            ( model |> touchMove touch y, getTime touch )
 
         TouchEnd touch { y } ->
-            ( model |> touchEnd touch y, Cmd.none )
+            ( model |> touchEnd touch y, getTime touch )
 
-        NewTime time ->
+        OnTime touch time ->
             ( model
                 |> (case model.holdable of
                         Hold touch ->
-                            createOrChangeLastTimes time touch
+                            createOrChangeLastPositions time touch
 
                         Release ySpeed ->
                             changeSpeed time ySpeed
                    )
+            , Cmd.none
+            )
+
+        NewTime time ->
+            ( case model.holdable of
+                Hold touch ->
+                    model
+
+                Release ySpeed ->
+                    changeSpeed time ySpeed model
             , Cmd.none
             )
 
@@ -278,13 +342,12 @@ subscriptions model =
     Sub.batch
         (case model.holdable of
             Hold touch ->
-                [ Mouse.moves TouchAt
+                [ Mouse.moves (TouchAt touch)
                 , Mouse.ups (TouchEnd touch)
-                , AnimationFrame.times NewTime
                 ]
 
             Release speed ->
-                (if (speed /= 0) then
+                (if ((truncate speed) /= 0) then
                     [ AnimationFrame.times NewTime ]
                  else
                     []
