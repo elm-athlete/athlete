@@ -83,20 +83,25 @@ type HoldState
 
 
 type alias TouchHistory =
-    { startPosition : Float
-    , lastPositions : BoundedList ( Float, Time )
+    { lastPositions : BoundedList ( Float, Time )
+    , startPosition : Float
     }
 
 
-getLastPosition : TouchHistory -> Maybe ( Float, Time )
-getLastPosition history =
-    history.lastPositions
+interpolatePositionHelper : TouchHistory -> Float -> Float
+interpolatePositionHelper history position =
+    history
+        |> .lastPositions
         |> BoundedList.head
+        |> Maybe.map Tuple.first
+        |> Maybe.map (flip (-) history.startPosition)
+        |> Maybe.map ((-) position)
+        |> Maybe.withDefault position
 
 
 initTouchHistory : Float -> TouchHistory
-initTouchHistory position =
-    TouchHistory position (BoundedList.new 5)
+initTouchHistory =
+    TouchHistory (BoundedList.new 5)
 
 
 subscriptions : Model -> Sub Msg
@@ -113,16 +118,11 @@ subscriptions model =
                     []
 
 
-interpolateYPosition : Model -> Float
-interpolateYPosition { holdState, position } =
+interpolatePosition : Model -> Float
+interpolatePosition { holdState, position } =
     case holdState of
         Held history ->
-            history
-                |> getLastPosition
-                |> Maybe.map Tuple.first
-                |> Maybe.map (flip (-) history.startPosition)
-                |> Maybe.map ((-) position)
-                |> Maybe.withDefault position
+            interpolatePositionHelper history position
 
         Released _ ->
             position
@@ -236,7 +236,7 @@ touchEnd lastTouch y model =
         |> getTimeAndSpeed
         |> Released
         |> setHoldStateIn model
-        |> setPosition (interpolateYPosition model)
+        |> setPosition (interpolatePosition model)
 
 
 main : Program Basics.Never Model Msg
@@ -383,5 +383,5 @@ view model =
             , "27 janvier 2017"
             ]
             116
-            (interpolateYPosition model)
+            (interpolatePosition model)
         ]
