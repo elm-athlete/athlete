@@ -2,7 +2,6 @@ module DatetimePicker exposing (..)
 
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Events as Events
 import Elegant exposing (px, vh, percent, Style, deg)
 import Style
 import Box
@@ -17,8 +16,18 @@ import Time exposing (Time)
 import Task
 import List.Extra
 import SingleTouch
-import Mouse
 import Touch exposing (Coordinates)
+import BoundedList exposing (BoundedList)
+
+
+updateIdentity : a -> ( a, Cmd msg )
+updateIdentity model =
+    model ! []
+
+
+addCmds : List (Cmd msg) -> b -> ( b, Cmd msg )
+addCmds cmds model =
+    model ! cmds
 
 
 setHoldState : a -> { c | holdState : b } -> { c | holdState : a }
@@ -36,17 +45,26 @@ setPosition b a =
     { a | position = b }
 
 
-setCurrentY : a -> { c | yCurrent : b } -> { c | yCurrent : a }
-setCurrentY b a =
-    { a | yCurrent = b }
+setLastPositions : a -> { c | lastPositions : b } -> { c | lastPositions : a }
+setLastPositions b a =
+    { a | lastPositions = b }
+
+
+setLastPositionsIn : { c | lastPositions : b } -> a -> { c | lastPositions : a }
+setLastPositionsIn =
+    flip setLastPositions
 
 
 type Msg
+    = UpdateTouch TouchAction
+    | HappensAt Float Time
+    | NewTime Time
+
+
+type TouchAction
     = TouchStart Coordinates
     | TouchAt Coordinates
     | TouchEnd TouchHistory Coordinates
-    | OnTime Time
-    | NewTime Time
 
 
 type alias Model =
@@ -65,15 +83,20 @@ type HoldState
 
 
 type alias TouchHistory =
-    { yStart : Float
-    , yCurrent : Float
-    , lastPositions : List ( Float, Time )
+    { startPosition : Float
+    , lastPositions : BoundedList ( Float, Time )
     }
 
 
-initTouch : Float -> TouchHistory
-initTouch y =
-    TouchHistory y y []
+getLastPosition : TouchHistory -> Maybe ( Float, Time )
+getLastPosition history =
+    history.lastPositions
+        |> BoundedList.head
+
+
+initTouchHistory : Float -> TouchHistory
+initTouchHistory position =
+    TouchHistory position (BoundedList.new 5)
 
 
 subscriptions : Model -> Sub Msg
@@ -90,54 +113,22 @@ subscriptions model =
                     []
 
 
-addAndDropIfLimit : Int -> a -> List a -> List a
-addAndDropIfLimit limit e list =
-    list
-        |> addAndDropIfLimitCounter limit 1
-        |> (::) e
-
-
-addAndDropIfLimitCounter : Int -> Int -> List a -> List a
-addAndDropIfLimitCounter limit count list =
-    case list of
-        [] ->
-            []
-
-        hd :: tl ->
-            if count >= limit then
-                []
-            else
-                tl
-                    |> addAndDropIfLimitCounter limit (count + 1)
-                    |> (::) hd
-
-
-getTime : Cmd Msg
-getTime =
-    Task.perform OnTime Time.now
-
-
 interpolateYPosition : Model -> Float
 interpolateYPosition { holdState, position } =
     case holdState of
-        Held touch ->
-            position - (touch.yCurrent - touch.yStart)
+        Held history ->
+            history
+                |> getLastPosition
+                |> Maybe.map Tuple.first
+                |> Maybe.map (flip (-) history.startPosition)
+                |> Maybe.map ((-) position)
+                |> Maybe.withDefault position
 
-        _ ->
+        Released _ ->
             position
 
 
-updateCurrentPositionIn : HoldState -> Float -> HoldState
-updateCurrentPositionIn holdable yCurrent =
-    Held <|
-        case holdable of
-            Held touch ->
-                touch |> setCurrentY yCurrent
-
-            _ ->
-                initTouch yCurrent
-
-
+getTimeAndSpeed : List ( Float, Float ) -> ( Float, Float )
 getTimeAndSpeed lastPositions =
     case lastPositions of
         [] ->
@@ -179,41 +170,30 @@ applyAndChangeSpeed lastTime newTime ySpeed model =
             )
 
 
-createOrChangeLastPositions : Time.Time -> TouchHistory -> Model -> Model
-createOrChangeLastPositions newTime touch model =
-    model
-        |> setHoldState
-            (Held
-                { touch
-                    | lastPositions =
-                        addAndDropIfLimit 5
-                            ( touch.yCurrent, newTime )
-                            touch.lastPositions
-                }
-            )
+addInHistory : Float -> Time -> TouchHistory -> TouchHistory
+addInHistory position currentTime history =
+    history
+        |> .lastPositions
+        |> BoundedList.insert ( position, currentTime )
+        |> setLastPositionsIn history
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        TouchStart { clientY } ->
-            ( model |> touchStart clientY, Cmd.none )
+        UpdateTouch action ->
+            updateTouchAction action model
 
-        TouchAt { clientY } ->
-            ( model |> touchMove clientY, getTime )
+        HappensAt position currentTime ->
+            ( case model.holdState of
+                Held history ->
+                    history
+                        |> addInHistory position currentTime
+                        |> Held
+                        |> setHoldStateIn model
 
-        TouchEnd touch { clientY } ->
-            ( model |> touchEnd touch clientY, getTime )
-
-        OnTime time ->
-            ( model
-                |> (case model.holdState of
-                        Held touch ->
-                            createOrChangeLastPositions time touch
-
-                        Released ( lastTime, ySpeed ) ->
-                            applyAndChangeSpeed lastTime time ySpeed
-                   )
+                Released ( lastTime, ySpeed ) ->
+                    applyAndChangeSpeed lastTime currentTime ySpeed model
             , Cmd.none
             )
 
@@ -228,23 +208,31 @@ update msg model =
             )
 
 
-touchStart : Float -> Model -> Model
-touchStart =
-    initTouch
-        >> Held
-        >> setHoldState
+updateTouchAction : TouchAction -> Model -> ( Model, Cmd Msg )
+updateTouchAction msg =
+    case msg of
+        TouchStart { clientY } ->
+            setHoldState
+                (Held (initTouchHistory clientY))
+                >> happensAt clientY
+
+        TouchAt { clientY } ->
+            happensAt clientY
+
+        TouchEnd touch { clientY } ->
+            touchEnd touch clientY
+                >> happensAt clientY
 
 
-touchMove : Float -> Model -> Model
-touchMove currentPosition ({ holdState } as model) =
-    currentPosition
-        |> updateCurrentPositionIn holdState
-        |> setHoldStateIn model
+happensAt : Float -> Model -> ( Model, Cmd Msg )
+happensAt position =
+    addCmds [ Task.perform (HappensAt position) Time.now ]
 
 
 touchEnd : TouchHistory -> Float -> Model -> Model
 touchEnd lastTouch y model =
     lastTouch.lastPositions
+        |> BoundedList.content
         |> getTimeAndSpeed
         |> Released
         |> setHoldStateIn model
@@ -371,12 +359,12 @@ view model =
                     ]
                 ]
             ]
-         , Attributes.rawAttribute <| SingleTouch.onStart TouchStart
+         , Attributes.rawAttribute <| SingleTouch.onStart (UpdateTouch << TouchStart)
          ]
             ++ (case model.holdState of
                     Held touch ->
-                        [ Attributes.rawAttribute <| SingleTouch.onMove TouchAt
-                        , Attributes.rawAttribute <| SingleTouch.onEnd (TouchEnd touch)
+                        [ Attributes.rawAttribute <| SingleTouch.onMove (UpdateTouch << TouchAt)
+                        , Attributes.rawAttribute <| SingleTouch.onEnd (UpdateTouch << TouchEnd touch)
                         ]
 
                     Released ( timeTime, ySpeed ) ->
