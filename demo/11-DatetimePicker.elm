@@ -45,6 +45,11 @@ setPosition b a =
     { a | position = b }
 
 
+setPositionIn : { c | position : b } -> a -> { c | position : a }
+setPositionIn =
+    flip setPosition
+
+
 setLastPositions : a -> { c | lastPositions : b } -> { c | lastPositions : a }
 setLastPositions b a =
     { a | lastPositions = b }
@@ -55,20 +60,31 @@ setLastPositionsIn =
     flip setLastPositions
 
 
+setTouchesHistory : a -> { c | touchesHistory : b } -> { c | touchesHistory : a }
+setTouchesHistory b a =
+    { a | touchesHistory = b }
+
+
+setTouchesHistoryIn : { c | touchesHistory : b } -> a -> { c | touchesHistory : a }
+setTouchesHistoryIn =
+    flip setTouchesHistory
+
+
 type Msg
-    = UpdateTouch TouchAction
-    | HappensAt Float Time
+    = RecordingTouches RecordingTouchesMsg
+    | RecordsAt Float Time
     | NewTime Time
 
 
-type TouchAction
-    = TouchStart Coordinates
-    | TouchAt Coordinates
-    | TouchEnd TouchHistory Coordinates
+type RecordingTouchesMsg
+    = StartRecordingTouches Coordinates
+    | RecordTouch Coordinates
+    | StopRecordingTouches Coordinates
 
 
 type alias Model =
     { holdState : HoldState
+    , touchesHistory : TouchesHistory
     , position : Float
     }
 
@@ -78,37 +94,50 @@ type alias Speed =
 
 
 type HoldState
-    = Held TouchHistory
+    = Held
     | Released ( Time, Speed )
 
 
-type alias TouchHistory =
+type alias TouchesHistory =
     { lastPositions : BoundedList ( Float, Time )
     , startPosition : Float
     }
 
 
-interpolatePositionHelper : TouchHistory -> Float -> Float
-interpolatePositionHelper history position =
-    history
-        |> .lastPositions
-        |> BoundedList.head
-        |> Maybe.map Tuple.first
-        |> Maybe.map (flip (-) history.startPosition)
-        |> Maybe.map ((-) position)
-        |> Maybe.withDefault position
+initTouchesHistory : Float -> TouchesHistory
+initTouchesHistory =
+    TouchesHistory (BoundedList.new 5)
 
 
-initTouchHistory : Float -> TouchHistory
-initTouchHistory =
-    TouchHistory (BoundedList.new 5)
+reinitTouchesHistory : Float -> Model -> Model
+reinitTouchesHistory =
+    setTouchesHistory << initTouchesHistory
+
+
+main : Program Basics.Never Model Msg
+main =
+    Builder.program
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
+
+
+init : ( Model, Cmd Msg )
+init =
+    { holdState = Released ( 0, 0 )
+    , touchesHistory = initTouchesHistory 0
+    , position = 0
+    }
+        ! []
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch <|
         case model.holdState of
-            Held touch ->
+            Held ->
                 []
 
             Released ( _, speed ) ->
@@ -118,17 +147,43 @@ subscriptions model =
                     []
 
 
+updatePosition : Model -> Model
+updatePosition model =
+    model
+        |> interpolatePosition
+        |> setPositionIn model
+
+
 interpolatePosition : Model -> Float
-interpolatePosition { holdState, position } =
+interpolatePosition { holdState, touchesHistory, position } =
     case holdState of
-        Held history ->
-            interpolatePositionHelper history position
+        Held ->
+            interpolatePositionHelper touchesHistory position
 
         Released _ ->
             position
 
 
-getTimeAndSpeed : List ( Float, Float ) -> ( Float, Float )
+interpolatePositionHelper : TouchesHistory -> Float -> Float
+interpolatePositionHelper history position =
+    history.lastPositions
+        |> BoundedList.head
+        |> Maybe.map Tuple.first
+        |> Maybe.map (flip (-) history.startPosition)
+        |> Maybe.map ((-) position)
+        |> Maybe.withDefault position
+
+
+computeSpeed : Model -> Model
+computeSpeed ({ touchesHistory } as model) =
+    touchesHistory.lastPositions
+        |> BoundedList.content
+        |> getTimeAndSpeed
+        |> Released
+        |> setHoldStateIn model
+
+
+getTimeAndSpeed : List ( Float, Time ) -> ( Float, Float )
 getTimeAndSpeed lastPositions =
     case lastPositions of
         [] ->
@@ -137,13 +192,13 @@ getTimeAndSpeed lastPositions =
         [ e ] ->
             ( 0, 0 )
 
-        ( lastYPosition, lastTime ) :: l ->
+        ( lastPosition, lastTime ) :: l ->
             case List.Extra.last l of
-                Just ( oldYPosition, oldTime ) ->
+                Just ( firstPosition, firstTime ) ->
                     ( lastTime
                     , 2
-                        * (lastYPosition - oldYPosition)
-                        / (lastTime - oldTime)
+                        * (lastPosition - firstPosition)
+                        / (lastTime - firstTime)
                     )
 
                 Nothing ->
@@ -170,83 +225,71 @@ applyAndChangeSpeed lastTime newTime ySpeed model =
             )
 
 
-addInHistory : Float -> Time -> TouchHistory -> TouchHistory
+addInHistory : Float -> Time -> TouchesHistory -> TouchesHistory
 addInHistory position currentTime history =
-    history
-        |> .lastPositions
+    history.lastPositions
         |> BoundedList.insert ( position, currentTime )
         |> setLastPositionsIn history
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg ({ touchesHistory, holdState } as model) =
     case msg of
-        UpdateTouch action ->
-            updateTouchAction action model
+        RecordingTouches action ->
+            updateRecordingAction action model
 
-        HappensAt position currentTime ->
-            ( case model.holdState of
-                Held history ->
-                    history
-                        |> addInHistory position currentTime
-                        |> Held
-                        |> setHoldStateIn model
+        RecordsAt position currentTime ->
+            touchesHistory
+                |> addInHistory position currentTime
+                |> setTouchesHistoryIn model
+                |> (case model.holdState of
+                        Held ->
+                            identity
 
-                Released ( lastTime, ySpeed ) ->
-                    applyAndChangeSpeed lastTime currentTime ySpeed model
-            , Cmd.none
-            )
+                        Released ( lastTime, ySpeed ) ->
+                            computeSpeed
+                                >> updatePosition
+                                >> applyAndChangeSpeed lastTime currentTime ySpeed
+                   )
+                |> updateIdentity
 
         NewTime time ->
-            ( case model.holdState of
-                Held touch ->
-                    model
+            updateIdentity <|
+                case model.holdState of
+                    Held ->
+                        model
 
-                Released ( lastTime, ySpeed ) ->
-                    applyAndChangeSpeed lastTime time ySpeed model
-            , Cmd.none
-            )
+                    Released ( lastTime, ySpeed ) ->
+                        applyAndChangeSpeed lastTime time ySpeed model
 
 
-updateTouchAction : TouchAction -> Model -> ( Model, Cmd Msg )
-updateTouchAction msg =
+updateRecordingAction : RecordingTouchesMsg -> Model -> ( Model, Cmd Msg )
+updateRecordingAction msg =
     case msg of
-        TouchStart { clientY } ->
-            setHoldState
-                (Held (initTouchHistory clientY))
-                >> happensAt clientY
+        StartRecordingTouches { clientY } ->
+            reinitTouchesHistory clientY >> recordsAt clientY
 
-        TouchAt { clientY } ->
-            happensAt clientY
+        RecordTouch { clientY } ->
+            recordsAt clientY
 
-        TouchEnd touch { clientY } ->
-            touchEnd touch clientY
-                >> happensAt clientY
+        StopRecordingTouches { clientY } ->
+            stopRecordTouches >> recordsAt clientY
 
 
-happensAt : Float -> Model -> ( Model, Cmd Msg )
-happensAt position =
-    addCmds [ Task.perform (HappensAt position) Time.now ]
+recordsAt : Float -> Model -> ( Model, Cmd Msg )
+recordsAt position =
+    addCmds [ Task.perform (RecordsAt position) Time.now ]
 
 
-touchEnd : TouchHistory -> Float -> Model -> Model
-touchEnd lastTouch y model =
-    lastTouch.lastPositions
-        |> BoundedList.content
-        |> getTimeAndSpeed
-        |> Released
-        |> setHoldStateIn model
-        |> setPosition (interpolatePosition model)
+stopRecordTouches : Model -> Model
+stopRecordTouches ({ touchesHistory, holdState } as model) =
+    case holdState of
+        Held ->
+            Released ( 0, 0 )
+                |> setHoldStateIn model
 
-
-main : Program Basics.Never Model Msg
-main =
-    Builder.program
-        { init = Model (Released ( 0, 0 )) 0 ! []
-        , update = update
-        , subscriptions = subscriptions
-        , view = view
-        }
+        Released _ ->
+            model
 
 
 
@@ -359,12 +402,12 @@ view model =
                     ]
                 ]
             ]
-         , Attributes.rawAttribute <| SingleTouch.onStart (UpdateTouch << TouchStart)
+         , Attributes.rawAttribute <| SingleTouch.onStart (RecordingTouches << StartRecordingTouches)
          ]
             ++ (case model.holdState of
-                    Held touch ->
-                        [ Attributes.rawAttribute <| SingleTouch.onMove (UpdateTouch << TouchAt)
-                        , Attributes.rawAttribute <| SingleTouch.onEnd (UpdateTouch << TouchEnd touch)
+                    Held ->
+                        [ Attributes.rawAttribute <| SingleTouch.onMove (RecordingTouches << RecordTouch)
+                        , Attributes.rawAttribute <| SingleTouch.onEnd (RecordingTouches << StopRecordingTouches)
                         ]
 
                     Released ( timeTime, ySpeed ) ->
