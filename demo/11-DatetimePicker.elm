@@ -35,6 +35,11 @@ setHoldState b a =
     { a | holdState = b }
 
 
+setHeld : { c | holdState : b } -> { c | holdState : HoldState }
+setHeld =
+    setHoldState Held
+
+
 setHoldStateIn : { c | holdState : b } -> a -> { c | holdState : a }
 setHoldStateIn =
     flip setHoldState
@@ -267,7 +272,7 @@ updateRecordingAction : RecordingTouchesMsg -> Model -> ( Model, Cmd Msg )
 updateRecordingAction msg =
     case msg of
         StartRecordingTouches { clientY } ->
-            reinitTouchesHistory clientY >> recordsAt clientY
+            reinitTouchesHistory clientY >> setHeld >> recordsAt clientY
 
         RecordTouch { clientY } ->
             recordsAt clientY
