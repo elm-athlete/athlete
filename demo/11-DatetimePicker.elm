@@ -98,13 +98,17 @@ type alias Speed =
     Float
 
 
+type alias Position =
+    Float
+
+
 type HoldState
     = Held
     | Released ( Time, Speed )
 
 
 type alias TouchesHistory =
-    { lastPositions : BoundedList ( Float, Time )
+    { lastPositions : BoundedList ( Position, Time )
     , startPosition : Float
     }
 
@@ -179,35 +183,25 @@ interpolatePositionHelper history position =
         |> Maybe.withDefault position
 
 
-computeSpeed : Model -> Model
-computeSpeed ({ touchesHistory } as model) =
+updateSpeedAndTime : Model -> Model
+updateSpeedAndTime ({ touchesHistory } as model) =
     touchesHistory.lastPositions
         |> BoundedList.content
-        |> getTimeAndSpeed
+        |> computeSpeedAndTime
         |> Released
         |> setHoldStateIn model
 
 
-getTimeAndSpeed : List ( Float, Time ) -> ( Float, Float )
-getTimeAndSpeed lastPositions =
+computeSpeedAndTime : List ( Float, Time ) -> ( Time, Speed )
+computeSpeedAndTime lastPositions =
     case lastPositions of
-        [] ->
+        ( lastPosition, lastTime ) :: l :: [ ( firstPosition, firstTime ) ] ->
+            ( lastTime
+            , 2 * (lastPosition - firstPosition) / (lastTime - firstTime)
+            )
+
+        _ ->
             ( 0, 0 )
-
-        [ e ] ->
-            ( 0, 0 )
-
-        ( lastPosition, lastTime ) :: l ->
-            case List.Extra.last l of
-                Just ( firstPosition, firstTime ) ->
-                    ( lastTime
-                    , 2
-                        * (lastPosition - firstPosition)
-                        / (lastTime - firstTime)
-                    )
-
-                Nothing ->
-                    ( 0, 0 )
 
 
 applyAndChangeSpeed : Time.Time -> Time.Time -> Speed -> Model -> Model
@@ -252,7 +246,7 @@ update msg ({ touchesHistory, holdState } as model) =
                             identity
 
                         Released ( lastTime, ySpeed ) ->
-                            computeSpeed
+                            updateSpeedAndTime
                                 >> updatePosition
                                 >> applyAndChangeSpeed lastTime currentTime ySpeed
                    )
