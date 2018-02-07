@@ -17,7 +17,7 @@ BodyBuilder provides an abstract, type-safe way to write web applications! It ab
 
 Elegant and BodyBuilder take another approach: while Elm CSS provides nice way to write CSS directly in Elm to add it into your project, Elegant removes entirely CSS! The whole package uses inline styling for everything, while maintaining a `VirtualCss` handling all dirty CSS details for you. Just focus on your needs, write your application, write your styles and you're done! Elegant takes care of the styles for you! By abstracting HTML, BodyBuilder allows you to focus on your application, without having to worry on all the HTML details.
 
-Looking for demos? You can find [examples in the repo](https://github.com/elm-bodybuilder/elegant/demo) and [working versions on the project site](https://elm-bodybuilder.github.io/elegant)!
+Looking for demos? You can find [examples in the repo](https://github.com/elm-bodybuilder/elegant/tree/master/demo) and [working versions on the project site](https://elm-bodybuilder.github.io/elegant)!
 
 If you are looking for an abstraction over CSS, look at [`rtfeldman/elm-css`](http://package.elm-lang.org/packages/rtfeldman/elm-css/latest). This is exactly what you are looking for.
 
