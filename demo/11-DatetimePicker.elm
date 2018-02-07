@@ -142,7 +142,6 @@ init =
         ! []
 
 
-insignificantSpeed : Speed -> Bool
 insignificantSpeed speed =
     abs speed < 0.05
 
@@ -156,9 +155,9 @@ subscriptions model =
 
             Released ( _, speed ) ->
                 if insignificantSpeed speed then
-                    [ AnimationFrame.times NewTime ]
-                else
                     []
+                else
+                    [ AnimationFrame.times NewTime ]
 
 
 updatePosition : Model -> Model
