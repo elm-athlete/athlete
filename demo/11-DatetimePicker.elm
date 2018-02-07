@@ -97,7 +97,7 @@ type RecordingTouchesMsg
 
 type HoldState
     = Held
-    | Released ( Time, Speed )
+    | Released (Maybe ( Time, Speed ))
 
 
 type alias TouchesHistory =
@@ -115,7 +115,7 @@ type alias Model =
 
 initTouchesHistory : Float -> TouchesHistory
 initTouchesHistory =
-    TouchesHistory (BoundedList.new 5)
+    TouchesHistory (BoundedList.new 20)
 
 
 reinitTouchesHistory : Float -> Model -> Model
@@ -135,15 +135,16 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    { holdState = Released ( 0, 0 )
+    { holdState = Released Nothing
     , touchesHistory = initTouchesHistory 0
     , position = 0
     }
         ! []
 
 
+insignificantSpeed : Speed -> Bool
 insignificantSpeed speed =
-    abs speed < 0.05
+    abs speed < 0.000005
 
 
 subscriptions : Model -> Sub Msg
@@ -153,11 +154,14 @@ subscriptions model =
             Held ->
                 []
 
-            Released ( _, speed ) ->
+            Released (Just ( _, speed )) ->
                 if insignificantSpeed speed then
                     []
                 else
                     [ AnimationFrame.times NewTime ]
+
+            Released Nothing ->
+                []
 
 
 updatePosition : Model -> Model
@@ -171,6 +175,9 @@ interpolatePosition : Model -> Float
 interpolatePosition { holdState, touchesHistory, position } =
     case holdState of
         Held ->
+            interpolatePositionHelper touchesHistory position
+
+        Released Nothing ->
             interpolatePositionHelper touchesHistory position
 
         Released _ ->
@@ -192,22 +199,36 @@ updateTimeAndSpeed ({ touchesHistory } as model) =
     touchesHistory.lastPositions
         |> BoundedList.content
         |> computeTimeAndSpeed
+        |> Just
         |> Released
         |> setHoldStateIn model
+
+
+relevantTimeFrame : Float
+relevantTimeFrame =
+    0.2
+
+
+relevantPositions : Time -> List ( Time, Position ) -> List ( Time, Position )
+relevantPositions lastTime =
+    List.filter (\( time, _ ) -> (lastTime - time |> Time.inSeconds) < relevantTimeFrame)
 
 
 computeTimeAndSpeed : List ( Time, Position ) -> ( Time, Speed )
 computeTimeAndSpeed lastPositions =
     case lastPositions of
         ( lastTime, lastPosition ) :: queue ->
-            case List.Extra.last queue of
+            case List.Extra.last (lastPositions |> relevantPositions lastTime) of
                 Nothing ->
                     ( 0, 0 )
 
                 Just ( firstTime, firstPosition ) ->
-                    ( lastTime
-                    , 2 * (lastPosition - firstPosition) / (lastTime - firstTime)
-                    )
+                    if lastTime == firstTime then
+                        ( 0, 0 )
+                    else
+                        ( lastTime
+                        , 2 * (lastPosition - firstPosition) / (lastTime - firstTime)
+                        )
 
         _ ->
             ( 0, 0 )
@@ -221,14 +242,16 @@ applyAndChangeSpeed lastTime newTime ySpeed model =
     }
         |> setHoldState
             (Released
-                ( newTime
-                , ySpeed
-                    * (0.99
-                        ^ ((round (newTime - lastTime))
-                            % 17
-                            |> toFloat
+                (Just
+                    ( newTime
+                    , ySpeed
+                        * (0.99
+                            ^ ((round (newTime - lastTime))
+                                % 17
+                                |> toFloat
+                              )
                           )
-                      )
+                    )
                 )
             )
 
@@ -255,8 +278,8 @@ update msg ({ touchesHistory, holdState } as model) =
                             identity
 
                         Released _ ->
-                            updateTimeAndSpeed
-                                >> updatePosition
+                            updatePosition
+                                >> updateTimeAndSpeed
                    )
                 |> updateIdentity
 
@@ -266,8 +289,11 @@ update msg ({ touchesHistory, holdState } as model) =
                     Held ->
                         model
 
-                    Released ( lastTime, ySpeed ) ->
+                    Released (Just ( lastTime, ySpeed )) ->
                         applyAndChangeSpeed lastTime time ySpeed model
+
+                    Released _ ->
+                        model
 
 
 updateRecordingAction : RecordingTouchesMsg -> Model -> ( Model, Cmd Msg )
@@ -292,7 +318,7 @@ stopRecordTouches : Model -> Model
 stopRecordTouches ({ touchesHistory, holdState } as model) =
     case holdState of
         Held ->
-            Released ( 0, 0 )
+            Released Nothing
                 |> setHoldStateIn model
 
         Released _ ->
@@ -417,7 +443,7 @@ view model =
                         , Attributes.rawAttribute <| SingleTouch.onEnd (RecordingTouches << StopRecordingTouches)
                         ]
 
-                    Released ( timeTime, ySpeed ) ->
+                    Released _ ->
                         []
                )
         )
