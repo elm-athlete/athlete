@@ -86,7 +86,7 @@ type alias Position =
 type Msg
     = RecordingTouches RecordingTouchesMsg
     | RecordsAt Position Time
-    | NewTime Time
+    | UpdateViewAt Time
 
 
 type RecordingTouchesMsg
@@ -158,7 +158,7 @@ subscriptions model =
                 if insignificantSpeed speed then
                     []
                 else
-                    [ AnimationFrame.times NewTime ]
+                    [ AnimationFrame.times UpdateViewAt ]
 
             Released Nothing ->
                 []
@@ -234,26 +234,18 @@ computeTimeAndSpeed lastPositions =
             ( 0, 0 )
 
 
-applyAndChangeSpeed : Time.Time -> Time.Time -> Speed -> Model -> Model
-applyAndChangeSpeed lastTime newTime ySpeed model =
-    { model
-        | position =
-            model.position - (ySpeed * (newTime - lastTime))
-    }
+computeNewSpeed : Speed -> Time -> Time -> Speed
+computeNewSpeed speed currentTime lastTime =
+    speed * (0.99 ^ ((round (currentTime - lastTime)) % 17 |> toFloat))
+
+
+applyAndChangeSpeed : Time -> Time -> Speed -> Model -> Model
+applyAndChangeSpeed lastTime currentTime speed ({ position } as model) =
+    position
+        - (speed * (currentTime - lastTime))
+        |> setPositionIn model
         |> setHoldState
-            (Released
-                (Just
-                    ( newTime
-                    , ySpeed
-                        * (0.99
-                            ^ ((round (newTime - lastTime))
-                                % 17
-                                |> toFloat
-                              )
-                          )
-                    )
-                )
-            )
+            (Released <| Just ( currentTime, computeNewSpeed speed currentTime lastTime ))
 
 
 addInHistory : Float -> Time -> TouchesHistory -> TouchesHistory
@@ -273,7 +265,7 @@ update msg ({ touchesHistory, holdState } as model) =
             touchesHistory
                 |> addInHistory position currentTime
                 |> setTouchesHistoryIn model
-                |> (case model.holdState of
+                |> (case holdState of
                         Held ->
                             identity
 
@@ -283,14 +275,14 @@ update msg ({ touchesHistory, holdState } as model) =
                    )
                 |> updateIdentity
 
-        NewTime time ->
+        UpdateViewAt currentTime ->
             updateIdentity <|
-                case model.holdState of
+                case holdState of
                     Held ->
                         model
 
-                    Released (Just ( lastTime, ySpeed )) ->
-                        applyAndChangeSpeed lastTime time ySpeed model
+                    Released (Just ( lastTime, speed )) ->
+                        applyAndChangeSpeed lastTime currentTime speed model
 
                     Released _ ->
                         model
@@ -358,70 +350,67 @@ rotatedDiv angle text height translationZ =
         [ Builder.text text ]
 
 
+reelAngle : Float -> Float -> Float
+reelAngle i l =
+    ((l / 2) - i) * 360 / l
+
+
+reelFrame : Int -> Int -> Int -> String -> Node msg
+reelFrame length height index content =
+    let
+        l =
+            length |> toFloat
+
+        h =
+            height |> toFloat
+
+        i =
+            index |> toFloat
+    in
+        rotatedDiv
+            (reelAngle i l)
+            content
+            height
+            (px
+                (Basics.round
+                    (h / (2 * Basics.tan (Basics.pi / l)))
+                )
+            )
+
+
 carousel : List String -> Int -> Float -> Node msg
 carousel list height rotation =
-    let
-        length =
-            List.length list
-    in
-        Builder.div
+    Builder.div
+        [ Attributes.style
+            [ Style.blockProperties
+                [ Block.width (px 300)
+                , Block.height (px height)
+                ]
+            , Style.box
+                [ Box.transform
+                    [ Transform.preserve3d
+                    , Transform.perspective (px 1000)
+                    ]
+                ]
+            ]
+        ]
+        [ Builder.div
             [ Attributes.style
-                [ Style.blockProperties
-                    [ Block.width (px 300)
-                    , Block.height (px height)
-                    ]
-                , Style.box
+                [ Style.box
                     [ Box.transform
-                        [ Transform.preserve3d
-                        , Transform.perspective (px 1000)
+                        [ Transform.rotateX (deg (rotation / 2))
+                        , Transform.preserve3d
+                        , Transform.origin
+                            ( Constants.zero
+                            , px ((toFloat height) / 2 |> round)
+                            , Constants.zero
+                            )
                         ]
                     ]
                 ]
             ]
-            [ Builder.div
-                [ Attributes.style
-                    [ Style.box
-                        [ Box.transform
-                            [ Transform.rotateX (deg (rotation / 2))
-                            , Transform.preserve3d
-                            , Transform.origin
-                                ( Constants.zero
-                                , px
-                                    ((toFloat height)
-                                        / 2
-                                        |> round
-                                    )
-                                , Constants.zero
-                                )
-                            ]
-                        ]
-                    ]
-                ]
-                (List.indexedMap
-                    (\i e ->
-                        (rotatedDiv
-                            (-(((i |> toFloat)) + ((length |> toFloat) / 2))
-                                * (360 / (length |> toFloat))
-                            )
-                        )
-                            e
-                            height
-                            (px
-                                (Basics.round
-                                    (((height |> toFloat)
-                                        / 2
-                                     )
-                                        / Basics.tan
-                                            (Basics.pi
-                                                / (length |> toFloat)
-                                            )
-                                    )
-                                )
-                            )
-                    )
-                    list
-                )
-            ]
+            (List.indexedMap (reelFrame (List.length list) height) list)
+        ]
 
 
 view : Model -> Node Msg
