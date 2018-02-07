@@ -75,9 +75,17 @@ setTouchesHistoryIn =
     flip setTouchesHistory
 
 
+type alias Speed =
+    Float
+
+
+type alias Position =
+    Float
+
+
 type Msg
     = RecordingTouches RecordingTouchesMsg
-    | RecordsAt Float Time
+    | RecordsAt Position Time
     | NewTime Time
 
 
@@ -87,29 +95,21 @@ type RecordingTouchesMsg
     | StopRecordingTouches Coordinates
 
 
-type alias Model =
-    { holdState : HoldState
-    , touchesHistory : TouchesHistory
-    , position : Float
-    }
-
-
-type alias Speed =
-    Float
-
-
-type alias Position =
-    Float
-
-
 type HoldState
     = Held
     | Released ( Time, Speed )
 
 
 type alias TouchesHistory =
-    { lastPositions : BoundedList ( Position, Time )
-    , startPosition : Float
+    { lastPositions : BoundedList ( Time, Position )
+    , startPosition : Position
+    }
+
+
+type alias Model =
+    { holdState : HoldState
+    , touchesHistory : TouchesHistory
+    , position : Position
     }
 
 
@@ -142,6 +142,11 @@ init =
         ! []
 
 
+insignificantSpeed : Speed -> Bool
+insignificantSpeed speed =
+    abs speed < 0.05
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch <|
@@ -150,7 +155,7 @@ subscriptions model =
                 []
 
             Released ( _, speed ) ->
-                if (speed < -0.05 || speed > 0.05) then
+                if insignificantSpeed speed then
                     [ AnimationFrame.times NewTime ]
                 else
                     []
@@ -177,28 +182,33 @@ interpolatePositionHelper : TouchesHistory -> Float -> Float
 interpolatePositionHelper history position =
     history.lastPositions
         |> BoundedList.head
-        |> Maybe.map Tuple.first
+        |> Maybe.map Tuple.second
         |> Maybe.map (flip (-) history.startPosition)
         |> Maybe.map ((-) position)
         |> Maybe.withDefault position
 
 
-updateSpeedAndTime : Model -> Model
-updateSpeedAndTime ({ touchesHistory } as model) =
+updateTimeAndSpeed : Model -> Model
+updateTimeAndSpeed ({ touchesHistory } as model) =
     touchesHistory.lastPositions
         |> BoundedList.content
-        |> computeSpeedAndTime
+        |> computeTimeAndSpeed
         |> Released
         |> setHoldStateIn model
 
 
-computeSpeedAndTime : List ( Float, Time ) -> ( Time, Speed )
-computeSpeedAndTime lastPositions =
+computeTimeAndSpeed : List ( Time, Position ) -> ( Time, Speed )
+computeTimeAndSpeed lastPositions =
     case lastPositions of
-        ( lastPosition, lastTime ) :: l :: [ ( firstPosition, firstTime ) ] ->
-            ( lastTime
-            , 2 * (lastPosition - firstPosition) / (lastTime - firstTime)
-            )
+        ( lastTime, lastPosition ) :: queue ->
+            case List.Extra.last queue of
+                Nothing ->
+                    ( 0, 0 )
+
+                Just ( firstTime, firstPosition ) ->
+                    ( lastTime
+                    , 2 * (lastPosition - firstPosition) / (lastTime - firstTime)
+                    )
 
         _ ->
             ( 0, 0 )
@@ -227,7 +237,7 @@ applyAndChangeSpeed lastTime newTime ySpeed model =
 addInHistory : Float -> Time -> TouchesHistory -> TouchesHistory
 addInHistory position currentTime history =
     history.lastPositions
-        |> BoundedList.insert ( position, currentTime )
+        |> BoundedList.insert ( currentTime, position )
         |> setLastPositionsIn history
 
 
@@ -245,10 +255,9 @@ update msg ({ touchesHistory, holdState } as model) =
                         Held ->
                             identity
 
-                        Released ( lastTime, ySpeed ) ->
-                            updateSpeedAndTime
+                        Released _ ->
+                            updateTimeAndSpeed
                                 >> updatePosition
-                                >> applyAndChangeSpeed lastTime currentTime ySpeed
                    )
                 |> updateIdentity
 
