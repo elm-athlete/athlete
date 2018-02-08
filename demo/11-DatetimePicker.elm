@@ -110,6 +110,7 @@ type alias Model =
     { holdState : HoldState
     , touchesHistory : TouchesHistory
     , position : ( Int, Position )
+    , selections : List String
     }
 
 
@@ -138,6 +139,33 @@ init =
     { holdState = Released Nothing
     , touchesHistory = initTouchesHistory 0
     , position = ( 0, 0 )
+    , selections =
+        [ "19 janvier 2017"
+        , "20 janvier 2017"
+        , "21 janvier 2017"
+        , "22 janvier 2017"
+        , "23 janvier 2017"
+        , "24 janvier 2017"
+        , "25 janvier 2017"
+        , "26 janvier 2017"
+        , "27 janvier 2017"
+        , "28 janvier 2017"
+        , "29 janvier 2017"
+        , "30 janvier 2017"
+        , "31 janvier 2017"
+        , "20 février 2017"
+        , "21 février 2017"
+        , "22 février 2017"
+        , "23 février 2017"
+        , "24 février 2017"
+        , "25 février 2017"
+        , "26 février 2017"
+        , "27 février 2017"
+        , "28 février 2017"
+        , "29 février 2017"
+        , "30 février 2017"
+        , "31 février 2017"
+        ]
     }
         ! []
 
@@ -186,7 +214,7 @@ toPartialRotation position =
 
 
 interpolatePosition : Model -> ( Int, Position )
-interpolatePosition { holdState, touchesHistory, position } =
+interpolatePosition { holdState, touchesHistory, position, selections } =
     let
         rotation =
             toCompleteRotation position
@@ -201,12 +229,14 @@ interpolatePosition { holdState, touchesHistory, position } =
 
                 Released _ ->
                     rotation
+
+        maxValue =
+            (toFloat <| List.length selections) * 37.2
     in
         if value <= 0 then
             toPartialRotation 0
-        else if value >= 930 then
-            -- TODO That's ugly, please fix
-            toPartialRotation 930
+        else if value >= maxValue then
+            toPartialRotation maxValue
         else
             toPartialRotation value
 
@@ -267,11 +297,11 @@ computeNewSpeed speed currentTime lastTime =
 
 
 applyAndChangeSpeed : Time -> Time -> Speed -> Model -> Model
-applyAndChangeSpeed lastTime currentTime speed ({ position } as model) =
+applyAndChangeSpeed lastTime currentTime speed ({ position, selections } as model) =
     position
         |> toCompleteRotation
         |> flip (-) (speed * (currentTime - lastTime))
-        |> clamp 0 930 -- TODO please fix
+        |> clamp 0 ((toFloat <| List.length selections) * 37.2)
         |> toPartialRotation
         |> setPositionIn model
         |> setHoldState
@@ -382,7 +412,6 @@ rotatedDiv angle text height translationZ =
 
 reelAngle : Float -> Float -> Float
 reelAngle i l =
-    -- ((l / 2) - i) * 360 / l
     -i * 360 / 15
 
 
@@ -409,26 +438,42 @@ reelFrame length height ( index, content ) =
             )
 
 
-selectVisibleItems : ( Int, Position ) -> List ( Int, String ) -> List ( Int, String )
-selectVisibleItems position list =
-    -- TODO Maybe we could do something better
-    let
-        completeRotation =
-            toCompleteRotation position
-    in
-        list
-            |> List.drop (round completeRotation // 80)
-            |> List.take
-                (if completeRotation < 240 then
-                    12
-                 else
-                    15
-                )
-            |> (if completeRotation < 240 then
-                    flip List.append [ ( 12, "" ), ( 13, "" ), ( 14, "" ) ]
-                else
-                    identity
-               )
+selectVisibleItems : Position -> List ( Int, String ) -> List ( Int, String )
+selectVisibleItems completeRotation =
+    List.drop (round completeRotation // 80)
+        >> List.take (chooseHowManyVisibleItems completeRotation)
+        >> addWhiteSpaces
+
+
+chooseHowManyVisibleItems : Position -> Int
+chooseHowManyVisibleItems completeRotation =
+    if completeRotation < 240 then
+        12
+    else
+        15
+
+
+addWhiteSpaces : List ( Int, String ) -> List ( Int, String )
+addWhiteSpaces list =
+    List.range 0 14
+        |> List.map (fillAbsentEntries list)
+        |> List.foldl removeUselessEntries ( True, [] )
+        |> Tuple.second
+
+
+removeUselessEntries : ( Int, String ) -> ( Bool, List ( Int, String ) ) -> ( Bool, List ( Int, String ) )
+removeUselessEntries ( index, content ) ( keeping, accumulator ) =
+    if (content /= "" && keeping) || index < 3 then
+        ( True, ( index, content ) :: accumulator )
+    else
+        ( False, ( index, "" ) :: accumulator )
+
+
+fillAbsentEntries : List ( Int, String ) -> Int -> ( Int, String )
+fillAbsentEntries list element =
+    list
+        |> List.Extra.find (Tuple.first >> (==) element)
+        |> Maybe.withDefault ( element, "" )
 
 
 carousel : List String -> Int -> ( Int, Position ) -> Node msg
@@ -437,7 +482,7 @@ carousel list height (( wheelRound, rotation ) as position) =
         list2 =
             list
                 |> associateIndexes
-                |> selectVisibleItems position
+                |> selectVisibleItems (toCompleteRotation position)
     in
         Builder.div
             [ Attributes.style
@@ -489,32 +534,7 @@ view model =
          ]
         )
         [ carousel
-            [ "19 janvier 2017"
-            , "20 janvier 2017"
-            , "21 janvier 2017"
-            , "22 janvier 2017"
-            , "23 janvier 2017"
-            , "24 janvier 2017"
-            , "25 janvier 2017"
-            , "26 janvier 2017"
-            , "27 janvier 2017"
-            , "28 janvier 2017"
-            , "29 janvier 2017"
-            , "30 janvier 2017"
-            , "31 janvier 2017"
-            , "20 février 2017"
-            , "21 février 2017"
-            , "22 février 2017"
-            , "23 février 2017"
-            , "24 février 2017"
-            , "25 février 2017"
-            , "26 février 2017"
-            , "27 février 2017"
-            , "28 février 2017"
-            , "29 février 2017"
-            , "30 février 2017"
-            , "31 février 2017"
-            ]
+            model.selections
             50
             (interpolatePosition model)
         ]
