@@ -202,7 +202,13 @@ interpolatePosition { holdState, touchesHistory, position } =
                 Released _ ->
                     rotation
     in
-        toPartialRotation value
+        if value <= 0 then
+            toPartialRotation 0
+        else if value >= 930 then
+            -- TODO That's ugly, please fix
+            toPartialRotation 930
+        else
+            toPartialRotation value
 
 
 interpolatePositionHelper : TouchesHistory -> Float -> Float
@@ -379,8 +385,8 @@ reelAngle i l =
     -i * 360 / 15
 
 
-reelFrame : Int -> Int -> Int -> String -> Node msg
-reelFrame length height index content =
+reelFrame : Int -> Int -> ( Int, String ) -> Node msg
+reelFrame length height ( index, content ) =
     let
         l =
             length |> toFloat
@@ -402,11 +408,35 @@ reelFrame length height index content =
             )
 
 
+selectVisibleItems : ( Int, Position ) -> List ( Int, String ) -> List ( Int, String )
+selectVisibleItems position list =
+    -- TODO Maybe we could do something better
+    let
+        completeRotation =
+            toCompleteRotation position
+    in
+        list
+            |> List.drop (round completeRotation // 80)
+            |> List.take
+                (if completeRotation < 240 then
+                    12
+                 else
+                    15
+                )
+            |> (if completeRotation < 240 then
+                    flip List.append [ ( 12, "" ), ( 13, "" ), ( 14, "" ) ]
+                else
+                    identity
+               )
+
+
 carousel : List String -> Int -> ( Int, Position ) -> Node msg
-carousel list height ( wheelRound, rotation ) =
+carousel list height (( wheelRound, rotation ) as position) =
     let
         list2 =
-            list ++ [ "", "", "" ]
+            list
+                |> associateIndexes
+                |> selectVisibleItems position
     in
         Builder.div
             [ Attributes.style
@@ -437,7 +467,7 @@ carousel list height ( wheelRound, rotation ) =
                         ]
                     ]
                 ]
-                (List.indexedMap (reelFrame (List.length list2) height) list2)
+                (List.map (reelFrame (List.length list2) height) list2)
             ]
 
 
@@ -470,7 +500,26 @@ view model =
             , "28 janvier 2017"
             , "29 janvier 2017"
             , "30 janvier 2017"
+            , "31 janvier 2017"
+            , "20 février 2017"
+            , "21 février 2017"
+            , "22 février 2017"
+            , "23 février 2017"
+            , "24 février 2017"
+            , "25 février 2017"
+            , "26 février 2017"
+            , "27 février 2017"
+            , "28 février 2017"
+            , "29 février 2017"
+            , "30 février 2017"
+            , "31 février 2017"
             ]
             50
             (interpolatePosition model)
         ]
+
+
+associateIndexes : List a -> List ( Int, a )
+associateIndexes list =
+    list
+        |> List.indexedMap (\index content -> ( index % 15, content ))
