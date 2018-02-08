@@ -109,7 +109,7 @@ type alias TouchesHistory =
 type alias Model =
     { holdState : HoldState
     , touchesHistory : TouchesHistory
-    , position : Position
+    , position : ( Int, Position )
     }
 
 
@@ -137,7 +137,7 @@ init : ( Model, Cmd Msg )
 init =
     { holdState = Released Nothing
     , touchesHistory = initTouchesHistory 0
-    , position = 0
+    , position = ( 0, 0 )
     }
         ! []
 
@@ -171,27 +171,38 @@ updatePosition model =
         |> setPositionIn model
 
 
-interpolatePosition : Model -> Float
+toCompleteRotation : ( Int, Position ) -> Position
+toCompleteRotation ( wheelRound, position ) =
+    (wheelRound * 360 |> toFloat) + position
+
+
+toPartialRotation : Position -> ( Int, Position )
+toPartialRotation position =
+    let
+        wheelRound =
+            round position // 360
+    in
+        ( wheelRound, position - (wheelRound * 360 |> toFloat) )
+
+
+interpolatePosition : Model -> ( Int, Position )
 interpolatePosition { holdState, touchesHistory, position } =
     let
+        rotation =
+            toCompleteRotation position
+
         value =
             case holdState of
                 Held ->
-                    interpolatePositionHelper touchesHistory position
+                    interpolatePositionHelper touchesHistory rotation
 
                 Released Nothing ->
-                    interpolatePositionHelper touchesHistory position
+                    interpolatePositionHelper touchesHistory rotation
 
                 Released _ ->
-                    position
+                    rotation
     in
-        -- Just because it works, bitch. 😎
-        if value > 150 then
-            150
-        else if value < -360 then
-            -360
-        else
-            value
+        toPartialRotation value
 
 
 interpolatePositionHelper : TouchesHistory -> Float -> Float
@@ -252,7 +263,9 @@ computeNewSpeed speed currentTime lastTime =
 applyAndChangeSpeed : Time -> Time -> Speed -> Model -> Model
 applyAndChangeSpeed lastTime currentTime speed ({ position } as model) =
     position
-        - (speed * (currentTime - lastTime))
+        |> toCompleteRotation
+        |> flip (-) (speed * (currentTime - lastTime))
+        |> toPartialRotation
         |> setPositionIn model
         |> setHoldState
             (Released <| Just ( currentTime, computeNewSpeed speed currentTime lastTime ))
@@ -362,7 +375,8 @@ rotatedDiv angle text height translationZ =
 
 reelAngle : Float -> Float -> Float
 reelAngle i l =
-    ((l / 2) - i) * 360 / l
+    -- ((l / 2) - i) * 360 / l
+    -i * 360 / 15
 
 
 reelFrame : Int -> Int -> Int -> String -> Node msg
@@ -388,8 +402,8 @@ reelFrame length height index content =
             )
 
 
-carousel : List String -> Int -> Float -> Node msg
-carousel list height rotation =
+carousel : List String -> Int -> ( Int, Position ) -> Node msg
+carousel list height ( wheelRound, rotation ) =
     let
         list2 =
             list ++ [ "", "", "" ]
@@ -412,7 +426,7 @@ carousel list height rotation =
                 [ Attributes.style
                     [ Style.box
                         [ Box.transform
-                            [ Transform.rotateX (deg (rotation / 2))
+                            [ Transform.rotateX (deg rotation)
                             , Transform.preserve3d
                             , Transform.origin
                                 ( Constants.zero
@@ -439,23 +453,16 @@ view model =
                 ]
             ]
          , Attributes.rawAttribute <| SingleTouch.onStart (RecordingTouches << StartRecordingTouches)
+         , Attributes.rawAttribute <| SingleTouch.onMove (RecordingTouches << RecordTouch)
+         , Attributes.rawAttribute <| SingleTouch.onEnd (RecordingTouches << StopRecordingTouches)
          ]
-            ++ (case model.holdState of
-                    Held ->
-                        [ Attributes.rawAttribute <| SingleTouch.onMove (RecordingTouches << RecordTouch)
-                        , Attributes.rawAttribute <| SingleTouch.onEnd (RecordingTouches << StopRecordingTouches)
-                        ]
-
-                    Released _ ->
-                        []
-               )
         )
         [ carousel
             [ "19 janvier 2017"
             , "20 janvier 2017"
             , "21 janvier 2017"
             , "22 janvier 2017"
-            , "23 janvier 2017" --
+            , "23 janvier 2017"
             , "24 janvier 2017"
             , "25 janvier 2017"
             , "26 janvier 2017"
