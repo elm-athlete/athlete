@@ -271,6 +271,7 @@ applyAndChangeSpeed lastTime currentTime speed ({ position } as model) =
     position
         |> toCompleteRotation
         |> flip (-) (speed * (currentTime - lastTime))
+        |> clamp 0 930 -- TODO please fix
         |> toPartialRotation
         |> setPositionIn model
         |> setHoldState
