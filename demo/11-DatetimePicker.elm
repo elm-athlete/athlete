@@ -377,10 +377,6 @@ stopRecordTouches ({ touchesHistory, holdState } as model) =
             model
 
 
-
--- View
-
-
 rotatedDiv : Float -> String -> Int -> Elegant.SizeUnit -> Node msg
 rotatedDiv angle text height translationZ =
     Builder.div
@@ -441,20 +437,20 @@ reelFrame length height ( index, content ) =
 selectVisibleItems : Position -> List ( Int, String ) -> List ( Int, String )
 selectVisibleItems completeRotation =
     List.drop (round completeRotation // 80)
-        >> List.take (chooseHowManyVisibleItems completeRotation)
-        >> addWhiteSpaces
+        >> List.take (chooseNumberOfVisibleItems completeRotation)
+        >> fillAbsentAndRemoveUselessEntries
 
 
-chooseHowManyVisibleItems : Position -> Int
-chooseHowManyVisibleItems completeRotation =
+chooseNumberOfVisibleItems : Position -> Int
+chooseNumberOfVisibleItems completeRotation =
     if completeRotation < 240 then
         12
     else
         15
 
 
-addWhiteSpaces : List ( Int, String ) -> List ( Int, String )
-addWhiteSpaces list =
+fillAbsentAndRemoveUselessEntries : List ( Int, String ) -> List ( Int, String )
+fillAbsentAndRemoveUselessEntries list =
     List.range 0 14
         |> List.map (fillAbsentEntries list)
         |> List.foldl removeUselessEntries ( True, [] )
