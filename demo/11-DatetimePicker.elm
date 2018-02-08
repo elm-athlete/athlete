@@ -173,15 +173,25 @@ updatePosition model =
 
 interpolatePosition : Model -> Float
 interpolatePosition { holdState, touchesHistory, position } =
-    case holdState of
-        Held ->
-            interpolatePositionHelper touchesHistory position
+    let
+        value =
+            case holdState of
+                Held ->
+                    interpolatePositionHelper touchesHistory position
 
-        Released Nothing ->
-            interpolatePositionHelper touchesHistory position
+                Released Nothing ->
+                    interpolatePositionHelper touchesHistory position
 
-        Released _ ->
-            position
+                Released _ ->
+                    position
+    in
+        -- Just because it works, bitch. 😎
+        if value > 150 then
+            150
+        else if value < -360 then
+            -360
+        else
+            value
 
 
 interpolatePositionHelper : TouchesHistory -> Float -> Float
@@ -380,37 +390,41 @@ reelFrame length height index content =
 
 carousel : List String -> Int -> Float -> Node msg
 carousel list height rotation =
-    Builder.div
-        [ Attributes.style
-            [ Style.blockProperties
-                [ Block.width (px 300)
-                , Block.height (px height)
-                ]
-            , Style.box
-                [ Box.transform
-                    [ Transform.preserve3d
-                    , Transform.perspective (px 1000)
-                    ]
-                ]
-            ]
-        ]
-        [ Builder.div
+    let
+        list2 =
+            list ++ [ "", "", "" ]
+    in
+        Builder.div
             [ Attributes.style
-                [ Style.box
+                [ Style.blockProperties
+                    [ Block.width (px 300)
+                    , Block.height (px height)
+                    ]
+                , Style.box
                     [ Box.transform
-                        [ Transform.rotateX (deg (rotation / 2))
-                        , Transform.preserve3d
-                        , Transform.origin
-                            ( Constants.zero
-                            , px ((toFloat height) / 2 |> round)
-                            , Constants.zero
-                            )
+                        [ Transform.preserve3d
+                        , Transform.perspective (px 1000)
                         ]
                     ]
                 ]
             ]
-            (List.indexedMap (reelFrame (List.length list) height) list)
-        ]
+            [ Builder.div
+                [ Attributes.style
+                    [ Style.box
+                        [ Box.transform
+                            [ Transform.rotateX (deg (rotation / 2))
+                            , Transform.preserve3d
+                            , Transform.origin
+                                ( Constants.zero
+                                , px ((toFloat height) / 2 |> round)
+                                , Constants.zero
+                                )
+                            ]
+                        ]
+                    ]
+                ]
+                (List.indexedMap (reelFrame (List.length list2) height) list2)
+            ]
 
 
 view : Model -> Node Msg
@@ -441,12 +455,15 @@ view model =
             , "20 janvier 2017"
             , "21 janvier 2017"
             , "22 janvier 2017"
-            , "23 janvier 2017"
+            , "23 janvier 2017" --
             , "24 janvier 2017"
             , "25 janvier 2017"
             , "26 janvier 2017"
             , "27 janvier 2017"
+            , "28 janvier 2017"
+            , "29 janvier 2017"
+            , "30 janvier 2017"
             ]
-            116
+            50
             (interpolatePosition model)
         ]
