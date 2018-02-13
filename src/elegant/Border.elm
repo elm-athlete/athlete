@@ -16,6 +16,7 @@ module Border
         , all
         , borderToCouples
         , full
+        , color
         )
 
 {-| Border contains everything about borders rendering.
@@ -41,6 +42,7 @@ module Border
 @docs none
 @docs solid
 @docs dashed
+@docs color
 
 
 ## Sides
@@ -133,6 +135,13 @@ dashed =
 thickness : SizeUnit -> Modifier Border
 thickness =
     setThickness << Just
+
+
+{-| Set the color of the border.
+-}
+color : Color -> Modifier Border
+color =
+    setColor << Just
 
 
 {-| Accepts a list of border modifiers, and modify the top side of the border.
