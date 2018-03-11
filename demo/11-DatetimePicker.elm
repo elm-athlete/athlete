@@ -18,6 +18,7 @@ import List.Extra
 import SingleTouch
 import Touch exposing (Coordinates)
 import BoundedList exposing (BoundedList)
+import Color
 
 
 updateIdentity : a -> ( a, Cmd msg )
@@ -183,10 +184,7 @@ subscriptions model =
                 []
 
             Released (Just ( _, speed )) ->
-                if insignificantSpeed speed then
-                    []
-                else
-                    [ AnimationFrame.times UpdateViewAt ]
+                [ AnimationFrame.times UpdateViewAt ]
 
             Released Nothing ->
                 []
@@ -342,10 +340,55 @@ update msg ({ touchesHistory, holdState } as model) =
                         model
 
                     Released (Just ( lastTime, speed )) ->
-                        applyAndChangeSpeed lastTime currentTime speed model
+                        if insignificantSpeed speed then
+                            focusOnNearestItem model
+                        else
+                            applyAndChangeSpeed lastTime currentTime speed model
 
                     Released _ ->
                         model
+
+
+focusOnNearestItem : Model -> Model
+focusOnNearestItem ({ position, selections } as model) =
+    position
+        |> decreasePosition
+        |> toNearestPosition model
+
+
+decreasePosition : ( Int, Position ) -> ( Int, Position )
+decreasePosition =
+    toCompleteRotation
+        >> (-) 1.0
+        >> toPartialRotation
+
+
+toNearestPosition : Model -> ( Int, Position ) -> Model
+toNearestPosition model position =
+    model.selections
+        |> associateIndexes
+        |> List.map (\( index, _ ) -> reelAngle (toFloat index) 15.0)
+        |> List.foldr modifyToNearestPosition ( False, position )
+        |> modifyModelAccordingToNearestPosition model
+
+
+modifyModelAccordingToNearestPosition : Model -> ( Bool, ( Int, Position ) ) -> Model
+modifyModelAccordingToNearestPosition model ( reset, position ) =
+    model
+        |> setPosition position
+        |> (if reset then
+                setHoldState (Released Nothing)
+            else
+                identity
+           )
+
+
+modifyToNearestPosition : Position -> ( Bool, ( Int, Position ) ) -> ( Bool, ( Int, Position ) )
+modifyToNearestPosition angle ( reset, ( wheelRound, position ) ) =
+    if 0 < angle + position && angle + position <= 3 then
+        ( True, ( wheelRound, abs angle ) )
+    else
+        ( reset, ( wheelRound, position ) )
 
 
 updateRecordingAction : RecordingTouchesMsg -> Model -> ( Model, Cmd Msg )
@@ -377,8 +420,8 @@ stopRecordTouches ({ touchesHistory, holdState } as model) =
             model
 
 
-rotatedDiv : Float -> String -> Int -> Elegant.SizeUnit -> Node msg
-rotatedDiv angle text height translationZ =
+rotatedDiv : Float -> String -> Position -> Int -> Elegant.SizeUnit -> Node msg
+rotatedDiv angle text rotation height translationZ =
     Builder.div
         [ Attributes.style
             [ Style.blockProperties
@@ -396,6 +439,12 @@ rotatedDiv angle text height translationZ =
                     [ Typography.size (px 20)
                     , Typography.lineHeight (px height)
                     , Typography.userSelect (False)
+                    , Typography.color
+                        (if moreOrLess 10.0 (abs angle) (abs rotation) then
+                            Color.black
+                         else
+                            Color.grayscale 0.3
+                        )
                     ]
                 , Box.position <|
                     Position.absolute
@@ -406,13 +455,30 @@ rotatedDiv angle text height translationZ =
         [ Builder.text text ]
 
 
+
+-- percent : Float -> Float -> Float
+-- percent value number =
+--     (number * value) / 100.0
+--
+--
+-- moreOrLess : Float -> Float -> Float -> Bool
+-- moreOrLess perc value comparison =
+--     (toFloat (round (comparison - (percent perc comparison)) % 360) < value)
+--         && (value < toFloat (round (comparison + (percent perc comparison)) % 360))
+
+
+moreOrLess : Float -> Float -> Float -> Bool
+moreOrLess value base comparison =
+    comparison - value < base && base < comparison + value
+
+
 reelAngle : Float -> Float -> Float
 reelAngle i l =
     -i * 360 / 15
 
 
-reelFrame : Int -> Int -> ( Int, String ) -> Node msg
-reelFrame length height ( index, content ) =
+reelFrame : Position -> Int -> Int -> ( Int, String ) -> Node msg
+reelFrame rotation length height ( index, content ) =
     let
         l =
             length |> toFloat
@@ -426,6 +492,7 @@ reelFrame length height ( index, content ) =
         rotatedDiv
             (reelAngle i l)
             content
+            rotation
             height
             (px
                 (Basics.round
@@ -509,7 +576,7 @@ carousel list height (( wheelRound, rotation ) as position) =
                         ]
                     ]
                 ]
-                (List.map (reelFrame (List.length list2) height) list2)
+                (List.map (reelFrame rotation (List.length list2) height) list2)
             ]
 
 
