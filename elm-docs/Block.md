@@ -45,6 +45,42 @@ maxWidth : SizeUnit -> Modifier Display.BlockDetails
 ```
 
 
+- [maxHeight](#maxheight)
+
+### **maxHeight**
+```elm
+maxHeight : SizeUnit -> Modifier Display.BlockDetails
+
+```
+
+
+- [minWidth](#minwidth)
+
+### **minWidth**
+```elm
+minWidth : SizeUnit -> Modifier Display.BlockDetails
+
+```
+
+
+- [minHeight](#minheight)
+
+### **minHeight**
+```elm
+minHeight : SizeUnit -> Modifier Display.BlockDetails
+
+```
+
+
+- [width](#width)
+
+### **width**
+```elm
+width : SizeUnit -> Modifier Display.BlockDetails
+
+```
+
+
 - [height](#height)
 
 ### **height**
@@ -63,13 +99,10 @@ fullHeight : Modifier Display.BlockDetails
 ```
 
 
-- [width](#width)
+- [fullWidth](#fullwidth)
 
-### **width**
+### **fullWidth**
 ```elm
-width : SizeUnit -> Modifier Display.BlockDetails
+fullWidth : Modifier Display.BlockDetails
 
 ```
-
-
-
