@@ -2,13 +2,15 @@
 
 Athlete is a **native looking** app builder for elm !
 
-Elegant.elm and Bodybuilder.elm are the underlying parts of Athlete.
+`Elegant.elm` and `Bodybuilder.elm` are the underlying parts of Athlete.
 
-They use the best parts of html and css under the hood to let you create stunning apps.
+They use the best parts of HTML and CSS under the hood to let you create stunning apps.
 
 The key idea is to let you control the exact graphical path you want take, without compromises. We dreamt for years about creating this framework, but we finally did it.
 
-An simple example being a lot better than tons of explanations, let's begin with a simple app we want to build with Athlete.
+A simple example being a lot better than tons of explanations, let's begin with an app we want to build with Athlete.
+
+Let's create a cat browsing app (everybody knows that it's the next Facebook in terms of ROI).
 
 ## Athlete - build your app, **one function at a time ™**
 
