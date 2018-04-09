@@ -115,12 +115,12 @@ type alias Model =
     }
 
 
-initTouchesHistory : Float -> TouchesHistory
+initTouchesHistory : Position -> TouchesHistory
 initTouchesHistory =
     TouchesHistory (BoundedList.new 20)
 
 
-reinitTouchesHistory : Float -> Model -> Model
+reinitTouchesHistory : Position -> Model -> Model
 reinitTouchesHistory =
     setTouchesHistory << initTouchesHistory
 
@@ -261,7 +261,7 @@ updateTimeAndSpeed ({ touchesHistory } as model) =
 
 relevantTimeFrame : Float
 relevantTimeFrame =
-    0.2
+    0.3
 
 
 relevantPositions : Time -> List ( Time, Position ) -> List ( Time, Position )
@@ -273,7 +273,7 @@ computeTimeAndSpeed : List ( Time, Position ) -> ( Time, Speed )
 computeTimeAndSpeed lastPositions =
     case lastPositions of
         ( lastTime, lastPosition ) :: queue ->
-            case List.Extra.last (lastPositions |> relevantPositions lastTime) of
+            case List.Extra.last (lastPositions) of
                 Nothing ->
                     ( 0, 0 )
 
@@ -336,16 +336,14 @@ update msg ({ touchesHistory, holdState } as model) =
         UpdateViewAt currentTime ->
             updateIdentity <|
                 case holdState of
-                    Held ->
-                        model
-
                     Released (Just ( lastTime, speed )) ->
-                        if insignificantSpeed speed then
-                            focusOnNearestItem model
-                        else
-                            applyAndChangeSpeed lastTime currentTime speed model
+                        -- if insignificantSpeed speed then
+                        --     -- focusOnNearestItem model
+                        --     model |> setHoldState (Released Nothing)
+                        -- else
+                        applyAndChangeSpeed lastTime currentTime speed model
 
-                    Released _ ->
+                    _ ->
                         model
 
 
@@ -395,7 +393,9 @@ updateRecordingAction : RecordingTouchesMsg -> Model -> ( Model, Cmd Msg )
 updateRecordingAction msg =
     case msg of
         StartRecordingTouches { clientY } ->
-            reinitTouchesHistory clientY >> setHeld >> recordsAt clientY
+            reinitTouchesHistory clientY
+                >> setHeld
+                >> recordsAt clientY
 
         RecordTouch { clientY } ->
             recordsAt clientY
@@ -413,8 +413,7 @@ stopRecordTouches : Model -> Model
 stopRecordTouches ({ touchesHistory, holdState } as model) =
     case holdState of
         Held ->
-            Released Nothing
-                |> setHoldStateIn model
+            setHoldStateIn model (Released Nothing)
 
         Released _ ->
             model
@@ -540,7 +539,7 @@ fillAbsentEntries list element =
 
 
 carousel : List String -> Int -> ( Int, Position ) -> Node msg
-carousel list height (( wheelRound, rotation ) as position) =
+carousel list height (( _, rotation ) as position) =
     let
         list2 =
             list
@@ -583,7 +582,7 @@ carousel list height (( wheelRound, rotation ) as position) =
 view : Model -> Node Msg
 view model =
     Builder.div
-        ([ Attributes.style
+        [ Attributes.style
             [ Style.box
                 [ Box.padding
                     [ Padding.left (px 200)
@@ -591,11 +590,16 @@ view model =
                     ]
                 ]
             ]
-         , Attributes.rawAttribute <| SingleTouch.onStart (RecordingTouches << StartRecordingTouches)
-         , Attributes.rawAttribute <| SingleTouch.onMove (RecordingTouches << RecordTouch)
-         , Attributes.rawAttribute <| SingleTouch.onEnd (RecordingTouches << StopRecordingTouches)
-         ]
-        )
+        , Attributes.rawAttribute <|
+            SingleTouch.onStart
+                (RecordingTouches << StartRecordingTouches)
+        , Attributes.rawAttribute <|
+            SingleTouch.onMove
+                (RecordingTouches << RecordTouch)
+        , Attributes.rawAttribute <|
+            SingleTouch.onEnd
+                (RecordingTouches << StopRecordingTouches)
+        ]
         [ carousel
             model.selections
             50

@@ -44,7 +44,7 @@
         "Fresheyeball/elm-tuple-extra": "3.0.0 <= v < 4.0.0",
         "elm-bodybuilder/elm-function": "1.0.0 <= v < 2.0.0",
         "elm-community/dict-extra": "2.2.0 <= v < 3.0.0",
-        "elm-community/list-extra": "6.1.0 <= v < 7.0.0",
+        "elm-community/list-extra": "7.1.0 <= v < 8.0.0",
         "elm-community/maybe-extra": "4.0.0 <= v < 5.0.0",
         "elm-lang/animation-frame": "1.0.1 <= v < 2.0.0",
         "elm-lang/core": "5.0.0 <= v < 6.0.0",
