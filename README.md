@@ -13,11 +13,10 @@ Elegant.elm and Bodybuilder.elm are the underlying parts of your athlete
 ![Elegant](readme/elegant.png)
 
 ### Create your router : your views are now part of an app !
-![Router](readme/router.png)
 ``` elm
-    type CatRouter
-      = CatsIndex
-      | CatShow Id
+type CatRouter
+  = CatsIndex
+  | CatShow Id
 ```
 
 ### Use (or implement) transitions between your views !
