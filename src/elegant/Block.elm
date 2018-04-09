@@ -1,21 +1,27 @@
 module Block exposing (..)
 
 {-|
+
 @docs overflowHidden
 @docs alignCenter
 @docs alignRight
 @docs alignLeft
 @docs maxWidth
-@docs height
-@docs fullHeight
+@docs maxHeight
+@docs minWidth
+@docs minHeight
 @docs width
+@docs height
+@docs fullWidth
+@docs fullHeight
+
 -}
 
-import Helpers.Shared exposing (..)
-import Overflow
-import Display
 import Dimensions
+import Display
+import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
+import Overflow
 
 
 {-| -}
@@ -49,18 +55,42 @@ maxWidth size =
 
 
 {-| -}
-height : SizeUnit -> Modifier Display.BlockDetails
-height size =
-    Display.dimensions [ Dimensions.height size ]
+maxHeight : SizeUnit -> Modifier Display.BlockDetails
+maxHeight size =
+    Display.dimensions [ Dimensions.maxHeight size ]
 
 
 {-| -}
-fullHeight : Modifier Display.BlockDetails
-fullHeight =
-    height (Percent 100)
+minWidth : SizeUnit -> Modifier Display.BlockDetails
+minWidth size =
+    Display.dimensions [ Dimensions.minWidth size ]
+
+
+{-| -}
+minHeight : SizeUnit -> Modifier Display.BlockDetails
+minHeight size =
+    Display.dimensions [ Dimensions.minHeight size ]
 
 
 {-| -}
 width : SizeUnit -> Modifier Display.BlockDetails
 width size =
     Display.dimensions [ Dimensions.width size ]
+
+
+{-| -}
+height : SizeUnit -> Modifier Display.BlockDetails
+height size =
+    Display.dimensions [ Dimensions.height size ]
+
+
+{-| -}
+fullWidth : Modifier Display.BlockDetails
+fullWidth =
+    width (Percent 100)
+
+
+{-| -}
+fullHeight : Modifier Display.BlockDetails
+fullHeight =
+    height (Percent 100)
