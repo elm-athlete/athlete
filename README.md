@@ -1,38 +1,39 @@
-# Elegant & BodyBuilder
+# Athlete
 
-# Table of Contents
+Athlete is a **native looking** app builder for elm !
 
-- [What is Elegant and BodyBuilder?](#what-is-elegant-and-bodybuilder)
-- [What differences with Elm CSS and HTML?](#what-differences-with-elm-css-and-html)
-- [It's awesome! How can I get it?](#its-awesome-how-can-i-get-it)
-- [I need help! Can you help me?](#i-need-help-can-you-help-me)
-- [It's the best package I've ever used! What can I do to help?](#its-the-best-package-ive-ever-used-what-can-i-do-to-help)
+`Elegant.elm` and `Bodybuilder.elm` are the underlying parts of Athlete.
 
-# What is Elegant and BodyBuilder?
+They use the best parts of HTML and CSS under the hood to let you create stunning apps.
 
-Elegant provides a safe way to write style on HTML elements without having to worry dealing with CSS. It allows you to write inline styling directly on elements. Those styles are computed, and converted into CSS under the hood, allowing to enjoy the full power of CSS without dealing with its inherent problems (cascading for example).<br>
-BodyBuilder provides an abstract, type-safe way to write web applications! It abstracts HTML to facilitates the use of inline styles, type checks the attributes, and deals with HTML for you!
+The key idea is to let you control the exact graphical path you want take, without compromises. We dreamt for years about creating this framework, but we finally did it.
 
-# What differences with Elm CSS and HTML?
+A simple example being a lot better than tons of explanations, let's begin with an app we want to build with Athlete.
 
-Elegant and BodyBuilder take another approach: while Elm CSS provides nice way to write CSS directly in Elm to add it into your project, Elegant removes entirely CSS! The whole package uses inline styling for everything, while maintaining a `VirtualCss` handling all dirty CSS details for you. Just focus on your needs, write your application, write your styles and you're done! Elegant takes care of the styles for you! By abstracting HTML, BodyBuilder allows you to focus on your application, without having to worry on all the HTML details.
+Let's create a cat browsing app (everybody knows that it's the next Facebook in terms of ROI).
 
-Looking for demos? You can find [examples in the repo](https://github.com/elm-bodybuilder/elegant/tree/master/demo) and [working versions on the project site](https://elm-bodybuilder.github.io/elegant)!
+## Athlete - build your app, **one function at a time ™**
 
-If you are looking for an abstraction over CSS, look at [`rtfeldman/elm-css`](http://package.elm-lang.org/packages/rtfeldman/elm-css/latest). This is exactly what you are looking for.
+Start with 2 bodybuilder views
 
-# It's awesome! How can I get it?
+![Bodybuilder](readme/bodybuilder.png)
 
-It's easy as pie to get your version! Just use [`panosoft/elm-grove`](https://github.com/panosoft/elm-grove) or [`gdotdesign/elm-install`](https://github.com/gdotdesign/elm-github-install)!<br>
-But you can also clone [`elm-bodybuilder/elegant-template`](https://github.com/elm-bodybuilder/elegant-template) to get started right away!
+Add some elegant styles (almost all the css spec is built in, in a type safe way)
 
-# I need help! Can you help me?
+![Elegant](readme/elegant.png)
 
-Don't worry, we're on [Slack](https://elmlang.herokuapp.com/)! And we have a dedicated channel `#bodybuilder` just for this! We would be so happy to help you and to see you join us! Just come say hi!<br>
-You should check [the official repo too](https://github.com/elm-bodybuilder/elegant). There are at least 10 examples to help you understand how it works! The [working versions are available on the project site](https://elm-bodybuilder.github.io/elegant)! And [the documentation](https://github.com/elm-bodybuilder/elegant/tree/master/elm-docs) is on the repo too!
+Create your router : your views are now part of an app !
 
-# It's the best package I've ever used! What can I do to help?
+``` elm
+type CatRouter
+  = CatsIndex
+  | CatShow Id
+```
 
-First, thanks!
+Use (or implement) transitions between your views !
 
-If you want to help us, you can do plenty of things: we need documentation, tutorials, help for newcomers, detailed examples, and even performance improvements! Feel free to send us a Pull Request, to help newcomers on Slack, to improve [documentation](https://github.com/elm-bodybuilder/elegant/tree/master/elm-docs) and to post [issues](https://github.com/elm-bodybuilder/elegant/issues)!
+![Transitions](readme/transitions.png)
+
+**You are done !** You can know deploy your app on the app store and the android store (and even the web)
+
+But there's more, far more... you can create so many other [things](https://elm-bodybuilder.github.io/elegant) with Athlete.
