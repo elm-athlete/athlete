@@ -295,23 +295,34 @@ focusOnNearestItem ({ position, selections, touchesHistory } as model) =
     |> modifyModelAccordingToNearestPosition model
 
 adjustPosition : TouchesHistory -> (WheelRound, Position) -> (WheelRound, Position)
-adjustPosition { lastPositions, startPosition } =
-  -- let operator = selectIncreaseOrDecrease (BoundedList.content lastPositions) startPosition in
-  toCompleteRotation >> flip (-) 1.0 >> toPartialRotation
+adjustPosition { lastPositions } =
+  let operator = selectIncreaseOrDecrease (BoundedList.content lastPositions) in
+  toCompleteRotation >> flip operator 1.0 >> toPartialRotation
 
--- selectIncreaseOrDecrease : List (Time, Position) -> Position -> (a -> a -> a)
--- selectIncreaseOrDecrease positions =
---   case List.head positions of
---     Nothing -> (-)
---     Just (lastTime, lastPosition) ->
---       case secondElement (relevantPositions lastTime positions) of
---         Nothing -> (-)
---         Just (secondTime, secondPosition) ->
---           let firstCompleteRotation = interpolatePosition toCompleteRotation lastPosition
---               secondCompleteRotation = toCompleteRotation
---
--- secondElement : List a -> Maybe a
--- secondElement list = Maybe.andThen List.head (List.tail list)
+selectIncreaseOrDecrease : List (Time, Position) -> (Position -> Position -> Position)
+selectIncreaseOrDecrease positions =
+  Maybe.withDefault (+) <|
+    case List.head positions of
+      Nothing -> Nothing
+      Just (_, lastPosition) ->
+        case secondElement positions of
+          Nothing -> Nothing
+          Just (_, previousPosition) ->
+            if lastPosition > previousPosition then
+              Just (-)
+            else if lastPosition == previousPosition then
+              case thirdElement positions of
+                Nothing -> Nothing
+                Just (_, thirdPosition) ->
+                  if lastPosition > thirdPosition then Just (-) else Nothing
+            else
+              Nothing
+
+secondElement : List a -> Maybe a
+secondElement list = Maybe.andThen List.head (List.tail list)
+
+thirdElement : List a -> Maybe a
+thirdElement list = Maybe.andThen List.head (Maybe.andThen List.tail (List.tail list))
 
 toNearestPosition : List String -> (WheelRound, Position) -> (Bool, (WheelRound, Position))
 toNearestPosition selections position =
