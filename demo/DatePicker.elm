@@ -21,12 +21,10 @@ import BoundedList exposing (BoundedList)
 import Color
 
 updateIdentity : a -> ( a, Cmd msg )
-updateIdentity model =
-  model ! []
+updateIdentity model = model ! []
 
 addCmds : List (Cmd msg) -> b -> ( b, Cmd msg )
-addCmds cmds model =
-  model ! cmds
+addCmds cmds model = model ! cmds
 
 type HoldState
   = Held
@@ -46,48 +44,37 @@ type alias Model =
   }
 
 setHoldState : HoldState -> Model -> Model
-setHoldState state model =
-  { model | holdState = state }
+setHoldState state model = { model | holdState = state }
 
 setHeld : Model -> Model
-setHeld =
-  setHoldState Held
+setHeld = setHoldState Held
 
 setHoldStateIn : Model -> HoldState -> Model
-setHoldStateIn =
-  flip setHoldState
+setHoldStateIn = flip setHoldState
 
 setPosition : (Int, Position) -> Model -> Model
-setPosition position model =
-  { model | position = position }
+setPosition position model = { model | position = position }
 
 setPositionIn : Model -> (Int, Position) -> Model
-setPositionIn =
-  flip setPosition
+setPositionIn = flip setPosition
 
 setTouchesHistory : TouchesHistory -> Model -> Model
-setTouchesHistory history model =
-  { model | touchesHistory = history }
+setTouchesHistory history model = { model | touchesHistory = history }
 
 setTouchesHistoryIn : Model -> TouchesHistory -> Model
-setTouchesHistoryIn =
-  flip setTouchesHistory
+setTouchesHistoryIn = flip setTouchesHistory
 
 initTouchesHistory : Position -> TouchesHistory
-initTouchesHistory =
-  TouchesHistory (BoundedList.new 20)
+initTouchesHistory = TouchesHistory (BoundedList.new 20)
 
 reinitTouchesHistory : Position -> Model -> Model
-reinitTouchesHistory =
-  setTouchesHistory << initTouchesHistory
+reinitTouchesHistory = setTouchesHistory << initTouchesHistory
 
 setInertia : Inertia -> Model -> Model
-setInertia inertia model =
-  { model | inertia = inertia }
+setInertia inertia model = { model | inertia = inertia }
 
 setInertiaIn : Model -> Inertia -> Model
-setInertiaIn =
-  flip setInertia
+setInertiaIn = flip setInertia
 
 type alias TouchesHistory =
   { lastPositions : BoundedList (Time, Position)
@@ -95,12 +82,10 @@ type alias TouchesHistory =
   }
 
 setLastPositions : BoundedList (Time, Position) -> TouchesHistory -> TouchesHistory
-setLastPositions list history =
-  { history | lastPositions = list }
+setLastPositions list history = { history | lastPositions = list }
 
 setLastPositionsIn : TouchesHistory -> BoundedList (Time, Position) -> TouchesHistory
-setLastPositionsIn =
-  flip setLastPositions
+setLastPositionsIn = flip setLastPositions
 
 addInHistory : Position -> Time -> TouchesHistory -> TouchesHistory
 addInHistory position currentTime ({ lastPositions } as history) =
@@ -199,12 +184,13 @@ updateRecordingAction msg =
     StopRecordingTouches { clientY } -> stopRecordTouches >> recordsAt clientY
 
 recordsAt : Float -> Model -> (Model, Cmd Msg)
-recordsAt position =
-  addCmds [ Task.perform (RecordsAt position) Time.now ]
+recordsAt position = addCmds [ Task.perform (RecordsAt position) Time.now ]
 
 stopRecordTouches : Model -> Model
 stopRecordTouches model =
-  model |> setHoldState Released |> setInertia Computing
+  model
+    |> setHoldState Released
+    |> setInertia Computing
 
 updatePosition : Model -> Model
 updatePosition model =
@@ -229,8 +215,7 @@ interpolatePosition { holdState, inertia, touchesHistory, position, selections }
     toPartialRotation value
 
 toCompleteRotation : (Int, Position) -> Position
-toCompleteRotation (wheelRound, position) =
-  (toFloat (wheelRound * 360)) + position
+toCompleteRotation (wheelRound, position) = (toFloat (wheelRound * 360)) + position
 
 toPartialRotation : Position -> (Int, Position)
 toPartialRotation position =
@@ -291,8 +276,7 @@ computeNewSpeed speed currentTime lastTime =
     Just newSpeed
 
 insignificantSpeed : Speed -> Bool
-insignificantSpeed speed =
-  abs speed < 0.000005
+insignificantSpeed speed = abs speed < 0.000005
 
 {-
   View. Carousel and reel.
@@ -400,9 +384,7 @@ rotatedDiv angle text rotation height translationZ =
     [ Builder.text text ]
 
 reelAngle : Float -> Float -> Float
-reelAngle i l =
-  -i * 360 / 15
+reelAngle i l = -i * 360 / 15
 
 moreOrLess : Float -> Float -> Float -> Bool
-moreOrLess value base comparison =
-  comparison - value < base && base < comparison + value
+moreOrLess value base comparison = comparison - value < base && base < comparison + value
