@@ -38,7 +38,7 @@ type Inertia
 type alias Model =
   { holdState : HoldState
   , touchesHistory : TouchesHistory
-  , position : (Int, Position)
+  , position : (WheelRound, Position)
   , selections : List String
   , inertia : Inertia
   }
@@ -52,10 +52,10 @@ setHeld = setHoldState Held
 setHoldStateIn : Model -> HoldState -> Model
 setHoldStateIn = flip setHoldState
 
-setPosition : (Int, Position) -> Model -> Model
+setPosition : (WheelRound, Position) -> Model -> Model
 setPosition position model = { model | position = position }
 
-setPositionIn : Model -> (Int, Position) -> Model
+setPositionIn : Model -> (WheelRound, Position) -> Model
 setPositionIn = flip setPosition
 
 setTouchesHistory : TouchesHistory -> Model -> Model
@@ -95,6 +95,7 @@ addInHistory position currentTime ({ lastPositions } as history) =
 
 type alias Speed = Float
 type alias Position = Float
+type alias WheelRound = Int
 
 type Msg
   = RecordingTouches RecordingTouchesMsg
@@ -173,7 +174,11 @@ update msg ({ touchesHistory, holdState, inertia } as model) =
     UpdateViewAt currentTime ->
       updateIdentity <|
         case inertia of
-          Mobile (lastTime, speed) -> applyAndChangeSpeed lastTime currentTime speed model
+          Mobile (lastTime, speed) ->
+            if insignificantSpeed speed then
+              focusOnNearestItem model
+            else
+              applyAndChangeSpeed lastTime currentTime speed model
           _ -> model
 
 updateRecordingAction : RecordingTouchesMsg -> Model -> ( Model, Cmd Msg )
@@ -198,7 +203,7 @@ updatePosition model =
     |> interpolatePosition
     |> setPositionIn model
 
-interpolatePosition : Model -> (Int, Position)
+interpolatePosition : Model -> (WheelRound, Position)
 interpolatePosition { holdState, inertia, touchesHistory, position, selections } =
   let rotation = toCompleteRotation position
       value = case holdState of
@@ -214,7 +219,7 @@ interpolatePosition { holdState, inertia, touchesHistory, position, selections }
   else
     toPartialRotation value
 
-toCompleteRotation : (Int, Position) -> Position
+toCompleteRotation : (WheelRound, Position) -> Position
 toCompleteRotation (wheelRound, position) = (toFloat (wheelRound * 360)) + position
 
 toPartialRotation : Position -> (Int, Position)
@@ -222,7 +227,7 @@ toPartialRotation position =
   let wheelRound = round position // 360 in
   (wheelRound, position - (toFloat (wheelRound * 360)))
 
-interpolatePositionHelper : TouchesHistory -> Float -> Float
+interpolatePositionHelper : TouchesHistory -> Position -> Position
 interpolatePositionHelper ({ lastPositions, startPosition } as history) position =
   lastPositions
     |> BoundedList.head
@@ -243,7 +248,7 @@ computeTimeAndSpeed : List (Time, Position) -> (Time, Speed)
 computeTimeAndSpeed lastPositions =
   case lastPositions of
     (lastTime, lastPosition) :: queue ->
-      case List.Extra.last (lastPositions) of
+      case List.Extra.last (relevantPositions lastTime lastPositions) of
         Nothing -> (0, 0)
         Just (firstTime, firstPosition) ->
           if lastTime == firstTime then
@@ -254,6 +259,13 @@ computeTimeAndSpeed lastPositions =
             )
     _ -> (0, 0)
 
+relevantPositions : Time -> List (Time, Position) -> List (Time, Position)
+relevantPositions lastTime =
+    List.filter <| \(time, _) -> (Time.inSeconds (lastTime - time)) < relevantTimeFrame
+
+relevantTimeFrame : Float
+relevantTimeFrame = 0.3
+
 applyAndChangeSpeed : Time -> Time -> Speed -> Model -> Model
 applyAndChangeSpeed lastTime currentTime speed ({ position, selections } as model) =
   position
@@ -262,21 +274,64 @@ applyAndChangeSpeed lastTime currentTime speed ({ position, selections } as mode
     |> clamp 0 ((toFloat <| List.length selections) * 37.2)
     |> toPartialRotation
     |> setPositionIn model
-    |> setInertia
-      (computeNewSpeed speed currentTime lastTime
-        |> Maybe.map ((,) currentTime >> Mobile)
-        |> Maybe.withDefault Immobile)
+    |> setInertia (Mobile (currentTime, computeNewSpeed speed currentTime lastTime))
 
-computeNewSpeed : Speed -> Time -> Time -> Maybe Speed
+computeNewSpeed : Speed -> Time -> Time -> Speed
 computeNewSpeed speed currentTime lastTime =
-  let newSpeed = speed * (0.99 ^ toFloat ((round (currentTime - lastTime)) % 17)) in
-  if insignificantSpeed newSpeed then
-    Nothing
-  else
-    Just newSpeed
+  speed * (0.99 ^ toFloat ((round (currentTime - lastTime)) % 17))
 
 insignificantSpeed : Speed -> Bool
 insignificantSpeed speed = abs speed < 0.000005
+
+{-
+  Focus.
+-}
+
+focusOnNearestItem : Model -> Model
+focusOnNearestItem ({ position, selections, touchesHistory } as model) =
+  position
+    |> adjustPosition touchesHistory
+    |> toNearestPosition selections
+    |> modifyModelAccordingToNearestPosition model
+
+adjustPosition : TouchesHistory -> (WheelRound, Position) -> (WheelRound, Position)
+adjustPosition { lastPositions, startPosition } =
+  -- let operator = selectIncreaseOrDecrease (BoundedList.content lastPositions) startPosition in
+  toCompleteRotation >> flip (-) 1.0 >> toPartialRotation
+
+-- selectIncreaseOrDecrease : List (Time, Position) -> Position -> (a -> a -> a)
+-- selectIncreaseOrDecrease positions =
+--   case List.head positions of
+--     Nothing -> (-)
+--     Just (lastTime, lastPosition) ->
+--       case secondElement (relevantPositions lastTime positions) of
+--         Nothing -> (-)
+--         Just (secondTime, secondPosition) ->
+--           let firstCompleteRotation = interpolatePosition toCompleteRotation lastPosition
+--               secondCompleteRotation = toCompleteRotation
+--
+-- secondElement : List a -> Maybe a
+-- secondElement list = Maybe.andThen List.head (List.tail list)
+
+toNearestPosition : List String -> (WheelRound, Position) -> (Bool, (WheelRound, Position))
+toNearestPosition selections position =
+  selections
+    |> associateIndexes
+    |> List.map (\(index, _) -> reelAngle (toFloat index) 15.0)
+    |> List.foldr modifyToNearestPosition (False, position)
+
+modifyToNearestPosition : Position -> (Bool, (WheelRound, Position)) -> (Bool, (WheelRound, Position))
+modifyToNearestPosition angle (reset, (wheelRound, position)) =
+  if 0 < angle + position && angle + position <= 3 then
+    (True, (wheelRound, abs angle))
+  else
+    (reset, (wheelRound, position))
+
+modifyModelAccordingToNearestPosition : Model -> (Bool, (WheelRound, Position)) -> Model
+modifyModelAccordingToNearestPosition model (reset, position) =
+  model
+    |> setPosition position
+    |> (if reset then setInertia Immobile else identity)
 
 {-
   View. Carousel and reel.
