@@ -363,7 +363,7 @@ toNearestPosition selections position =
 
 modifyToNearestPosition : Position -> (Bool, (WheelRound, Position)) -> (Bool, (WheelRound, Position))
 modifyToNearestPosition angle (reset, (wheelRound, position)) =
-  if 0 < angle + position && angle + position <= 3 then
+  if 0 <= angle + position && angle + position <= 3 then
     (True, (wheelRound, abs angle))
   else
     (reset, (wheelRound, position))
