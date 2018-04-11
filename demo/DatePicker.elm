@@ -207,6 +207,7 @@ getActiveItem : DatePicker -> DatePicker
 getActiveItem (DatePicker { position, selections } as model) =
   selections
     |> associateIndexes
+    |> selectVisibleItems (toCompleteRotation position)
     |> List.map (\(index, content, _) -> (abs (reelAngle (toFloat index) 15.0), content))
     |> selectActiveItem position
     |> Maybe.map (setActiveItemIn model)
@@ -427,8 +428,8 @@ carousel list height (( _, rotation ) as position) =
     ]
 
 associateIndexes : List (a, b) -> List (Int, a, b)
-associateIndexes list =
-  List.indexedMap (\index (a, b) -> (index % 15, a, b)) list
+associateIndexes =
+  List.indexedMap (\index (a, b) -> (index % 15, a, b))
 
 selectVisibleItems : Position -> List (Int, Date, Bool) -> List (Int, Date, Bool)
 selectVisibleItems completeRotation =
