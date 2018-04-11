@@ -20,16 +20,11 @@ import Touch exposing (Coordinates)
 import BoundedList exposing (BoundedList)
 import Color
 
-updateIdentity : a -> ( a, Cmd msg )
-updateIdentity model = model ! []
+updateIdentity : a -> (a, Cmd msg)
+updateIdentity = flip (!) []
 
-addCmds : List (Cmd msg) -> b -> ( b, Cmd msg )
-addCmds cmds model = model ! cmds
-
-updateAndThen : (msg -> model -> (model, Cmd msg)) -> msg -> (model, Cmd msg) -> (model, Cmd msg)
-updateAndThen function msg (model, cmd) =
-  let (newModel, newCmds) = function msg model in
-  model ! [ cmd, newCmds ]
+addCmds : List (Cmd msg) -> b -> (b, Cmd msg)
+addCmds = flip (!)
 
 type HoldState
   = Held
@@ -82,6 +77,12 @@ setInertia inertia model = { model | inertia = inertia }
 setInertiaIn : Model -> Inertia -> Model
 setInertiaIn = flip setInertia
 
+setActiveItem : String -> Model -> Model
+setActiveItem activeItem model = { model | activeItem = activeItem }
+
+setActiveItemIn : Model -> String -> Model
+setActiveItemIn = flip setActiveItem
+
 type alias TouchesHistory =
   { lastPositions : BoundedList (Time, Position)
   , startPosition : Position
@@ -107,7 +108,6 @@ type Msg
   = RecordingTouches RecordingTouchesMsg
   | RecordsAt Position Time
   | UpdateViewAt Time
-  | GetActiveItem
 
 type RecordingTouchesMsg
   = StartRecordingTouches Coordinates
@@ -169,30 +169,49 @@ subscriptions { inertia } =
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg ({ touchesHistory, holdState, inertia } as model) =
-  updateAndThen update GetActiveItem <|
-    case msg of
-      RecordingTouches action -> updateRecordingAction action model
-      RecordsAt position currentTime ->
-        touchesHistory
-          |> addInHistory position currentTime
-          |> setTouchesHistoryIn model
-          |> (case inertia of
-            Computing -> updatePosition >> updateTimeAndSpeed
-            _ -> identity)
-          |> updateIdentity
-      UpdateViewAt currentTime ->
-        updateIdentity <|
-          case inertia of
+  case msg of
+    RecordingTouches action -> updateRecordingAction action model
+    RecordsAt position currentTime ->
+      touchesHistory
+        |> addInHistory position currentTime
+        |> setTouchesHistoryIn model
+        |> (case inertia of
+          Computing -> updatePosition >> updateTimeAndSpeed
+          _ -> identity)
+        |> getActiveItem
+        |> updateIdentity
+    UpdateViewAt currentTime ->
+      updateIdentity
+        <| getActiveItem
+        <| case inertia of
             Mobile (lastTime, speed) ->
               if insignificantSpeed speed then
                 focusOnNearestItem model
               else
                 applyAndChangeSpeed lastTime currentTime speed model
             _ -> model
-      GetActiveItem ->
-        model ! []
 
-updateRecordingAction : RecordingTouchesMsg -> Model -> ( Model, Cmd Msg )
+getActiveItem : Model -> Model
+getActiveItem ({ position, selections } as model) =
+  selections
+    |> associateIndexes
+    |> List.map (\(index, content) -> (abs (reelAngle (toFloat index) 15.0), content))
+    |> selectActiveItem position
+    |> Maybe.map (setActiveItemIn model)
+    |> Maybe.withDefault model
+
+selectActiveItem : (WheelRound, Position) -> List (Float, String) -> Maybe String
+selectActiveItem (wheelRound, position) list =
+  case list of
+    [] -> Nothing
+    (pos, content) :: tl ->
+      if pos <= position && position <= pos then
+        Just content
+      else
+        selectActiveItem (wheelRound, position) tl
+
+
+updateRecordingAction : RecordingTouchesMsg -> Model -> (Model, Cmd Msg)
 updateRecordingAction msg =
   case msg of
     StartRecordingTouches { clientY } -> reinitTouchesHistory clientY >> setInertia Immobile >> setHeld >> recordsAt clientY
