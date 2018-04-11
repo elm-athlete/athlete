@@ -47,7 +47,7 @@ type DatePicker =
     { holdState : HoldState
     , touchesHistory : TouchesHistory
     , position : (WheelRound, Position)
-    , selections : List (Date, Bool)
+    , selections : List (Int, Date, Bool)
     , inertia : Inertia
     , activeItem : Date
     }
@@ -58,8 +58,8 @@ newDatePicker { start, end, unselectableDates } =
   DatePicker
     { holdState = Released
     , touchesHistory = initTouchesHistory 0
-    , position = (0, 0)
-    , selections = dateRange
+    , position = (0, 240)
+    , selections = associateIndexes dateRange
     , inertia = Immobile
     , activeItem = Date.fromTime start
     }
@@ -83,6 +83,10 @@ unselectWrongDates unselectableDates time =
     (date, False)
   else
     (date, True)
+
+associateIndexes : List (a, b) -> List (Int, a, b)
+associateIndexes =
+  List.indexedMap (\index (a, b) -> (index % 15, a, b))
 
 setHoldState : HoldState -> DatePicker -> DatePicker
 setHoldState state (DatePicker datePicker) = DatePicker { datePicker | holdState = state }
@@ -168,7 +172,7 @@ init : (Model, Cmd Msg)
 init =
   (newDatePicker
     { start = 1523451140067
-    , end = 1525537540067
+    , end = 1526537540067
     , unselectableDates = []
     }) ! []
 
@@ -206,7 +210,6 @@ update msg (DatePicker { touchesHistory, holdState, inertia } as model) =
 getActiveItem : DatePicker -> DatePicker
 getActiveItem (DatePicker { position, selections } as model) =
   selections
-    |> associateIndexes
     |> selectVisibleItems (toCompleteRotation position)
     |> List.map (\(index, content, _) -> (abs (reelAngle (toFloat index) 15.0), content))
     |> selectActiveItem position
@@ -254,7 +257,7 @@ interpolatePosition (DatePicker { holdState, inertia, touchesHistory, position, 
         Released -> case inertia of
           Computing -> interpolatePositionHelper touchesHistory rotation
           _ -> rotation
-      maxValue = (toFloat (List.length selections)) * 37.2 in
+      maxValue = (toFloat (List.length selections + 1)) * 23 in -- Have to find the right formula.
   if value <= 0 then
     toPartialRotation 0
   else if value >= maxValue then
@@ -314,7 +317,7 @@ applyAndChangeSpeed lastTime currentTime speed (DatePicker { position, selection
   position
     |> toCompleteRotation
     |> flip (-) (speed * (currentTime - lastTime))
-    |> clamp 0 ((toFloat <| List.length selections) * 37.2)
+    |> clamp 0 ((toFloat <| List.length selections) * 37.2) -- Have to find the right formula.
     |> toPartialRotation
     |> setPositionIn model
     |> setInertia (Mobile (currentTime, computeNewSpeed speed currentTime lastTime))
@@ -367,10 +370,9 @@ secondElement list = Maybe.andThen List.head (List.tail list)
 thirdElement : List a -> Maybe a
 thirdElement list = Maybe.andThen List.head (Maybe.andThen List.tail (List.tail list))
 
-toNearestPosition : List (Date, Bool) -> (WheelRound, Position) -> (Bool, (WheelRound, Position))
+toNearestPosition : List (Int, Date, Bool) -> (WheelRound, Position) -> (Bool, (WheelRound, Position))
 toNearestPosition selections position =
   selections
-    |> associateIndexes
     |> List.map (\(index, _, displayed) -> (reelAngle (toFloat index) 15.0, displayed))
     |> List.foldr modifyToNearestPosition (False, position)
 
@@ -404,9 +406,9 @@ view (DatePicker { selections } as model) =
     ]
     [ carousel selections 50 (interpolatePosition model) ]
 
-carousel : List (Date, Bool) -> Int -> (Int, Position) -> Node msg
-carousel list height (( _, rotation ) as position) =
-  let list2 = selectVisibleItems (toCompleteRotation position) (associateIndexes list) in
+carousel : List (Int, Date, Bool) -> Int -> (Int, Position) -> Node msg
+carousel list height ((_, rotation) as position) =
+  let visibleItems = selectVisibleItems (toCompleteRotation position) list in
   Builder.div
     [ Attributes.style
       [ Style.blockProperties [ Block.width (px 300) , Block.height (px height) ]
@@ -424,36 +426,23 @@ carousel list height (( _, rotation ) as position) =
           ]
         ]
       ]
-      (List.map (reelFrame rotation (List.length list2) height) list2)
+      (List.map (reelFrame rotation (List.length visibleItems) height) visibleItems)
     ]
 
-associateIndexes : List (a, b) -> List (Int, a, b)
-associateIndexes =
-  List.indexedMap (\index (a, b) -> (index % 15, a, b))
-
 selectVisibleItems : Position -> List (Int, Date, Bool) -> List (Int, Date, Bool)
-selectVisibleItems completeRotation =
-  List.drop (round completeRotation // 80)
-    >> List.take (chooseNumberOfVisibleItems completeRotation)
-    >> fillAbsentAndRemoveUselessEntries
+selectVisibleItems completeRotation items =
+  items
+    |> List.drop (round completeRotation // 35) -- Have to find the right formula.
+    |> List.take (chooseNumberOfVisibleItems completeRotation)
+    |> fillAbsent
 
 chooseNumberOfVisibleItems : Position -> Int
 chooseNumberOfVisibleItems completeRotation =
   if completeRotation < 240 then 12 else 15
 
-fillAbsentAndRemoveUselessEntries : List (Int, Date, Bool) -> List (Int, Date, Bool)
-fillAbsentAndRemoveUselessEntries list =
-  List.range 0 14
-    |> List.map (fillAbsentEntries list)
-    |> List.foldl removeUselessEntries (True, [])
-    |> Tuple.second
-
-removeUselessEntries : (Int, Date, Bool) -> (Bool, List (Int, Date, Bool)) -> (Bool, List (Int, Date, Bool))
-removeUselessEntries (index, content, displayed) (keeping, accumulator) =
-  if (Date.toTime content /= 0 && keeping) || index < 3 then
-      (True, (index, content, displayed) :: accumulator)
-  else
-      (False, (index, firstDate, True) :: accumulator)
+fillAbsent : List (Int, Date, Bool) -> List (Int, Date, Bool)
+fillAbsent list =
+  List.map (fillAbsentEntries list) (List.range 0 14)
 
 fillAbsentEntries : List (Int, Date, Bool) -> Int -> (Int, Date, Bool)
 fillAbsentEntries list element =
