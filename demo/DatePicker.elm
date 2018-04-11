@@ -19,12 +19,19 @@ import SingleTouch
 import Touch exposing (Coordinates)
 import BoundedList exposing (BoundedList)
 import Color
+import Date exposing (Date)
+import Time exposing (Time)
+import List.Extra as List
 
 updateIdentity : a -> (a, Cmd msg)
 updateIdentity = flip (!) []
 
 addCmds : List (Cmd msg) -> b -> (b, Cmd msg)
 addCmds = flip (!)
+
+firstDate : Date
+firstDate =
+  Date.fromTime 0
 
 type HoldState
   = Held
@@ -35,52 +42,85 @@ type Inertia
   | Computing
   | Mobile (Time, Speed)
 
-type alias Model =
-  { holdState : HoldState
-  , touchesHistory : TouchesHistory
-  , position : (WheelRound, Position)
-  , selections : List String
-  , inertia : Inertia
-  , activeItem : String
-  }
+type DatePicker =
+  DatePicker
+    { holdState : HoldState
+    , touchesHistory : TouchesHistory
+    , position : (WheelRound, Position)
+    , selections : List (Date, Bool)
+    , inertia : Inertia
+    , activeItem : Date
+    }
 
-setHoldState : HoldState -> Model -> Model
-setHoldState state model = { model | holdState = state }
+newDatePicker : { start : Time, end : Time, unselectableDates : List Date } -> DatePicker
+newDatePicker { start, end, unselectableDates } =
+  let dateRange = List.map (unselectWrongDates unselectableDates) (createDateRange start end) in
+  DatePicker
+    { holdState = Released
+    , touchesHistory = initTouchesHistory 0
+    , position = (0, 0)
+    , selections = dateRange
+    , inertia = Immobile
+    , activeItem = Date.fromTime start
+    }
 
-setHeld : Model -> Model
+createDateRange : Time -> Time -> List Time
+createDateRange start end =
+  createDateRangeHelper start end []
+
+-- 86_400_000 ms in a day.
+createDateRangeHelper : Time -> Time -> List Time -> List Time
+createDateRangeHelper start end acc =
+  if start < end then
+    createDateRangeHelper (start + 86400000) end (start :: acc)
+  else
+    List.reverse (List.unique acc)
+
+unselectWrongDates : List Date -> Time -> (Date, Bool)
+unselectWrongDates unselectableDates time =
+  let date = Date.fromTime time in
+  if List.member date unselectableDates then
+    (date, False)
+  else
+    (date, True)
+
+setHoldState : HoldState -> DatePicker -> DatePicker
+setHoldState state (DatePicker datePicker) = DatePicker { datePicker | holdState = state }
+
+setHeld : DatePicker -> DatePicker
 setHeld = setHoldState Held
 
-setHoldStateIn : Model -> HoldState -> Model
+setHoldStateIn : DatePicker -> HoldState -> DatePicker
 setHoldStateIn = flip setHoldState
 
-setPosition : (WheelRound, Position) -> Model -> Model
-setPosition position model = { model | position = position }
+setPosition : (WheelRound, Position) -> DatePicker -> DatePicker
+setPosition position (DatePicker datePicker) = DatePicker { datePicker | position = position }
 
-setPositionIn : Model -> (WheelRound, Position) -> Model
+setPositionIn : DatePicker -> (WheelRound, Position) -> DatePicker
 setPositionIn = flip setPosition
 
-setTouchesHistory : TouchesHistory -> Model -> Model
-setTouchesHistory history model = { model | touchesHistory = history }
+setTouchesHistory : TouchesHistory -> DatePicker -> DatePicker
+setTouchesHistory history (DatePicker datePicker) = DatePicker { datePicker | touchesHistory = history }
 
-setTouchesHistoryIn : Model -> TouchesHistory -> Model
+setTouchesHistoryIn : DatePicker -> TouchesHistory -> DatePicker
 setTouchesHistoryIn = flip setTouchesHistory
 
 initTouchesHistory : Position -> TouchesHistory
 initTouchesHistory = TouchesHistory (BoundedList.new 20)
 
-reinitTouchesHistory : Position -> Model -> Model
+reinitTouchesHistory : Position -> DatePicker -> DatePicker
 reinitTouchesHistory = setTouchesHistory << initTouchesHistory
 
-setInertia : Inertia -> Model -> Model
-setInertia inertia model = { model | inertia = inertia }
+setInertia : Inertia -> DatePicker -> DatePicker
+setInertia inertia (DatePicker datePicker) = DatePicker { datePicker | inertia = inertia }
 
-setInertiaIn : Model -> Inertia -> Model
+setInertiaIn : DatePicker -> Inertia -> DatePicker
 setInertiaIn = flip setInertia
 
-setActiveItem : String -> Model -> Model
-setActiveItem activeItem model = { model | activeItem = activeItem }
+setActiveItem : Date -> DatePicker -> DatePicker
+setActiveItem activeItem (DatePicker datePicker) = DatePicker { datePicker | activeItem = activeItem }
 
-setActiveItemIn : Model -> String -> Model
+setActiveItemIn : DatePicker -> Date -> DatePicker
 setActiveItemIn = flip setActiveItem
 
 type alias TouchesHistory =
@@ -103,6 +143,7 @@ addInHistory position currentTime ({ lastPositions } as history) =
 type alias Speed = Float
 type alias Position = Float
 type alias WheelRound = Int
+type alias Model = DatePicker
 
 type Msg
   = RecordingTouches RecordingTouchesMsg
@@ -125,50 +166,21 @@ main =
 
 init : (Model, Cmd Msg)
 init =
-  { holdState = Released
-  , touchesHistory = initTouchesHistory 0
-  , position = (0, 0)
-  , selections =
-    [ "19 janvier 2017"
-    , "20 janvier 2017"
-    , "21 janvier 2017"
-    , "22 janvier 2017"
-    , "23 janvier 2017"
-    , "24 janvier 2017"
-    , "25 janvier 2017"
-    , "26 janvier 2017"
-    , "27 janvier 2017"
-    , "28 janvier 2017"
-    , "29 janvier 2017"
-    , "30 janvier 2017"
-    , "31 janvier 2017"
-    , "20 février 2017"
-    , "21 février 2017"
-    , "22 février 2017"
-    , "23 février 2017"
-    , "24 février 2017"
-    , "25 février 2017"
-    , "26 février 2017"
-    , "27 février 2017"
-    , "28 février 2017"
-    , "29 février 2017"
-    , "30 février 2017"
-    , "31 février 2017"
-    ]
-  , inertia = Immobile
-  , activeItem = "19 janvier 2017"
-  }
-    ! []
+  (newDatePicker
+    { start = 1523451140067
+    , end = 1525537540067
+    , unselectableDates = []
+    }) ! []
 
 subscriptions : Model -> Sub Msg
-subscriptions { inertia } =
+subscriptions (DatePicker { inertia }) =
   case inertia of
     Immobile -> Sub.none
     Computing -> Sub.none
     Mobile speed -> AnimationFrame.times UpdateViewAt
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg ({ touchesHistory, holdState, inertia } as model) =
+update msg (DatePicker { touchesHistory, holdState, inertia } as model) =
   case msg of
     RecordingTouches action -> updateRecordingAction action model
     RecordsAt position currentTime ->
@@ -191,16 +203,16 @@ update msg ({ touchesHistory, holdState, inertia } as model) =
                 applyAndChangeSpeed lastTime currentTime speed model
             _ -> model
 
-getActiveItem : Model -> Model
-getActiveItem ({ position, selections } as model) =
+getActiveItem : DatePicker -> DatePicker
+getActiveItem (DatePicker { position, selections } as model) =
   selections
     |> associateIndexes
-    |> List.map (\(index, content) -> (abs (reelAngle (toFloat index) 15.0), content))
+    |> List.map (\(index, content, _) -> (abs (reelAngle (toFloat index) 15.0), content))
     |> selectActiveItem position
     |> Maybe.map (setActiveItemIn model)
     |> Maybe.withDefault model
 
-selectActiveItem : (WheelRound, Position) -> List (Float, String) -> Maybe String
+selectActiveItem : (WheelRound, Position) -> List (Float, Date) -> Maybe Date
 selectActiveItem (wheelRound, position) list =
   case list of
     [] -> Nothing
@@ -211,30 +223,30 @@ selectActiveItem (wheelRound, position) list =
         selectActiveItem (wheelRound, position) tl
 
 
-updateRecordingAction : RecordingTouchesMsg -> Model -> (Model, Cmd Msg)
+updateRecordingAction : RecordingTouchesMsg -> DatePicker -> (DatePicker, Cmd Msg)
 updateRecordingAction msg =
   case msg of
     StartRecordingTouches { clientY } -> reinitTouchesHistory clientY >> setInertia Immobile >> setHeld >> recordsAt clientY
     RecordTouch { clientY } -> recordsAt clientY
     StopRecordingTouches { clientY } -> stopRecordTouches >> recordsAt clientY
 
-recordsAt : Float -> Model -> (Model, Cmd Msg)
+recordsAt : Float -> DatePicker -> (DatePicker, Cmd Msg)
 recordsAt position = addCmds [ Task.perform (RecordsAt position) Time.now ]
 
-stopRecordTouches : Model -> Model
+stopRecordTouches : DatePicker -> DatePicker
 stopRecordTouches model =
   model
     |> setHoldState Released
     |> setInertia Computing
 
-updatePosition : Model -> Model
+updatePosition : DatePicker -> DatePicker
 updatePosition model =
   model
     |> interpolatePosition
     |> setPositionIn model
 
-interpolatePosition : Model -> (WheelRound, Position)
-interpolatePosition { holdState, inertia, touchesHistory, position, selections } =
+interpolatePosition : DatePicker -> (WheelRound, Position)
+interpolatePosition (DatePicker { holdState, inertia, touchesHistory, position, selections }) =
   let rotation = toCompleteRotation position
       value = case holdState of
         Held -> interpolatePositionHelper touchesHistory rotation
@@ -267,7 +279,7 @@ interpolatePositionHelper ({ lastPositions, startPosition } as history) position
     |> Maybe.withDefault position
 
 updateTimeAndSpeed : Model -> Model
-updateTimeAndSpeed ({ touchesHistory } as model) =
+updateTimeAndSpeed (DatePicker { touchesHistory } as model) =
   touchesHistory.lastPositions
     |> BoundedList.content
     |> computeTimeAndSpeed
@@ -297,7 +309,7 @@ relevantTimeFrame : Float
 relevantTimeFrame = 0.3
 
 applyAndChangeSpeed : Time -> Time -> Speed -> Model -> Model
-applyAndChangeSpeed lastTime currentTime speed ({ position, selections } as model) =
+applyAndChangeSpeed lastTime currentTime speed (DatePicker { position, selections } as model) =
   position
     |> toCompleteRotation
     |> flip (-) (speed * (currentTime - lastTime))
@@ -311,14 +323,14 @@ computeNewSpeed speed currentTime lastTime =
   speed * (0.99 ^ toFloat ((round (currentTime - lastTime)) % 17))
 
 insignificantSpeed : Speed -> Bool
-insignificantSpeed speed = abs speed < 0.00005
+insignificantSpeed speed = abs speed < 0.05
 
 {-
   Focus.
 -}
 
 focusOnNearestItem : Model -> Model
-focusOnNearestItem ({ position, selections, touchesHistory } as model) =
+focusOnNearestItem (DatePicker { position, selections, touchesHistory } as model) =
   position
     |> adjustPosition touchesHistory
     |> toNearestPosition selections
@@ -354,17 +366,20 @@ secondElement list = Maybe.andThen List.head (List.tail list)
 thirdElement : List a -> Maybe a
 thirdElement list = Maybe.andThen List.head (Maybe.andThen List.tail (List.tail list))
 
-toNearestPosition : List String -> (WheelRound, Position) -> (Bool, (WheelRound, Position))
+toNearestPosition : List (Date, Bool) -> (WheelRound, Position) -> (Bool, (WheelRound, Position))
 toNearestPosition selections position =
   selections
     |> associateIndexes
-    |> List.map (\(index, _) -> reelAngle (toFloat index) 15.0)
+    |> List.map (\(index, _, displayed) -> (reelAngle (toFloat index) 15.0, displayed))
     |> List.foldr modifyToNearestPosition (False, position)
 
-modifyToNearestPosition : Position -> (Bool, (WheelRound, Position)) -> (Bool, (WheelRound, Position))
-modifyToNearestPosition angle (reset, (wheelRound, position)) =
-  if 0 <= angle + position && angle + position <= 3 then
-    (True, (wheelRound, abs angle))
+modifyToNearestPosition : (Position, Bool) -> (Bool, (WheelRound, Position)) -> (Bool, (WheelRound, Position))
+modifyToNearestPosition (angle, displayed) (reset, (wheelRound, position)) =
+  if displayed then
+    if 0 <= angle + position && angle + position <= 3 then
+      (True, (wheelRound, abs angle))
+    else
+      (reset, (wheelRound, position))
   else
     (reset, (wheelRound, position))
 
@@ -379,18 +394,18 @@ modifyModelAccordingToNearestPosition model (reset, position) =
 -}
 
 view : Model -> Node Msg
-view model =
+view (DatePicker { selections } as model) =
   Builder.div
     [ Attributes.style [ Style.box [ Box.padding [ Padding.left (px 200), Padding.top (px 200) ] ] ]
     , Attributes.rawAttribute (SingleTouch.onStart (RecordingTouches << StartRecordingTouches))
     , Attributes.rawAttribute (SingleTouch.onMove (RecordingTouches << RecordTouch))
     , Attributes.rawAttribute (SingleTouch.onEnd (RecordingTouches << StopRecordingTouches))
     ]
-    [ carousel model.selections 50 (interpolatePosition model) ]
+    [ carousel selections 50 (interpolatePosition model) ]
 
-carousel : List String -> Int -> (Int, Position) -> Node msg
+carousel : List (Date, Bool) -> Int -> (Int, Position) -> Node msg
 carousel list height (( _, rotation ) as position) =
-  let list2 = (selectVisibleItems (toCompleteRotation position) (associateIndexes list)) in
+  let list2 = selectVisibleItems (toCompleteRotation position) (associateIndexes list) in
   Builder.div
     [ Attributes.style
       [ Style.blockProperties [ Block.width (px 300) , Block.height (px height) ]
@@ -411,11 +426,11 @@ carousel list height (( _, rotation ) as position) =
       (List.map (reelFrame rotation (List.length list2) height) list2)
     ]
 
-associateIndexes : List a -> List (Int, a)
+associateIndexes : List (a, b) -> List (Int, a, b)
 associateIndexes list =
-  List.indexedMap (\index content -> (index % 15, content)) list
+  List.indexedMap (\index (a, b) -> (index % 15, a, b)) list
 
-selectVisibleItems : Position -> List (Int, String) -> List (Int, String)
+selectVisibleItems : Position -> List (Int, Date, Bool) -> List (Int, Date, Bool)
 selectVisibleItems completeRotation =
   List.drop (round completeRotation // 80)
     >> List.take (chooseNumberOfVisibleItems completeRotation)
@@ -425,35 +440,35 @@ chooseNumberOfVisibleItems : Position -> Int
 chooseNumberOfVisibleItems completeRotation =
   if completeRotation < 240 then 12 else 15
 
-fillAbsentAndRemoveUselessEntries : List (Int, String) -> List (Int, String)
+fillAbsentAndRemoveUselessEntries : List (Int, Date, Bool) -> List (Int, Date, Bool)
 fillAbsentAndRemoveUselessEntries list =
   List.range 0 14
     |> List.map (fillAbsentEntries list)
     |> List.foldl removeUselessEntries (True, [])
     |> Tuple.second
 
-removeUselessEntries : (Int, String) -> (Bool, List (Int, String)) -> (Bool, List (Int, String))
-removeUselessEntries (index, content ) ( keeping, accumulator ) =
-  if (content /= "" && keeping) || index < 3 then
-      (True, (index, content) :: accumulator)
+removeUselessEntries : (Int, Date, Bool) -> (Bool, List (Int, Date, Bool)) -> (Bool, List (Int, Date, Bool))
+removeUselessEntries (index, content, displayed) (keeping, accumulator) =
+  if (Date.toTime content /= 0 && keeping) || index < 3 then
+      (True, (index, content, displayed) :: accumulator)
   else
-      (False, (index, "") :: accumulator)
+      (False, (index, firstDate, True) :: accumulator)
 
-fillAbsentEntries : List (Int, String) -> Int -> (Int, String)
+fillAbsentEntries : List (Int, Date, Bool) -> Int -> (Int, Date, Bool)
 fillAbsentEntries list element =
   list
-    |> List.Extra.find (Tuple.first >> (==) element)
-    |> Maybe.withDefault (element, "")
+    |> List.Extra.find (\(elem, _, _) -> element == elem)
+    |> Maybe.withDefault (element, firstDate, True)
 
-reelFrame : Position -> Int -> Int -> (Int, String) -> Node msg
-reelFrame rotation length height ( index, content ) =
+reelFrame : Position -> Int -> Int -> (Int, Date, Bool) -> Node msg
+reelFrame rotation length height (index, content, displayed) =
   let l = toFloat length
       h = toFloat height
       i = toFloat index in
-  rotatedDiv (reelAngle i l) content rotation height (px (Basics.round (h / (2 * Basics.tan (Basics.pi / l)))))
+  rotatedDiv (reelAngle i l) content displayed rotation height (px (Basics.round (h / (2 * Basics.tan (Basics.pi / l)))))
 
-rotatedDiv : Float -> String -> Position -> Int -> Elegant.SizeUnit -> Node msg
-rotatedDiv angle text rotation height translationZ =
+rotatedDiv : Float -> Date -> Bool -> Position -> Int -> Elegant.SizeUnit -> Node msg
+rotatedDiv angle date displayed rotation height translationZ =
   Builder.div
     [ Attributes.style
       [ Style.blockProperties
@@ -471,13 +486,29 @@ rotatedDiv angle text rotation height translationZ =
           [ Typography.size (px 20)
           , Typography.lineHeight (px height)
           , Typography.userSelect (False)
-          , Typography.color (if moreOrLess 10.0 (abs angle) (abs rotation) then Color.black else Color.grayscale 0.3)
+          , Typography.color <|
+            if displayed then
+              if moreOrLess 10.0 (abs angle) (abs rotation) then
+                Color.black
+              else
+                Color.grayscale 0.3
+            else
+              Color.grayscale 0.1
           ]
-      , Box.position (Position.absolute [])
+        , Box.position (Position.absolute [])
         ]
       ]
     ]
-    [ Builder.text text ]
+    [ Builder.text
+        <| String.join " "
+        <| if date == firstDate then
+             []
+           else
+             [ toString (Date.day date)
+             , toString (Date.month date)
+             , toString (Date.year date)
+             ]
+    ]
 
 reelAngle : Float -> Float -> Float
 reelAngle i l = -i * 360 / 15
