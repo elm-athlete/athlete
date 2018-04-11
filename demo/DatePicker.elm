@@ -26,6 +26,11 @@ updateIdentity model = model ! []
 addCmds : List (Cmd msg) -> b -> ( b, Cmd msg )
 addCmds cmds model = model ! cmds
 
+updateAndThen : (msg -> model -> (model, Cmd msg)) -> msg -> (model, Cmd msg) -> (model, Cmd msg)
+updateAndThen function msg (model, cmd) =
+  let (newModel, newCmds) = function msg model in
+  model ! [ cmd, newCmds ]
+
 type HoldState
   = Held
   | Released
@@ -41,6 +46,7 @@ type alias Model =
   , position : (WheelRound, Position)
   , selections : List String
   , inertia : Inertia
+  , activeItem : String
   }
 
 setHoldState : HoldState -> Model -> Model
@@ -101,6 +107,7 @@ type Msg
   = RecordingTouches RecordingTouchesMsg
   | RecordsAt Position Time
   | UpdateViewAt Time
+  | GetActiveItem
 
 type RecordingTouchesMsg
   = StartRecordingTouches Coordinates
@@ -149,6 +156,7 @@ init =
     , "31 février 2017"
     ]
   , inertia = Immobile
+  , activeItem = "19 janvier 2017"
   }
     ! []
 
@@ -161,25 +169,28 @@ subscriptions { inertia } =
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg ({ touchesHistory, holdState, inertia } as model) =
-  case msg of
-    RecordingTouches action -> updateRecordingAction action model
-    RecordsAt position currentTime ->
-      touchesHistory
-        |> addInHistory position currentTime
-        |> setTouchesHistoryIn model
-        |> (case inertia of
-          Computing -> updatePosition >> updateTimeAndSpeed
-          _ -> identity)
-        |> updateIdentity
-    UpdateViewAt currentTime ->
-      updateIdentity <|
-        case inertia of
-          Mobile (lastTime, speed) ->
-            if insignificantSpeed speed then
-              focusOnNearestItem model
-            else
-              applyAndChangeSpeed lastTime currentTime speed model
-          _ -> model
+  updateAndThen update GetActiveItem <|
+    case msg of
+      RecordingTouches action -> updateRecordingAction action model
+      RecordsAt position currentTime ->
+        touchesHistory
+          |> addInHistory position currentTime
+          |> setTouchesHistoryIn model
+          |> (case inertia of
+            Computing -> updatePosition >> updateTimeAndSpeed
+            _ -> identity)
+          |> updateIdentity
+      UpdateViewAt currentTime ->
+        updateIdentity <|
+          case inertia of
+            Mobile (lastTime, speed) ->
+              if insignificantSpeed speed then
+                focusOnNearestItem model
+              else
+                applyAndChangeSpeed lastTime currentTime speed model
+            _ -> model
+      GetActiveItem ->
+        model ! []
 
 updateRecordingAction : RecordingTouchesMsg -> Model -> ( Model, Cmd Msg )
 updateRecordingAction msg =
@@ -281,7 +292,7 @@ computeNewSpeed speed currentTime lastTime =
   speed * (0.99 ^ toFloat ((round (currentTime - lastTime)) % 17))
 
 insignificantSpeed : Speed -> Bool
-insignificantSpeed speed = abs speed < 0.000005
+insignificantSpeed speed = abs speed < 0.00005
 
 {-
   Focus.
