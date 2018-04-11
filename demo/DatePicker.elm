@@ -323,7 +323,7 @@ computeNewSpeed speed currentTime lastTime =
   speed * (0.99 ^ toFloat ((round (currentTime - lastTime)) % 17))
 
 insignificantSpeed : Speed -> Bool
-insignificantSpeed speed = abs speed < 0.05
+insignificantSpeed speed = abs speed < 0.04
 
 {-
   Focus.
@@ -376,7 +376,7 @@ toNearestPosition selections position =
 modifyToNearestPosition : (Position, Bool) -> (Bool, (WheelRound, Position)) -> (Bool, (WheelRound, Position))
 modifyToNearestPosition (angle, displayed) (reset, (wheelRound, position)) =
   if displayed then
-    if 0 <= angle + position && angle + position <= 3 then
+    if 0 <= angle + position && angle + position <= 1 then
       (True, (wheelRound, abs angle))
     else
       (reset, (wheelRound, position))
