@@ -14,6 +14,7 @@ module Transform
         , backfaceVisibilityVisible
         , preserve3d
         , perspective
+        , perspectiveOrigin
         )
 
 {-| Transform contains everything about css transformations : translate, rotate and scale.
@@ -22,6 +23,7 @@ module Transform
 # Types
 
 @docs Transform
+
 
 # Default transform
 
@@ -41,6 +43,8 @@ module Transform
 @docs backfaceVisibilityVisible
 @docs preserve3d
 @docs perspective
+@docs perspectiveOrigin
+
 
 # Compilation
 
@@ -75,6 +79,7 @@ type alias Transform =
     , backfaceVisibility : Maybe BackfaceVisibility
     , transformStyle : Maybe TransformStyle
     , perspective : Maybe SizeUnit
+    , perspectiveOrigin : Maybe ( SizeUnit, SizeUnit )
 
     -- , scale : Triplet Scale
     }
@@ -92,12 +97,19 @@ perspective a transform =
     { transform | perspective = Just a }
 
 
+{-| Defines the origin of the perspective of a scene
+-}
+perspectiveOrigin : ( SizeUnit, SizeUnit ) -> Transform -> Transform
+perspectiveOrigin perspectiveOrigin transform =
+    { transform | perspectiveOrigin = Just perspectiveOrigin }
+
+
 {-| Generate an empty `Translate` record, with every field equal to Nothing.
 You are free to use it as you wish, but it is instanciated automatically by `Box.translate`.
 -}
 default : Transform
 default =
-    Transform ( Nothing, Nothing, Nothing ) ( Nothing, Nothing, Nothing ) Nothing Nothing Nothing Nothing
+    Transform ( Nothing, Nothing, Nothing ) ( Nothing, Nothing, Nothing ) Nothing Nothing Nothing Nothing Nothing
 
 
 {-| Set the origin of the Transform.
@@ -171,6 +183,7 @@ transformToCouples transform =
         ++ unwrapToCouple .backfaceVisibility backfaceVisibilityToCouple transform
         ++ unwrapToCouple .transformStyle transformStyleToCouple transform
         ++ unwrapToCouple .perspective perspectiveToCouple transform
+        ++ unwrapToCouple .perspectiveOrigin perspectiveOriginToCouple transform
         ++ unwrapToCouple .origin originToCouple transform
 
 
@@ -289,6 +302,18 @@ transformStyleToCouple =
 perspectiveToCouple : SizeUnit -> ( String, String )
 perspectiveToCouple =
     (,) "perspective" << sizeUnitToString
+
+
+perspectiveOriginToString : ( SizeUnit, SizeUnit ) -> String
+perspectiveOriginToString ( x, y ) =
+    [ x, y ]
+        |> List.map sizeUnitToString
+        |> String.join " "
+
+
+perspectiveOriginToCouple : ( SizeUnit, SizeUnit ) -> ( String, String )
+perspectiveOriginToCouple =
+    (,) "perspective-origin" << perspectiveOriginToString
 
 
 originToString : ( SizeUnit, SizeUnit, SizeUnit ) -> String
