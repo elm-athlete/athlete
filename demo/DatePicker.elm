@@ -609,18 +609,9 @@ carousel list radius (( _, rotation ) as position) =
 selectVisibleItems : Rotation -> List ( Int, Date, Bool ) -> List ( Int, Date, Bool )
 selectVisibleItems completeRotation items =
     items
-        |> List.drop (round completeRotation // 35)
-        -- Have to find the right formula.
-        |> List.take (chooseNumberOfVisibleItems completeRotation)
+        |> List.drop (round completeRotation // angleBetweenTwoItems - 5)
+        |> List.take 10
         |> fillAbsent
-
-
-chooseNumberOfVisibleItems : Rotation -> Int
-chooseNumberOfVisibleItems completeRotation =
-    if completeRotation < 240 then
-        12
-    else
-        round (360 / angleBetweenTwoItems)
 
 
 fillAbsent : List ( Int, Date, Bool ) -> List ( Int, Date, Bool )
