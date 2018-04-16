@@ -94,6 +94,11 @@ setDoubleClick click record =
     { record | doubleClick = Just click }
 
 
+setContextMenu : b -> { a | contextMenu : Maybe b } -> { a | contextMenu : Maybe b }
+setContextMenu contextMenu record =
+    { record | contextMenu = Just contextMenu }
+
+
 setOnMouseUp : b -> { a | mouseUp : Maybe b } -> { a | mouseUp : Maybe b }
 setOnMouseUp mouseUp record =
     { record | mouseUp = Just mouseUp }
