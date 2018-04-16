@@ -196,8 +196,8 @@ all =
 {-| Accepts a color modifier
 -}
 full : Color -> Modifier (Surrounded Border)
-full color =
-    all [ (setColor << Just) color, thickness (Px 1), solid ]
+full borderColor =
+    all [ color borderColor, thickness (Px 1), solid ]
 
 
 {-| Compiles a `Surrounded Border` record to the corresponding CSS list of tuples.
