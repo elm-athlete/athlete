@@ -7,143 +7,143 @@ module BodyBuilder.Attributes
         , style
         , rawStyle
         , rawAttribute
-        , AutocompleteAttribute
-        , WidthAttribute
-        , HeightAttribute
-        , ValueAttribute
-        , StepAttribute
-        , MaxAttribute
-        , MinAttribute
-        , TargetAttribute
-        , HrefAttribute
-        , NameAttribute
-        , DisabledAttribute
-        , MaybeBlockContainer
-        , BlockContainer
-        , PlaceholderAttribute
-        , PositionAttribute
-        , DataAttribute
-        , TypeContainer
-        , BoxContainer
-        , CheckedContainer
-        , UniversalContainer
-        , FlexContainerProperties
-        , FlexItemProperties
-        , GridContainerProperties
-        , GridItemProperties
-        , Position
-        , VisibleAttributes
-        , VisibleAttributesAndEvents
-        , InputPasswordAttributes
-        , InputRangeAttributes
-        , SelectAttributes
-        , UniversalAttributes
-        , FlowAttributes
-        , NodeAttributes
-        , FlexContainerAttributes
-        , FlexItemAttributes
-        , GridContainerAttributes
-        , GridItemAttributes
-        , BlockAttributes
-        , HeadingAttributes
-        , ButtonAttributes
         , AAttributes
-        , TextareaAttributes
-        , ImgAttributes
         , AudioAttributes
-        , ProgressAttributes
-        , ScriptAttributes
+        , AutocompleteAttribute
+        , BlockAttributes
+        , BlockContainer
+        , BoxContainer
+        , ButtonAttributes
+        , CheckedContainer
+        , DataAttribute
+        , DisabledAttribute
+        , FlexContainerAttributes
+        , FlexContainerProperties
+        , FlexItemAttributes
+        , FlexItemProperties
+        , FlowAttributes
+        , GridContainerAttributes
+        , GridContainerProperties
+        , GridItemAttributes
+        , GridItemProperties
+        , HeadingAttributes
+        , HeightAttribute
+        , HrefAttribute
+        , ImgAttributes
         , InputAttributes
-        , InputHiddenAttributes
-        , LabelAttributes
-        , InputRadioAttributes
         , InputCheckboxAttributes
-        , InputTextAttributes
-        , InputTelAttributes
-        , InputSubmitAttributes
-        , InputUrlAttributes
-        , InputNumberAttributes
         , InputColorAttributes
         , InputFileAttributes
-        , label
-        , value
-        , title
-        , id
-        , class
-        , tabindex
-        , disabled
-        , target
-        , href
-        , name
-        , width
-        , height
-        , data
+        , InputHiddenAttributes
+        , InputNumberAttributes
+        , InputPasswordAttributes
+        , InputRadioAttributes
+        , InputRangeAttributes
+        , InputSubmitAttributes
+        , InputTelAttributes
+        , InputTextAttributes
+        , InputUrlAttributes
+        , LabelAttributes
+        , MaxAttribute
+        , MaybeBlockContainer
+        , MinAttribute
+        , NameAttribute
+        , NodeAttributes
+        , PlaceholderAttribute
+        , Position
+        , PositionAttribute
+        , ProgressAttributes
+        , ScriptAttributes
+        , SelectAttributes
+        , StepAttribute
+        , TargetAttribute
+        , TextareaAttributes
+        , TypeContainer
+        , UniversalAttributes
+        , UniversalContainer
+        , ValueAttribute
+        , VisibleAttributes
+        , VisibleAttributesAndEvents
+        , WidthAttribute
+        , aAttributesToHtmlAttributes
+        , audioAttributesToHtmlAttributes
         , autocomplete
-        , placeholder
-        , step
-        , max
-        , min
+        , buttonAttributesToHtmlAttributes
         , checked
-        , defaultUniversalAttributes
-        , defaultFlowAttributes
-        , defaultNodeAttributes
-        , defaultFlexContainerAttributes
-        , defaultGridContainerAttributes
-        , defaultHeadingAttributes
-        , defaultFlexItemAttributes
-        , defaultGridItemAttributes
-        , defaultButtonAttributes
+        , class
+        , data
         , defaultAAttributes
-        , defaultTextareaAttributes
-        , defaultImgAttributes
         , defaultAudioAttributes
-        , defaultProgressAttributes
-        , defaultScriptAttributes
-        , defaultInputHiddenAttributes
-        , defaultInputTextAttributes
-        , defaultInputTelAttributes
-        , defaultInputNumberAttributes
-        , defaultInputColorAttributes
+        , defaultButtonAttributes
+        , defaultFlexContainerAttributes
+        , defaultFlexItemAttributes
+        , defaultFlowAttributes
+        , defaultGridContainerAttributes
+        , defaultGridItemAttributes
+        , defaultHeadingAttributes
+        , defaultImgAttributes
         , defaultInputCheckboxAttributes
+        , defaultInputColorAttributes
         , defaultInputFileAttributes
+        , defaultInputHiddenAttributes
+        , defaultInputNumberAttributes
         , defaultInputPasswordAttributes
         , defaultInputRadioAttributes
         , defaultInputRangeAttributes
         , defaultInputSubmitAttributes
+        , defaultInputTelAttributes
+        , defaultInputTextAttributes
         , defaultInputUrlAttributes
+        , defaultNodeAttributes
+        , defaultProgressAttributes
+        , defaultScriptAttributes
         , defaultSelectAttributes
-        , universalAttributesToHtmlAttributes
-        , visibleAttributesToHtmlAttributes
-        , rawStyleToHtmlAttributes
-        , flowAttributesToHtmlAttributes
-        , nodeAttributesToHtmlAttributes
+        , defaultTextareaAttributes
+        , defaultUniversalAttributes
+        , disabled
+        , disabledAttributeToHtmlAttributes
         , flexContainerAttributesToHtmlAttributes
         , flexItemAttributesToHtmlAttributes
+        , flowAttributesToHtmlAttributes
         , gridContainerAttributesToHtmlAttributes
         , gridItemAttributesToHtmlAttributes
         , headingAttributesToHtmlAttributes
-        , disabledAttributeToHtmlAttributes
-        , buttonAttributesToHtmlAttributes
-        , aAttributesToHtmlAttributes
-        , textareaAttributesToHtmlAttributes
+        , height
+        , href
+        , id
         , imgAttributesToHtmlAttributes
-        , audioAttributesToHtmlAttributes
-        , progressAttributesToHtmlAttributes
-        , scriptAttributesToHtmlAttributes
         , inputAttributesToHtmlAttributes
-        , inputHiddenAttributesToHtmlAttributes
-        , inputVisibleToHtmlAttributes
-        , inputTextAttributesToHtmlAttributes
-        , inputNumberAttributesToHtmlAttributes
-        , inputColorAttributesToHtmlAttributes
         , inputCheckboxAttributesToHtmlAttributes
+        , inputColorAttributesToHtmlAttributes
         , inputFileAttributesToHtmlAttributes
+        , inputHiddenAttributesToHtmlAttributes
+        , inputNumberAttributesToHtmlAttributes
         , inputPasswordAttributesToHtmlAttributes
         , inputRadioAttributesToHtmlAttributes
         , inputRangeAttributesToHtmlAttributes
         , inputSubmitAttributesToHtmlAttributes
+        , inputTextAttributesToHtmlAttributes
         , inputUrlAttributesToHtmlAttributes
+        , inputVisibleToHtmlAttributes
+        , label
+        , max
+        , min
+        , name
+        , nodeAttributesToHtmlAttributes
+        , placeholder
+        , progressAttributesToHtmlAttributes
+        , rawStyleToHtmlAttributes
+        , scriptAttributesToHtmlAttributes
         , selectAttributesToHtmlAttributes
+        , step
+        , tabindex
+        , target
+        , textareaAttributesToHtmlAttributes
+        , title
+        , universalAttributesToHtmlAttributes
+        , value
+        , visibleAttributesToHtmlAttributes
+        , width
         )
 
 {-| This module entirely replaces Html.Attributes, providing a type-safer alternatives.
@@ -212,21 +212,21 @@ It is not compatible with Html.Attributes, though.
 
 -}
 
-import Html exposing (Html)
-import Html.Attributes
+import BodyBuilder.Events exposing (..)
+import BodyBuilder.Setters exposing (..)
+import BodyBuilder.Shared as Shared
+import Box
 import Color exposing (Color)
 import Color.Convert
-import Box
 import Display exposing (BlockDetails)
-import Helpers.Shared exposing (..)
-import BodyBuilder.Events exposing (..)
-import Function
-import Json.Decode exposing (Decoder)
-import Flex
-import BodyBuilder.Shared as Shared
-import Grid
 import Elegant
-import BodyBuilder.Setters exposing (..)
+import Flex
+import Function
+import Grid
+import Helpers.Shared exposing (..)
+import Html exposing (Html)
+import Html.Attributes
+import Json.Decode exposing (Decoder)
 import Modifiers exposing (..)
 
 
