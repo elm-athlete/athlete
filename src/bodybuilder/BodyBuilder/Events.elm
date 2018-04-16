@@ -31,6 +31,7 @@ module BodyBuilder.Events
         , onBlurEventToHtmlAttributes
         , OnEvent
         , on
+        , onWithOptions
         , onEventToHtmlAttributes
         )
 
@@ -43,6 +44,7 @@ It is not compatible with Html, though.
 @docs inputEventToHtmlEvent
 @docs mouseEventsToHtmlAttributes
 @docs on
+@docs onWithOptions
 @docs onBlur
 @docs OnBlurEvent
 @docs onBlurEventToHtmlAttributes
@@ -237,7 +239,7 @@ type alias OnBlurEvent msg a =
 
 {-| -}
 type alias OnEvent msg a =
-    { a | onEvent : Maybe ( String, Decoder msg ) }
+    { a | onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg ) }
 
 
 {-| -}
@@ -308,10 +310,21 @@ onBlurEventToHtmlAttributes =
 {-| -}
 on : String -> Decoder msg -> Modifier (OnEvent msg a)
 on event decoder attrs =
-    { attrs | onEvent = Just ( event, decoder ) }
+    { attrs | onEvent = Just ( event, Nothing, decoder ) }
 
 
 {-| -}
-onEventToHtmlAttributes : ( String, Decoder msg ) -> List (Html.Attribute msg)
-onEventToHtmlAttributes ( event, decoder ) =
-    [ Html.Events.on event decoder ]
+onWithOptions : String -> Html.Events.Options -> Decoder msg -> Modifier (OnEvent msg a)
+onWithOptions event options decoder attrs =
+    { attrs | onEvent = Just ( event, Just options, decoder ) }
+
+
+{-| -}
+onEventToHtmlAttributes : ( String, Maybe Html.Events.Options, Decoder msg ) -> List (Html.Attribute msg)
+onEventToHtmlAttributes ( event, maybeOptions, decoder ) =
+    case maybeOptions of
+        Nothing ->
+            [ Html.Events.on event decoder ]
+
+        Just options ->
+            [ Html.Events.onWithOptions event options decoder ]
