@@ -36,4 +36,4 @@ Use (or implement) transitions between your views !
 
 **You are done !** You can know deploy your app on the app store and the android store (and even the web)
 
-But there's more, far more... you can create so many other [things](https://elm-bodybuilder.github.io/elegant) with Athlete.
+But there's more, far more... you can create so many other [things](https://elm-athlete.github.io/athlete) with Athlete.
