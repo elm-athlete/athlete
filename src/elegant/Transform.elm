@@ -90,14 +90,20 @@ type TransformStyle
     | Preserve3d
 
 
-{-| Change the perspective of a scene. It represents the distance between the z=0 plane and the user in order to give a 3D-positioned element some perspective. Each 3D element with z>0 becomes larger; each 3D-element with z<0 becomes smaller. The strength of the effect is determined by the value of this property.
+{-| Change the perspective of a scene. It represents the distance between the
+z=0 plane and the user in order to give a 3D-positioned element some
+perspective. Each 3D element with z>0 becomes larger; each 3D-element with z<0
+becomes smaller. The strength of the effect is determined by the value of this
+property.
 -}
 perspective : SizeUnit -> Transform -> Transform
 perspective a transform =
     { transform | perspective = Just a }
 
 
-{-| Define the origin of the perspective of a scene. It represents the position at which the viewer is looking. It is used as the vanishing point by the perspective property.
+{-| Define the origin of the perspective of a scene. It represents the position
+at which the viewer is looking. It is used as the vanishing point by the
+perspective property.
 -}
 perspectiveOrigin : ( SizeUnit, SizeUnit ) -> Transform -> Transform
 perspectiveOrigin perspectiveOrigin transform =
