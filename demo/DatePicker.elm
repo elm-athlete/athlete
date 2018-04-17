@@ -150,7 +150,7 @@ selectCorrectRotationHelp (( wheelTurns, rotation ) as partialRotation) selectio
                     && bool
             then
                 Just partialRotation
-            else if (index == 360 // angleBetweenTwoItems) then
+            else if index == (360 // angleBetweenTwoItems) - 1 then
                 selectCorrectRotationHelp ( wheelTurns + 1, 0 ) tl date
             else
                 selectCorrectRotationHelp ( wheelTurns, rotation + angleBetweenTwoItems ) tl date
@@ -290,7 +290,7 @@ init =
       , unselectableDates = []
       }
         |> newDatePicker
-        |> setActiveDate (Debug.log "test" (Date.fromTime 1526131540067))
+        |> setActiveDate (Date.fromTime 1526131540067)
     , Cmd.none
     )
 
@@ -314,13 +314,14 @@ update msg ((DatePicker { touchesHistory, holdState, inertia }) as model) =
         RecordingTouches action ->
             updateRecordingAction action model
 
-        RecordsAt position currentTime ->
+        RecordsAt mouseX currentTime ->
             touchesHistory
-                |> addInHistory position currentTime
+                |> addInHistory mouseX currentTime
                 |> setTouchesHistoryIn model
+                -- |> updateRotation
                 |> (case inertia of
                         Mobilizing ->
-                            updatePosition >> updateTimeAndSpeed
+                            updateRotation >> updateTimeAndSpeed
 
                         _ ->
                             identity
@@ -390,10 +391,10 @@ stopRecordTouches model =
         |> setInertia Mobilizing
 
 
-updatePosition : DatePicker -> DatePicker
-updatePosition model =
+updateRotation : DatePicker -> DatePicker
+updateRotation model =
     model
-        |> interpolatePosition
+        |> interpolateRotation
         |> setRotationIn model
 
 
@@ -407,8 +408,8 @@ maxRotation selections =
     (toFloat (List.length selections - 1)) * angleBetweenTwoItems
 
 
-interpolatePosition : DatePicker -> ( WheelTurns, Rotation )
-interpolatePosition (DatePicker { holdState, inertia, touchesHistory, rotation, selections }) =
+interpolateRotation : DatePicker -> ( WheelTurns, Rotation )
+interpolateRotation (DatePicker { holdState, inertia, touchesHistory, rotation, selections }) =
     let
         completeRotation =
             toCompleteRotation rotation
@@ -416,12 +417,12 @@ interpolatePosition (DatePicker { holdState, inertia, touchesHistory, rotation, 
         value =
             case holdState of
                 Held ->
-                    interpolatePositionHelper touchesHistory completeRotation
+                    interpolateRotationHelper touchesHistory completeRotation
 
                 Released ->
                     case inertia of
                         Mobilizing ->
-                            interpolatePositionHelper touchesHistory completeRotation
+                            interpolateRotationHelper touchesHistory completeRotation
 
                         _ ->
                             completeRotation
@@ -443,8 +444,8 @@ toPartialRotation rotation =
         ( wheelTurns, rotation - (toFloat (wheelTurns * 360)) )
 
 
-interpolatePositionHelper : TouchesHistory -> Rotation -> Rotation
-interpolatePositionHelper ({ lastPositions, startPosition } as history) position =
+interpolateRotationHelper : TouchesHistory -> Rotation -> Rotation
+interpolateRotationHelper ({ lastPositions, startPosition } as history) position =
     lastPositions
         |> BoundedList.head
         |> Maybe.map Tuple.second
@@ -520,18 +521,18 @@ insignificantSpeed speed =
 focusOnNearestItem : Model -> Model
 focusOnNearestItem ((DatePicker { rotation, selections, touchesHistory }) as model) =
     rotation
-        |> adjustPosition touchesHistory
+        |> adjustPosition touchesHistory (maxRotation selections)
         |> toNearestPosition selections
         |> modifyModelAccordingToNearestPosition model
 
 
-adjustPosition : TouchesHistory -> ( WheelTurns, Rotation ) -> ( WheelTurns, Rotation )
-adjustPosition { lastPositions } =
+adjustPosition : TouchesHistory -> Float -> ( WheelTurns, Rotation ) -> ( WheelTurns, Rotation )
+adjustPosition { lastPositions } maxRotation =
     let
         operator =
             selectIncreaseOrDecrease (BoundedList.content lastPositions)
     in
-        toCompleteRotation >> flip operator 1.0 >> toPartialRotation
+        toCompleteRotation >> flip operator 1.0 >> clamp 0 maxRotation >> toPartialRotation
 
 
 selectIncreaseOrDecrease : List ( Time, Rotation ) -> (Rotation -> Rotation -> Rotation)
@@ -609,14 +610,14 @@ modifyModelAccordingToNearestPosition model ( reset, position ) =
 
 
 view : Model -> Node Msg
-view ((DatePicker { selections }) as model) =
+view ((DatePicker { selections, rotation }) as model) =
     Builder.div
         [ Attributes.style [ Style.box [ Box.padding [ Padding.left (px 200), Padding.top (px 200) ] ] ]
         , Attributes.rawAttribute (SingleTouch.onStart (RecordingTouches << StartRecordingTouches))
         , Attributes.rawAttribute (SingleTouch.onMove (RecordingTouches << RecordTouch))
         , Attributes.rawAttribute (SingleTouch.onEnd (RecordingTouches << StopRecordingTouches))
         ]
-        [ carousel selections 50 (interpolatePosition model) ]
+        [ carousel selections 50 (interpolateRotation model) ]
 
 
 carousel : List ( Int, Date, Bool ) -> Int -> ( WheelTurns, Rotation ) -> Node msg
