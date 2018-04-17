@@ -1,6 +1,13 @@
 module BodyBuilder.Attributes
     exposing
-        ( AAttributes
+        ( StyleSelector
+        , defaultStyleSelector
+        , MediaQuery(..)
+        , StyleModifier
+        , style
+        , rawStyle
+        , rawAttribute
+        , AAttributes
         , AudioAttributes
         , AutocompleteAttribute
         , BlockAttributes
@@ -39,7 +46,6 @@ module BodyBuilder.Attributes
         , LabelAttributes
         , MaxAttribute
         , MaybeBlockContainer
-        , MediaQuery(..)
         , MinAttribute
         , NameAttribute
         , NodeAttributes
@@ -50,8 +56,6 @@ module BodyBuilder.Attributes
         , ScriptAttributes
         , SelectAttributes
         , StepAttribute
-        , StyleModifier
-        , StyleSelector
         , TargetAttribute
         , TextareaAttributes
         , TypeContainer
@@ -94,7 +98,6 @@ module BodyBuilder.Attributes
         , defaultProgressAttributes
         , defaultScriptAttributes
         , defaultSelectAttributes
-        , defaultStyleSelector
         , defaultTextareaAttributes
         , defaultUniversalAttributes
         , disabled
@@ -129,13 +132,10 @@ module BodyBuilder.Attributes
         , nodeAttributesToHtmlAttributes
         , placeholder
         , progressAttributesToHtmlAttributes
-        , rawAttribute
-        , rawStyle
         , rawStyleToHtmlAttributes
         , scriptAttributesToHtmlAttributes
         , selectAttributesToHtmlAttributes
         , step
-        , style
         , tabindex
         , target
         , textareaAttributesToHtmlAttributes

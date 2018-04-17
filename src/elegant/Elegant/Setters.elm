@@ -41,6 +41,16 @@ setAngleIn =
     flip setAngle
 
 
+setBackfaceVisibility : a -> { c | backfaceVisibility : b } -> { c | backfaceVisibility : a }
+setBackfaceVisibility b a =
+    { a | backfaceVisibility = b }
+
+
+setTransformStyle : a -> { c | transformStyle : b } -> { c | transformStyle : a }
+setTransformStyle b a =
+    { a | transformStyle = b }
+
+
 setBackground : c -> { b | background : a } -> { b | background : c }
 setBackground v o =
     { o | background = v }
@@ -134,6 +144,11 @@ setTransform v o =
 setTranslate : a -> { c | translate : b } -> { c | translate : a }
 setTranslate v o =
     { o | translate = v }
+
+
+setOrigin : a -> { c | origin : b } -> { c | origin : a }
+setOrigin v o =
+    { o | origin = v }
 
 
 setRotate : a -> { c | rotate : b } -> { c | rotate : a }

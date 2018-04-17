@@ -116,6 +116,13 @@ sizeUnitToString val =
             concatNumberWithString x "rem"
 
 
+sizeUnitCoupleToString : ( SizeUnit, SizeUnit ) -> String
+sizeUnitCoupleToString ( x, y ) =
+    [ x, y ]
+        |> List.map sizeUnitToString
+        |> String.join " "
+
+
 modifiedElementOrNothing : a -> List (a -> a) -> Maybe a
 modifiedElementOrNothing default modifiers =
     if List.isEmpty modifiers then
