@@ -204,8 +204,8 @@ cornerToCouple corner values =
 
 
 cornerToString : ( SizeUnit, SizeUnit ) -> String
-cornerToString ( val1, val2 ) =
-    [ sizeUnitToString val1, sizeUnitToString val2 ] |> String.join " "
+cornerToString =
+    sizeUnitCoupleToString
 
 
 setCorner : CornerSet -> SizeUnit -> SizeUnit -> Modifier Corner

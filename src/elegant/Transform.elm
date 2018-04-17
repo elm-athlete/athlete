@@ -311,10 +311,8 @@ perspectiveToCouple =
 
 
 perspectiveOriginToString : ( SizeUnit, SizeUnit ) -> String
-perspectiveOriginToString ( x, y ) =
-    [ x, y ]
-        |> List.map sizeUnitToString
-        |> String.join " "
+perspectiveOriginToString =
+    sizeUnitCoupleToString
 
 
 perspectiveOriginToCouple : ( SizeUnit, SizeUnit ) -> ( String, String )
