@@ -430,17 +430,17 @@ interpolatePosition (DatePicker { holdState, inertia, touchesHistory, rotation, 
 
 
 toCompleteRotation : ( WheelTurns, Rotation ) -> Rotation
-toCompleteRotation ( wheelTurns, position ) =
-    (toFloat (wheelTurns * 360)) + position
+toCompleteRotation ( wheelTurns, rotation ) =
+    (toFloat (wheelTurns * 360)) + rotation
 
 
-toPartialRotation : Rotation -> ( Int, Rotation )
-toPartialRotation position =
+toPartialRotation : Rotation -> ( WheelTurns, Rotation )
+toPartialRotation rotation =
     let
         wheelTurns =
-            round position // 360
+            round rotation // 360
     in
-        ( wheelTurns, position - (toFloat (wheelTurns * 360)) )
+        ( wheelTurns, rotation - (toFloat (wheelTurns * 360)) )
 
 
 interpolatePositionHelper : TouchesHistory -> Rotation -> Rotation
