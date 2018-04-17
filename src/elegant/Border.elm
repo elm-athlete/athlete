@@ -16,6 +16,7 @@ module Border
         , all
         , borderToCouples
         , full
+        , color
         )
 
 {-| Border contains everything about borders rendering.
@@ -41,6 +42,7 @@ module Border
 @docs none
 @docs solid
 @docs dashed
+@docs color
 
 
 ## Sides
@@ -135,6 +137,13 @@ thickness =
     setThickness << Just
 
 
+{-| Set the color of the border.
+-}
+color : Color -> Modifier Border
+color =
+    setColor << Just
+
+
 {-| Accepts a list of border modifiers, and modify the top side of the border.
 -}
 top : Modifiers Border -> Modifier (Surrounded Border)
@@ -187,8 +196,8 @@ all =
 {-| Accepts a color modifier
 -}
 full : Color -> Modifier (Surrounded Border)
-full color =
-    all [ (setColor << Just) color, thickness (Px 1), solid ]
+full borderColor =
+    all [ color borderColor, thickness (Px 1), solid ]
 
 
 {-| Compiles a `Surrounded Border` record to the corresponding CSS list of tuples.

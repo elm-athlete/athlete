@@ -4,6 +4,7 @@ module BodyBuilder.Events
         , OnMouseEventsInside
         , onClick
         , onDoubleClick
+        , onContextMenu
         , onMouseUp
         , onMouseOut
         , onMouseOver
@@ -30,6 +31,7 @@ module BodyBuilder.Events
         , onBlurEventToHtmlAttributes
         , OnEvent
         , on
+        , onWithOptions
         , onEventToHtmlAttributes
         )
 
@@ -42,6 +44,7 @@ It is not compatible with Html, though.
 @docs inputEventToHtmlEvent
 @docs mouseEventsToHtmlAttributes
 @docs on
+@docs onWithOptions
 @docs onBlur
 @docs OnBlurEvent
 @docs onBlurEventToHtmlAttributes
@@ -50,6 +53,7 @@ It is not compatible with Html, though.
 @docs onClick
 @docs OnColorInputEvent
 @docs onDoubleClick
+@docs onContextMenu
 @docs OnEvent
 @docs onEventToHtmlAttributes
 @docs onFocus
@@ -91,6 +95,7 @@ defaultOnMouseEvents =
         Nothing
         Nothing
         Nothing
+        Nothing
 
 
 withDefaultOnMouse : Modifier (OnMouseEventsInside msg) -> Modifier (OnMouseEvents msg a)
@@ -111,6 +116,12 @@ onClick val =
 onDoubleClick : msg -> Modifier (OnMouseEvents msg a)
 onDoubleClick val =
     withDefaultOnMouse (setDoubleClick val)
+
+
+{-| -}
+onContextMenu : msg -> Modifier (OnMouseEvents msg a)
+onContextMenu val =
+    withDefaultOnMouse (setContextMenu val)
 
 
 {-| -}
@@ -152,16 +163,17 @@ onMouseEnter val =
 {-| -}
 mouseEventsToHtmlAttributes : OnMouseEventsInside msg -> List (Html.Attribute msg)
 mouseEventsToHtmlAttributes events =
-    [ unwrapEmptyList (Html.Events.onClick >> List.singleton) << .click
-    , unwrapEmptyList (Html.Events.onDoubleClick >> List.singleton) << .doubleClick
-    , unwrapEmptyList (Html.Events.onMouseDown >> List.singleton) << .mouseDown
-    , unwrapEmptyList (Html.Events.onMouseUp >> List.singleton) << .mouseUp
-    , unwrapEmptyList (Html.Events.onMouseEnter >> List.singleton) << .mouseEnter
-    , unwrapEmptyList (Html.Events.onMouseLeave >> List.singleton) << .mouseLeave
-    , unwrapEmptyList (Html.Events.onMouseOver >> List.singleton) << .mouseOver
-    , unwrapEmptyList (Html.Events.onMouseOut >> List.singleton) << .mouseOut
-    ]
-        |> List.concatMap (callOn events)
+    List.concatMap (callOn events)
+        [ unwrapEmptyList (Html.Events.onClick >> List.singleton) << .click
+        , unwrapEmptyList (Html.Events.onDoubleClick >> List.singleton) << .doubleClick
+        , unwrapEmptyList (Json.Decode.succeed >> Html.Events.on "contextmenu" >> List.singleton) << .contextMenu
+        , unwrapEmptyList (Html.Events.onMouseDown >> List.singleton) << .mouseDown
+        , unwrapEmptyList (Html.Events.onMouseUp >> List.singleton) << .mouseUp
+        , unwrapEmptyList (Html.Events.onMouseEnter >> List.singleton) << .mouseEnter
+        , unwrapEmptyList (Html.Events.onMouseLeave >> List.singleton) << .mouseLeave
+        , unwrapEmptyList (Html.Events.onMouseOver >> List.singleton) << .mouseOver
+        , unwrapEmptyList (Html.Events.onMouseOut >> List.singleton) << .mouseOut
+        ]
 
 
 {-| -}
@@ -173,6 +185,7 @@ type alias OnMouseEvents msg a =
 type alias OnMouseEventsInside msg =
     { click : Maybe msg
     , doubleClick : Maybe msg
+    , contextMenu : Maybe msg
     , mouseDown : Maybe msg
     , mouseUp : Maybe msg
     , mouseEnter : Maybe msg
@@ -226,7 +239,7 @@ type alias OnBlurEvent msg a =
 
 {-| -}
 type alias OnEvent msg a =
-    { a | onEvent : Maybe ( String, Decoder msg ) }
+    { a | onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg ) }
 
 
 {-| -}
@@ -297,10 +310,21 @@ onBlurEventToHtmlAttributes =
 {-| -}
 on : String -> Decoder msg -> Modifier (OnEvent msg a)
 on event decoder attrs =
-    { attrs | onEvent = Just ( event, decoder ) }
+    { attrs | onEvent = Just ( event, Nothing, decoder ) }
 
 
 {-| -}
-onEventToHtmlAttributes : ( String, Decoder msg ) -> List (Html.Attribute msg)
-onEventToHtmlAttributes ( event, decoder ) =
-    [ Html.Events.on event decoder ]
+onWithOptions : String -> Html.Events.Options -> Decoder msg -> Modifier (OnEvent msg a)
+onWithOptions event options decoder attrs =
+    { attrs | onEvent = Just ( event, Just options, decoder ) }
+
+
+{-| -}
+onEventToHtmlAttributes : ( String, Maybe Html.Events.Options, Decoder msg ) -> List (Html.Attribute msg)
+onEventToHtmlAttributes ( event, maybeOptions, decoder ) =
+    case maybeOptions of
+        Nothing ->
+            [ Html.Events.on event decoder ]
+
+        Just options ->
+            [ Html.Events.onWithOptions event options decoder ]
