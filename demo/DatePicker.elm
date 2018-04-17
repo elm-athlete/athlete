@@ -75,6 +75,7 @@ type alias Model =
 type alias MouseX =
     Float
 
+
 type Msg
     = RecordingTouches RecordingTouchesMsg
     | RecordsAt MouseX Time
@@ -114,16 +115,56 @@ newDatePicker { start, end, unselectableDates } =
             }
 
 
+setActiveDate : Date -> DatePicker -> DatePicker
+setActiveDate activeDate ((DatePicker { selections }) as datePicker) =
+    case selectCorrectRotation selections activeDate of
+        Nothing ->
+            datePicker
+
+        Just newRotation ->
+            datePicker
+                |> setRotation newRotation
+                |> getActiveItem
+
+
+selectCorrectRotation : List ( Int, Date, Bool ) -> Date -> Maybe ( WheelTurns, Rotation )
+selectCorrectRotation =
+    selectCorrectRotationHelp ( 0, 0 )
+
+
+selectCorrectRotationHelp :
+    ( WheelTurns, Rotation )
+    -> List ( Int, Date, Bool )
+    -> Date
+    -> Maybe ( WheelTurns, Rotation )
+selectCorrectRotationHelp (( wheelTurns, rotation ) as partialRotation) selections date =
+    case selections of
+        [] ->
+            Nothing
+
+        ( index, selectionDate, bool ) :: tl ->
+            if
+                (Date.year selectionDate == Date.year date)
+                    && (Date.month selectionDate == Date.month date)
+                    && (Date.day selectionDate == Date.day date)
+                    && bool
+            then
+                Just partialRotation
+            else if (index == 360 // angleBetweenTwoItems) then
+                selectCorrectRotationHelp ( wheelTurns + 1, 0 ) tl date
+            else
+                selectCorrectRotationHelp ( wheelTurns, rotation + angleBetweenTwoItems ) tl date
+
+
 createDateRange : Time -> Time -> List Time
 createDateRange start end =
     createDateRangeHelper start end []
 
 
-
--- 86_400_000 ms in a day.
 numberOfMsInADay : number
 numberOfMsInADay =
-  86400000
+    86400000
+
 
 createDateRangeHelper : Time -> Time -> List Time -> List Time
 createDateRangeHelper start end acc =
@@ -147,7 +188,7 @@ unselectWrongDates unselectableDates time =
 
 associateIndexes : List ( a, b ) -> List ( Int, a, b )
 associateIndexes =
-    List.indexedMap (\index ( a, b ) -> ( index % (round (360 / angleBetweenTwoItems)) , a, b ))
+    List.indexedMap (\index ( a, b ) -> ( index % (round (360 / angleBetweenTwoItems)), a, b ))
 
 
 setHoldState : HoldState -> DatePicker -> DatePicker
@@ -215,8 +256,6 @@ setActiveItemIn =
     flip setActiveItem
 
 
-
-
 setLastPositions : BoundedList ( Time, Rotation ) -> TouchesHistory -> TouchesHistory
 setLastPositions list history =
     { history | lastPositions = list }
@@ -234,7 +273,6 @@ addInHistory position currentTime ({ lastPositions } as history) =
         |> setLastPositionsIn history
 
 
-
 main : Program Basics.Never Model Msg
 main =
     Builder.program
@@ -247,13 +285,14 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    (newDatePicker
-        { start = 1523451140067
-        , end = 1526537540067
-        , unselectableDates = []
-        }
+    ( { start = 1523451140067
+      , end = 1526537540067
+      , unselectableDates = []
+      }
+        |> newDatePicker
+        |> setActiveDate (Debug.log "test" (Date.fromTime 1526131540067))
+    , Cmd.none
     )
-        ! []
 
 
 subscriptions : Model -> Sub Msg
@@ -303,13 +342,11 @@ update msg ((DatePicker { touchesHistory, holdState, inertia }) as model) =
                             model
 
 
-
-
 getActiveItem : DatePicker -> DatePicker
 getActiveItem ((DatePicker { rotation, selections }) as model) =
     selections
         |> selectVisibleItems (toCompleteRotation rotation)
-        |> List.map (\( index, content, _ ) -> ( abs (reelAngle (toFloat index) ), content ))
+        |> List.map (\( index, content, _ ) -> ( abs (reelAngle (toFloat index)), content ))
         |> selectActiveItem rotation
         |> Maybe.map (setActiveItemIn model)
         |> Maybe.withDefault model
@@ -359,12 +396,15 @@ updatePosition model =
         |> interpolatePosition
         |> setRotationIn model
 
+
 angleBetweenTwoItems : number
 angleBetweenTwoItems =
-  24
+    24
+
+
 maxRotation : List a -> Float
 maxRotation selections =
-   (toFloat (List.length selections - 1)) * angleBetweenTwoItems
+    (toFloat (List.length selections - 1)) * angleBetweenTwoItems
 
 
 interpolatePosition : DatePicker -> ( WheelTurns, Rotation )
@@ -385,9 +425,9 @@ interpolatePosition (DatePicker { holdState, inertia, touchesHistory, rotation, 
 
                         _ ->
                             completeRotation
-
     in
         toPartialRotation (clamp 0 (maxRotation selections) value)
+
 
 toCompleteRotation : ( WheelTurns, Rotation ) -> Rotation
 toCompleteRotation ( wheelTurns, position ) =
