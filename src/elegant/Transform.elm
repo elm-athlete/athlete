@@ -14,6 +14,7 @@ module Transform
         , backfaceVisibilityVisible
         , preserve3d
         , perspective
+        , perspectiveOrigin
         )
 
 {-| Transform contains everything about css transformations : translate, rotate and scale.
@@ -22,6 +23,7 @@ module Transform
 # Types
 
 @docs Transform
+
 
 # Default transform
 
@@ -41,6 +43,8 @@ module Transform
 @docs backfaceVisibilityVisible
 @docs preserve3d
 @docs perspective
+@docs perspectiveOrigin
+
 
 # Compilation
 
@@ -75,6 +79,7 @@ type alias Transform =
     , backfaceVisibility : Maybe BackfaceVisibility
     , transformStyle : Maybe TransformStyle
     , perspective : Maybe SizeUnit
+    , perspectiveOrigin : Maybe ( SizeUnit, SizeUnit )
 
     -- , scale : Triplet Scale
     }
@@ -85,11 +90,24 @@ type TransformStyle
     | Preserve3d
 
 
-{-| Change the perspective of a scene
+{-| Change the perspective of a scene. It represents the distance between the
+z=0 plane and the user in order to give a 3D-positioned element some
+perspective. Each 3D element with z>0 becomes larger; each 3D-element with z<0
+becomes smaller. The strength of the effect is determined by the value of this
+property.
 -}
 perspective : SizeUnit -> Transform -> Transform
 perspective a transform =
     { transform | perspective = Just a }
+
+
+{-| Define the origin of the perspective of a scene. It represents the position
+at which the viewer is looking. It is used as the vanishing point by the
+perspective property.
+-}
+perspectiveOrigin : ( SizeUnit, SizeUnit ) -> Transform -> Transform
+perspectiveOrigin perspectiveOrigin transform =
+    { transform | perspectiveOrigin = Just perspectiveOrigin }
 
 
 {-| Generate an empty `Translate` record, with every field equal to Nothing.
@@ -97,7 +115,7 @@ You are free to use it as you wish, but it is instanciated automatically by `Box
 -}
 default : Transform
 default =
-    Transform ( Nothing, Nothing, Nothing ) ( Nothing, Nothing, Nothing ) Nothing Nothing Nothing Nothing
+    Transform ( Nothing, Nothing, Nothing ) ( Nothing, Nothing, Nothing ) Nothing Nothing Nothing Nothing Nothing
 
 
 {-| Set the origin of the Transform.
@@ -171,6 +189,7 @@ transformToCouples transform =
         ++ unwrapToCouple .backfaceVisibility backfaceVisibilityToCouple transform
         ++ unwrapToCouple .transformStyle transformStyleToCouple transform
         ++ unwrapToCouple .perspective perspectiveToCouple transform
+        ++ unwrapToCouple .perspectiveOrigin perspectiveOriginToCouple transform
         ++ unwrapToCouple .origin originToCouple transform
 
 
@@ -289,6 +308,16 @@ transformStyleToCouple =
 perspectiveToCouple : SizeUnit -> ( String, String )
 perspectiveToCouple =
     (,) "perspective" << sizeUnitToString
+
+
+perspectiveOriginToString : ( SizeUnit, SizeUnit ) -> String
+perspectiveOriginToString =
+    sizeUnitCoupleToString
+
+
+perspectiveOriginToCouple : ( SizeUnit, SizeUnit ) -> ( String, String )
+perspectiveOriginToCouple =
+    (,) "perspective-origin" << perspectiveOriginToString
 
 
 originToString : ( SizeUnit, SizeUnit, SizeUnit ) -> String
