@@ -17,7 +17,7 @@ function setValAndReturnValue (cacheStore, key, value) {
   return value
 }
 
-var _elm_bodybuilder$elegant$Native_Elegant = (function() {
+var _elm_athlete$athlete$Native_Elegant = (function() {
   var stylesCache = new Map()
   var atomicClassCache = new Map()
   var insertedClasses = new Set()

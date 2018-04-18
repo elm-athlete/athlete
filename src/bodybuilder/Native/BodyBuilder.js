@@ -1,4 +1,4 @@
-var _elm_bodybuilder$elegant$Native_BodyBuilder = (function() {
+var _elm_athlete$athlete$Native_BodyBuilder = (function() {
   var classesNamesCache = new Map()
   var displayStyleCache = new Map()
 
