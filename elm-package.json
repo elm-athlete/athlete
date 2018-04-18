@@ -1,7 +1,7 @@
 {
     "version": "12.1.0",
     "summary": "Framework for inline CSS",
-    "repository": "https://github.com/elm-bodybuilder/elegant.git",
+    "repository": "https://github.com/elm-athlete/athlete.git",
     "license": "MIT",
     "source-directories": [
         "src/elegant",
