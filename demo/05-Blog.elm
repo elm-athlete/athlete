@@ -198,10 +198,9 @@ pageView { blogposts } { route } transition =
 
 view : Model -> Node Msg
 view ({ history, data } as model) =
-    node
+    div
         [ style
-            [ Style.block []
-            , Style.box
+            [ Style.box
                 [ Box.typography
                     [ Typography.fontFamilySansSerif
                     , Typography.size Constants.zeta
