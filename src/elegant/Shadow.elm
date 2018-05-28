@@ -1,16 +1,16 @@
-module Shadow
+module Elegant.Shadow
     exposing
         ( Shadow
-        , default
-        , inset
-        , spreadRadius
         , blurRadius
-        , offset
-        , standard
-        , plain
         , blurry
         , boxShadowToCouple
         , color
+        , default
+        , inset
+        , offset
+        , plain
+        , spreadRadius
+        , standard
         )
 
 {-| Shadow contains everything about boxShadow.
@@ -37,6 +37,7 @@ module Shadow
 @docs blurry
 @docs color
 
+
 # Compilation
 
 @docs boxShadowToCouple
@@ -45,8 +46,8 @@ module Shadow
 
 import Color exposing (Color)
 import Color.Convert
-import Helpers.Shared exposing (..)
-import Elegant.Setters exposing (..)
+import Elegant.Helpers.Shared exposing (..)
+import Elegant.Internals.Setters exposing (..)
 import Modifiers exposing (..)
 
 
@@ -172,17 +173,17 @@ insetToStringList : Bool -> List String
 insetToStringList inset =
     if inset then
         [ "inset" ]
+
     else
         []
 
 
 boxShadowToString : Shadow -> String
 boxShadowToString { inset, offset, spreadRadius, color, blurRadius } =
-    ([ offsetToStringList offset
-     , blurAndSpreadRadiusToStringList blurRadius spreadRadius
-     , colorToStringList color
-     , insetToStringList inset
-     ]
+    [ offsetToStringList offset
+    , blurAndSpreadRadiusToStringList blurRadius spreadRadius
+    , colorToStringList color
+    , insetToStringList inset
+    ]
         |> List.concat
         |> String.join " "
-    )

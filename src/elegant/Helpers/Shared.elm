@@ -1,10 +1,10 @@
-module Helpers.Shared exposing (..)
+module Elegant.Helpers.Shared exposing (..)
 
 {-| -}
 
-import Function
-import Color.Convert
 import Color exposing (Color)
+import Color.Convert
+import Function
 import Maybe.Extra
 import ParseInt
 
@@ -127,6 +127,7 @@ modifiedElementOrNothing : a -> List (a -> a) -> Maybe a
 modifiedElementOrNothing default modifiers =
     if List.isEmpty modifiers then
         Nothing
+
     else
         default
             |> Function.compose modifiers
