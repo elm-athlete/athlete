@@ -1,16 +1,16 @@
 module BodyBuilder.Convert exposing (..)
 
-import BodyBuilder.Setters exposing (..)
-import Elegant
-import Display
-import Box
 import BodyBuilder.Attributes as Attributes
-import List.Extra
+import BodyBuilder.Setters exposing (..)
+import Box
 import Dict exposing (Dict)
-import Maybe.Extra
-import Function
+import Display
+import Elegant
 import Flex
+import Function
 import Grid
+import List.Extra
+import Maybe.Extra
 import Modifiers exposing (..)
 
 
@@ -81,7 +81,7 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
 
         computedBoxDetails : List ( Attributes.StyleSelector, Box.Box )
         computedBoxDetails =
-            boxModifiers |> (groupByStyleSelectorAndCompute (Box.default))
+            boxModifiers |> groupByStyleSelectorAndCompute Box.default
 
         key =
             ( computedFlexContainerDetails
@@ -92,24 +92,28 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
             , computedBoxDetails
             )
     in
-        Native.BodyBuilder.fetchDisplayStyle key
-            |> Maybe.withDefault
-                (separatedComponentsToElegantStyle
-                    computedFlexContainerDetails
-                    computedFlexItemDetails
-                    computedGridContainerDetails
-                    computedGridItemDetails
-                    computedBlockDetails
-                    computedBoxDetails
-                    |> Native.BodyBuilder.addDisplayStyle key
-                )
+    []
+
+
+
+-- Native.BodyBuilder.fetchDisplayStyle key
+--     |> Maybe.withDefault
+--         (separatedComponentsToElegantStyle
+--             computedFlexContainerDetails
+--             computedFlexItemDetails
+--             computedGridContainerDetails
+--             computedGridItemDetails
+--             computedBlockDetails
+--             computedBoxDetails
+--             |> Native.BodyBuilder.addDisplayStyle key
+--         )
 
 
 groupByStyleSelectorAndCompute : a -> List ( Modifiers a, Attributes.StyleSelector ) -> List ( Attributes.StyleSelector, a )
 groupByStyleSelectorAndCompute default =
     List.Extra.groupWhile (\x y -> Tuple.second x == Tuple.second y)
         >> List.concatMap mergeModifiersAndSwap
-        >> List.map (Tuple.mapSecond (\modifiers -> (Function.compose modifiers) default))
+        >> List.map (Tuple.mapSecond (\modifiers -> Function.compose modifiers default))
 
 
 mergeModifiersAndSwap : List ( Modifiers a, Attributes.StyleSelector ) -> List ( Attributes.StyleSelector, Modifiers a )
@@ -167,14 +171,14 @@ appendInStyleComponent setter ( styleSelector, elem ) results =
         key =
             toString styleSelector
     in
-        Dict.get key results
-            |> Maybe.Extra.unwrap
-                (defaultStyleComponents
-                    |> setter elem
-                    |> (,) styleSelector
-                )
-                (Tuple.mapSecond (setter elem))
-            |> flip (Dict.insert key) results
+    Dict.get key results
+        |> Maybe.Extra.unwrap
+            (defaultStyleComponents
+                |> setter elem
+                |> (,) styleSelector
+            )
+            (Tuple.mapSecond (setter elem))
+        |> flip (Dict.insert key) results
 
 
 samePseudoClass :
@@ -201,11 +205,11 @@ componentsToElegantStyle isBlock isFlex isGrid components =
         computedDisplay =
             List.map (componentsToParameteredDisplayBox isBlock isFlex isGrid) components
     in
-        computedDisplay
-            |> List.Extra.find noMediaQueries
-            |> Maybe.Extra.unwrap Elegant.emptyStyle (Tuple.second >> Elegant.style)
-            |> Maybe.Extra.unwrap identity (Elegant.setSuffix) suffix
-            |> Elegant.withScreenWidth (List.concatMap toScreenWidth computedDisplay)
+    computedDisplay
+        |> List.Extra.find noMediaQueries
+        |> Maybe.Extra.unwrap Elegant.emptyStyle (Tuple.second >> Elegant.style)
+        |> Maybe.Extra.unwrap identity Elegant.setSuffix suffix
+        |> Elegant.withScreenWidth (List.concatMap toScreenWidth computedDisplay)
 
 
 componentsToParameteredDisplayBox :

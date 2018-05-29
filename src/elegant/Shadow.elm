@@ -1,4 +1,4 @@
-module Elegant.Shadow
+module Shadow
     exposing
         ( Shadow
         , blurRadius
@@ -46,8 +46,8 @@ module Elegant.Shadow
 
 import Color exposing (Color)
 import Color.Convert
-import Elegant.Helpers.Shared exposing (..)
-import Elegant.Internals.Setters exposing (..)
+import Elegant.Setters exposing (..)
+import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 
 
@@ -173,7 +173,6 @@ insetToStringList : Bool -> List String
 insetToStringList inset =
     if inset then
         [ "inset" ]
-
     else
         []
 

@@ -1,10 +1,12 @@
 module Elegant.Convert exposing (..)
 
-import Helpers.Css
-import Maybe.Extra exposing ((?))
-import Helpers.Style exposing (..)
 import Display
-import Native.Elegant
+import Helpers.Css
+import Helpers.Style exposing (..)
+import Maybe.Extra exposing ((?))
+
+
+-- import Native.Elegant
 
 
 computeStyle : Display.DisplayBox -> List ( String, String )
@@ -25,9 +27,9 @@ classesNamesFromStyle ({ screenWidths, display, suffix } as style) =
                 |> Maybe.withDefault []
                 |> classesNameGeneration suffix
     in
-        screenWidths
-            |> List.concatMap (screenWidthToClassesNames suffix)
-            |> List.append standardClassesNames
+    screenWidths
+        |> List.concatMap (screenWidthToClassesNames suffix)
+        |> List.append standardClassesNames
 
 
 classesNameGeneration : Maybe String -> List ( String, String ) -> List String
@@ -53,20 +55,23 @@ addScreenWidthToClassName =
 
 fetchStylesOrCompute : String -> Style -> List String
 fetchStylesOrCompute styleHash style =
-    case Native.Elegant.fetchStyles styleHash of
-        Nothing ->
-            let
-                classesNames =
-                    style
-                        |> extractScreenWidths
-                        |> List.concatMap compileConditionalStyle
-                        |> List.map computeAtomicClass
-                        |> Native.Elegant.addStyles styleHash
-            in
-                classesNames
+    []
 
-        Just classesNames ->
-            classesNames
+
+
+-- case Native.Elegant.fetchStyles styleHash of
+--     Nothing ->
+--         let
+--             classesNames =
+--                 style
+--                     |> extractScreenWidths
+--                     |> List.concatMap compileConditionalStyle
+--                     |> List.map computeAtomicClass
+--                     |> Native.Elegant.addStyles styleHash
+--         in
+--         classesNames
+--     Just classesNames ->
+--         classesNames
 
 
 type alias ConditionalStyle =
@@ -137,24 +142,24 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
         classHash =
             atomicClass
     in
-        case Native.Elegant.fetchAtomicClass classHash of
-            Nothing ->
-                let
-                    classNameComplete =
-                        String.join ""
-                            [ className
-                            , (mediaQueryId ? "")
-                            ]
+    case Native.Elegant.fetchAtomicClass classHash of
+        Nothing ->
+            let
+                classNameComplete =
+                    String.join ""
+                        [ className
+                        , mediaQueryId ? ""
+                        ]
 
-                    test =
-                        computeStyleToCss className mediaQueryId selector property
-                            |> inMediaQuery mediaQuery
-                            |> Native.Elegant.addAtomicClass classHash classNameComplete
-                in
-                    classNameComplete
+                test =
+                    computeStyleToCss className mediaQueryId selector property
+                        |> inMediaQuery mediaQuery
+                        |> Native.Elegant.addAtomicClass classHash classNameComplete
+            in
+            classNameComplete
 
-            Just class ->
-                class
+        Just class ->
+            class
 
 
 inMediaQuery : Maybe String -> String -> String
@@ -169,8 +174,8 @@ computeStyleToCss className mediaQueryId selector property =
     String.join ""
         [ "."
         , className
-        , (mediaQueryId ? "")
-        , (selector ? "")
+        , mediaQueryId ? ""
+        , selector ? ""
         , Helpers.Css.surroundWithBraces property
         ]
 

@@ -1,4 +1,4 @@
-module Elegant.Internals.Setters exposing (..)
+module Elegant.Setters exposing (..)
 
 
 setAlign : c -> { b | align : a } -> { b | align : c }

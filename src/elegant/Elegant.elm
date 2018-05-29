@@ -1,12 +1,14 @@
 module Elegant
     exposing
-        ( SizeUnit
+        ( CommonStyle
+        , SizeUnit
         , Style
-        , CommonStyle
-        , commonStyle
-        , commonStyleToStyle
         , classes
         , color
+        , commonStyle
+        , commonStyleToCss
+        , commonStyleToStyle
+        , deg
         , em
         , emptyStyle
         , inlineStyle
@@ -14,15 +16,13 @@ module Elegant
         , percent
         , pt
         , px
-        , rem
-        , deg
         , rad
+        , rem
         , screenWidthBetween
         , screenWidthGE
         , screenWidthLE
         , setSuffix
         , style
-        , commonStyleToCss
         , styleToCss
         , toCommonStyle
         , toInlineStyles
@@ -32,6 +32,7 @@ module Elegant
         )
 
 {-|
+
 @docs CommonStyle
 @docs commonStyle
 @docs commonStyleToCss
@@ -61,17 +62,20 @@ module Elegant
 @docs vh
 @docs vw
 @docs withScreenWidth
+
 -}
 
-import Html exposing (Html)
-import Html.Attributes
-import Helpers.Shared exposing (..)
-import Helpers.Style as CommonStyle
-import Modifiers exposing (..)
 import Display exposing (DisplayBox)
 import Elegant.Convert
 import Elegant.Setters exposing (..)
-import Native.BodyBuilder
+import Helpers.Shared exposing (..)
+import Helpers.Style as CommonStyle
+import Html exposing (Html)
+import Html.Attributes
+import Modifiers exposing (..)
+
+
+-- import Native.BodyBuilder
 
 
 {-| Contains all style for an element used with Elegant.
@@ -232,15 +236,18 @@ commonStyleToCss style =
         styleHash =
             toString style
     in
-        case Native.BodyBuilder.fetchClassesNames styleHash of
-            Nothing ->
-                style
-                    |> Elegant.Convert.fetchStylesOrCompute styleHash
-                    |> String.join " "
-                    |> Native.BodyBuilder.addClassesNames styleHash
+    ""
 
-            Just classesNames ->
-                classesNames
+
+
+-- case Native.BodyBuilder.fetchClassesNames styleHash of
+--     Nothing ->
+--         style
+--             |> Elegant.Convert.fetchStylesOrCompute styleHash
+--             |> String.join " "
+--             |> Native.BodyBuilder.addClassesNames styleHash
+--     Just classesNames ->
+--         classesNames
 
 
 {-| -}

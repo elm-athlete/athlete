@@ -1,34 +1,34 @@
 module Router
     exposing
         ( History
-        , StandardHistoryMsg(Back)
         , Page
-        , Transition
         , PageView
-        , push
-        , slideUp
+        , StandardHistoryMsg(Back)
+        , Transition
+        , afterTransition
+        , beforeTransition
+        , customKind
+        , customTransition
+        , easeInOut
+        , focusedElement
+        , forward
+        , getMaybeTransitionValue
+        , handleStandardHistory
+        , headerButton
+        , headerElement
+        , historyView
+        , initHistoryAndData
+        , maybeTransitionSubscription
+        , overflowHiddenContainer
+        , pageView
         , pageWithDefaultTransition
+        , pageWithHeader
         , pageWithTransition
         , pageWithoutTransition
-        , headerElement
-        , headerButton
-        , historyView
-        , handleStandardHistory
-        , maybeTransitionSubscription
-        , initHistoryAndData
-        , pageWithHeader
-        , customTransition
-        , forward
-        , pageView
-        , customKind
-        , easeInOut
-        , overflowHiddenContainer
-        , beforeTransition
         , percentage
-        , getMaybeTransitionValue
-        , afterTransition
+        , push
+        , slideUp
         , visiblePages
-        , focusedElement
         )
 
 {-| Router based on BodyBuilder and Elegant implementing transitions between
@@ -68,29 +68,30 @@ pages and history (backward and forward)
 
 -}
 
+-- import Native.BodyBuilder
+
+import AnimationFrame
+import Block
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
-import Elegant exposing (SizeUnit, px, percent)
-import Modifiers exposing (..)
-import AnimationFrame
-import Time exposing (Time)
-import Display
-import Overflow
 import Box
-import Position
-import Typography
-import Padding
-import Cursor
 import Color
-import Flex
+import Cursor
 import Dimensions
-import Transform
-import Block
-import Style
+import Display
 import Dom
+import Elegant exposing (SizeUnit, percent, px)
+import Flex
+import Modifiers exposing (..)
+import Overflow
+import Padding
+import Position
+import Style
 import Task
-import Native.BodyBuilder
+import Time exposing (Time)
+import Transform
+import Typography
 
 
 type Easing
@@ -106,8 +107,7 @@ type Kind route msg
         )
 
 
-{-|
--}
+{-| -}
 customKind : (History route msg -> (Page route msg -> Maybe (Transition route msg) -> Node msg) -> Node msg) -> Kind route msg
 customKind =
     CustomKind
@@ -152,8 +152,7 @@ type TransitionWrapper route msg
     | NoTransition
 
 
-{-|
--}
+{-| -}
 type alias PageView route msg =
     Page route msg
     -> Maybe (Transition route msg)
@@ -254,7 +253,7 @@ timeDiff diff ({ timer } as transition) =
             else
                 timer - diff
     in
-        { transition | timer = newTimer }
+    { transition | timer = newTimer }
 
 
 basicDuration : number
@@ -280,7 +279,7 @@ push el ({ transition, before, current, after } as history) =
             , current = el
             , after = []
             , transition = el.maybeTransition
-            , currentPageHasFocusElement = Maybe.withDefault False (Maybe.map (always True) (el.maybeFocusedId))
+            , currentPageHasFocusElement = Maybe.withDefault False (Maybe.map (always True) el.maybeFocusedId)
         }
 
 
@@ -339,8 +338,7 @@ pageWithTransition transition =
     pageWithoutIdToFocusOn (Just transition)
 
 
-{-|
--}
+{-| -}
 focusedElement : String -> Page route msg -> Page route msg
 focusedElement idElement page =
     { page | maybeFocusedId = Just idElement }
@@ -381,8 +379,7 @@ putHeadInListIfExists list =
             [ head ]
 
 
-{-|
--}
+{-| -}
 visiblePages : History route msg -> List (Page route msg)
 visiblePages { transition, before, current, after } =
     case transition of
@@ -392,7 +389,7 @@ visiblePages { transition, before, current, after } =
         Just transition ->
             case transition.direction of
                 Forward ->
-                    (putHeadInListIfExists before) ++ [ current ]
+                    putHeadInListIfExists before ++ [ current ]
 
                 Backward ->
                     current :: putHeadInListIfExists after
@@ -507,33 +504,33 @@ slideUpView history insidePageView_ =
         visiblePages_ =
             visiblePages history
     in
-        overflowHiddenContainer
+    overflowHiddenContainer
+        [ style
+            [ Style.block
+                [ Display.dimensions [ Dimensions.height <| Elegant.vh <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
+            , Style.box
+                [ Box.transform
+                    [ Transform.translateY (Elegant.vh <| percentage (0 - getMaybeTransitionValue history.transition))
+                    ]
+                ]
+            , Style.flexContainerProperties [ Flex.direction Flex.column ]
+            ]
+        ]
+        [ flexItem
             [ style
-                [ Style.block
-                    [ Display.dimensions [ Dimensions.height <| Elegant.vh <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
-                , Style.box
-                    [ Box.transform
-                        [ Transform.translateY (Elegant.vh <| percentage (0 - getMaybeTransitionValue history.transition))
-                        ]
-                    ]
-                , Style.flexContainerProperties [ Flex.direction Flex.column ]
+                [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
+                , Style.flexItemProperties [ Flex.basis (percent 100) ]
                 ]
             ]
-            [ flexItem
-                [ style
-                    [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
-                    , Style.flexItemProperties [ Flex.basis (percent 100) ]
-                    ]
+            (List.map (pageView insidePageView_ history.transition) (history |> beforeTransition))
+        , flexItem
+            [ style
+                [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
+                , Style.flexItemProperties [ Flex.basis (percent 100) ]
                 ]
-                (List.map (pageView insidePageView_ history.transition) (history |> beforeTransition))
-            , flexItem
-                [ style
-                    [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
-                    , Style.flexItemProperties [ Flex.basis (percent 100) ]
-                    ]
-                ]
-                (List.map (pageView insidePageView_ history.transition) (history |> afterTransition))
             ]
+            (List.map (pageView insidePageView_ history.transition) (history |> afterTransition))
+        ]
 
 
 slideLeftView :
@@ -545,34 +542,34 @@ slideLeftView history insidePageView_ =
         visiblePages_ =
             visiblePages history
     in
-        overflowHiddenContainer
-            [ style
-                [ Style.block
-                    [ Display.dimensions [ Dimensions.width <| Elegant.vw <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
-                , Style.box
-                    [ Box.transform
-                        [ Transform.translateX (Elegant.vw <| percentage (0 - getMaybeTransitionValue history.transition))
-                        ]
-
-                    -- , Box.position
-                    -- (Position.relative
-                    --     ([ Position.right (percentage (getMaybeTransitionValue history.transition)) ])
-                    -- )
+    overflowHiddenContainer
+        [ style
+            [ Style.block
+                [ Display.dimensions [ Dimensions.width <| Elegant.vw <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
+            , Style.box
+                [ Box.transform
+                    [ Transform.translateX (Elegant.vw <| percentage (0 - getMaybeTransitionValue history.transition))
                     ]
+
+                -- , Box.position
+                -- (Position.relative
+                --     ([ Position.right (percentage (getMaybeTransitionValue history.transition)) ])
+                -- )
                 ]
             ]
-            (List.map
-                (BodyBuilder.flexItem
-                    [ Attributes.style
-                        [ Style.flexItemProperties
-                            [ Flex.basis (percent 100)
-                            ]
+        ]
+        (List.map
+            (BodyBuilder.flexItem
+                [ Attributes.style
+                    [ Style.flexItemProperties
+                        [ Flex.basis (percent 100)
                         ]
                     ]
-                    << List.singleton
-                )
-                (List.map (pageView insidePageView_ history.transition) visiblePages_)
+                ]
+                << List.singleton
             )
+            (List.map (pageView insidePageView_ history.transition) visiblePages_)
+        )
 
 
 {-| display the current possible transition from one page to the other using
@@ -643,12 +640,12 @@ standardHandleHistory historyMsg history =
                     Just transition ->
                         let
                             newTransition =
-                                (transition |> timeDiff diff)
+                                transition |> timeDiff diff
                         in
-                            if newTransition.timer > 0 then
-                                { history | transition = Just newTransition }
-                            else
-                                { history | transition = Nothing }
+                        if newTransition.timer > 0 then
+                            { history | transition = Just newTransition }
+                        else
+                            { history | transition = Nothing }
 
 
 focusChoosenElement : History route msg -> model -> ( model, Cmd msg )
@@ -661,7 +658,7 @@ focusChoosenElement history model =
         True ->
             history.current.maybeFocusedId
                 |> Maybe.withDefault ""
-                |> Native.BodyBuilder.focusWithoutScroll
+                -- |> Native.BodyBuilder.focusWithoutScroll
                 |> Task.attempt (FocusMsg >> history.standardHistoryWrapper)
     )
 
@@ -672,7 +669,7 @@ handleStandardHistory : StandardHistoryMsg -> { a | history : History route msg 
 handleStandardHistory historyMsg ({ history } as model) =
     history
         |> standardHandleHistory historyMsg
-        |> \( history, cmds ) -> { model | history = history } ! [ cmds ]
+        |> (\( history, cmds ) -> { model | history = history } ! [ cmds ])
 
 
 {-| initialize history and data based on the routing system
