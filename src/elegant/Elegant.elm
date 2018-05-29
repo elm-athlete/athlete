@@ -190,11 +190,11 @@ toInlineStyles (Style style_) =
 
 
 {-| -}
-inlineStyle : DisplayBox -> Html.Attribute msg
+inlineStyle : DisplayBox -> List (Html.Attribute msg)
 inlineStyle =
     style
         >> toInlineStyles
-        >> Html.Attributes.style
+        >> List.map (\( a, b ) -> Html.Attributes.style a b)
 
 
 
@@ -232,15 +232,15 @@ classes (Style style_) =
 {-| -}
 commonStyleToCss : CommonStyle -> String
 commonStyleToCss style_ =
-    let
-        styleHash =
-            String.fromInt style_
-    in
     ""
 
 
 
 -- Todo : Fix that
+-- let
+--     styleHash =
+--         String.fromInt style_
+-- in
 -- case Native.BodyBuilder.fetchClassesNames styleHash of
 --     Nothing ->
 --         style
@@ -253,8 +253,8 @@ commonStyleToCss style_ =
 
 {-| -}
 styleToCss : Style -> String
-styleToCss (Style style) =
-    commonStyleToCss style
+styleToCss (Style style_) =
+    commonStyleToCss style_
 
 
 {-| -}
