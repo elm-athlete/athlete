@@ -14,6 +14,7 @@
         "elm/html": "1.0.0",
         "elm/json": "1.0.0",
         "elm/regex": "1.0.0",
+        "elm/virtual-dom": "1.0.0",
         "elm-community/dict-extra": "2.3.1",
         "elm-community/list-extra": "8.0.0"
     },
@@ -21,8 +22,7 @@
     "do-not-edit-this-by-hand": {
         "transitive-dependencies": {
             "elm/time": "1.0.0",
-            "elm/url": "1.0.0",
-            "elm/virtual-dom": "1.0.0"
+            "elm/url": "1.0.0"
         }
     }
 }

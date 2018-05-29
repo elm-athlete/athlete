@@ -31,7 +31,7 @@ module BodyBuilder.Events
         , onMouseOver
         , onMouseUp
         , onSubmit
-        , onWithOptions
+        , onCustom
         , submitEventToHtmlEvent
         )
 
@@ -44,7 +44,7 @@ It is not compatible with Html, though.
 @docs inputEventToHtmlEvent
 @docs mouseEventsToHtmlAttributes
 @docs on
-@docs onWithOptions
+@docs onCustom
 @docs onBlur
 @docs OnBlurEvent
 @docs onBlurEventToHtmlAttributes
@@ -82,6 +82,7 @@ import Html
 import Html.Events
 import Json.Decode exposing (Decoder)
 import Modifiers exposing (..)
+import VirtualDom
 
 
 defaultOnMouseEvents : OnMouseEventsInside msg
@@ -239,7 +240,7 @@ type alias OnBlurEvent msg a =
 
 {-| -}
 type alias OnEvent msg a =
-    { a | onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg ) }
+    { a | onEvent : Maybe ( String, VirtualDom.Handler msg ) }
 
 
 {-| -}
@@ -310,21 +311,23 @@ onBlurEventToHtmlAttributes =
 {-| -}
 on : String -> Decoder msg -> Modifier (OnEvent msg a)
 on event decoder attrs =
-    { attrs | onEvent = Just ( event, Nothing, decoder ) }
+    { attrs | onEvent = Just ( event, VirtualDom.Normal (Json.Decode.map VirtualDom.Sync decoder) ) }
 
 
 {-| -}
-onWithOptions : String -> Html.Events.Options -> Decoder msg -> Modifier (OnEvent msg a)
-onWithOptions event options decoder attrs =
-    { attrs | onEvent = Just ( event, Just options, decoder ) }
+onCustom : String -> Decoder { message : msg, stopPropagation : Bool, preventDefault : Bool } -> Modifier (OnEvent msg a)
+onCustom event decoder attrs =
+    let
+        syncRecord { message, stopPropagation, preventDefault } =
+            { message = VirtualDom.Sync message
+            , stopPropagation = stopPropagation
+            , preventDefault = preventDefault
+            }
+    in
+        { attrs | onEvent = Just ( event, VirtualDom.Custom (Json.Decode.map syncRecord decoder) ) }
 
 
 {-| -}
-onEventToHtmlAttributes : ( String, Maybe Html.Events.Options, Decoder msg ) -> List (Html.Attribute msg)
-onEventToHtmlAttributes ( event, maybeOptions, decoder ) =
-    case maybeOptions of
-        Nothing ->
-            [ Html.Events.on event decoder ]
-
-        Just options ->
-            [ Html.Events.onWithOptions event options decoder ]
+onEventToHtmlAttributes : ( String, VirtualDom.Handler msg ) -> List (Html.Attribute msg)
+onEventToHtmlAttributes ( event, handler ) =
+    [ VirtualDom.on event handler ]
