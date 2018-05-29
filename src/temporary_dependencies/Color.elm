@@ -18,3 +18,9 @@ rgb r g b =
 white : Color
 white =
     Color 255 255 255 1
+
+
+{-| -}
+black : Color
+black =
+    Color 0 0 0 1

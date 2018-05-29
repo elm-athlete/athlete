@@ -502,12 +502,12 @@ directionToString direction =
 
 growToCouple : Int -> ( String, String )
 growToCouple =
-    Tuple.pair "flex-grow" << toString
+    Tuple.pair "flex-grow" << String.fromInt
 
 
 shrinkToCouple : Int -> ( String, String )
 shrinkToCouple =
-    Tuple.pair "flex-shrink" << toString
+    Tuple.pair "flex-shrink" << String.fromInt
 
 
 basisToCouple : Either SizeUnit Auto -> ( String, String )

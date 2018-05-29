@@ -60,9 +60,7 @@ module Grid
         , viewWidth
         )
 
-{-|
-
-@docs align
+{-| @docs align
 @docs alignItems
 @docs alignItemsToCouple
 @docs alignSelfToCouple
@@ -120,7 +118,6 @@ module Grid
 @docs GridTemplate
 @docs Repeatable
 @docs ValType
-
 -}
 
 import Helpers.Shared exposing (..)
@@ -527,10 +524,10 @@ valTypeToString valType =
             sizeUnitToString val
 
         Fr val ->
-            toString val ++ "fr"
+            String.fromInt val ++ "fr"
 
         Vw val ->
-            toString val ++ "vw"
+            String.fromInt val ++ "vw"
 
         MinContent ->
             "min-content"
@@ -567,7 +564,7 @@ placementToCouple columnRow placement =
 {-| -}
 placementToString : Int -> String
 placementToString beginning =
-    toString beginning
+    String.fromInt beginning
 
 
 {-| -}
@@ -584,7 +581,7 @@ sizeToString itemSize =
             "-1"
 
         Span val ->
-            "span " ++ toString val
+            "span " ++ String.fromInt val
 
 
 {-| -}
