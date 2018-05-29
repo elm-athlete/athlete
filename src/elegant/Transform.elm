@@ -279,8 +279,10 @@ backfaceVisibilityToString val =
 
 
 backfaceVisibilityToCouple : BackfaceVisibility -> ( String, String )
-backfaceVisibilityToCouple =
-    (,) "backface-visibility" << backfaceVisibilityToString
+backfaceVisibilityToCouple backfaceVisibility =
+    backfaceVisibility
+        |> backfaceVisibilityToString
+        |> (,) "backface-visibility"
 
 
 {-| in a (css) 3d rendered scene, we hide back facing elements.

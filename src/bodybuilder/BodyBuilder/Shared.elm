@@ -8,8 +8,8 @@ type Label msg
 
 
 extractLabel : Label msg -> Html msg -> Html msg
-extractLabel (Label label) =
-    label
+extractLabel (Label l) =
+    l
 
 
 label : (Html msg -> Html msg) -> Label msg

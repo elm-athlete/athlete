@@ -59,8 +59,11 @@ module Typography
 
 # Typography modifiers
 
+
 ## Color
+
 @docs color
+
 
 ## Text Transformations
 
@@ -116,6 +119,7 @@ module Typography
 @docs fontFamily
 @docs fontFamilyInherit
 @docs fontFamilySansSerif
+
 
 ## Letter Spacing
 
@@ -499,8 +503,8 @@ whiteSpaceWrapToString val =
 
 
 userSelectToCouples : UserSelect -> ( String, String )
-userSelectToCouples userSelect =
-    ( "user-select", userSelectToString userSelect )
+userSelectToCouples userSelect_ =
+    ( "user-select", userSelectToString userSelect_ )
 
 
 userSelectToString : UserSelect -> String
@@ -514,8 +518,8 @@ userSelectToString val =
 
 
 lineHeightToCouples : Either SizeUnit Normal -> ( String, String )
-lineHeightToCouples lineHeight =
-    ( "line-height", lineHeightToString lineHeight )
+lineHeightToCouples lineHeight_ =
+    ( "line-height", lineHeightToString lineHeight_ )
 
 
 lineHeightToString : Either SizeUnit Normal -> String
@@ -530,7 +534,7 @@ lineHeightToString normalSizeUnitEither =
 
 weightToCouple : Int -> ( String, String )
 weightToCouple int =
-    ( "font-weight", toString int )
+    ( "font-weight", String.fromInt int )
 
 
 tiltToCouple : FontTilt -> ( String, String )
@@ -557,8 +561,8 @@ sizeToCouple val =
 
 
 familyToCouple : FontFamily -> ( String, String )
-familyToCouple fontFamily =
-    ( "font-family", fontFamilyToString fontFamily )
+familyToCouple fontFamily_ =
+    ( "font-family", fontFamilyToString fontFamily_ )
 
 
 letterSpacingToCouple : SizeUnit -> ( String, String )
@@ -579,8 +583,8 @@ fontFamilyToString val =
 
 
 extractFontName : CustomFontFamily -> String
-extractFontName customFont =
-    case customFont of
+extractFontName customFont_ =
+    case customFont_ of
         CustomFont fontName ->
             Helpers.Css.surroundWithQuotes fontName
 

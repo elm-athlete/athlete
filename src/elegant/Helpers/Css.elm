@@ -79,7 +79,16 @@ joiner ( a, b ) ( c, d ) =
 
 generateMediaQueryId : ( Maybe Int, Maybe Int ) -> String
 generateMediaQueryId ( min, max ) =
-    cssValidName (toString min ++ toString max)
+    let
+        toString a =
+            case a of
+                Nothing ->
+                    "error"
+
+                Just int ->
+                    String.fromInt int
+    in
+        cssValidName (toString min ++ toString max)
 
 
 generateSelector : Maybe String -> Maybe String
@@ -106,15 +115,15 @@ mediaQuerySelector min max =
                     ""
 
                 Just max_ ->
-                    "(max-width: " ++ toString max_ ++ "px)"
+                    "(max-width: " ++ String.fromInt max_ ++ "px)"
 
         Just min_ ->
             case max of
                 Nothing ->
-                    "(min-width: " ++ toString min_ ++ "px)"
+                    "(min-width: " ++ String.fromInt min_ ++ "px)"
 
                 Just max_ ->
-                    "(min-width: " ++ toString min_ ++ "px) and (max-width: " ++ toString max_ ++ "px)"
+                    "(min-width: " ++ String.fromInt min_ ++ "px) and (max-width: " ++ String.fromInt max_ ++ "px)"
 
 
 generateClassName : Maybe String -> ( String, String ) -> String

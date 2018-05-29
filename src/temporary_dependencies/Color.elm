@@ -1,4 +1,4 @@
-module Color exposing (Color)
+module Color exposing (..)
 
 
 type alias Color =
@@ -7,3 +7,14 @@ type alias Color =
     , blue : Int
     , alpha : Float
     }
+
+
+rgb : Int -> Int -> Int -> Color
+rgb r g b =
+    Color r g b 1
+
+
+{-| -}
+white : Color
+white =
+    Color 255 255 255 1
