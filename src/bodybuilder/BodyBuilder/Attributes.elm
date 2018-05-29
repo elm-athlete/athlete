@@ -229,6 +229,7 @@ import Html.Attributes
 import Html.Events
 import Json.Decode exposing (Decoder)
 import Modifiers exposing (..)
+import VirtualDom
 
 
 {-| -}
@@ -432,7 +433,7 @@ type alias ColorValue a =
 type alias VisibleAttributesAndEvents msg a =
     { a
         | onMouseEvents : Maybe (OnMouseEventsInside msg)
-        , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+        , onEvent : Maybe ( String, VirtualDom.Handler msg )
         , onBlurEvent : Maybe msg
         , onFocusEvent : Maybe msg
         , box : List ( Modifiers Box.Box, StyleSelector )
@@ -458,7 +459,7 @@ type alias SelectAttributes msg =
     { block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , value : Maybe String
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -483,7 +484,7 @@ type alias UniversalAttributes =
 {-| -}
 type alias FlowAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -497,7 +498,7 @@ type alias FlowAttributes msg =
 -}
 type alias NodeAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -516,7 +517,7 @@ type alias NodeAttributes msg =
 type alias FlexContainerAttributes msg =
     { flexContainerProperties : List ( Modifiers Flex.FlexContainerDetails, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -535,7 +536,7 @@ type alias FlexContainerAttributes msg =
 type alias FlexItemAttributes msg =
     { flexItemProperties : List ( Modifiers Flex.FlexItemDetails, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -554,7 +555,7 @@ type alias FlexItemAttributes msg =
 type alias GridContainerAttributes msg =
     { gridContainerProperties : List ( Modifiers Grid.GridContainerDetails, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -573,7 +574,7 @@ type alias GridContainerAttributes msg =
 type alias GridItemAttributes msg =
     { gridItemProperties : List ( Modifiers Grid.GridItemDetails, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -592,7 +593,7 @@ type alias GridItemAttributes msg =
 type alias BlockAttributes msg =
     { block : List ( Modifiers BlockDetails, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -612,7 +613,7 @@ type alias ButtonAttributes msg =
     { disabled : Bool
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -625,7 +626,7 @@ type alias ButtonAttributes msg =
 {-| -}
 type alias AAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -641,7 +642,7 @@ type alias AAttributes msg =
 {-| -}
 type alias TextareaAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -659,7 +660,7 @@ type alias TextareaAttributes msg =
 {-| -}
 type alias ImgAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -677,7 +678,7 @@ type alias ImgAttributes msg =
 {-| -}
 type alias AudioAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -692,7 +693,7 @@ type alias AudioAttributes msg =
 {-| -}
 type alias ProgressAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -706,7 +707,7 @@ type alias ProgressAttributes msg =
 {-| -}
 type alias ScriptAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -731,7 +732,7 @@ type alias InputHiddenAttributes =
 {-| -}
 type alias LabelAttributes msg =
     { onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
@@ -750,7 +751,7 @@ type alias InputRadioAttributes msg =
     , universal : UniversalAttributes
     , box : List ( Modifiers Box.Box, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , value : Maybe String
@@ -768,7 +769,7 @@ type alias InputCheckboxAttributes msg =
     , universal : UniversalAttributes
     , box : List ( Modifiers Box.Box, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , value : Maybe String
@@ -788,7 +789,7 @@ type alias InputTextAttributes msg =
     , universal : UniversalAttributes
     , box : List ( Modifiers Box.Box, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , value : Maybe String
@@ -815,7 +816,7 @@ type alias InputSubmitAttributes msg =
     , disabled : Bool
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , onSubmitEvent : Maybe msg
@@ -838,7 +839,7 @@ type alias InputNumberAttributes msg =
     , universal : UniversalAttributes
     , box : List ( Modifiers Box.Box, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , label : Maybe (Shared.Label msg)
@@ -862,7 +863,7 @@ type alias InputColorAttributes msg =
     , universal : UniversalAttributes
     , box : List ( Modifiers Box.Box, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , label : Maybe (Shared.Label msg)
@@ -882,7 +883,7 @@ type alias InputFileAttributes msg =
     , universal : UniversalAttributes
     , box : List ( Modifiers Box.Box, StyleSelector )
     , onMouseEvents : Maybe (OnMouseEventsInside msg)
-    , onEvent : Maybe ( String, Maybe Html.Events.Options, Decoder msg )
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , label : Maybe (Shared.Label msg)
