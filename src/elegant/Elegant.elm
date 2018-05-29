@@ -127,24 +127,24 @@ emptyStyle =
 
 {-| -}
 setSuffix : String -> Style -> Style
-setSuffix value (Style style) =
-    style
+setSuffix value (Style style_) =
+    style_
         |> CommonStyle.setSuffix value
         |> Style
 
 
 {-| -}
 withScreenWidth : List CommonStyle.ScreenWidth -> Modifier Style
-withScreenWidth screenWidth (Style style) =
-    style
+withScreenWidth screenWidth (Style style_) =
+    style_
         |> setScreenWidths screenWidth
         |> Style
 
 
 {-| -}
 screenWidthBetween : Int -> Int -> DisplayBox -> Modifier Style
-screenWidthBetween min max betweenStyle (Style style) =
-    style
+screenWidthBetween min max betweenStyle (Style style_) =
+    style_
         |> addScreenWidth
             { min = Just min
             , max = Just max
@@ -155,8 +155,8 @@ screenWidthBetween min max betweenStyle (Style style) =
 
 {-| -}
 screenWidthGE : Int -> DisplayBox -> Modifier Style
-screenWidthGE min greaterStyle (Style style) =
-    style
+screenWidthGE min greaterStyle (Style style_) =
+    style_
         |> addScreenWidth
             { min = Just min
             , max = Nothing
@@ -167,8 +167,8 @@ screenWidthGE min greaterStyle (Style style) =
 
 {-| -}
 screenWidthLE : Int -> DisplayBox -> Modifier Style
-screenWidthLE max lessStyle (Style style) =
-    style
+screenWidthLE max lessStyle (Style style_) =
+    style_
         |> addScreenWidth
             { min = Nothing
             , max = Just max
@@ -183,8 +183,8 @@ screenWidthLE max lessStyle (Style style) =
 
 {-| -}
 toInlineStyles : Style -> List ( String, String )
-toInlineStyles (Style style) =
-    style.display
+toInlineStyles (Style style_) =
+    style_.display
         |> Maybe.map Elegant.Convert.computeStyle
         |> Maybe.withDefault []
 
@@ -215,8 +215,8 @@ inlineStyle =
 {-| Generate all the classes of a list of Styles
 -}
 classes : Style -> String
-classes (Style style) =
-    style
+classes (Style style_) =
+    style_
         |> Elegant.Convert.classesNamesFromStyle
         |> String.join " "
 
@@ -231,10 +231,10 @@ classes (Style style) =
 
 {-| -}
 commonStyleToCss : CommonStyle -> String
-commonStyleToCss style =
+commonStyleToCss style_ =
     let
         styleHash =
-            String.fromInt style
+            String.fromInt style_
     in
     ""
 
@@ -259,8 +259,8 @@ styleToCss (Style style) =
 
 {-| -}
 toCommonStyle : Style -> CommonStyle.Style
-toCommonStyle (Style style) =
-    style
+toCommonStyle (Style style_) =
+    style_
 
 
 

@@ -79,6 +79,7 @@ joiner ( a, b ) ( c, d ) =
 
 generateMediaQueryId : ( Maybe Int, Maybe Int ) -> String
 generateMediaQueryId ( min, max ) =
+    -- Todo : Fix that (it's very ugly)
     let
         toString a =
             case a of

@@ -40,12 +40,22 @@ classesNameGeneration suffix =
 
 screenWidthToClassesNames : Maybe String -> ScreenWidth -> List String
 screenWidthToClassesNames suffix { min, max, style } =
+    let
+        toString a =
+            case a of
+                Nothing ->
+                    "error"
+
+                Just int ->
+                    String.fromInt int
+    in
+    -- Todo : Fix that (it's very ugly)
     style
         |> computeStyle
         |> classesNameGeneration suffix
         |> List.map
             (addScreenWidthToClassName
-                (Helpers.Css.cssValidName (String.fromInt min ++ String.fromInt max))
+                (Helpers.Css.cssValidName (toString min ++ toString max))
             )
 
 
