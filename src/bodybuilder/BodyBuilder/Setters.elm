@@ -1,9 +1,11 @@
 module BodyBuilder.Setters exposing (..)
 
+import Function
+
 
 setBox : b -> { a | box : List b } -> { a | box : List b }
 setBox =
-    flip setBoxIn
+    Function.flip setBoxIn
 
 
 setBoxIn : { a | box : List b } -> b -> { a | box : List b }
@@ -13,7 +15,7 @@ setBoxIn ({ box } as record) boxAttribute =
 
 setBlock : b -> { a | block : List b } -> { a | block : List b }
 setBlock =
-    flip setBlockIn
+    Function.flip setBlockIn
 
 
 setBlockIn : { a | block : List b } -> b -> { a | block : List b }
@@ -23,7 +25,7 @@ setBlockIn ({ block } as record) blockAttribute =
 
 setMaybeBlock : b -> { a | block : Maybe (List b) } -> { a | block : Maybe (List b) }
 setMaybeBlock =
-    flip setMaybeBlockIn
+    Function.flip setMaybeBlockIn
 
 
 setMaybeBlockIn : { a | block : Maybe (List b) } -> b -> { a | block : Maybe (List b) }
@@ -41,7 +43,7 @@ setMaybeBlockIn ({ block } as record) blockAttribute =
 
 setFlexContainerProperties : c -> { b | flexContainerProperties : List c } -> { b | flexContainerProperties : List c }
 setFlexContainerProperties =
-    flip setFlexContainerPropertiesIn
+    Function.flip setFlexContainerPropertiesIn
 
 
 setFlexContainerPropertiesIn : { b | flexContainerProperties : List c } -> c -> { b | flexContainerProperties : List c }
@@ -51,7 +53,7 @@ setFlexContainerPropertiesIn ({ flexContainerProperties } as record) flexContain
 
 setFlexItemProperties : c -> { b | flexItemProperties : List c } -> { b | flexItemProperties : List c }
 setFlexItemProperties =
-    flip setFlexItemPropertiesIn
+    Function.flip setFlexItemPropertiesIn
 
 
 setFlexItemPropertiesIn : { b | flexItemProperties : List c } -> c -> { b | flexItemProperties : List c }
@@ -61,7 +63,7 @@ setFlexItemPropertiesIn ({ flexItemProperties } as record) flexItemAttribute =
 
 setGridContainerProperties : c -> { b | gridContainerProperties : List c } -> { b | gridContainerProperties : List c }
 setGridContainerProperties =
-    flip setGridContainerPropertiesIn
+    Function.flip setGridContainerPropertiesIn
 
 
 setGridContainerPropertiesIn : { b | gridContainerProperties : List c } -> c -> { b | gridContainerProperties : List c }
@@ -71,7 +73,7 @@ setGridContainerPropertiesIn ({ gridContainerProperties } as record) gridContain
 
 setGridItemProperties : c -> { b | gridItemProperties : List c } -> { b | gridItemProperties : List c }
 setGridItemProperties =
-    flip setGridItemPropertiesIn
+    Function.flip setGridItemPropertiesIn
 
 
 setGridItemPropertiesIn : { b | gridItemProperties : List c } -> c -> { b | gridItemProperties : List c }

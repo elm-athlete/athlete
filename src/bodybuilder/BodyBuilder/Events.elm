@@ -1,38 +1,38 @@
 module BodyBuilder.Events
     exposing
-        ( OnMouseEvents
-        , OnMouseEventsInside
-        , onClick
-        , onDoubleClick
-        , onContextMenu
-        , onMouseUp
-        , onMouseOut
-        , onMouseOver
-        , onMouseDown
-        , onMouseLeave
-        , onMouseEnter
-        , mouseEventsToHtmlAttributes
-        , OnStringInputEvent
-        , OnIntInputEvent
-        , OnColorInputEvent
-        , onInput
-        , inputEventToHtmlEvent
+        ( OnBlurEvent
         , OnCheckEvent
-        , onCheck
-        , checkEventToHtmlEvent
-        , OnSubmitEvent
-        , onSubmit
-        , submitEventToHtmlEvent
+        , OnColorInputEvent
+        , OnEvent
         , OnFocusEvent
-        , onFocus
+        , OnIntInputEvent
+        , OnMouseEvents
+        , OnMouseEventsInside
+        , OnStringInputEvent
+        , OnSubmitEvent
+        , checkEventToHtmlEvent
         , focusEventToHtmlAttributes
-        , OnBlurEvent
+        , inputEventToHtmlEvent
+        , mouseEventsToHtmlAttributes
+        , on
         , onBlur
         , onBlurEventToHtmlAttributes
-        , OnEvent
-        , on
-        , onWithOptions
+        , onCheck
+        , onClick
+        , onContextMenu
+        , onDoubleClick
         , onEventToHtmlAttributes
+        , onFocus
+        , onInput
+        , onMouseDown
+        , onMouseEnter
+        , onMouseLeave
+        , onMouseOut
+        , onMouseOver
+        , onMouseUp
+        , onSubmit
+        , onWithOptions
+        , submitEventToHtmlEvent
         )
 
 {-| This module entirely replaces Html.Events, providing a type-safer alternative.
@@ -75,12 +75,12 @@ It is not compatible with Html, though.
 
 -}
 
+import BodyBuilder.Setters exposing (..)
+import Color exposing (Color)
+import Helpers.Shared exposing (..)
 import Html
 import Html.Events
 import Json.Decode exposing (Decoder)
-import Color exposing (Color)
-import Helpers.Shared exposing (..)
-import BodyBuilder.Setters exposing (..)
 import Modifiers exposing (..)
 
 

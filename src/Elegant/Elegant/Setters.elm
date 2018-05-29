@@ -1,489 +1,491 @@
 module Elegant.Setters exposing (..)
 
+import Function
 
-setAlign : c -> { b | align : a } -> { b | align : c }
+
+setAlign : a -> { b | align : a } -> { b | align : a }
 setAlign v o =
     { o | align = v }
 
 
-setAlignIn : { b | align : a } -> c -> { b | align : c }
+setAlignIn : { b | align : a } -> a -> { b | align : a }
 setAlignIn =
-    flip setAlign
+    Function.flip setAlign
 
 
-setAlignment : c -> { b | alignment : a } -> { b | alignment : c }
+setAlignment : a -> { b | alignment : a } -> { b | alignment : a }
 setAlignment v o =
     { o | alignment = v }
 
 
-setAlignmentIn : { b | alignment : a } -> c -> { b | alignment : c }
+setAlignmentIn : { b | alignment : a } -> a -> { b | alignment : a }
 setAlignmentIn =
-    flip setAlignment
+    Function.flip setAlignment
 
 
-setAlignSelf : c -> { b | alignSelf : a } -> { b | alignSelf : c }
+setAlignSelf : a -> { b | alignSelf : a } -> { b | alignSelf : a }
 setAlignSelf v o =
     { o | alignSelf = v }
 
 
-setAlignSelfIn : { b | alignSelf : a } -> c -> { b | alignSelf : c }
+setAlignSelfIn : { b | alignSelf : a } -> a -> { b | alignSelf : a }
 setAlignSelfIn =
-    flip setAlignSelf
+    Function.flip setAlignSelf
 
 
-setAngle : c -> { b | angle : a } -> { b | angle : c }
+setAngle : a -> { b | angle : a } -> { b | angle : a }
 setAngle v o =
     { o | angle = v }
 
 
-setAngleIn : { b | angle : a } -> c -> { b | angle : c }
+setAngleIn : { b | angle : a } -> a -> { b | angle : a }
 setAngleIn =
-    flip setAngle
+    Function.flip setAngle
 
 
-setBackfaceVisibility : a -> { c | backfaceVisibility : b } -> { c | backfaceVisibility : a }
+setBackfaceVisibility : a -> { c | backfaceVisibility : a } -> { c | backfaceVisibility : a }
 setBackfaceVisibility b a =
     { a | backfaceVisibility = b }
 
 
-setTransformStyle : a -> { c | transformStyle : b } -> { c | transformStyle : a }
+setTransformStyle : a -> { c | transformStyle : a } -> { c | transformStyle : a }
 setTransformStyle b a =
     { a | transformStyle = b }
 
 
-setBackground : c -> { b | background : a } -> { b | background : c }
+setBackground : a -> { b | background : a } -> { b | background : a }
 setBackground v o =
     { o | background = v }
 
 
-setBackgroundIn : { b | background : a } -> c -> { b | background : c }
+setBackgroundIn : { b | background : a } -> a -> { b | background : a }
 setBackgroundIn =
-    flip setBackground
+    Function.flip setBackground
 
 
-setBackgroundPosition : c -> { b | backgroundPosition : a } -> { b | backgroundPosition : c }
+setBackgroundPosition : a -> { b | backgroundPosition : a } -> { b | backgroundPosition : a }
 setBackgroundPosition v o =
     { o | backgroundPosition = v }
 
 
-setBackgroundPositionIn : { b | backgroundPosition : a } -> c -> { b | backgroundPosition : c }
+setBackgroundPositionIn : { b | backgroundPosition : a } -> a -> { b | backgroundPosition : a }
 setBackgroundPositionIn =
-    flip setBackgroundPosition
+    Function.flip setBackgroundPosition
 
 
-setBasis : c -> { b | basis : a } -> { b | basis : c }
+setBasis : a -> { b | basis : a } -> { b | basis : a }
 setBasis v o =
     { o | basis = v }
 
 
-setBasisIn : { b | basis : a } -> c -> { b | basis : c }
+setBasisIn : { b | basis : a } -> a -> { b | basis : a }
 setBasisIn =
-    flip setBasis
+    Function.flip setBasis
 
 
-setBlurRadius : c -> { b | blurRadius : a } -> { b | blurRadius : c }
+setBlurRadius : a -> { b | blurRadius : a } -> { b | blurRadius : a }
 setBlurRadius v o =
     { o | blurRadius = v }
 
 
-setBlurRadiusIn : { b | blurRadius : a } -> c -> { b | blurRadius : c }
+setBlurRadiusIn : { b | blurRadius : a } -> a -> { b | blurRadius : a }
 setBlurRadiusIn =
-    flip setBlurRadius
+    Function.flip setBlurRadius
 
 
-setBorder : c -> { b | border : a } -> { b | border : c }
+setBorder : a -> { b | border : a } -> { b | border : a }
 setBorder v o =
     { o | border = v }
 
 
-setBorderIn : { b | border : a } -> c -> { b | border : c }
+setBorderIn : { b | border : a } -> a -> { b | border : a }
 setBorderIn =
-    flip setBorder
+    Function.flip setBorder
 
 
-setBottom : c -> { b | bottom : a } -> { b | bottom : c }
+setBottom : a -> { b | bottom : a } -> { b | bottom : a }
 setBottom v o =
     { o | bottom = v }
 
 
-setBottomIn : { b | bottom : a } -> c -> { b | bottom : c }
+setBottomIn : { b | bottom : a } -> a -> { b | bottom : a }
 setBottomIn =
-    flip setBottom
+    Function.flip setBottom
 
 
-setBottomLeft : c -> { b | bottomLeft : a } -> { b | bottomLeft : c }
+setBottomLeft : a -> { b | bottomLeft : a } -> { b | bottomLeft : a }
 setBottomLeft v o =
     { o | bottomLeft = v }
 
 
-setBottomLeftIn : { b | bottomLeft : a } -> c -> { b | bottomLeft : c }
+setBottomLeftIn : { b | bottomLeft : a } -> a -> { b | bottomLeft : a }
 setBottomLeftIn =
-    flip setBottomLeft
+    Function.flip setBottomLeft
 
 
-setBottomRight : c -> { b | bottomRight : a } -> { b | bottomRight : c }
+setBottomRight : a -> { b | bottomRight : a } -> { b | bottomRight : a }
 setBottomRight v o =
     { o | bottomRight = v }
 
 
-setBottomRightIn : { b | bottomRight : a } -> c -> { b | bottomRight : c }
+setBottomRightIn : { b | bottomRight : a } -> a -> { b | bottomRight : a }
 setBottomRightIn =
-    flip setBottomRight
+    Function.flip setBottomRight
 
 
-setShadow : c -> { b | boxShadow : a } -> { b | boxShadow : c }
+setShadow : a -> { b | boxShadow : a } -> { b | boxShadow : a }
 setShadow v o =
     { o | boxShadow = v }
 
 
-setTransform : c -> { b | transform : a } -> { b | transform : c }
+setTransform : a -> { b | transform : a } -> { b | transform : a }
 setTransform v o =
     { o | transform = v }
 
 
-setTranslate : a -> { c | translate : b } -> { c | translate : a }
+setTranslate : a -> { c | translate : a } -> { c | translate : a }
 setTranslate v o =
     { o | translate = v }
 
 
-setOrigin : a -> { c | origin : b } -> { c | origin : a }
+setOrigin : a -> { c | origin : a } -> { c | origin : a }
 setOrigin v o =
     { o | origin = v }
 
 
-setRotate : a -> { c | rotate : b } -> { c | rotate : a }
+setRotate : a -> { c | rotate : a } -> { c | rotate : a }
 setRotate v o =
     { o | rotate = v }
 
 
-setShadowIn : { b | boxShadow : a } -> c -> { b | boxShadow : c }
+setShadowIn : { b | boxShadow : a } -> a -> { b | boxShadow : a }
 setShadowIn =
-    flip setShadow
+    Function.flip setShadow
 
 
-setTransformIn : { b | transform : a } -> c -> { b | transform : c }
+setTransformIn : { b | transform : a } -> a -> { b | transform : a }
 setTransformIn =
-    flip setTransform
+    Function.flip setTransform
 
 
-setCapitalization : c -> { b | capitalization : a } -> { b | capitalization : c }
+setCapitalization : a -> { b | capitalization : a } -> { b | capitalization : a }
 setCapitalization v o =
     { o | capitalization = v }
 
 
-setCapitalizationIn : { b | capitalization : a } -> c -> { b | capitalization : c }
+setCapitalizationIn : { b | capitalization : a } -> a -> { b | capitalization : a }
 setCapitalizationIn =
-    flip setCapitalization
+    Function.flip setCapitalization
 
 
-setCharacter : c -> { b | character : a } -> { b | character : c }
+setCharacter : a -> { b | character : a } -> { b | character : a }
 setCharacter v o =
     { o | character = v }
 
 
-setCharacterIn : { b | character : a } -> c -> { b | character : c }
+setCharacterIn : { b | character : a } -> a -> { b | character : a }
 setCharacterIn =
-    flip setCharacter
+    Function.flip setCharacter
 
 
-setColor : c -> { b | color : a } -> { b | color : c }
+setColor : a -> { b | color : a } -> { b | color : a }
 setColor v o =
     { o | color = v }
 
 
-setColorIn : { b | color : a } -> c -> { b | color : c }
+setColorIn : { b | color : a } -> a -> { b | color : a }
 setColorIn =
-    flip setColor
+    Function.flip setColor
 
 
-setColorStops : c -> { b | colorStops : a } -> { b | colorStops : c }
+setColorStops : a -> { b | colorStops : a } -> { b | colorStops : a }
 setColorStops v o =
     { o | colorStops = v }
 
 
-setColorStopsIn : { b | colorStops : a } -> c -> { b | colorStops : c }
+setColorStopsIn : { b | colorStops : a } -> a -> { b | colorStops : a }
 setColorStopsIn =
-    flip setColorStops
+    Function.flip setColorStops
 
 
-setCursor : c -> { b | cursor : a } -> { b | cursor : c }
+setCursor : a -> { b | cursor : a } -> { b | cursor : a }
 setCursor v o =
     { o | cursor = v }
 
 
-setCursorIn : { b | cursor : a } -> c -> { b | cursor : c }
+setCursorIn : { b | cursor : a } -> a -> { b | cursor : a }
 setCursorIn =
-    flip setCursor
+    Function.flip setCursor
 
 
-setDecoration : c -> { b | decoration : a } -> { b | decoration : c }
+setDecoration : a -> { b | decoration : a } -> { b | decoration : a }
 setDecoration v o =
     { o | decoration = v }
 
 
-setDecorationIn : { b | decoration : a } -> c -> { b | decoration : c }
+setDecorationIn : { b | decoration : a } -> a -> { b | decoration : a }
 setDecorationIn =
-    flip setDecoration
+    Function.flip setDecoration
 
 
-setDimension : c -> { b | dimension : a } -> { b | dimension : c }
+setDimension : a -> { b | dimension : a } -> { b | dimension : a }
 setDimension v o =
     { o | dimension = v }
 
 
-setDimensionIn : { b | dimension : a } -> c -> { b | dimension : c }
+setDimensionIn : { b | dimension : a } -> a -> { b | dimension : a }
 setDimensionIn =
-    flip setDimension
+    Function.flip setDimension
 
 
-setDimensions : c -> { b | dimensions : a } -> { b | dimensions : c }
+setDimensions : a -> { b | dimensions : a } -> { b | dimensions : a }
 setDimensions v o =
     { o | dimensions = v }
 
 
-setDimensionsIn : { b | dimensions : a } -> c -> { b | dimensions : c }
+setDimensionsIn : { b | dimensions : a } -> a -> { b | dimensions : a }
 setDimensionsIn =
-    flip setDimensions
+    Function.flip setDimensions
 
 
-setDirection : c -> { b | direction : a } -> { b | direction : c }
+setDirection : a -> { b | direction : a } -> { b | direction : a }
 setDirection v o =
     { o | direction = v }
 
 
-setDirectionIn : { b | direction : a } -> c -> { b | direction : c }
+setDirectionIn : { b | direction : a } -> a -> { b | direction : a }
 setDirectionIn =
-    flip setDirection
+    Function.flip setDirection
 
 
-setDisplay : c -> { b | display : a } -> { b | display : c }
+setDisplay : a -> { b | display : a } -> { b | display : a }
 setDisplay v o =
     { o | display = v }
 
 
-setDisplayIn : { b | display : a } -> c -> { b | display : c }
+setDisplayIn : { b | display : a } -> a -> { b | display : a }
 setDisplayIn =
-    flip setDisplay
+    Function.flip setDisplay
 
 
-setFamily : c -> { b | family : a } -> { b | family : c }
+setFamily : a -> { b | family : a } -> { b | family : a }
 setFamily v o =
     { o | family = v }
 
 
-setFamilyIn : { b | family : a } -> c -> { b | family : c }
+setFamilyIn : { b | family : a } -> a -> { b | family : a }
 setFamilyIn =
-    flip setFamily
+    Function.flip setFamily
 
 
-setGrow : c -> { b | grow : a } -> { b | grow : c }
+setGrow : a -> { b | grow : a } -> { b | grow : a }
 setGrow v o =
     { o | grow = v }
 
 
-setGrowIn : { b | grow : a } -> c -> { b | grow : c }
+setGrowIn : { b | grow : a } -> a -> { b | grow : a }
 setGrowIn =
-    flip setGrow
+    Function.flip setGrow
 
 
-setHorizontal : c -> { b | horizontal : a } -> { b | horizontal : c }
+setHorizontal : a -> { b | horizontal : a } -> { b | horizontal : a }
 setHorizontal v o =
     { o | horizontal = v }
 
 
-setHorizontalIn : { b | horizontal : a } -> c -> { b | horizontal : c }
+setHorizontalIn : { b | horizontal : a } -> a -> { b | horizontal : a }
 setHorizontalIn =
-    flip setHorizontal
+    Function.flip setHorizontal
 
 
-setImage : c -> { b | image : a } -> { b | image : c }
+setImage : a -> { b | image : a } -> { b | image : a }
 setImage v o =
     { o | image = v }
 
 
-setImageIn : { b | image : a } -> c -> { b | image : c }
+setImageIn : { b | image : a } -> a -> { b | image : a }
 setImageIn =
-    flip setImage
+    Function.flip setImage
 
 
-setImages : c -> { b | images : a } -> { b | images : c }
+setImages : a -> { b | images : a } -> { b | images : a }
 setImages v o =
     { o | images = v }
 
 
-setImagesIn : { b | images : a } -> c -> { b | images : c }
+setImagesIn : { b | images : a } -> a -> { b | images : a }
 setImagesIn =
-    flip setImages
+    Function.flip setImages
 
 
-setInset : c -> { b | inset : a } -> { b | inset : c }
+setInset : a -> { b | inset : a } -> { b | inset : a }
 setInset v o =
     { o | inset = v }
 
 
-setInsetIn : { b | inset : a } -> c -> { b | inset : c }
+setInsetIn : { b | inset : a } -> a -> { b | inset : a }
 setInsetIn =
-    flip setInset
+    Function.flip setInset
 
 
-setJustifyContent : c -> { b | justifyContent : a } -> { b | justifyContent : c }
+setJustifyContent : a -> { b | justifyContent : a } -> { b | justifyContent : a }
 setJustifyContent v o =
     { o | justifyContent = v }
 
 
-setJustifyContentIn : { b | justifyContent : a } -> c -> { b | justifyContent : c }
+setJustifyContentIn : { b | justifyContent : a } -> a -> { b | justifyContent : a }
 setJustifyContentIn =
-    flip setJustifyContent
+    Function.flip setJustifyContent
 
 
-setLeft : c -> { b | left : a } -> { b | left : c }
+setLeft : a -> { b | left : a } -> { b | left : a }
 setLeft v o =
     { o | left = v }
 
 
-setLeftIn : { b | left : a } -> c -> { b | left : c }
+setLeftIn : { b | left : a } -> a -> { b | left : a }
 setLeftIn =
-    flip setLeft
+    Function.flip setLeft
 
 
-setLineHeight : c -> { b | lineHeight : a } -> { b | lineHeight : c }
+setLineHeight : a -> { b | lineHeight : a } -> { b | lineHeight : a }
 setLineHeight v o =
     { o | lineHeight = v }
 
 
-setLineHeightIn : { b | lineHeight : a } -> c -> { b | lineHeight : c }
+setLineHeightIn : { b | lineHeight : a } -> a -> { b | lineHeight : a }
 setLineHeightIn =
-    flip setLineHeight
+    Function.flip setLineHeight
 
 
-setListStyleType : c -> { b | listStyleType : a } -> { b | listStyleType : c }
+setListStyleType : a -> { b | listStyleType : a } -> { b | listStyleType : a }
 setListStyleType v o =
     { o | listStyleType = v }
 
 
-setListStyleTypeIn : { b | listStyleType : a } -> c -> { b | listStyleType : c }
+setListStyleTypeIn : { b | listStyleType : a } -> a -> { b | listStyleType : a }
 setListStyleTypeIn =
-    flip setListStyleType
+    Function.flip setListStyleType
 
 
-setMargin : c -> { b | margin : a } -> { b | margin : c }
+setMargin : a -> { b | margin : a } -> { b | margin : a }
 setMargin v o =
     { o | margin = v }
 
 
-setMarginIn : { b | margin : a } -> c -> { b | margin : c }
+setMarginIn : { b | margin : a } -> a -> { b | margin : a }
 setMarginIn =
-    flip setMargin
+    Function.flip setMargin
 
 
-setMax : c -> { b | max : a } -> { b | max : c }
+setMax : a -> { b | max : a } -> { b | max : a }
 setMax v o =
     { o | max = v }
 
 
-setMaxIn : { b | max : a } -> c -> { b | max : c }
+setMaxIn : { b | max : a } -> a -> { b | max : a }
 setMaxIn =
-    flip setMax
+    Function.flip setMax
 
 
-setMaybeColor : c -> { b | maybeColor : a } -> { b | maybeColor : c }
+setMaybeColor : a -> { b | maybeColor : a } -> { b | maybeColor : a }
 setMaybeColor v o =
     { o | maybeColor = v }
 
 
-setMaybeColorIn : { b | maybeColor : a } -> c -> { b | maybeColor : c }
+setMaybeColorIn : { b | maybeColor : a } -> a -> { b | maybeColor : a }
 setMaybeColorIn =
-    flip setMaybeColor
+    Function.flip setMaybeColor
 
 
-setMin : c -> { b | min : a } -> { b | min : c }
+setMin : a -> { b | min : a } -> { b | min : a }
 setMin v o =
     { o | min = v }
 
 
-setMinIn : { b | min : a } -> c -> { b | min : c }
+setMinIn : { b | min : a } -> a -> { b | min : a }
 setMinIn =
-    flip setMin
+    Function.flip setMin
 
 
-setOffset : c -> { b | offset : a } -> { b | offset : c }
+setOffset : a -> { b | offset : a } -> { b | offset : a }
 setOffset v o =
     { o | offset = v }
 
 
-setOffsetIn : { b | offset : a } -> c -> { b | offset : c }
+setOffsetIn : { b | offset : a } -> a -> { b | offset : a }
 setOffsetIn =
-    flip setOffset
+    Function.flip setOffset
 
 
-setOpacity : c -> { b | opacity : a } -> { b | opacity : c }
+setOpacity : a -> { b | opacity : a } -> { b | opacity : a }
 setOpacity v o =
     { o | opacity = v }
 
 
-setOpacityIn : { b | opacity : a } -> c -> { b | opacity : c }
+setOpacityIn : { b | opacity : a } -> a -> { b | opacity : a }
 setOpacityIn =
-    flip setOpacity
+    Function.flip setOpacity
 
 
-setOutline : c -> { b | outline : a } -> { b | outline : c }
+setOutline : a -> { b | outline : a } -> { b | outline : a }
 setOutline v o =
     { o | outline = v }
 
 
-setOutlineIn : { b | outline : a } -> c -> { b | outline : c }
+setOutlineIn : { b | outline : a } -> a -> { b | outline : a }
 setOutlineIn =
-    flip setOutline
+    Function.flip setOutline
 
 
-setOverflow : c -> { b | overflow : a } -> { b | overflow : c }
+setOverflow : a -> { b | overflow : a } -> { b | overflow : a }
 setOverflow v o =
     { o | overflow = v }
 
 
-setOverflowIn : { b | overflow : a } -> c -> { b | overflow : c }
+setOverflowIn : { b | overflow : a } -> a -> { b | overflow : a }
 setOverflowIn =
-    flip setOverflow
+    Function.flip setOverflow
 
 
-setPadding : c -> { b | padding : a } -> { b | padding : c }
+setPadding : a -> { b | padding : a } -> { b | padding : a }
 setPadding v o =
     { o | padding = v }
 
 
-setPaddingIn : { b | padding : a } -> c -> { b | padding : c }
+setPaddingIn : { b | padding : a } -> a -> { b | padding : a }
 setPaddingIn =
-    flip setPadding
+    Function.flip setPadding
 
 
-setPosition : c -> { b | position : a } -> { b | position : c }
+setPosition : a -> { b | position : a } -> { b | position : a }
 setPosition v o =
     { o | position = v }
 
 
-setPositionIn : { b | position : a } -> c -> { b | position : c }
+setPositionIn : { b | position : a } -> a -> { b | position : a }
 setPositionIn =
-    flip setPosition
+    Function.flip setPosition
 
 
-setCorner : c -> { b | corner : a } -> { b | corner : c }
+setCorner : a -> { b | corner : a } -> { b | corner : a }
 setCorner v o =
     { o | corner = v }
 
 
-setCornerIn : { b | corner : a } -> c -> { b | corner : c }
+setCornerIn : { b | corner : a } -> a -> { b | corner : a }
 setCornerIn =
-    flip setCorner
+    Function.flip setCorner
 
 
-setRight : c -> { b | right : a } -> { b | right : c }
+setRight : a -> { b | right : a } -> { b | right : a }
 setRight v o =
     { o | right = v }
 
 
-setRightIn : { b | right : a } -> c -> { b | right : c }
+setRightIn : { b | right : a } -> a -> { b | right : a }
 setRightIn =
-    flip setRight
+    Function.flip setRight
 
 
 addScreenWidth : b -> { a | screenWidths : List b } -> { a | screenWidths : List b }
@@ -491,221 +493,221 @@ addScreenWidth screenWidth record =
     { record | screenWidths = screenWidth :: record.screenWidths }
 
 
-setScreenWidths : c -> { b | screenWidths : a } -> { b | screenWidths : c }
+setScreenWidths : a -> { b | screenWidths : a } -> { b | screenWidths : a }
 setScreenWidths v o =
     { o | screenWidths = v }
 
 
-setScreenWidthsIn : { b | screenWidths : a } -> c -> { b | screenWidths : c }
+setScreenWidthsIn : { b | screenWidths : a } -> a -> { b | screenWidths : a }
 setScreenWidthsIn =
-    flip setScreenWidths
+    Function.flip setScreenWidths
 
 
-setShrink : c -> { b | shrink : a } -> { b | shrink : c }
+setShrink : a -> { b | shrink : a } -> { b | shrink : a }
 setShrink v o =
     { o | shrink = v }
 
 
-setShrinkIn : { b | shrink : a } -> c -> { b | shrink : c }
+setShrinkIn : { b | shrink : a } -> a -> { b | shrink : a }
 setShrinkIn =
-    flip setShrink
+    Function.flip setShrink
 
 
-setSize : c -> { b | size : a } -> { b | size : c }
+setSize : a -> { b | size : a } -> { b | size : a }
 setSize v o =
     { o | size = v }
 
 
-setSizeIn : { b | size : a } -> c -> { b | size : c }
+setSizeIn : { b | size : a } -> a -> { b | size : a }
 setSizeIn =
-    flip setSize
+    Function.flip setSize
 
 
-setSpreadRadius : c -> { b | spreadRadius : a } -> { b | spreadRadius : c }
+setSpreadRadius : a -> { b | spreadRadius : a } -> { b | spreadRadius : a }
 setSpreadRadius v o =
     { o | spreadRadius = v }
 
 
-setSpreadRadiusIn : { b | spreadRadius : a } -> c -> { b | spreadRadius : c }
+setSpreadRadiusIn : { b | spreadRadius : a } -> a -> { b | spreadRadius : a }
 setSpreadRadiusIn =
-    flip setSpreadRadius
+    Function.flip setSpreadRadius
 
 
-setStyle : c -> { b | style : a } -> { b | style : c }
+setStyle : a -> { b | style : a } -> { b | style : a }
 setStyle v o =
     { o | style = v }
 
 
-setStyleIn : { b | style : a } -> c -> { b | style : c }
+setStyleIn : { b | style : a } -> a -> { b | style : a }
 setStyleIn =
-    flip setStyle
+    Function.flip setStyle
 
 
-setTextOverflow : c -> { b | textOverflow : a } -> { b | textOverflow : c }
+setTextOverflow : a -> { b | textOverflow : a } -> { b | textOverflow : a }
 setTextOverflow v o =
     { o | textOverflow = v }
 
 
-setTextOverflowIn : { b | textOverflow : a } -> c -> { b | textOverflow : c }
+setTextOverflowIn : { b | textOverflow : a } -> a -> { b | textOverflow : a }
 setTextOverflowIn =
-    flip setTextOverflow
+    Function.flip setTextOverflow
 
 
-setTilt : c -> { b | tilt : a } -> { b | tilt : c }
+setTilt : a -> { b | tilt : a } -> { b | tilt : a }
 setTilt v o =
     { o | tilt = v }
 
 
-setTiltIn : { b | tilt : a } -> c -> { b | tilt : c }
+setTiltIn : { b | tilt : a } -> a -> { b | tilt : a }
 setTiltIn =
-    flip setTilt
+    Function.flip setTilt
 
 
-setTop : c -> { b | top : a } -> { b | top : c }
+setTop : a -> { b | top : a } -> { b | top : a }
 setTop v o =
     { o | top = v }
 
 
-setTopIn : { b | top : a } -> c -> { b | top : c }
+setTopIn : { b | top : a } -> a -> { b | top : a }
 setTopIn =
-    flip setTop
+    Function.flip setTop
 
 
-setTopLeft : c -> { b | topLeft : a } -> { b | topLeft : c }
+setTopLeft : a -> { b | topLeft : a } -> { b | topLeft : a }
 setTopLeft v o =
     { o | topLeft = v }
 
 
-setTopLeftIn : { b | topLeft : a } -> c -> { b | topLeft : c }
+setTopLeftIn : { b | topLeft : a } -> a -> { b | topLeft : a }
 setTopLeftIn =
-    flip setTopLeft
+    Function.flip setTopLeft
 
 
-setTopRight : c -> { b | topRight : a } -> { b | topRight : c }
+setTopRight : a -> { b | topRight : a } -> { b | topRight : a }
 setTopRight v o =
     { o | topRight = v }
 
 
-setTopRightIn : { b | topRight : a } -> c -> { b | topRight : c }
+setTopRightIn : { b | topRight : a } -> a -> { b | topRight : a }
 setTopRightIn =
-    flip setTopRight
+    Function.flip setTopRight
 
 
-setTypography : c -> { b | typography : a } -> { b | typography : c }
+setTypography : a -> { b | typography : a } -> { b | typography : a }
 setTypography v o =
     { o | typography = v }
 
 
-setTypographyIn : { b | typography : a } -> c -> { b | typography : c }
+setTypographyIn : { b | typography : a } -> a -> { b | typography : a }
 setTypographyIn =
-    flip setTypography
+    Function.flip setTypography
 
 
-setUserSelect : c -> { b | userSelect : a } -> { b | userSelect : c }
+setUserSelect : a -> { b | userSelect : a } -> { b | userSelect : a }
 setUserSelect v o =
     { o | userSelect = v }
 
 
-setUserSelectIn : { b | userSelect : a } -> c -> { b | userSelect : c }
+setUserSelectIn : { b | userSelect : a } -> a -> { b | userSelect : a }
 setUserSelectIn =
-    flip setUserSelect
+    Function.flip setUserSelect
 
 
-setVertical : c -> { b | vertical : a } -> { b | vertical : c }
+setVertical : a -> { b | vertical : a } -> { b | vertical : a }
 setVertical v o =
     { o | vertical = v }
 
 
-setVerticalIn : { b | vertical : a } -> c -> { b | vertical : c }
+setVerticalIn : { b | vertical : a } -> a -> { b | vertical : a }
 setVerticalIn =
-    flip setVertical
+    Function.flip setVertical
 
 
-setVisibility : c -> { b | visibility : a } -> { b | visibility : c }
+setVisibility : a -> { b | visibility : a } -> { b | visibility : a }
 setVisibility v o =
     { o | visibility = v }
 
 
-setVisibilityIn : { b | visibility : a } -> c -> { b | visibility : c }
+setVisibilityIn : { b | visibility : a } -> a -> { b | visibility : a }
 setVisibilityIn =
-    flip setVisibility
+    Function.flip setVisibility
 
 
-setWeight : c -> { b | weight : a } -> { b | weight : c }
+setWeight : a -> { b | weight : a } -> { b | weight : a }
 setWeight v o =
     { o | weight = v }
 
 
-setWeightIn : { b | weight : a } -> c -> { b | weight : c }
+setWeightIn : { b | weight : a } -> a -> { b | weight : a }
 setWeightIn =
-    flip setWeight
+    Function.flip setWeight
 
 
-setWhiteSpaceWrap : c -> { b | whiteSpaceWrap : a } -> { b | whiteSpaceWrap : c }
+setWhiteSpaceWrap : a -> { b | whiteSpaceWrap : a } -> { b | whiteSpaceWrap : a }
 setWhiteSpaceWrap v o =
     { o | whiteSpaceWrap = v }
 
 
-setWhiteSpaceWrapIn : { b | whiteSpaceWrap : a } -> c -> { b | whiteSpaceWrap : c }
+setWhiteSpaceWrapIn : { b | whiteSpaceWrap : a } -> a -> { b | whiteSpaceWrap : a }
 setWhiteSpaceWrapIn =
-    flip setWhiteSpaceWrap
+    Function.flip setWhiteSpaceWrap
 
 
-setWidth : c -> { b | width : a } -> { b | width : c }
+setWidth : a -> { b | width : a } -> { b | width : a }
 setWidth v o =
     { o | width = v }
 
 
-setWidthIn : { b | width : a } -> c -> { b | width : c }
+setWidthIn : { b | width : a } -> a -> { b | width : a }
 setWidthIn =
-    flip setWidth
+    Function.flip setWidth
 
 
-setWrap : c -> { b | wrap : a } -> { b | wrap : c }
+setWrap : a -> { b | wrap : a } -> { b | wrap : a }
 setWrap v o =
     { o | wrap = v }
 
 
-setWrapIn : { b | wrap : a } -> c -> { b | wrap : c }
+setWrapIn : { b | wrap : a } -> a -> { b | wrap : a }
 setWrapIn =
-    flip setWrap
+    Function.flip setWrap
 
 
-setZIndex : c -> { b | zIndex : a } -> { b | zIndex : c }
+setZIndex : a -> { b | zIndex : a } -> { b | zIndex : a }
 setZIndex v o =
     { o | zIndex = v }
 
 
-setZIndexIn : { b | zIndex : a } -> c -> { b | zIndex : c }
+setZIndexIn : { b | zIndex : a } -> a -> { b | zIndex : a }
 setZIndexIn =
-    flip setZIndex
+    Function.flip setZIndex
 
 
-setThickness : a -> { c | thickness : b } -> { c | thickness : a }
+setThickness : a -> { c | thickness : a } -> { c | thickness : a }
 setThickness v o =
     { o | thickness = v }
 
 
-setThicknessIn : { c | thickness : b } -> a -> { c | thickness : a }
+setThicknessIn : { c | thickness : a } -> a -> { c | thickness : a }
 setThicknessIn =
-    flip setThickness
+    Function.flip setThickness
 
 
-setValue : a -> { c | value : b } -> { c | value : a }
+setValue : a -> { c | value : a } -> { c | value : a }
 setValue v o =
     { o | value = v }
 
 
-setValueIn : { c | value : b } -> a -> { c | value : a }
+setValueIn : { c | value : a } -> a -> { c | value : a }
 setValueIn =
-    flip setValue
+    Function.flip setValue
 
 
-setLetterSpacing : a -> { c | letterSpacing : b } -> { c | letterSpacing : a }
+setLetterSpacing : a -> { c | letterSpacing : a } -> { c | letterSpacing : a }
 setLetterSpacing v o =
     { o | letterSpacing = v }
 
 
-setLetterSpacingIn : { c | letterSpacing : b } -> a -> { c | letterSpacing : a }
+setLetterSpacingIn : { c | letterSpacing : a } -> a -> { c | letterSpacing : a }
 setLetterSpacingIn =
-    flip setLetterSpacing
+    Function.flip setLetterSpacing

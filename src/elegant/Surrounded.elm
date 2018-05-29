@@ -2,6 +2,7 @@ module Surrounded
     exposing
         ( Surrounded
         , all
+        , applyModifiersOnDefault
         , bottom
         , default
         , horizontal
@@ -10,7 +11,6 @@ module Surrounded
         , surroundedToCouples
         , top
         , vertical
-        , applyModifiersOnDefault
         )
 
 {-| Generic module for surrounded values.
@@ -29,10 +29,10 @@ module Surrounded
 
 -}
 
-import Function
-import List.Extra
-import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
+import Function
+import Helpers.Shared exposing (..)
+import List.Extra
 import Modifiers exposing (..)
 
 
@@ -114,7 +114,7 @@ surroundedToCouples prefix toCouple border =
     , unwrapToCouples .left toCouple
     ]
         |> List.map (callOn border)
-        |> flip List.Extra.andMap
+        |> Function.flip List.Extra.andMap
             [ List.map (addPrefix prefix "top")
             , List.map (addPrefix prefix "bottom")
             , List.map (addPrefix prefix "right")
@@ -144,4 +144,4 @@ addPrefix qualifier orientation ( selector, value ) =
                         Just qual ->
                             [ qual, orientation, name ]
     in
-        ( name |> String.join "-", value )
+    ( name |> String.join "-", value )

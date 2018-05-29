@@ -1,47 +1,47 @@
 module Box
     exposing
         ( Box
-        , default
         , Visibility
         , appearanceNone
-        , hidden
-        , visible
         , background
+        , backgroundColor
         , border
+        , borderColor
+        , borderNone
+        , borderSolid
+        , borderWidth
         , boxShadow
-        , shadow
+        , boxToCouples
         , corner
+        , cornerRadius
+        , cornerRound
         , cursor
+        , default
+        , fontFamilySansSerif
+        , hidden
         , margin
+        , marginAuto
         , opacity
         , outline
-        , padding
-        , position
-        , typography
-        , visibility
-        , zIndex
-        , boxToCouples
         , outlineNone
-        , backgroundColor
-        , cornerRound
-        , cornerRadius
-        , borderNone
-        , borderColor
-        , borderWidth
-        , borderSolid
+        , padding
         , paddingAll
-        , paddingHorizontal
-        , paddingVertical
-        , paddingTop
-        , paddingRight
         , paddingBottom
+        , paddingHorizontal
         , paddingLeft
-        , transform
+        , paddingRight
+        , paddingTop
+        , paddingVertical
+        , position
+        , shadow
         , shadowCenteredBlurry
-        , marginAuto
-        , fontFamilySansSerif
         , systemFont
         , textColor
+        , transform
+        , typography
+        , visibility
+        , visible
+        , zIndex
         )
 
 {-| Handles all modifications for the box. You don't need to instanciate one,
@@ -112,22 +112,22 @@ It contains only modifiers, and they can be found in the respective modules.
 
 -}
 
-import Color exposing (Color)
-import Helpers.Shared exposing (..)
-import Elegant.Setters exposing (..)
-import Typography
-import Padding
-import Border
-import Corner
-import Margin
-import Outline
-import Shadow
-import Cursor
-import Surrounded exposing (Surrounded)
 import Background
-import Position
-import Transform
+import Border
+import Color exposing (Color)
+import Corner
+import Cursor
+import Elegant.Setters exposing (..)
+import Helpers.Shared exposing (..)
+import Margin
 import Modifiers exposing (..)
+import Outline
+import Padding
+import Position
+import Shadow
+import Surrounded exposing (Surrounded)
+import Transform
+import Typography
 
 
 {-| Represents a box, handling the properties of blocks. They are automatically

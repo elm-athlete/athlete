@@ -50,7 +50,7 @@ screenWidthToClassesNames suffix { min, max, style } =
 
 addScreenWidthToClassName : String -> String -> String
 addScreenWidthToClassName =
-    flip (++)
+    Function.flip (++)
 
 
 fetchStylesOrCompute : String -> Style -> List String
@@ -165,7 +165,7 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
 inMediaQuery : Maybe String -> String -> String
 inMediaQuery mediaQuery content =
     mediaQuery
-        |> Maybe.map (flip (++) (Helpers.Css.surroundWithBraces content))
+        |> Maybe.map (Function.flip (++) (Helpers.Css.surroundWithBraces content))
         |> Maybe.withDefault content
 
 

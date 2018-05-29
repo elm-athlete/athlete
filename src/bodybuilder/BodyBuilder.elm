@@ -1,54 +1,54 @@
 module BodyBuilder
     exposing
-        ( Node
+        ( BlockAttributes
         , FlexItem
         , GridItem
+        , Node
         , Option
-        , text
+        , a
+        , article
+        , aside
+        , audio
         , br
-        , program
-        , node
-        , span
+        , button
+        , div
         , flex
         , flexItem
+        , footer
         , grid
         , gridItem
-        , a
-        , img
-        , audio
-        , progress
-        , button
-        , inputHidden
-        , inputText
-        , inputTel
-        , inputPassword
-        , inputRange
-        , inputNumber
-        , inputRadio
-        , inputCheckbox
-        , inputSubmit
-        , inputUrl
-        , inputColor
-        , inputFile
-        , textarea
-        , select
-        , option
         , h1
         , h2
         , h3
         , h4
         , h5
         , h6
-        , p
-        , BlockAttributes
-        , div
-        , section
-        , nav
-        , article
-        , aside
-        , footer
         , header
+        , img
+        , inputCheckbox
+        , inputColor
+        , inputFile
+        , inputHidden
+        , inputNumber
+        , inputPassword
+        , inputRadio
+        , inputRange
+        , inputSubmit
+        , inputTel
+        , inputText
+        , inputUrl
+        , nav
+        , node
         , none
+        , option
+        , p
+        , program
+        , progress
+        , section
+        , select
+        , span
+        , text
+        , textarea
         )
 
 {-| This module entirely replaces Html, providing a type-safer alternatives.
@@ -108,16 +108,16 @@ It is possible to style those elements using `Style.blockProperties`.
 
 -}
 
-import Html exposing (Html)
-import Html.Attributes
 import BodyBuilder.Attributes exposing (..)
 import BodyBuilder.Convert
 import BodyBuilder.Shared as Shared
-import Elegant
-import Function
-import Flex exposing (FlexContainerDetails)
 import Display
+import Elegant
+import Flex exposing (FlexContainerDetails)
+import Function
 import Grid
+import Html exposing (Html)
+import Html.Attributes
 import Modifiers exposing (..)
 
 
@@ -1134,7 +1134,7 @@ inputAndLabel :
 inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
     let
         attributes =
-            (Function.compose modifiers)
+            Function.compose modifiers
                 defaultAttributes
 
         computedInput =
@@ -1149,16 +1149,16 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                     |> List.map Elegant.styleToCss
                     |> String.join " "
                     |> Html.Attributes.class
-                    |> flip (::) (attributesToHtmlAttributes attributes)
+                    |> Function.flip (::) (attributesToHtmlAttributes attributes)
                 )
                 []
     in
-        case attributes.label of
-            Nothing ->
-                computedInput
+    case attributes.label of
+        Nothing ->
+            computedInput
 
-            Just label ->
-                (Shared.extractLabel label) computedInput
+        Just label ->
+            Shared.extractLabel label computedInput
 
 
 computeBlock :
@@ -1176,20 +1176,20 @@ computeBlock :
 computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers blockModifiers defaultAttributes attributesToHtmlAttributes modifiers content =
     let
         attributes =
-            (Function.compose modifiers)
+            Function.compose modifiers
                 defaultAttributes
     in
-        Html.node tag
-            (BodyBuilder.Convert.toElegantStyle
-                (flexModifiers attributes)
-                (flexItemModifiers attributes)
-                (gridModifiers attributes)
-                (gridItemModifiers attributes)
-                (blockModifiers attributes)
-                attributes.box
-                |> List.map Elegant.styleToCss
-                |> String.join " "
-                |> Html.Attributes.class
-                |> flip (::) (attributesToHtmlAttributes attributes)
-            )
-            content
+    Html.node tag
+        (BodyBuilder.Convert.toElegantStyle
+            (flexModifiers attributes)
+            (flexItemModifiers attributes)
+            (gridModifiers attributes)
+            (gridItemModifiers attributes)
+            (blockModifiers attributes)
+            attributes.box
+            |> List.map Elegant.styleToCss
+            |> String.join " "
+            |> Html.Attributes.class
+            |> Function.flip (::) (attributesToHtmlAttributes attributes)
+        )
+        content

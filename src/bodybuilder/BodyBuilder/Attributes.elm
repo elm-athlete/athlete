@@ -929,7 +929,7 @@ setUniversalIn :
     -> UniversalAttributes
     -> { a | universal : UniversalAttributes }
 setUniversalIn =
-    flip setUniversal
+    Function.flip setUniversal
 
 
 setValueInUniversal :
@@ -1013,7 +1013,7 @@ visibleAttributesToHtmlAttributes visibleAttributes =
     , unwrapEmptyList rawStyleToHtmlAttributes << .rawStyle
     ]
         |> List.concatMap (callOn visibleAttributes)
-        |> flip List.append visibleAttributes.rawAttributes
+        |> Function.flip List.append visibleAttributes.rawAttributes
 
 
 {-| -}
@@ -1614,7 +1614,7 @@ defaultInputCheckboxAttributes =
 inputCheckboxAttributesToHtmlAttributes : InputCheckboxAttributes msg -> List (Html.Attribute msg)
 inputCheckboxAttributesToHtmlAttributes attributes =
     Html.Attributes.checked attributes.checked
-        |> flip (::) (unwrapMaybeAttribute Html.Attributes.value (Maybe.map toString <| attributes.value))
+        |> Function.flip (::) (unwrapMaybeAttribute Html.Attributes.value (Maybe.map toString <| attributes.value))
         |> List.append (inputVisibleToHtmlAttributes attributes)
         |> List.append (checkEventToHtmlEvent attributes)
 

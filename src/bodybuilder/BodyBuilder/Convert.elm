@@ -178,7 +178,7 @@ appendInStyleComponent setter ( styleSelector, elem ) results =
                 |> (,) styleSelector
             )
             (Tuple.mapSecond (setter elem))
-        |> flip (Dict.insert key) results
+        |> Function.flip (Dict.insert key) results
 
 
 samePseudoClass :

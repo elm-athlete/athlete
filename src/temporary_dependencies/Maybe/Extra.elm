@@ -1,7 +1,6 @@
 module Maybe.Extra
     exposing
-        ( (?)
-        , andMap
+        ( andMap
         , combine
         , combineArray
         , filter
@@ -28,7 +27,7 @@ module Maybe.Extra
 
 # Common helpers
 
-@docs (?), join, isNothing, isJust, unwrap, unpack, filter
+@docs join, isNothing, isJust, unwrap, unpack, filter
 
 
 # Applicative functions
@@ -48,15 +47,8 @@ module Maybe.Extra
 -}
 
 import Array
+import Function
 import Maybe exposing (..)
-
-
-{-| Flipped, infix version of `withDefault`.
-head [] ? 0 == 0
--}
-(?) : Maybe a -> a -> a
-(?) mx x =
-    withDefault x mx
 
 
 {-| Flattens nested `Maybe`s
@@ -151,7 +143,7 @@ Advanced functional programmers will recognize this as the implementation of `*>
 -}
 next : Maybe a -> Maybe b -> Maybe b
 next =
-    map2 (flip always)
+    map2 (Function.flip always)
 
 
 {-| Take two `Maybe` values. If the second one equals `Nothing`, return `Nothing`. Otherwise return the first value.

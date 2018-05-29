@@ -1,4 +1,4 @@
-module Elegant.Helpers.Shared exposing (..)
+module Helpers.Shared exposing (..)
 
 {-| -}
 
@@ -127,7 +127,6 @@ modifiedElementOrNothing : a -> List (a -> a) -> Maybe a
 modifiedElementOrNothing default modifiers =
     if List.isEmpty modifiers then
         Nothing
-
     else
         default
             |> Function.compose modifiers
