@@ -144,24 +144,27 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
         classHash =
             atomicClass
     in
-    case Native.Elegant.fetchAtomicClass classHash of
-        Nothing ->
-            let
-                classNameComplete =
-                    String.join ""
-                        [ className
-                        , Maybe.withDefault "" mediaQueryId
-                        ]
+    ""
 
-                test =
-                    computeStyleToCss className mediaQueryId selector property
-                        |> inMediaQuery mediaQuery
-                        |> Native.Elegant.addAtomicClass classHash classNameComplete
-            in
-            classNameComplete
 
-        Just class ->
-            class
+
+-- Todo : Fix Native
+-- case Native.Elegant.fetchAtomicClass classHash of
+--     Nothing ->
+--         let
+--             classNameComplete =
+--                 String.join ""
+--                     [ className
+--                     , Maybe.withDefault "" mediaQueryId
+--                     ]
+--             test =
+--                 computeStyleToCss className mediaQueryId selector property
+--                     |> inMediaQuery mediaQuery
+--                     |> Native.Elegant.addAtomicClass classHash classNameComplete
+--         in
+--         classNameComplete
+--     Just class ->
+--         class
 
 
 inMediaQuery : Maybe String -> String -> String
