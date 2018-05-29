@@ -1,49 +1,49 @@
 module Flex
     exposing
-        ( FlexContainerDetails
-        , FlexItemDetails
+        ( Align
+        , FlexContainerDetails
         , FlexDirection
-        , direction
-        , column
-        , row
+        , FlexItemDetails
         , FlexWrap
-        , wrap
-        , noWrap
-        , Align
+        , JustifyContent
         , align
+        , alignCenter
+        , alignSelf
         , alignXY
         , baseline
-        , alignCenter
-        , flexStart
-        , flexEnd
-        , inherit
-        , initial
-        , stretch
-        , JustifyContent
-        , justifyContent
-        , spaceBetween
-        , spaceAround
-        , justifyContentCenter
-        , justifyContentFlexStart
-        , justifyContentFlexEnd
-        , grow
-        , shrink
-        , basisAuto
         , basis
-        , alignSelf
-        , flexItemDetailsToCouples
-        , flexContainerDetailsToCouples
+        , basisAuto
+        , bottomCenter
+        , bottomLeft
+        , bottomRight
+        , center
+        , centerLeft
+        , centerRight
+        , column
         , defaultFlexContainerDetails
         , defaultFlexItemDetails
-        , topLeft
+        , direction
+        , flexContainerDetailsToCouples
+        , flexEnd
+        , flexItemDetailsToCouples
+        , flexStart
+        , grow
+        , inherit
+        , initial
+        , justifyContent
+        , justifyContentCenter
+        , justifyContentFlexEnd
+        , justifyContentFlexStart
+        , noWrap
+        , row
+        , shrink
+        , spaceAround
+        , spaceBetween
+        , stretch
         , topCenter
+        , topLeft
         , topRight
-        , centerLeft
-        , center
-        , centerRight
-        , bottomLeft
-        , bottomCenter
-        , bottomRight
+        , wrap
         )
 
 {-| Flex handles everything related to the flex element.
@@ -121,8 +121,8 @@ module Flex
 -}
 
 import Either exposing (Either(..))
-import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
+import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 
 
@@ -370,12 +370,12 @@ alignSelf =
 
 alignItemsToCouple : Align -> ( String, String )
 alignItemsToCouple =
-    (,) "align-items" << alignToString
+    Tuple.pair "align-items" << alignToString
 
 
 alignSelfToCouple : Align -> ( String, String )
 alignSelfToCouple =
-    (,) "align-self" << alignToString
+    Tuple.pair "align-self" << alignToString
 
 
 alignToString : Align -> String
@@ -487,7 +487,7 @@ flexContainerDetailsToCouples flexContainerDetails =
 
 directionToCouple : FlexDirection -> ( String, String )
 directionToCouple =
-    (,) "flex-direction" << directionToString
+    Tuple.pair "flex-direction" << directionToString
 
 
 directionToString : FlexDirection -> String
@@ -502,17 +502,17 @@ directionToString direction =
 
 growToCouple : Int -> ( String, String )
 growToCouple =
-    (,) "flex-grow" << toString
+    Tuple.pair "flex-grow" << toString
 
 
 shrinkToCouple : Int -> ( String, String )
 shrinkToCouple =
-    (,) "flex-shrink" << toString
+    Tuple.pair "flex-shrink" << toString
 
 
 basisToCouple : Either SizeUnit Auto -> ( String, String )
 basisToCouple =
-    (,) "flex-basis" << basisToString
+    Tuple.pair "flex-basis" << basisToString
 
 
 basisToString : Either SizeUnit Auto -> String
@@ -527,7 +527,7 @@ basisToString autoSizeUnitEither =
 
 justifyContentToCouple : JustifyContent -> ( String, String )
 justifyContentToCouple =
-    (,) "justify-content" << justifyContentToString
+    Tuple.pair "justify-content" << justifyContentToString
 
 
 justifyContentToString : JustifyContent -> String
@@ -551,7 +551,7 @@ justifyContentToString val =
 
 flexWrapToCouple : FlexWrap -> ( String, String )
 flexWrapToCouple =
-    (,) "flex-wrap" << flexWrapToString
+    Tuple.pair "flex-wrap" << flexWrapToString
 
 
 flexWrapToString : FlexWrap -> String
@@ -566,7 +566,7 @@ flexWrapToString val =
 
 flexDirectionToCouple : FlexDirection -> ( String, String )
 flexDirectionToCouple =
-    (,) "flex-direction" << flexDirectionToString
+    Tuple.pair "flex-direction" << flexDirectionToString
 
 
 flexDirectionToString : FlexDirection -> String

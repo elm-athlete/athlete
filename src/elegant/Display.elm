@@ -1,30 +1,30 @@
 module Display
     exposing
-        ( DisplayBox(..)
-        , OutsideDisplay(..)
-        , InsideDisplay(..)
-        , Contents
+        ( Alignment
         , BlockDetails
-        , defaultBlockDetails
+        , Contents
+        , DisplayBox(..)
+        , InsideDisplay(..)
         , ListStyleType
-        , listStyleNone
-        , listStyleDisc
-        , listStyleCircle
-        , listStyleSquare
-        , listStyleDecimal
-        , listStyleGeorgian
-        , Alignment
-        , alignment
-        , right
-        , center
-        , left
-        , justify
-        , overflow
+        , OutsideDisplay(..)
         , TextOverflow
-        , textOverflowEllipsis
+        , alignment
+        , center
+        , defaultBlockDetails
         , dimensions
         , displayBoxToCouples
         , fullWidth
+        , justify
+        , left
+        , listStyleCircle
+        , listStyleDecimal
+        , listStyleDisc
+        , listStyleGeorgian
+        , listStyleNone
+        , listStyleSquare
+        , overflow
+        , right
+        , textOverflowEllipsis
         )
 
 {-| Display contains everything about an element rendering. It is the basis of
@@ -82,15 +82,15 @@ every style, for every element. Each element can be block, inline, flow or flex.
 
 -}
 
-import Helpers.Css
 import Box
-import Helpers.Shared exposing (..)
-import Elegant.Setters exposing (..)
-import Overflow
 import Dimensions
+import Elegant.Setters exposing (..)
 import Flex
 import Grid
+import Helpers.Css
+import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
+import Overflow
 
 
 {-| Represents a box and contains all the style inside.
@@ -410,7 +410,7 @@ toLegacyDisplayCss str =
 
 listStyleTypeToCouple : ListStyleType -> ( String, String )
 listStyleTypeToCouple =
-    (,) "list-style" << listStyleTypeToString
+    Tuple.pair "list-style" << listStyleTypeToString
 
 
 listStyleTypeToString : ListStyleType -> String
@@ -437,7 +437,7 @@ listStyleTypeToString val =
 
 textAlignToCouple : Alignment -> ( String, String )
 textAlignToCouple =
-    (,) "text-align" << textAlignToString
+    Tuple.pair "text-align" << textAlignToString
 
 
 textAlignToString : Alignment -> String
@@ -458,7 +458,7 @@ textAlignToString val =
 
 textOverflowToCouple : TextOverflow -> ( String, String )
 textOverflowToCouple =
-    (,) "text-overflow" << textOverflowToString
+    Tuple.pair "text-overflow" << textOverflowToString
 
 
 textOverflowToString : TextOverflow -> String

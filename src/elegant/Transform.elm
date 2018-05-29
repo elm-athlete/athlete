@@ -1,20 +1,20 @@
 module Transform
     exposing
         ( Transform
+        , backfaceVisibilityHidden
+        , backfaceVisibilityVisible
         , default
-        , translateX
-        , translateY
-        , translateZ
-        , transformToCouples
+        , origin
+        , perspective
+        , perspectiveOrigin
+        , preserve3d
         , rotateX
         , rotateY
         , rotateZ
-        , origin
-        , backfaceVisibilityHidden
-        , backfaceVisibilityVisible
-        , preserve3d
-        , perspective
-        , perspectiveOrigin
+        , transformToCouples
+        , translateX
+        , translateY
+        , translateZ
         )
 
 {-| Transform contains everything about css transformations : translate, rotate and scale.
@@ -52,8 +52,8 @@ module Transform
 
 -}
 
-import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
+import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 
 
@@ -204,7 +204,7 @@ translateCoordinateToString ( coord, val ) =
             []
 
         Just val ->
-            [ "translate" ++ coord ++ "(" ++ (sizeUnitToString val) ++ ")"
+            [ "translate" ++ coord ++ "(" ++ sizeUnitToString val ++ ")"
             ]
 
 
@@ -215,7 +215,7 @@ rotateCoordinateToString ( coord, val ) =
             []
 
         Just val ->
-            [ "rotate" ++ coord ++ "(" ++ (angleToString val) ++ ")"
+            [ "rotate" ++ coord ++ "(" ++ angleToString val ++ ")"
             ]
 
 
@@ -241,12 +241,11 @@ rotateToStringList ( maybeX, maybeY, maybeZ ) =
 
 transformToString : Transform -> String
 transformToString { translate, rotate } =
-    ([ rotateToStringList rotate
-     , translateToStringList translate
-     ]
+    [ rotateToStringList rotate
+    , translateToStringList translate
+    ]
         |> List.concat
         |> String.join " "
-    )
 
 
 type BackfaceVisibility
@@ -282,7 +281,7 @@ backfaceVisibilityToCouple : BackfaceVisibility -> ( String, String )
 backfaceVisibilityToCouple backfaceVisibility =
     backfaceVisibility
         |> backfaceVisibilityToString
-        |> (,) "backface-visibility"
+        |> Tuple.pair "backface-visibility"
 
 
 {-| in a (css) 3d rendered scene, we hide back facing elements.
@@ -304,12 +303,12 @@ transformStyleToString val =
 
 transformStyleToCouple : TransformStyle -> ( String, String )
 transformStyleToCouple =
-    (,) "transform-style" << transformStyleToString
+    Tuple.pair "transform-style" << transformStyleToString
 
 
 perspectiveToCouple : SizeUnit -> ( String, String )
 perspectiveToCouple =
-    (,) "perspective" << sizeUnitToString
+    Tuple.pair "perspective" << sizeUnitToString
 
 
 perspectiveOriginToString : ( SizeUnit, SizeUnit ) -> String
@@ -319,7 +318,7 @@ perspectiveOriginToString =
 
 perspectiveOriginToCouple : ( SizeUnit, SizeUnit ) -> ( String, String )
 perspectiveOriginToCouple =
-    (,) "perspective-origin" << perspectiveOriginToString
+    Tuple.pair "perspective-origin" << perspectiveOriginToString
 
 
 originToString : ( SizeUnit, SizeUnit, SizeUnit ) -> String
@@ -331,4 +330,4 @@ originToString ( x, y, z ) =
 
 originToCouple : ( SizeUnit, SizeUnit, SizeUnit ) -> ( String, String )
 originToCouple =
-    (,) "transform-origin" << originToString
+    Tuple.pair "transform-origin" << originToString

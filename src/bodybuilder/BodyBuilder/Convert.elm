@@ -125,7 +125,7 @@ mergeModifiersAndSwap styles =
         Just ( _, styleSelector ) ->
             styles
                 |> List.foldr (Tuple.first >> (++)) []
-                |> (,) styleSelector
+                |> Tuple.pair styleSelector
                 |> List.singleton
 
 
@@ -175,7 +175,7 @@ appendInStyleComponent setter ( styleSelector, elem ) results =
         |> Maybe.Extra.unwrap
             (defaultStyleComponents
                 |> setter elem
-                |> (,) styleSelector
+                |> Tuple.pair styleSelector
             )
             (Tuple.mapSecond (setter elem))
         |> Function.flip (Dict.insert key) results
@@ -224,7 +224,7 @@ componentsToParameteredDisplayBox isBlock isFlex isGrid ( { media }, { flexConta
             (computeOutsideDisplay flexItem gridItem block isBlock)
             (computeInsideDisplay flexItem flexContainer gridItem gridContainer isFlex isGrid)
         |> Display.ContentsWrapper
-        |> (,) media
+        |> Tuple.pair media
 
 
 computeOutsideDisplay :

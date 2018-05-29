@@ -1,6 +1,14 @@
 module Grid
     exposing
-        ( align
+        ( GridContainerCoordinate
+        , GridContainerDetails
+        , GridItemCoordinate
+        , GridItemDetails
+        , GridItemSize(..)
+        , GridTemplate
+        , Repeatable(..)
+        , ValType(..)
+        , align
         , alignItems
         , alignItemsToCouple
         , alignSelfToCouple
@@ -28,14 +36,14 @@ module Grid
         , placement
         , placementToCouple
         , placementToString
-        , size
-        , sizeToCouple
-        , sizeToString
         , repeat
         , repeatOptionToString
         , repeatableToString
         , rows
         , simple
+        , size
+        , sizeToCouple
+        , sizeToString
         , sizeUnitVal
         , spaceAround
         , spaceBetween
@@ -50,17 +58,10 @@ module Grid
         , valTypeToString
         , vertical
         , viewWidth
-        , GridItemDetails
-        , GridContainerDetails
-        , GridItemSize(..)
-        , GridTemplate
-        , GridContainerCoordinate
-        , GridItemCoordinate
-        , Repeatable(..)
-        , ValType(..)
         )
 
 {-|
+
 @docs align
 @docs alignItems
 @docs alignItemsToCouple
@@ -119,6 +120,7 @@ module Grid
 @docs GridTemplate
 @docs Repeatable
 @docs ValType
+
 -}
 
 import Helpers.Shared exposing (..)
@@ -423,13 +425,13 @@ gridContainerCoordinateToCouples columnRow alignJustify gridContainerCoordinate 
 {-| -}
 gutterToCouple : String -> SizeUnit -> ( String, String )
 gutterToCouple columnRow =
-    (,) ("grid-" ++ columnRow ++ "-gap") << sizeUnitToString
+    Tuple.pair ("grid-" ++ columnRow ++ "-gap") << sizeUnitToString
 
 
 {-| -}
 alignToCouple : String -> Align -> ( String, String )
 alignToCouple alignJustify =
-    (,) (alignJustify ++ "-content") << alignToString
+    Tuple.pair (alignJustify ++ "-content") << alignToString
 
 
 {-| -}
@@ -582,7 +584,7 @@ sizeToString itemSize =
             "-1"
 
         Span val ->
-            "span " ++ (toString val)
+            "span " ++ toString val
 
 
 {-| -}
