@@ -117,25 +117,25 @@ offset =
 {-| Defines a standard boxShadow.
 -}
 standard : SizeUnit -> Color -> ( SizeUnit, SizeUnit ) -> Modifier Shadow
-standard size color offset =
-    blurRadius size
-        >> setColor color
-        >> setOffset offset
+standard size_ color_ offset_ =
+    blurRadius size_
+        >> setColor color_
+        >> setOffset offset_
 
 
 {-| Creates a plain boxShadow.
 -}
 plain : ( SizeUnit, SizeUnit ) -> Color -> Modifier Shadow
-plain offset color =
-    setOffset offset
-        >> setColor color
+plain offset_ color_ =
+    setOffset offset_
+        >> setColor color_
 
 
 {-| Creates a plain boxShadow.
 -}
 blurry : SizeUnit -> SizeUnit -> Color -> Modifier Shadow
-blurry spread blur color =
-    spreadRadius spread << blurRadius blur << plain ( Px 0, Px 0 ) color
+blurry spread_ blur_ color_ =
+    spreadRadius spread_ << blurRadius blur_ << plain ( Px 0, Px 0 ) color_
 
 
 {-| Compiles a `Shadow` record to the corresponding CSS tuple.
@@ -157,9 +157,9 @@ offsetToStringList ( x, y ) =
 
 
 blurAndSpreadRadiusToStringList : SizeUnit -> SizeUnit -> List String
-blurAndSpreadRadiusToStringList blurRadius spreadRadius =
-    [ blurRadius
-    , spreadRadius
+blurAndSpreadRadiusToStringList blurRadius_ spreadRadius_ =
+    [ blurRadius_
+    , spreadRadius_
     ]
         |> List.map sizeUnitToString
 
@@ -170,19 +170,19 @@ colorToStringList =
 
 
 insetToStringList : Bool -> List String
-insetToStringList inset =
-    if inset then
+insetToStringList inset_ =
+    if inset_ then
         [ "inset" ]
     else
         []
 
 
 boxShadowToString : Shadow -> String
-boxShadowToString { inset, offset, spreadRadius, color, blurRadius } =
-    [ offsetToStringList offset
-    , blurAndSpreadRadiusToStringList blurRadius spreadRadius
-    , colorToStringList color
-    , insetToStringList inset
+boxShadowToString shadow =
+    [ offsetToStringList shadow.offset
+    , blurAndSpreadRadiusToStringList shadow.blurRadius shadow.spreadRadius
+    , colorToStringList shadow.color
+    , insetToStringList shadow.inset
     ]
         |> List.concat
         |> String.join " "

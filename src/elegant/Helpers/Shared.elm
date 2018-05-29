@@ -78,7 +78,7 @@ degree =
 
 concatNumberWithString : number -> String -> String
 concatNumberWithString number str =
-    -- TODO : (toString number) ++ str
+    -- Todo : (toString number) ++ str
     str
 
 

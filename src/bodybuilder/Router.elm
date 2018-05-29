@@ -658,6 +658,7 @@ focusChoosenElement history model =
         True ->
             history.current.maybeFocusedId
                 |> Maybe.withDefault ""
+                -- Todo Fix the scroll (using ports)
                 -- |> Native.BodyBuilder.focusWithoutScroll
                 |> Task.attempt (FocusMsg >> history.standardHistoryWrapper)
     )

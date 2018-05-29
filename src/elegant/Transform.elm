@@ -106,8 +106,8 @@ at which the viewer is looking. It is used as the vanishing point by the
 perspective property.
 -}
 perspectiveOrigin : ( SizeUnit, SizeUnit ) -> Transform -> Transform
-perspectiveOrigin perspectiveOrigin transform =
-    { transform | perspectiveOrigin = Just perspectiveOrigin }
+perspectiveOrigin perspectiveOrigin_ transform =
+    { transform | perspectiveOrigin = Just perspectiveOrigin_ }
 
 
 {-| Generate an empty `Translate` record, with every field equal to Nothing.
@@ -198,8 +198,8 @@ transformToCouples transform =
 
 
 translateCoordinateToString : ( String, Maybe SizeUnit ) -> List String
-translateCoordinateToString ( coord, val ) =
-    case val of
+translateCoordinateToString ( coord, val_ ) =
+    case val_ of
         Nothing ->
             []
 
@@ -209,8 +209,8 @@ translateCoordinateToString ( coord, val ) =
 
 
 rotateCoordinateToString : ( String, Maybe Angle ) -> List String
-rotateCoordinateToString ( coord, val ) =
-    case val of
+rotateCoordinateToString ( coord, val_ ) =
+    case val_ of
         Nothing ->
             []
 

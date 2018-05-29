@@ -53,45 +53,45 @@ default =
 
 {-| -}
 top : a -> Modifiers a -> Modifier (Surrounded a)
-top default =
-    getModifyAndSet .top setTopIn default
+top default_ =
+    getModifyAndSet .top setTopIn default_
 
 
 {-| -}
 bottom : a -> Modifiers a -> Modifier (Surrounded a)
-bottom default =
-    getModifyAndSet .bottom setBottomIn default
+bottom default_ =
+    getModifyAndSet .bottom setBottomIn default_
 
 
 {-| -}
 right : a -> Modifiers a -> Modifier (Surrounded a)
-right default =
-    getModifyAndSet .right setRightIn default
+right default_ =
+    getModifyAndSet .right setRightIn default_
 
 
 {-| -}
 left : a -> Modifiers a -> Modifier (Surrounded a)
-left default =
-    getModifyAndSet .left setLeftIn default
+left default_ =
+    getModifyAndSet .left setLeftIn default_
 
 
 {-| -}
 horizontal : a -> Modifiers a -> Modifier (Surrounded a)
-horizontal default modifiers =
-    left default modifiers >> right default modifiers
+horizontal default_ modifiers =
+    left default_ modifiers >> right default_ modifiers
 
 
 {-| -}
 vertical : a -> Modifiers a -> Modifier (Surrounded a)
-vertical default modifiers =
-    top default modifiers >> bottom default modifiers
+vertical default_ modifiers =
+    top default_ modifiers >> bottom default_ modifiers
 
 
 {-| -}
 all : a -> Modifiers a -> Modifier (Surrounded a)
-all default modifiers =
-    vertical default modifiers
-        >> horizontal default modifiers
+all default_ modifiers =
+    vertical default_ modifiers
+        >> horizontal default_ modifiers
 
 
 {-| -}
@@ -136,12 +136,12 @@ addPrefix qualifier orientation ( selector, value ) =
                         Just qual ->
                             [ qual, orientation ]
 
-                name ->
+                name_ ->
                     case qualifier of
                         Nothing ->
-                            [ orientation, name ]
+                            [ orientation, name_ ]
 
                         Just qual ->
-                            [ qual, orientation, name ]
+                            [ qual, orientation, name_ ]
     in
     ( name |> String.join "-", value )

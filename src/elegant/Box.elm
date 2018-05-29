@@ -476,13 +476,13 @@ textColor color =
 
 
 opacityToCouple : Float -> ( String, String )
-opacityToCouple opacity =
-    ( "opacity", toString opacity )
+opacityToCouple opacity_ =
+    ( "opacity", String.fromFloat opacity_ )
 
 
 visibilityToCouple : Visibility -> ( String, String )
-visibilityToCouple visibility =
-    ( "visibility", visibilityToString visibility )
+visibilityToCouple visibility_ =
+    ( "visibility", visibilityToString visibility_ )
 
 
 visibilityToString : Visibility -> String
@@ -496,5 +496,5 @@ visibilityToString val =
 
 
 zIndexToCouple : Int -> ( String, String )
-zIndexToCouple zIndex =
-    ( "z-index", toString zIndex )
+zIndexToCouple zIndex_ =
+    ( "z-index", String.fromInt zIndex_ )

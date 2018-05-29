@@ -1,9 +1,10 @@
 module Elegant.Convert exposing (..)
 
 import Display
+import Function
 import Helpers.Css
 import Helpers.Style exposing (..)
-import Maybe.Extra exposing ((?))
+import Maybe.Extra
 
 
 -- import Native.Elegant
@@ -44,7 +45,7 @@ screenWidthToClassesNames suffix { min, max, style } =
         |> classesNameGeneration suffix
         |> List.map
             (addScreenWidthToClassName
-                (Helpers.Css.cssValidName (toString min ++ toString max))
+                (Helpers.Css.cssValidName (String.fromInt min ++ String.fromInt max))
             )
 
 
@@ -59,6 +60,7 @@ fetchStylesOrCompute styleHash style =
 
 
 
+-- Todo Fix That
 -- case Native.Elegant.fetchStyles styleHash of
 --     Nothing ->
 --         let
@@ -148,7 +150,7 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
                 classNameComplete =
                     String.join ""
                         [ className
-                        , mediaQueryId ? ""
+                        , Maybe.withDefault "" mediaQueryId
                         ]
 
                 test =
@@ -174,8 +176,8 @@ computeStyleToCss className mediaQueryId selector property =
     String.join ""
         [ "."
         , className
-        , mediaQueryId ? ""
-        , selector ? ""
+        , Maybe.withDefault "" mediaQueryId
+        , Maybe.withDefault "" selector
         , Helpers.Css.surroundWithBraces property
         ]
 

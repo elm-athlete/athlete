@@ -1,19 +1,19 @@
 module Helpers.Css
     exposing
-        ( applyCssFunction
-        , prependUnderscore
+        ( addSuffixToClassName
+        , applyCssFunction
         , cssValidName
+        , generateClassName
+        , generateMediaQuery
+        , generateMediaQueryId
+        , generateProperty
+        , generateSelector
+        , joiner
+        , prependUnderscore
         , surroundWithBraces
         , surroundWithParentheses
         , surroundWithQuotes
         , surroundWithSingleQuotes
-        , joiner
-        , generateMediaQueryId
-        , generateSelector
-        , generateProperty
-        , generateMediaQuery
-        , generateClassName
-        , addSuffixToClassName
         )
 
 import Char
@@ -21,7 +21,7 @@ import Char
 
 applyCssFunction : String -> String -> String
 applyCssFunction funName content =
-    funName ++ (surroundWithParentheses content)
+    funName ++ surroundWithParentheses content
 
 
 prependUnderscore : String -> String
@@ -88,7 +88,7 @@ generateMediaQueryId ( min, max ) =
                 Just int ->
                     String.fromInt int
     in
-        cssValidName (toString min ++ toString max)
+    cssValidName (toString min ++ toString max)
 
 
 generateSelector : Maybe String -> Maybe String
@@ -156,7 +156,7 @@ isBetween low high char =
         code =
             Char.toCode char
     in
-        (code >= Char.toCode low) && (code <= Char.toCode high)
+    (code >= Char.toCode low) && (code <= Char.toCode high)
 
 
 isAlphaNum : Char -> Bool
@@ -170,7 +170,7 @@ isLower char =
         code =
             toCode char
     in
-        0x61 <= code && code <= 0x7A
+    0x61 <= code && code <= 0x7A
 
 
 isUpper : Char -> Bool
@@ -179,7 +179,7 @@ isUpper char =
         code =
             toCode char
     in
-        code <= 0x5A && 0x41 <= code
+    code <= 0x5A && 0x41 <= code
 
 
 isDigit : Char -> Bool
@@ -188,7 +188,7 @@ isDigit char =
         code =
             toCode char
     in
-        code <= 0x39 && 0x30 <= code
+    code <= 0x39 && 0x30 <= code
 
 
 toCode : Char -> Int

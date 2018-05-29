@@ -3,18 +3,18 @@ module Counter exposing (..)
 import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events exposing (..)
-import Display
-import Dimensions
-import Flex
-import Box
-import Constants
 import Border
-import Elegant exposing (px, percent, vh)
-import Typography
-import Padding
+import Box
 import Color
 import Color.Extra as Color
+import Constants
+import Dimensions
+import Display
+import Elegant exposing (percent, px, vh)
+import Flex
+import Padding
 import Style
+import Typography
 
 
 buttonStyle =
@@ -54,7 +54,7 @@ counter model =
                         ]
                     ]
                 , onInput Change
-                , value (model |> toString)
+                , value (model |> String.fromInt)
                 ]
             ]
         , flexItem []

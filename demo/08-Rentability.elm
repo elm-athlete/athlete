@@ -3,36 +3,36 @@ module Rentability exposing (..)
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (style)
 import BodyBuilder.Events
-import Elegant exposing (SizeUnit, px, pt, percent, vh)
-import Modifiers exposing (..)
+import Border
+import Box
 import Color
+import Constants
+import Cursor
+import Display
+import Elegant exposing (SizeUnit, percent, pt, px, vh)
+import Finders exposing (..)
+import Json.Decode as Decode exposing (Decoder)
+import Modifiers exposing (..)
+import Outline
+import Padding
 import Router
     exposing
         ( History
-        , StandardHistoryMsg(Back)
-        , handleStandardHistory
-        , push
-        , pageWithDefaultTransition
         , Page
+        , StandardHistoryMsg(Back)
         , Transition
+        , handleStandardHistory
         , historyView
-        , maybeTransitionSubscription
         , initHistoryAndData
+        , maybeTransitionSubscription
+        , pageWithDefaultTransition
         , pageWithHeader
+        , push
         )
-import Finders exposing (..)
-import Display
-import Box
-import Cursor
-import Border
-import Outline
-import Typography
-import Constants
-import Padding
-import Time exposing (Time)
-import Task
 import Style
-import Json.Decode as Decode exposing (Decoder)
+import Task
+import Time exposing (Time)
+import Typography
 
 
 type alias Persisted a =
@@ -111,12 +111,12 @@ handleHistory route history =
         AppartmentEditMsg id idToFocusOn ->
             history
                 |> Router.push
-                    (Router.pageWithTransition (Router.slideUp) (AppartmentsEdit id)
+                    (Router.pageWithTransition Router.slideUp (AppartmentsEdit id)
                         |> Router.focusedElement idToFocusOn
                     )
 
         AppartmentNewMsg ->
-            history |> Router.push (Router.pageWithTransition (Router.slideUp) AppartmentsNew)
+            history |> Router.push (Router.pageWithTransition Router.slideUp AppartmentsNew)
 
         AppartmentsIndexEditMsg ->
             history |> Router.push (Router.pageWithoutTransition AppartmentsIndexEdit)
@@ -228,7 +228,7 @@ renta collocs =
 
 maxPrice : AppartmentAttributes -> Float
 maxPrice appartment =
-    (yearlyRent appartment |> toFloat) / ((renta appartment.collocs) / 100)
+    (yearlyRent appartment |> toFloat) / (renta appartment.collocs / 100)
 
 
 yearsOfDebt : number
@@ -248,7 +248,7 @@ monthlyBankDebt model =
         n =
             yearsOfDebt * 12
     in
-        (k * (t / 12)) / (1 - ((1 + t / 12) ^ (-n))) |> round
+    (k * (t / 12)) / (1 - ((1 + t / 12) ^ -n)) |> round
 
 
 minSalary : AppartmentAttributes -> Int
@@ -269,13 +269,13 @@ result label value =
     node [ pad ]
         [ text <| label
         , br
-        , text (value |> toString)
+        , text (value |> String.fromInt)
         ]
 
 
 yearlyRent : AppartmentAttributes -> Int
 yearlyRent model =
-    (totalMonthlyRent model) * 12
+    totalMonthlyRent model * 12
 
 
 totalMonthlyRent : AppartmentAttributes -> Int
@@ -303,14 +303,14 @@ appartmentEditBodyView ({ attributes } as appartment) =
                     )
                 ]
             , inputNumber
-                [ Attributes.value (attributes.monthlyRent)
+                [ Attributes.value attributes.monthlyRent
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateMonthlyRent)
                 ]
             ]
         , node [ pad ]
             [ node [ style [ Style.block [] ] ] [ text "Nombre de locataires" ]
             , inputNumber
-                [ Attributes.value (attributes.collocs)
+                [ Attributes.value attributes.collocs
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateCollocs)
                 , Attributes.id collocNumberId
                 ]
@@ -318,7 +318,7 @@ appartmentEditBodyView ({ attributes } as appartment) =
         , node [ pad ]
             [ node [ style [ Style.block [] ] ] [ text "Travaux" ]
             , inputNumber
-                [ Attributes.value (attributes.works)
+                [ Attributes.value attributes.works
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateWorks)
                 ]
             ]
@@ -379,9 +379,8 @@ appartmentBodyView : Appartment -> Node msg
 appartmentBodyView appartment =
     node
         [ style [ Style.block [], Style.box [ Box.padding [ Padding.horizontal Constants.medium ] ] ] ]
-        ([ node [] (textToHtml appartment.attributes.details)
-         ]
-        )
+        [ node [] (textToHtml appartment.attributes.details)
+        ]
 
 
 title : String -> Node msg
@@ -425,7 +424,7 @@ appartmentsIndexEdit appartments =
 
 appartmentsShow : Int -> List Appartment -> Node Msg
 appartmentsShow id appartments =
-    node [] [ showView { maybeAppartment = (appartments |> find_by .id id) } ]
+    node [] [ showView { maybeAppartment = appartments |> find_by .id id } ]
 
 
 appartmentsEdit :
@@ -433,7 +432,7 @@ appartmentsEdit :
     -> List Appartment
     -> Node Msg
 appartmentsEdit id appartments =
-    node [] [ editView { maybeAppartment = (appartments |> find_by .id id) } ]
+    node [] [ editView { maybeAppartment = appartments |> find_by .id id } ]
 
 
 appartmentsNew : AppartmentAttributes -> Node Msg
@@ -458,21 +457,21 @@ insidePageView data page transition =
         appartments =
             data.appartments
     in
-        case page.route of
-            AppartmentsIndex ->
-                appartmentsIndex appartments
+    case page.route of
+        AppartmentsIndex ->
+            appartmentsIndex appartments
 
-            AppartmentsIndexEdit ->
-                appartmentsIndexEdit appartments
+        AppartmentsIndexEdit ->
+            appartmentsIndexEdit appartments
 
-            AppartmentsShow id ->
-                appartmentsShow id appartments
+        AppartmentsShow id ->
+            appartmentsShow id appartments
 
-            AppartmentsEdit id ->
-                appartmentsEdit id appartments
+        AppartmentsEdit id ->
+            appartmentsEdit id appartments
 
-            AppartmentsNew ->
-                appartmentsNew data.draftAppartment
+        AppartmentsNew ->
+            appartmentsNew data.draftAppartment
 
 
 view : Model -> Node Msg
@@ -513,10 +512,10 @@ updateAppartmentBasedOnMsg msg appartment =
         attributes =
             appartment.attributes
     in
-        { appartment
-            | attributes =
-                updateAppartmentAttributesBasedOnMsg msg attributes
-        }
+    { appartment
+        | attributes =
+            updateAppartmentAttributesBasedOnMsg msg attributes
+    }
 
 
 updateAppartmentHelper : Appartment -> UpdateAppartmentMsg -> Model -> Model
@@ -536,7 +535,7 @@ updateAppartmentHelper appartment msg model =
         newData =
             { data | appartments = newAppartments }
     in
-        { model | data = newData }
+    { model | data = newData }
 
 
 updateAppartment : Int -> UpdateAppartmentMsg -> Model -> Model
@@ -545,12 +544,12 @@ updateAppartment id customMsg model =
         maybeAppartment =
             model.data.appartments |> find_by .id id
     in
-        case maybeAppartment of
-            Nothing ->
-                model
+    case maybeAppartment of
+        Nothing ->
+            model
 
-            Just appartment ->
-                updateAppartmentHelper appartment customMsg model
+        Just appartment ->
+            updateAppartmentHelper appartment customMsg model
 
 
 updateAppartmentAttributes : UpdateAppartmentMsg -> Model -> Model
@@ -565,7 +564,7 @@ updateAppartmentAttributes customMsg model =
         newData =
             { data | draftAppartment = newAppartmentAttributes }
     in
-        { model | data = newData }
+    { model | data = newData }
 
 
 draftAppartmentToAppartment : { a | newId : Int, createdAt : Time } -> AppartmentAttributes -> Appartment
@@ -588,17 +587,16 @@ saveAppartmentAttributes currentTime ({ data } as model) =
         newData =
             { data
                 | appartments =
-                    (draftAppartmentToAppartment
-                        { newId = ((lastId data.appartments) + 1)
+                    draftAppartmentToAppartment
+                        { newId = lastId data.appartments + 1
                         , createdAt = currentTime
                         }
                         data.draftAppartment
-                    )
                         :: data.appartments
                 , draftAppartment = initAppartmentAttributes
             }
     in
-        { model | data = newData }
+    { model | data = newData }
 
 
 performSuccessfulTask : a -> Cmd a
@@ -615,7 +613,7 @@ destroyAppartment id model =
         newData =
             { data | appartments = data.appartments |> List.filter (\e -> e.id /= id) }
     in
-        { model | data = newData }
+    { model | data = newData }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

@@ -96,6 +96,7 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
 
 
 
+-- Todo : Fix That
 -- Native.BodyBuilder.fetchDisplayStyle key
 --     |> Maybe.withDefault
 --         (separatedComponentsToElegantStyle
@@ -169,7 +170,7 @@ appendInStyleComponent :
 appendInStyleComponent setter ( styleSelector, elem ) results =
     let
         key =
-            toString styleSelector
+            String.fromInt styleSelector
     in
     Dict.get key results
         |> Maybe.Extra.unwrap

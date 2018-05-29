@@ -1,25 +1,25 @@
 module Background
     exposing
-        ( Background
-        , default
-        , images
-        , Image
+        ( Angle
+        , Background
         , BackgroundImage
-        , image
-        , at
-        , Gradient
-        , linear
-        , radial
-        , gradient
-        , intermediateColors
-        , Angle
-        , Radiant
-        , Degree
-        , rad
-        , degree
-        , colorStop
         , ColorStop
+        , Degree
+        , Gradient
+        , Image
+        , Radiant
+        , at
         , backgroundToCouples
+        , colorStop
+        , default
+        , degree
+        , gradient
+        , image
+        , images
+        , intermediateColors
+        , linear
+        , rad
+        , radial
         )
 
 {-| Background contains everything about background rendering: using photos or gradient,
@@ -65,11 +65,11 @@ and positionning them on the page.
 
 import Color exposing (Color)
 import Color.Convert
-import Maybe.Extra
-import Helpers.Vector exposing (Vector)
-import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
 import Helpers.Css
+import Helpers.Shared exposing (..)
+import Helpers.Vector exposing (Vector)
+import Maybe.Extra
 import Modifiers exposing (..)
 
 
@@ -106,8 +106,8 @@ It modifies the images list in `Background`.
 
 -}
 images : List BackgroundImage -> Modifier Background
-images images =
-    setImages images
+images images_ =
+    setImages images_
 
 
 {-| Represents an image in CSS. It can be an image, represented by a source url, or
@@ -211,8 +211,8 @@ By default, a gradient is created with two colors. This can be used to add
 more colors.
 -}
 intermediateColors : List ColorStop -> Modifier Gradient
-intermediateColors colorStops gradient =
-    case gradient of
+intermediateColors colorStops gradient_ =
+    case gradient_ of
         Linear linearGradient ->
             linearGradient
                 |> setColorStops (Just colorStops)
@@ -329,10 +329,10 @@ positionToString ( a, b ) =
 
 
 imageToString : Image -> String
-imageToString image =
-    case image of
-        Gradient gradient ->
-            gradientToString gradient
+imageToString image_ =
+    case image_ of
+        Gradient gradient_ ->
+            gradientToString gradient_
 
         Source string ->
             string
@@ -341,8 +341,8 @@ imageToString image =
 
 
 gradientToString : Gradient -> String
-gradientToString gradient =
-    case gradient of
+gradientToString gradient_ =
+    case gradient_ of
         Linear { angle, first, colorStops, last } ->
             [ [ angleToString angle
               , colorStopToString first
@@ -377,15 +377,15 @@ angleToString : Angle -> String
 angleToString angle =
     case angle of
         Rad a ->
-            (a |> toString) ++ "rad"
+            (a |> String.fromFloat) ++ "rad"
 
         Deg a ->
-            (a |> toString) ++ "deg"
+            (a |> String.fromFloat) ++ "deg"
 
 
 colorStopToString : ColorStop -> String
-colorStopToString colorStop =
-    case colorStop of
+colorStopToString colorStop_ =
+    case colorStop_ of
         { color, position } ->
             [ color
                 |> Color.Convert.colorToCssRgba

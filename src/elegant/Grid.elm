@@ -60,7 +60,9 @@ module Grid
         , viewWidth
         )
 
-{-| @docs align
+{-|
+
+@docs align
 @docs alignItems
 @docs alignItemsToCouple
 @docs alignSelfToCouple
@@ -118,6 +120,7 @@ module Grid
 @docs GridTemplate
 @docs Repeatable
 @docs ValType
+
 -}
 
 import Helpers.Shared exposing (..)
@@ -433,8 +436,8 @@ alignToCouple alignJustify =
 
 {-| -}
 alignToString : Align -> String
-alignToString align =
-    case align of
+alignToString align_ =
+    case align_ of
         Start ->
             "start"
 
@@ -450,11 +453,11 @@ alignToString align =
 
 {-| -}
 alignItemsToCouple : String -> AlignItems -> ( String, String )
-alignItemsToCouple alignJustify alignItems =
-    ( alignJustify ++ "-items"
-    , case alignItems of
-        AlignWrapper align ->
-            alignToString align
+alignItemsToCouple alignJustify_ alignItems_ =
+    ( alignJustify_ ++ "-items"
+    , case alignItems_ of
+        AlignWrapper align_ ->
+            alignToString align_
 
         Space spacing ->
             spacingToString spacing
@@ -557,8 +560,8 @@ gridItemCoordinateToCouples columnRow alignJustify gridItemCoordinate =
 
 {-| -}
 placementToCouple : String -> Int -> ( String, String )
-placementToCouple columnRow placement =
-    ( "grid-" ++ columnRow ++ "-start", placementToString placement )
+placementToCouple columnRow placement_ =
+    ( "grid-" ++ columnRow ++ "-start", placementToString placement_ )
 
 
 {-| -}
@@ -569,8 +572,8 @@ placementToString beginning =
 
 {-| -}
 sizeToCouple : String -> GridItemSize -> ( String, String )
-sizeToCouple columnRow size =
-    ( "grid-" ++ columnRow ++ "-end", sizeToString size )
+sizeToCouple columnRow size_ =
+    ( "grid-" ++ columnRow ++ "-end", sizeToString size_ )
 
 
 {-| -}

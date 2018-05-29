@@ -404,8 +404,8 @@ toLegacyDisplayCss str =
         "block grid" ->
             "grid"
 
-        str ->
-            str
+        str_ ->
+            str_
 
 
 listStyleTypeToCouple : ListStyleType -> ( String, String )

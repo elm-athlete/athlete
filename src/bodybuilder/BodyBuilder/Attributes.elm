@@ -1544,9 +1544,9 @@ defaultInputNumberAttributes =
 {-| -}
 inputNumberAttributesToHtmlAttributes : InputNumberAttributes msg -> List (Html.Attribute msg)
 inputNumberAttributesToHtmlAttributes attributes =
-    [ unwrapMaybeAttribute Html.Attributes.value << (Maybe.map toString << .value)
-    , unwrapMaybeAttribute Html.Attributes.min << (Maybe.map toString << .min)
-    , unwrapMaybeAttribute Html.Attributes.max << (Maybe.map toString << .max)
+    [ unwrapMaybeAttribute Html.Attributes.value << (Maybe.map String.fromInt << .value)
+    , unwrapMaybeAttribute Html.Attributes.min << (Maybe.map String.fromInt << .min)
+    , unwrapMaybeAttribute Html.Attributes.max << (Maybe.map String.fromInt << .max)
     ]
         |> List.concatMap (callOn attributes)
         |> List.append [ Html.Attributes.disabled attributes.disabled ]
@@ -1614,7 +1614,7 @@ defaultInputCheckboxAttributes =
 inputCheckboxAttributesToHtmlAttributes : InputCheckboxAttributes msg -> List (Html.Attribute msg)
 inputCheckboxAttributesToHtmlAttributes attributes =
     Html.Attributes.checked attributes.checked
-        |> Function.flip (::) (unwrapMaybeAttribute Html.Attributes.value (Maybe.map toString <| attributes.value))
+        |> Function.flip (::) (unwrapMaybeAttribute Html.Attributes.value (Maybe.map String.fromInt <| attributes.value))
         |> List.append (inputVisibleToHtmlAttributes attributes)
         |> List.append (checkEventToHtmlEvent attributes)
 

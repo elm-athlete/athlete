@@ -234,12 +234,13 @@ commonStyleToCss : CommonStyle -> String
 commonStyleToCss style =
     let
         styleHash =
-            toString style
+            String.fromInt style
     in
     ""
 
 
 
+-- Todo : Fix that
 -- case Native.BodyBuilder.fetchClassesNames styleHash of
 --     Nothing ->
 --         style

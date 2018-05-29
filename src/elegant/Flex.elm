@@ -379,8 +379,8 @@ alignSelfToCouple =
 
 
 alignToString : Align -> String
-alignToString align =
-    case align of
+alignToString align_ =
+    case align_ of
         AlignBaseline ->
             "baseline"
 
@@ -491,8 +491,8 @@ directionToCouple =
 
 
 directionToString : FlexDirection -> String
-directionToString direction =
-    case direction of
+directionToString direction_ =
+    case direction_ of
         FlexDirectionColumn ->
             "column"
 

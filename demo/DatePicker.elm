@@ -1,27 +1,25 @@
 module DatePicker exposing (..)
 
+import AnimationFrame
+import Block
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
-import Elegant exposing (px, vh, percent, Style, deg)
-import Style
-import Box
-import Block
-import Transform
-import Position
-import Padding
-import Typography
-import Constants
-import AnimationFrame
-import Time exposing (Time)
-import Task
-import List.Extra
-import SingleTouch
-import Touch exposing (Coordinates)
 import BoundedList exposing (BoundedList)
+import Box
 import Color
+import Constants
 import Date exposing (Date)
-import Time exposing (Time)
+import Elegant exposing (Style, deg, percent, px, vh)
 import List.Extra as List
+import Padding
+import Position
+import SingleTouch
+import Style
+import Task
+import Time exposing (Time)
+import Touch exposing (Coordinates)
+import Transform
+import Typography
 
 
 updateIdentity : a -> ( a, Cmd msg )
@@ -105,14 +103,14 @@ newDatePicker { start, end, unselectableDates } =
         dateRange =
             List.map (unselectWrongDates unselectableDates) (createDateRange start end)
     in
-        DatePicker
-            { holdState = Released
-            , touchesHistory = initTouchesHistory 0
-            , rotation = ( 0, 0 )
-            , selections = associateIndexes dateRange
-            , inertia = Immobile
-            , activeItem = Date.fromTime start
-            }
+    DatePicker
+        { holdState = Released
+        , touchesHistory = initTouchesHistory 0
+        , rotation = ( 0, 0 )
+        , selections = associateIndexes dateRange
+        , inertia = Immobile
+        , activeItem = Date.fromTime start
+        }
 
 
 setActiveDate : Date -> DatePicker -> DatePicker
@@ -180,15 +178,15 @@ unselectWrongDates unselectableDates time =
         date =
             Date.fromTime time
     in
-        if List.member date unselectableDates then
-            ( date, False )
-        else
-            ( date, True )
+    if List.member date unselectableDates then
+        ( date, False )
+    else
+        ( date, True )
 
 
 associateIndexes : List ( a, b ) -> List ( Int, a, b )
 associateIndexes =
-    List.indexedMap (\index ( a, b ) -> ( index % (round (360 / angleBetweenTwoItems)), a, b ))
+    List.indexedMap (\index ( a, b ) -> ( index % round (360 / angleBetweenTwoItems), a, b ))
 
 
 setHoldState : HoldState -> DatePicker -> DatePicker
@@ -405,7 +403,7 @@ angleBetweenTwoItems =
 
 maxRotation : List a -> Float
 maxRotation selections =
-    (toFloat (List.length selections - 1)) * angleBetweenTwoItems
+    toFloat (List.length selections - 1) * angleBetweenTwoItems
 
 
 interpolateRotation : DatePicker -> ( WheelTurns, Rotation )
@@ -427,12 +425,12 @@ interpolateRotation (DatePicker { holdState, inertia, touchesHistory, rotation, 
                         _ ->
                             completeRotation
     in
-        toPartialRotation (clamp 0 (maxRotation selections) value)
+    toPartialRotation (clamp 0 (maxRotation selections) value)
 
 
 toCompleteRotation : ( WheelTurns, Rotation ) -> Rotation
 toCompleteRotation ( wheelTurns, rotation ) =
-    (toFloat (wheelTurns * 360)) + rotation
+    toFloat (wheelTurns * 360) + rotation
 
 
 toPartialRotation : Rotation -> ( WheelTurns, Rotation )
@@ -441,7 +439,7 @@ toPartialRotation rotation =
         wheelTurns =
             round rotation // 360
     in
-        ( wheelTurns, rotation - (toFloat (wheelTurns * 360)) )
+    ( wheelTurns, rotation - toFloat (wheelTurns * 360) )
 
 
 interpolateRotationHelper : TouchesHistory -> Rotation -> Rotation
@@ -485,7 +483,7 @@ computeTimeAndSpeed lastPositions =
 
 relevantPositions : Time -> List ( Time, Rotation ) -> List ( Time, Rotation )
 relevantPositions lastTime =
-    List.filter <| \( time, _ ) -> (Time.inSeconds (lastTime - time)) < relevantTimeFrame
+    List.filter <| \( time, _ ) -> Time.inSeconds (lastTime - time) < relevantTimeFrame
 
 
 relevantTimeFrame : Float
@@ -495,7 +493,7 @@ relevantTimeFrame =
 
 applyAndChangeSpeed : Time -> Time -> Speed -> Model -> Model
 applyAndChangeSpeed lastTime currentTime speed ((DatePicker { rotation, selections }) as model) =
-    ((toCompleteRotation rotation) - speed * (currentTime - lastTime))
+    (toCompleteRotation rotation - speed * (currentTime - lastTime))
         |> clamp 0 (maxRotation selections)
         |> toPartialRotation
         |> setRotationIn model
@@ -504,7 +502,7 @@ applyAndChangeSpeed lastTime currentTime speed ((DatePicker { rotation, selectio
 
 computeNewSpeed : Speed -> Time -> Time -> Speed
 computeNewSpeed speed currentTime lastTime =
-    speed * (0.99 ^ toFloat ((round (currentTime - lastTime)) % 17))
+    speed * (0.99 ^ toFloat (round (currentTime - lastTime) % 17))
 
 
 insignificantSpeed : Speed -> Bool
@@ -532,7 +530,7 @@ adjustPosition { lastPositions } maxRotation =
         operator =
             selectIncreaseOrDecrease (BoundedList.content lastPositions)
     in
-        toCompleteRotation >> flip operator 1.0 >> clamp 0 maxRotation >> toPartialRotation
+    toCompleteRotation >> flip operator 1.0 >> clamp 0 maxRotation >> toPartialRotation
 
 
 selectIncreaseOrDecrease : List ( Time, Rotation ) -> (Rotation -> Rotation -> Rotation)
@@ -626,25 +624,25 @@ carousel list radius (( _, rotation ) as position) =
         visibleItems =
             selectVisibleItems (toCompleteRotation position) list
     in
-        Builder.div
-            [ Attributes.style
-                [ Style.blockProperties [ Block.width (px 300), Block.height (px radius) ]
-                , Style.box [ Box.transform [ Transform.preserve3d, Transform.perspective (px 1000) ] ]
-                ]
+    Builder.div
+        [ Attributes.style
+            [ Style.blockProperties [ Block.width (px 300), Block.height (px radius) ]
+            , Style.box [ Box.transform [ Transform.preserve3d, Transform.perspective (px 1000) ] ]
             ]
-            [ Builder.div
-                [ Attributes.style
-                    [ Style.box
-                        [ Box.transform
-                            [ Transform.rotateX (deg rotation)
-                            , Transform.preserve3d
-                            , Transform.origin ( Constants.zero, px ((toFloat radius) / 2 |> round), Constants.zero )
-                            ]
+        ]
+        [ Builder.div
+            [ Attributes.style
+                [ Style.box
+                    [ Box.transform
+                        [ Transform.rotateX (deg rotation)
+                        , Transform.preserve3d
+                        , Transform.origin ( Constants.zero, px (toFloat radius / 2 |> round), Constants.zero )
                         ]
                     ]
                 ]
-                (List.map (reelFrame rotation (List.length visibleItems) radius) visibleItems)
             ]
+            (List.map (reelFrame rotation (List.length visibleItems) radius) visibleItems)
+        ]
 
 
 selectVisibleItems : Rotation -> List ( Int, Date, Bool ) -> List ( Int, Date, Bool )
@@ -679,7 +677,7 @@ reelFrame rotation length height ( index, content, displayed ) =
         i =
             toFloat index
     in
-        rotatedDiv (reelAngle i) content displayed rotation height (px (Basics.round (h / (2 * Basics.tan (Basics.pi / l)))))
+    rotatedDiv (reelAngle i) content displayed rotation height (px (Basics.round (h / (2 * Basics.tan (Basics.pi / l)))))
 
 
 rotatedDiv : Float -> Date -> Bool -> Rotation -> Int -> Elegant.SizeUnit -> Node msg
@@ -700,7 +698,7 @@ rotatedDiv angle date displayed rotation height translationZ =
                 , Box.typography
                     [ Typography.size (px 20)
                     , Typography.lineHeight (px height)
-                    , Typography.userSelect (False)
+                    , Typography.userSelect False
                     , Typography.color <|
                         if displayed then
                             if moreOrLess 10.0 (abs angle) (abs rotation) then
@@ -719,9 +717,9 @@ rotatedDiv angle date displayed rotation height translationZ =
                 if date == firstDate then
                     []
                 else
-                    [ toString (Date.day date)
-                    , toString (Date.month date)
-                    , toString (Date.year date)
+                    [ String.fromInt (Date.day date)
+                    , String.fromInt (Date.month date)
+                    , String.fromInt (Date.year date)
                     ]
         ]
 
