@@ -266,7 +266,6 @@ style styles =
 
 
 {-| -}
-rawStyle : a -> { c | rawStyle : b } -> { c | rawStyle : Maybe a }
 rawStyle theStyle attrs =
     { attrs | rawStyle = Just theStyle }
 
@@ -1019,8 +1018,8 @@ visibleAttributesToHtmlAttributes visibleAttributes =
 
 {-| -}
 rawStyleToHtmlAttributes : Elegant.Style -> List (Html.Attribute msg)
-rawStyleToHtmlAttributes style =
-    [ Html.Attributes.class (Elegant.styleToCss style) ]
+rawStyleToHtmlAttributes style_ =
+    [ Html.Attributes.class (Elegant.styleToCss style_) ]
 
 
 {-| -}
@@ -1362,7 +1361,7 @@ progressAttributesToHtmlAttributes =
 
 
 {-| -}
-data : a -> { c | data : b } -> { c | data : a }
+data : a -> { c | data : a } -> { c | data : a }
 data val attrs =
     { attrs | data = val }
 
