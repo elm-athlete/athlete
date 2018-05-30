@@ -12,6 +12,7 @@ module BodyBuilder
         , br
         , button
         , div
+        , embed
         , flex
         , flexItem
         , footer
@@ -42,7 +43,6 @@ module BodyBuilder
         , none
         , option
         , p
-        , embed
         , progress
         , section
         , select
@@ -111,13 +111,13 @@ It is possible to style those elements using `Style.blockProperties`.
 import BodyBuilder.Attributes exposing (..)
 import BodyBuilder.Convert
 import BodyBuilder.Shared as Shared
+import Browser
 import Display
 import Elegant
 import Flex exposing (FlexContainerDetails)
 import Function
 import Grid
 import Html exposing (Html)
-import Browser
 import Html.Attributes
 import Modifiers exposing (..)
 
@@ -1154,12 +1154,12 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                 )
                 []
     in
-        case attributes.label of
-            Nothing ->
-                computedInput
+    case attributes.label of
+        Nothing ->
+            computedInput
 
-            Just label ->
-                Shared.extractLabel label computedInput
+        Just label ->
+            Shared.extractLabel label computedInput
 
 
 computeBlock :
@@ -1180,17 +1180,17 @@ computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers
             Function.compose modifiers
                 defaultAttributes
     in
-        Html.node tag
-            (BodyBuilder.Convert.toElegantStyle
-                (flexModifiers attributes)
-                (flexItemModifiers attributes)
-                (gridModifiers attributes)
-                (gridItemModifiers attributes)
-                (blockModifiers attributes)
-                attributes.box
-                |> List.map Elegant.styleToCss
-                |> String.join " "
-                |> Html.Attributes.class
-                |> Function.flip (::) (attributesToHtmlAttributes attributes)
-            )
-            content
+    Html.node tag
+        (BodyBuilder.Convert.toElegantStyle
+            (flexModifiers attributes)
+            (flexItemModifiers attributes)
+            (gridModifiers attributes)
+            (gridItemModifiers attributes)
+            (blockModifiers attributes)
+            attributes.box
+            |> List.map Elegant.styleToCss
+            |> String.join " "
+            |> Html.Attributes.class
+            |> Function.flip (::) (attributesToHtmlAttributes attributes)
+        )
+        content

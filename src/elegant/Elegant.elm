@@ -232,23 +232,9 @@ classes (Style style_) =
 {-| -}
 commonStyleToCss : CommonStyle -> String
 commonStyleToCss style_ =
-    ""
-
-
-
--- Todo : Fix that
--- let
---     styleHash =
---         String.fromInt style_
--- in
--- case Native.BodyBuilder.fetchClassesNames styleHash of
---     Nothing ->
---         style
---             |> Elegant.Convert.fetchStylesOrCompute styleHash
---             |> String.join " "
---             |> Native.BodyBuilder.addClassesNames styleHash
---     Just classesNames ->
---         classesNames
+    style_
+        |> Elegant.Convert.fetchStylesOrCompute ""
+        |> String.join " "
 
 
 {-| -}

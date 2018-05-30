@@ -49,7 +49,7 @@ screenWidthToClassesNames suffix { min, max, style } =
                 Just int ->
                     String.fromInt int
     in
-    -- Todo : Fix that (it's very ugly)
+    -- TODO : Fix that (it's very ugly)
     style
         |> computeStyle
         |> classesNameGeneration suffix
@@ -66,24 +66,10 @@ addScreenWidthToClassName =
 
 fetchStylesOrCompute : String -> Style -> List String
 fetchStylesOrCompute styleHash style =
-    []
-
-
-
--- Todo Fix That
--- case Native.Elegant.fetchStyles styleHash of
---     Nothing ->
---         let
---             classesNames =
---                 style
---                     |> extractScreenWidths
---                     |> List.concatMap compileConditionalStyle
---                     |> List.map computeAtomicClass
---                     |> Native.Elegant.addStyles styleHash
---         in
---         classesNames
---     Just classesNames ->
---         classesNames
+    style
+        |> extractScreenWidths
+        |> List.concatMap compileConditionalStyle
+        |> List.map computeAtomicClass
 
 
 type alias ConditionalStyle =
@@ -153,28 +139,18 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
     let
         classHash =
             atomicClass
+
+        classNameComplete =
+            String.join ""
+                [ className
+                , Maybe.withDefault "" mediaQueryId
+                ]
+
+        test =
+            computeStyleToCss className mediaQueryId selector property
+                |> inMediaQuery mediaQuery
     in
-    ""
-
-
-
--- Todo : Fix Native
--- case Native.Elegant.fetchAtomicClass classHash of
---     Nothing ->
---         let
---             classNameComplete =
---                 String.join ""
---                     [ className
---                     , Maybe.withDefault "" mediaQueryId
---                     ]
---             test =
---                 computeStyleToCss className mediaQueryId selector property
---                     |> inMediaQuery mediaQuery
---                     |> Native.Elegant.addAtomicClass classHash classNameComplete
---         in
---         classNameComplete
---     Just class ->
---         class
+    classNameComplete
 
 
 inMediaQuery : Maybe String -> String -> String

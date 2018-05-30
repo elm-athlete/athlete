@@ -76,45 +76,49 @@ degree =
     Deg
 
 
-concatNumberWithString : number -> String -> String
-concatNumberWithString number str =
-    -- Todo : (toString number) ++ str
-    str
+concatIntWithString : Int -> String -> String
+concatIntWithString number str =
+    String.fromInt number ++ str
+
+
+concatFloatWithString : Float -> String -> String
+concatFloatWithString number str =
+    String.fromFloat number ++ str
 
 
 angleToString : Angle -> String
 angleToString angle =
     case angle of
         Rad a ->
-            concatNumberWithString a "rad"
+            concatFloatWithString a "rad"
 
         Deg a ->
-            concatNumberWithString a "deg"
+            concatFloatWithString a "deg"
 
 
 sizeUnitToString : SizeUnit -> String
 sizeUnitToString val =
     case val of
         Px x ->
-            concatNumberWithString x "px"
+            concatIntWithString x "px"
 
         Pt x ->
-            concatNumberWithString x "pt"
+            concatIntWithString x "pt"
 
         Percent x ->
-            concatNumberWithString x "%"
+            concatFloatWithString x "%"
 
         Vh x ->
-            concatNumberWithString x "vh"
+            concatFloatWithString x "vh"
 
         Vw x ->
-            concatNumberWithString x "vw"
+            concatFloatWithString x "vw"
 
         Em x ->
-            concatNumberWithString x "em"
+            concatFloatWithString x "em"
 
         Rem x ->
-            concatNumberWithString x "rem"
+            concatFloatWithString x "rem"
 
 
 sizeUnitCoupleToString : ( SizeUnit, SizeUnit ) -> String
