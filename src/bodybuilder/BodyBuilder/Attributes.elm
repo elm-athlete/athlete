@@ -1385,7 +1385,7 @@ defaultScriptAttributes =
 {-| -}
 scriptAttributesToHtmlAttributes : ScriptAttributes msg -> List (Html.Attribute msg)
 scriptAttributesToHtmlAttributes attributes =
-    -- TODO data handler
+    -- Todo data handler
     Html.Attributes.src attributes.src :: visibleAttributesToHtmlAttributes attributes
 
 

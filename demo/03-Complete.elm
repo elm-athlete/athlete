@@ -423,18 +423,20 @@ update msg model =
             ( model, Cmd.none )
 
 
-main : Program Basics.Never Model Msg
+main : Program () Model Msg
 main =
-    program
+    embed
         { init =
-            { color = Color.green
-            , columnWidth = 3
-            , gutterWidth = 12
-            , columnsNumber = 12
-            , bodybuilderState = False
-            , bootstrapState = False
-            }
-                ! []
+            \_ ->
+                ( { color = Color.green
+                  , columnWidth = 3
+                  , gutterWidth = 12
+                  , columnsNumber = 12
+                  , bodybuilderState = False
+                  , bootstrapState = False
+                  }
+                , Cmd.none
+                )
         , update = update
         , subscriptions = always Sub.none
         , view = view
