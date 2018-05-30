@@ -1614,7 +1614,7 @@ defaultInputCheckboxAttributes =
 inputCheckboxAttributesToHtmlAttributes : InputCheckboxAttributes msg -> List (Html.Attribute msg)
 inputCheckboxAttributesToHtmlAttributes attributes =
     Html.Attributes.checked attributes.checked
-        |> Function.flip (::) (unwrapMaybeAttribute Html.Attributes.value (Maybe.map String.fromInt <| attributes.value))
+        |> Function.flip (::) (unwrapMaybeAttribute Html.Attributes.value attributes.value)
         |> List.append (inputVisibleToHtmlAttributes attributes)
         |> List.append (checkEventToHtmlEvent attributes)
 

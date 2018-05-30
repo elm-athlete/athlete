@@ -84,15 +84,15 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
             boxModifiers |> groupByStyleSelectorAndCompute Box.default
 
         key =
-            ( computedFlexContainerDetails
-            , computedFlexItemDetails
-            , computedGridContainerDetails
-            , computedGridItemDetails
-            , computedBlockDetails
-            , computedBoxDetails
-            )
+            { computedFlexContainerDetails = computedFlexContainerDetails
+            , computedFlexItemDetails = computedFlexItemDetails
+            , computedGridContainerDetails = computedGridContainerDetails
+            , computedGridItemDetails = computedGridItemDetails
+            , computedBlockDetails = computedBlockDetails
+            , computedBoxDetails = computedBoxDetails
+            }
     in
-    []
+        []
 
 
 
@@ -162,6 +162,36 @@ insertStyleComponents modifiers setterInMediaQuery result =
         |> Maybe.withDefault result
 
 
+serializeStyleSelector : Attributes.StyleSelector -> String
+serializeStyleSelector styleSelector =
+    let
+        media_ =
+            case styleSelector.media of
+                Nothing ->
+                    "media:Nothing"
+
+                Just m ->
+                    case m of
+                        Attributes.Greater a ->
+                            "media:Just (Greater " ++ (String.fromInt a) ++ ")"
+
+                        Attributes.Lesser a ->
+                            "media:Just (Lesser " ++ (String.fromInt a) ++ ")"
+
+                        Attributes.Between a b ->
+                            "media:Just (Between " ++ (String.fromInt a) ++ " " ++ (String.fromInt b) ++ ")"
+
+        pseudoClass_ =
+            case styleSelector.pseudoClass of
+                Nothing ->
+                    "pseudoClass:Nothing"
+
+                Just pc ->
+                    "pseudoClass:Just " ++ pc
+    in
+        media_ ++ " | " ++ pseudoClass_
+
+
 appendInStyleComponent :
     (a -> StyleComponents -> StyleComponents)
     -> ( Attributes.StyleSelector, a )
@@ -170,16 +200,16 @@ appendInStyleComponent :
 appendInStyleComponent setter ( styleSelector, elem ) results =
     let
         key =
-            String.fromInt styleSelector
+            serializeStyleSelector styleSelector
     in
-    Dict.get key results
-        |> Maybe.Extra.unwrap
-            (defaultStyleComponents
-                |> setter elem
-                |> Tuple.pair styleSelector
-            )
-            (Tuple.mapSecond (setter elem))
-        |> Function.flip (Dict.insert key) results
+        Dict.get key results
+            |> Maybe.Extra.unwrap
+                (defaultStyleComponents
+                    |> setter elem
+                    |> Tuple.pair styleSelector
+                )
+                (Tuple.mapSecond (setter elem))
+            |> Function.flip (Dict.insert key) results
 
 
 samePseudoClass :
@@ -206,11 +236,11 @@ componentsToElegantStyle isBlock isFlex isGrid components =
         computedDisplay =
             List.map (componentsToParameteredDisplayBox isBlock isFlex isGrid) components
     in
-    computedDisplay
-        |> List.Extra.find noMediaQueries
-        |> Maybe.Extra.unwrap Elegant.emptyStyle (Tuple.second >> Elegant.style)
-        |> Maybe.Extra.unwrap identity Elegant.setSuffix suffix
-        |> Elegant.withScreenWidth (List.concatMap toScreenWidth computedDisplay)
+        computedDisplay
+            |> List.Extra.find noMediaQueries
+            |> Maybe.Extra.unwrap Elegant.emptyStyle (Tuple.second >> Elegant.style)
+            |> Maybe.Extra.unwrap identity Elegant.setSuffix suffix
+            |> Elegant.withScreenWidth (List.concatMap toScreenWidth computedDisplay)
 
 
 componentsToParameteredDisplayBox :

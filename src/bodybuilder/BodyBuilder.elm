@@ -117,6 +117,7 @@ import Flex exposing (FlexContainerDetails)
 import Function
 import Grid
 import Html exposing (Html)
+import Browser
 import Html.Attributes
 import Modifiers exposing (..)
 
@@ -162,8 +163,8 @@ type Option msg
 
 
 extractOption : Option msg -> Html msg
-extractOption (Option option) =
-    option
+extractOption (Option option_) =
+    option_
 
 
 {-| Puts plain text in the DOM. You can't set any attributes or events on it.
@@ -203,14 +204,14 @@ br =
 overrides Html to focus on BodyBuilder.
 -}
 program :
-    { init : ( model, Cmd msg )
-    , subscriptions : model -> Sub msg
-    , update : msg -> model -> ( model, Cmd msg )
+    { init : flags -> ( model, Cmd msg )
     , view : model -> Html msg
+    , update : msg -> model -> ( model, Cmd msg )
+    , subscriptions : model -> Sub msg
     }
-    -> Program Never model msg
+    -> Program flags model msg
 program =
-    Html.program
+    Browser.embed
 
 
 inlineNode : String -> Modifiers (NodeAttributes msg) -> List (Node msg) -> Node msg
@@ -1067,7 +1068,7 @@ commonChildlessNode :
     -> Modifiers (VisibleAttributes a)
     -> Node msg
 commonChildlessNode nodeName defaultAttributes childrenModifiers getFlexContainerProperties getFlexItemProperties getGridContainerProperties getGridItemProperties getBlockProperties attributesToHtmlAttributes =
-    flip
+    Function.flip
         (commonNode
             nodeName
             defaultAttributes
@@ -1153,12 +1154,12 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                 )
                 []
     in
-    case attributes.label of
-        Nothing ->
-            computedInput
+        case attributes.label of
+            Nothing ->
+                computedInput
 
-        Just label ->
-            Shared.extractLabel label computedInput
+            Just label ->
+                Shared.extractLabel label computedInput
 
 
 computeBlock :
@@ -1179,17 +1180,17 @@ computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers
             Function.compose modifiers
                 defaultAttributes
     in
-    Html.node tag
-        (BodyBuilder.Convert.toElegantStyle
-            (flexModifiers attributes)
-            (flexItemModifiers attributes)
-            (gridModifiers attributes)
-            (gridItemModifiers attributes)
-            (blockModifiers attributes)
-            attributes.box
-            |> List.map Elegant.styleToCss
-            |> String.join " "
-            |> Html.Attributes.class
-            |> Function.flip (::) (attributesToHtmlAttributes attributes)
-        )
-        content
+        Html.node tag
+            (BodyBuilder.Convert.toElegantStyle
+                (flexModifiers attributes)
+                (flexItemModifiers attributes)
+                (gridModifiers attributes)
+                (gridItemModifiers attributes)
+                (blockModifiers attributes)
+                attributes.box
+                |> List.map Elegant.styleToCss
+                |> String.join " "
+                |> Html.Attributes.class
+                |> Function.flip (::) (attributesToHtmlAttributes attributes)
+            )
+            content
