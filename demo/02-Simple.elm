@@ -41,10 +41,10 @@ view model =
         ]
 
 
-main : Program Basics.Never Int msg
+main : Program () Int msg
 main =
-    Builder.program
-        { init = ( 0, Cmd.none )
+    Builder.embed
+        { init = \_ -> ( 0, Cmd.none )
         , update = (\msg model -> ( model, Cmd.none ))
         , subscriptions = always Sub.none
         , view = view

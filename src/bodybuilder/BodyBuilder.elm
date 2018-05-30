@@ -42,7 +42,7 @@ module BodyBuilder
         , none
         , option
         , p
-        , program
+        , embed
         , progress
         , section
         , select
@@ -102,9 +102,9 @@ It is possible to style those elements using `Style.blockProperties`.
 @docs div, header, footer, nav, section, article, aside, h1, h2, h3, h4, h5, h6, p
 
 
-# Program
+# Embed
 
-@docs program
+@docs embed
 
 -}
 
@@ -203,14 +203,14 @@ br =
 {-| Creates a program, like you could with Html. This allows you to completely
 overrides Html to focus on BodyBuilder.
 -}
-program :
+embed :
     { init : flags -> ( model, Cmd msg )
-    , view : model -> Html msg
-    , update : msg -> model -> ( model, Cmd msg )
     , subscriptions : model -> Sub msg
+    , update : msg -> model -> ( model, Cmd msg )
+    , view : model -> Html msg
     }
     -> Program flags model msg
-program =
+embed =
     Browser.embed
 
 
