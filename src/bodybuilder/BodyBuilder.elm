@@ -1147,7 +1147,8 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                     Nothing
                     attributes.block
                     attributes.box
-                    |> List.map Elegant.styleToCss
+                    |> List.concatMap Elegant.styleToCss
+                    |> List.map Tuple.first
                     |> String.join " "
                     |> Html.Attributes.class
                     |> Function.flip (::) (attributesToHtmlAttributes attributes)
@@ -1179,18 +1180,32 @@ computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers
         attributes =
             Function.compose modifiers
                 defaultAttributes
+
+        styleResult =
+            BodyBuilder.Convert.toElegantStyle
+                (flexModifiers attributes)
+                (flexItemModifiers attributes)
+                (gridModifiers attributes)
+                (gridItemModifiers attributes)
+                (blockModifiers attributes)
+                attributes.box
+                |> List.concatMap Elegant.styleToCss
     in
     Html.node tag
-        (BodyBuilder.Convert.toElegantStyle
-            (flexModifiers attributes)
-            (flexItemModifiers attributes)
-            (gridModifiers attributes)
-            (gridItemModifiers attributes)
-            (blockModifiers attributes)
-            attributes.box
-            |> List.map Elegant.styleToCss
+        (styleResult
+            |> List.map Tuple.first
             |> String.join " "
             |> Html.Attributes.class
             |> Function.flip (::) (attributesToHtmlAttributes attributes)
         )
-        content
+        (content
+            ++ [ Html.node "style"
+                    []
+                    [ Html.text
+                        (styleResult
+                            |> List.map Tuple.second
+                            |> String.join " "
+                        )
+                    ]
+               ]
+        )

@@ -230,15 +230,14 @@ classes (Style style_) =
 
 
 {-| -}
-commonStyleToCss : CommonStyle -> String
+commonStyleToCss : CommonStyle -> List ( String, String )
 commonStyleToCss style_ =
     style_
         |> Elegant.Convert.fetchStylesOrCompute ""
-        |> String.join " "
 
 
 {-| -}
-styleToCss : Style -> String
+styleToCss : Style -> List ( String, String )
 styleToCss (Style style_) =
     commonStyleToCss style_
 

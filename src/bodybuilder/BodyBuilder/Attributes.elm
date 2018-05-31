@@ -1019,7 +1019,7 @@ visibleAttributesToHtmlAttributes visibleAttributes =
 {-| -}
 rawStyleToHtmlAttributes : Elegant.Style -> List (Html.Attribute msg)
 rawStyleToHtmlAttributes style_ =
-    [ Html.Attributes.class (Elegant.styleToCss style_) ]
+    [ Html.Attributes.class (Elegant.styleToCss style_ |> List.map Tuple.first |> String.join " ") ]
 
 
 {-| -}

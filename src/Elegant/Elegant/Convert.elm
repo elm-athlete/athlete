@@ -64,7 +64,7 @@ addScreenWidthToClassName =
     Function.flip (++)
 
 
-fetchStylesOrCompute : String -> Style -> List String
+fetchStylesOrCompute : String -> Style -> List ( String, String )
 fetchStylesOrCompute styleHash style =
     style
         |> extractScreenWidths
@@ -134,7 +134,7 @@ coupleToAtomicClass suffix mediaQuery property =
     }
 
 
-computeAtomicClass : AtomicClass -> String
+computeAtomicClass : AtomicClass -> ( String, String )
 computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } as atomicClass) =
     let
         classHash =
@@ -150,7 +150,7 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
             computeStyleToCss className mediaQueryId selector property
                 |> inMediaQuery mediaQuery
     in
-    classNameComplete
+    ( classNameComplete, test )
 
 
 inMediaQuery : Maybe String -> String -> String
