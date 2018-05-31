@@ -19,7 +19,7 @@ import Router
     exposing
         ( History
         , Page
-        , StandardHistoryMsg(Back)
+        , StandardHistoryMsg(..)
         , Transition
         , handleStandardHistory
         , historyView

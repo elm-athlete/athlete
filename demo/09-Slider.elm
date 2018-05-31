@@ -1,17 +1,17 @@
 module Slider exposing (..)
 
+import Block
 import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes exposing (style)
-import Display
-import Box
-import Block
 import Border
+import Box
 import Color
-import Elegant exposing (px)
-import Padding
 import Constants
 import Dimensions
-import Style exposing (box, block)
+import Display
+import Elegant exposing (px)
+import Padding
+import Style exposing (block, box)
 
 
 theFontSize : number
@@ -41,14 +41,14 @@ view model =
                     , box
                         [ Box.appearanceNone ]
                     , box
-                        [ Box.background [ Elegant.color (Color.blue) ]
+                        [ Box.background [ Elegant.color Color.blue ]
                         , Box.appearanceNone
                         , Box.border [ Border.all [ Border.none ] ]
                         ]
                         |> Style.pseudoClass ":-webkit-slider-thumb"
                     , box
-                        [ Box.border [ Border.full (Color.black) ]
-                        , Box.background [ Elegant.color (Color.red) ]
+                        [ Box.border [ Border.full Color.black ]
+                        , Box.background [ Elegant.color Color.red ]
                         , Box.border [ Border.all [ Border.none ] ]
                         ]
                         |> Style.pseudoClass ":-webkit-slider-runnable-track"
@@ -62,11 +62,11 @@ view model =
         ]
 
 
-main : Program Basics.Never Int msg
+main : Program () Int msg
 main =
-    Builder.program
-        { init = ( 0, Cmd.none )
-        , update = (\msg model -> ( model, Cmd.none ))
+    Builder.embed
+        { init = \_ -> ( 0, Cmd.none )
+        , update = \msg model -> ( model, Cmd.none )
         , subscriptions = always Sub.none
         , view = view
         }

@@ -3,7 +3,7 @@ module Router
         ( History
         , Page
         , PageView
-        , StandardHistoryMsg(Back)
+        , StandardHistoryMsg(..)
         , Transition
         , afterTransition
         , beforeTransition

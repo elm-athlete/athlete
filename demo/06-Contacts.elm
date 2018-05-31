@@ -9,40 +9,40 @@ I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Events as Events
 import BodyBuilder.Elements as Elements
-import Elegant exposing (SizeUnit, px, pt, percent, vh)
+import BodyBuilder.Events as Events
+import Border
+import Box
 import Color
+import Constants
+import Cursor
+import Dict exposing (Dict)
+import Dict.Extra as Dict
+import Dimensions
+import Display
+import Elegant exposing (SizeUnit, percent, pt, px, vh)
+import Finders exposing (..)
+import Flex
+import Function
+import Outline
+import Overflow
+import Padding
+import Position
 import Router
     exposing
         ( History
-        , StandardHistoryMsg(Back)
-        , handleStandardHistory
-        , push
-        , pageWithDefaultTransition
         , Page
+        , StandardHistoryMsg(..)
         , Transition
+        , handleStandardHistory
         , historyView
-        , maybeTransitionSubscription
         , initHistoryAndData
+        , maybeTransitionSubscription
+        , pageWithDefaultTransition
+        , push
         )
-import Finders exposing (..)
-import Dict exposing (Dict)
-import Dict.Extra as Dict
-import Display
-import Dimensions
-import Box
-import Cursor
-import Border
-import Outline
-import Typography
-import Constants
-import Padding
-import Overflow
-import Position
-import Function
-import Flex
 import Style
+import Typography
 
 
 type Route
@@ -246,12 +246,11 @@ contactBodyView data =
 
 filterByInitial : List Contact -> List ( Char, List Contact )
 filterByInitial =
-    (Dict.filterGroupBy
+    Dict.filterGroupBy
         (.name
             >> String.uncons
             >> Maybe.map Tuple.first
         )
-    )
         >> Dict.toList
 
 
@@ -296,7 +295,7 @@ contactsIndex contacts =
 
 contactsShow : Int -> List Contact -> Node Msg
 contactsShow id contacts =
-    node [] [ showView contactBodyView { maybeContact = (contacts |> find_by .id id) } ]
+    node [] [ showView contactBodyView { maybeContact = contacts |> find_by .id id } ]
 
 
 insidePageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> Node Msg
@@ -305,12 +304,12 @@ insidePageView data page transition =
         contacts =
             data.contacts
     in
-        case page.route of
-            ContactsIndex ->
-                contactsIndex contacts
+    case page.route of
+        ContactsIndex ->
+            contactsIndex contacts
 
-            ContactsShow id ->
-                contactsShow id contacts
+        ContactsShow id ->
+            contactsShow id contacts
 
 
 view : Model -> Node Msg
@@ -405,10 +404,10 @@ init =
     initHistoryAndData ContactsIndex initData StandardHistoryWrapper
 
 
-main : Program Basics.Never Model Msg
+main : Program () Model Msg
 main =
-    program
-        { init = ( init, Cmd.none )
+    embed
+        { init = \_ -> ( init, Cmd.none )
         , update = update
         , subscriptions = subscriptions
         , view = view

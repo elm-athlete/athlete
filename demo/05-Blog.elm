@@ -10,38 +10,36 @@ I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
-import Finders exposing (..)
-import Elegant exposing (SizeUnit, px, pt, percent, vh)
-import Modifiers exposing (..)
-import Padding
-import Constants
-import Elegant
-import Color
-import Display
-import Dimensions
-import Corner
-import Box
-import Cursor
 import Border
-import Outline
-import Typography
-import Style
+import Box
+import Color
+import Constants
+import Corner
+import Cursor
 import Date exposing (Month(..))
 import Date.Extra as Date
+import Dimensions
+import Display
+import Elegant exposing (SizeUnit, percent, pt, px, vh)
+import Finders exposing (..)
+import Modifiers exposing (..)
+import Outline
+import Padding
 import Router
     exposing
         ( History
-        , StandardHistoryMsg(Back)
-        , push
-        , pageWithDefaultTransition
         , Page
+        , StandardHistoryMsg(..)
         , Transition
-        , historyView
         , handleStandardHistory
-        , maybeTransitionSubscription
+        , historyView
         , initHistoryAndData
+        , maybeTransitionSubscription
+        , pageWithDefaultTransition
+        , push
         )
-import Finders exposing (..)
+import Style
+import Typography
 
 
 type Route
@@ -183,7 +181,7 @@ blogpostsIndex blogposts =
 
 blogpostsShow : Int -> List Blogpost -> Node Msg
 blogpostsShow id blogposts =
-    node [] [ showView { maybeBlogpost = (blogposts |> find_by .id id) } ]
+    node [] [ showView { maybeBlogpost = blogposts |> find_by .id id } ]
 
 
 pageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> Node Msg
@@ -253,10 +251,10 @@ init =
     initHistoryAndData BlogpostsIndex initData StandardHistoryWrapper
 
 
-main : Program Basics.Never Model Msg
+main : Program () Model Msg
 main =
-    program
-        { init = ( init, Cmd.none )
+    embed
+        { init = \_ -> ( init, Cmd.none )
         , update = update
         , subscriptions = subscriptions
         , view = view

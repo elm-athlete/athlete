@@ -29,7 +29,7 @@ buttonStyle =
     ]
 
 
-counter : a -> Node Msg
+counter : Int -> Node Msg
 counter model =
     flex
         [ style
@@ -82,7 +82,7 @@ windowCentered content =
         [ flexItem [ style [ Style.block [] ] ] [ content ] ]
 
 
-view : a -> Node Msg
+view : Int -> Node Msg
 view model =
     windowCentered (counter model)
 
@@ -93,7 +93,7 @@ type Msg
     | Change String
 
 
-update : Msg -> number -> ( number, Cmd Msg )
+update : Msg -> Int -> ( Int, Cmd Msg )
 update msg model =
     case msg of
         Add ->
@@ -103,13 +103,13 @@ update msg model =
             ( model - 1, Cmd.none )
 
         Change newVal ->
-            ( newVal |> String.toInt |> Result.withDefault 0, Cmd.none )
+            ( newVal |> String.toInt |> Maybe.withDefault 0, Cmd.none )
 
 
-main : Program Basics.Never Int Msg
+main : Program () Int Msg
 main =
-    program
-        { init = ( 0, Cmd.none )
+    embed
+        { init = \_ -> ( 0, Cmd.none )
         , update = update
         , subscriptions = always Sub.none
         , view = view
