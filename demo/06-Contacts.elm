@@ -93,7 +93,7 @@ gray =
     Color.grayscale 0.1
 
 
-titleView : Contact -> Node Msg
+titleView : Contact -> NodeWithStyle Msg
 titleView contact =
     BodyBuilder.button
         [ Events.onClick <| HistoryMsgWrapper <| ContactShow contact.id
@@ -177,9 +177,9 @@ header =
 
 
 showView :
-    (a -> Node Msg)
+    (a -> NodeWithStyle Msg)
     -> a
-    -> Node Msg
+    -> NodeWithStyle Msg
 showView bodyFun data =
     flex
         [ Attributes.style
@@ -210,7 +210,7 @@ showView bodyFun data =
         ]
 
 
-fullFlexCenter : List (Node msg) -> Node msg
+fullFlexCenter : List (NodeWithStyle msg) -> NodeWithStyle msg
 fullFlexCenter content =
     flex
         [ -- style [ pageCenter ]
@@ -230,7 +230,7 @@ fullFlexCenter content =
         [ flexItem [] content ]
 
 
-contactBodyView : { b | maybeContact : Maybe Contact } -> Node msg
+contactBodyView : { b | maybeContact : Maybe Contact } -> NodeWithStyle msg
 contactBodyView data =
     case data.maybeContact of
         Nothing ->
@@ -254,7 +254,7 @@ filterByInitial =
         >> Dict.toList
 
 
-initialView : ( Char, List Contact ) -> Node Msg
+initialView : ( Char, List Contact ) -> NodeWithStyle Msg
 initialView ( initial, contacts ) =
     Elements.stickyView
         [ Box.background [ Elegant.color gray ]
@@ -264,7 +264,7 @@ initialView ( initial, contacts ) =
         (contacts |> List.map titleView)
 
 
-contactsView : List Contact -> List (Node Msg)
+contactsView : List Contact -> List (NodeWithStyle Msg)
 contactsView =
     filterByInitial >> List.map initialView
 
@@ -276,7 +276,7 @@ backgroundColor color =
     Box.background [ Elegant.color color ]
 
 
-contactsIndex : List Contact -> Node Msg
+contactsIndex : List Contact -> NodeWithStyle Msg
 contactsIndex contacts =
     node
         [ Attributes.style
@@ -293,12 +293,12 @@ contactsIndex contacts =
         (contacts |> contactsView)
 
 
-contactsShow : Int -> List Contact -> Node Msg
+contactsShow : Int -> List Contact -> NodeWithStyle Msg
 contactsShow id contacts =
     node [] [ showView contactBodyView { maybeContact = contacts |> find_by .id id } ]
 
 
-insidePageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> Node Msg
+insidePageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> NodeWithStyle Msg
 insidePageView data page transition =
     let
         contacts =
@@ -312,7 +312,7 @@ insidePageView data page transition =
             contactsShow id contacts
 
 
-view : Model -> Node Msg
+view : Model -> NodeWithStyle Msg
 view { history, data } =
     node
         [ Attributes.style

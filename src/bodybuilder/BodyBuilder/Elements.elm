@@ -1,21 +1,21 @@
 module BodyBuilder.Elements exposing (..)
 
-import Elegant exposing (..)
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes
-import Style
-import Function
+import Box
 import Dimensions
 import Display
-import Box
+import Elegant exposing (..)
+import Function
 import Position
+import Style
 
 
 stickyView :
     List (Box.Box -> Box.Box)
     -> String
-    -> List (Node msg)
-    -> Node msg
+    -> List (NodeWithStyle msg)
+    -> NodeWithStyle msg
 stickyView sectionStyle sectionName elements =
     node []
         [ node
