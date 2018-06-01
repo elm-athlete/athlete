@@ -550,6 +550,7 @@ slideLeftView history insidePageView_ =
                 [ Box.transform
                     [ Transform.translateX (Elegant.vw <| percentage (0 - getMaybeTransitionValue history.transition))
                     ]
+                , Box.willChange [ "transform" ]
 
                 -- , Box.position
                 -- (Position.relative

@@ -41,6 +41,7 @@ module Box
         , typography
         , visibility
         , visible
+        , willChange
         , zIndex
         )
 
@@ -156,7 +157,12 @@ type alias Box =
     , visibility : Maybe Visibility
     , transform : Maybe Transform.Transform
     , zIndex : Maybe Int
+    , willChange : Maybe (List WillChange)
     }
+
+
+type alias WillChange =
+    String
 
 
 {-| Generates a default empty Box.
@@ -164,6 +170,7 @@ type alias Box =
 default : Box
 default =
     Box
+        Nothing
         Nothing
         Nothing
         Nothing
@@ -251,6 +258,15 @@ opacity =
     setMaybeValue setOpacity
 
 
+willChange : List WillChange -> Modifier Box
+willChange =
+    setMaybeValue setWillChange
+
+
+setWillChange willChange_ e =
+    { e | willChange = willChange_ }
+
+
 {-| Accepts a list of modifiers for the `Outline` and modifies the Box accordingly.
 -}
 outline : Modifiers Outline.Outline -> Modifier Box
@@ -301,6 +317,7 @@ boxToCouples box =
     [ unwrapToCouple .visibility visibilityToCouple
     , unwrapToCouple .opacity opacityToCouple
     , unwrapToCouple .zIndex zIndexToCouple
+    , unwrapToCouple .willChange willChangeToCouples
     , unwrapToCouple .cursor Cursor.cursorToCouple
     , unwrapToCouple .boxShadow Shadow.boxShadowToCouple
     , unwrapToCouples .transform Transform.transformToCouples
@@ -478,6 +495,11 @@ textColor color =
 opacityToCouple : Float -> ( String, String )
 opacityToCouple opacity_ =
     ( "opacity", String.fromFloat opacity_ )
+
+
+willChangeToCouples : List WillChange -> ( String, String )
+willChangeToCouples willChange_ =
+    ( "will-change", String.join " " willChange_ )
 
 
 visibilityToCouple : Visibility -> ( String, String )
