@@ -1,32 +1,33 @@
 module Main exposing (..)
 
-import Html exposing (Html)
-import Elegant exposing (px)
-import BodyBuilder exposing (node, text)
+import Background
+import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import Box
-import Typography
-import Shadow
 import Border
+import Box
 import Color exposing (Color)
 import Corner
-import Margin
-import Padding
 import Cursor
-import Outline
-import Background
-import Position
-import Display
-import Overflow
 import Dimensions
+import Display
+import Elegant exposing (px)
+import Html exposing (Html)
+import Margin
+import Outline
+import Overflow
+import Padding
+import Position
+import Shadow
 import Style
+import Typography
 
 
-main : Html msg
 main =
-    node
-        [ Attributes.style mainStyle ]
-        [ text "Just a text." ]
+    Builder.staticPage
+        (Builder.node
+            [ Attributes.style mainStyle ]
+            [ Builder.text "Just a text." ]
+        )
 
 
 mainStyle =

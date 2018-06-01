@@ -48,6 +48,7 @@ module BodyBuilder
         , section
         , select
         , span
+        , staticPage
         , text
         , textarea
         )
@@ -202,6 +203,23 @@ br =
     ( Html.br [] [], [] )
 
 
+stylise view_ e =
+    let
+        ( viewWithoutStyle, styles ) =
+            view_ e
+    in
+    Html.div []
+        (Html.node "style"
+            []
+            [ Html.text
+                (String.join "\n"
+                    (styles |> List.Extra.unique)
+                )
+            ]
+            :: [ viewWithoutStyle ]
+        )
+
+
 {-| Creates a program, like you could with Html. This allows you to completely
 overrides Html to focus on BodyBuilder.
 -}
@@ -219,12 +237,13 @@ embed el =
         , update = el.update
         , view =
             \e ->
-                let
-                    ( viewWithoutStyle, styles ) =
-                        el.view e
-                in
-                Html.div [] (Html.node "style" [] [ Html.text (String.join "\n" (styles |> List.Extra.unique)) ] :: [ viewWithoutStyle ])
+                stylise el.view e
         }
+
+
+staticPage : NodeWithStyle msg -> Program () () msg
+staticPage el =
+    Browser.staticPage (stylise (\_ -> el) ())
 
 
 inlineNode : String -> Modifiers (NodeAttributes msg) -> List (NodeWithStyle msg) -> NodeWithStyle msg
