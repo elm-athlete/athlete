@@ -151,7 +151,7 @@ standardCellStyle =
         ]
 
 
-titleView : Appartment -> Node Msg
+titleView : Appartment -> NodeWithStyle Msg
 titleView appartment =
     button
         [ BodyBuilder.Events.onClick <|
@@ -164,7 +164,7 @@ titleView appartment =
 
 titleViewWithDelete :
     Appartment
-    -> Node Msg
+    -> NodeWithStyle Msg
 titleViewWithDelete appartment =
     button
         [ standardCellStyle ]
@@ -177,7 +177,7 @@ titleViewWithDelete appartment =
         ]
 
 
-showView : { b | maybeAppartment : Maybe Appartment } -> Node Msg
+showView : { b | maybeAppartment : Maybe Appartment } -> NodeWithStyle Msg
 showView data =
     case data.maybeAppartment of
         Nothing ->
@@ -248,7 +248,7 @@ monthlyBankDebt model =
         n =
             yearsOfDebt * 12
     in
-    (k * (t / 12)) / (1 - ((1 + t / 12) ^ -n)) |> round
+        (k * (t / 12)) / (1 - ((1 + t / 12) ^ -n)) |> round
 
 
 minSalary : AppartmentAttributes -> Int
@@ -264,12 +264,12 @@ pad =
         ]
 
 
-result : String -> a -> Node msg
+result : String -> Float -> NodeWithStyle msg
 result label value =
     node [ pad ]
         [ text <| label
         , br
-        , text (value |> String.fromInt)
+        , text (value |> String.fromFloat)
         ]
 
 
@@ -287,7 +287,7 @@ collocNumberId =
     "collocNumber"
 
 
-appartmentEditBodyView : Appartment -> Node Msg
+appartmentEditBodyView : Appartment -> NodeWithStyle Msg
 appartmentEditBodyView ({ attributes } as appartment) =
     node []
         [ result "Renta standard en % : " (renta attributes.collocs)
@@ -322,13 +322,13 @@ appartmentEditBodyView ({ attributes } as appartment) =
                 , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateWorks)
                 ]
             ]
-        , result "Loyer mensuel total : " (totalMonthlyRent attributes)
-        , result "Loyer annuel : " (yearlyRent attributes)
+        , result "Loyer mensuel total : " (totalMonthlyRent attributes |> toFloat)
+        , result "Loyer annuel : " (yearlyRent attributes |> toFloat)
         , result "Prix d'acquisition global (travaux compris) max conseillé : " (maxPrice attributes)
         , result "Prix d'acquisition global (sans travaux) max conseillé : " (maxPrice attributes - (attributes.works |> toFloat))
         , result "Prix d'acquisition global (avant frais notaires) max conseillé : " ((maxPrice attributes - (attributes.works |> toFloat)) / 1.08)
-        , result "Mensualités moyennes à payer à la banque (20 ans) : " (monthlyBankDebt attributes)
-        , result "Revenus minimum pour endettement : " (minSalary attributes)
+        , result "Mensualités moyennes à payer à la banque (20 ans) : " (monthlyBankDebt attributes |> toFloat)
+        , result "Revenus minimum pour endettement : " (minSalary attributes |> toFloat)
         ]
 
 
@@ -351,7 +351,7 @@ backgroundColor color =
     Box.background [ Elegant.color color ]
 
 
-editView : { a | maybeAppartment : Maybe Appartment } -> Node Msg
+editView : { a | maybeAppartment : Maybe Appartment } -> NodeWithStyle Msg
 editView data =
     case data.maybeAppartment of
         Nothing ->
@@ -368,14 +368,14 @@ editView data =
                 (appartmentEditBodyView appartment)
 
 
-textToHtml : String -> List (Node msg)
+textToHtml : String -> List (NodeWithStyle msg)
 textToHtml =
     (>>)
         (String.split "\n")
         (List.foldr (\e accu -> accu ++ [ text e, br ]) [])
 
 
-appartmentBodyView : Appartment -> Node msg
+appartmentBodyView : Appartment -> NodeWithStyle msg
 appartmentBodyView appartment =
     node
         [ style [ Style.block [], Style.box [ Box.padding [ Padding.horizontal Constants.medium ] ] ] ]
@@ -383,7 +383,7 @@ appartmentBodyView appartment =
         ]
 
 
-title : String -> Node msg
+title : String -> NodeWithStyle msg
 title content =
     node
         [ style
@@ -394,7 +394,7 @@ title content =
         [ text content ]
 
 
-appartmentsIndex : List Appartment -> Node Msg
+appartmentsIndex : List Appartment -> NodeWithStyle Msg
 appartmentsIndex appartments =
     pageWithHeader
         (Router.headerElement
@@ -408,7 +408,7 @@ appartmentsIndex appartments =
         )
 
 
-appartmentsIndexEdit : List Appartment -> Node Msg
+appartmentsIndexEdit : List Appartment -> NodeWithStyle Msg
 appartmentsIndexEdit appartments =
     pageWithHeader
         (Router.headerElement
@@ -422,7 +422,7 @@ appartmentsIndexEdit appartments =
         )
 
 
-appartmentsShow : Int -> List Appartment -> Node Msg
+appartmentsShow : Int -> List Appartment -> NodeWithStyle Msg
 appartmentsShow id appartments =
     node [] [ showView { maybeAppartment = appartments |> find_by .id id } ]
 
@@ -430,12 +430,12 @@ appartmentsShow id appartments =
 appartmentsEdit :
     Int
     -> List Appartment
-    -> Node Msg
+    -> NodeWithStyle Msg
 appartmentsEdit id appartments =
     node [] [ editView { maybeAppartment = appartments |> find_by .id id } ]
 
 
-appartmentsNew : AppartmentAttributes -> Node Msg
+appartmentsNew : AppartmentAttributes -> NodeWithStyle Msg
 appartmentsNew draftAppartment =
     pageWithHeader
         (Router.headerElement
@@ -451,30 +451,30 @@ appartmentsNew draftAppartment =
         )
 
 
-insidePageView : Data -> Router.Page Route Msg -> Maybe (Router.Transition Route Msg) -> Node Msg
+insidePageView : Data -> Router.Page Route Msg -> Maybe (Router.Transition Route Msg) -> NodeWithStyle Msg
 insidePageView data page transition =
     let
         appartments =
             data.appartments
     in
-    case page.route of
-        AppartmentsIndex ->
-            appartmentsIndex appartments
+        case page.route of
+            AppartmentsIndex ->
+                appartmentsIndex appartments
 
-        AppartmentsIndexEdit ->
-            appartmentsIndexEdit appartments
+            AppartmentsIndexEdit ->
+                appartmentsIndexEdit appartments
 
-        AppartmentsShow id ->
-            appartmentsShow id appartments
+            AppartmentsShow id ->
+                appartmentsShow id appartments
 
-        AppartmentsEdit id ->
-            appartmentsEdit id appartments
+            AppartmentsEdit id ->
+                appartmentsEdit id appartments
 
-        AppartmentsNew ->
-            appartmentsNew data.draftAppartment
+            AppartmentsNew ->
+                appartmentsNew data.draftAppartment
 
 
-view : Model -> Node Msg
+view : Model -> NodeWithStyle Msg
 view { history, data } =
     node
         [ style
@@ -502,8 +502,8 @@ updateAppartmentAttributesBasedOnMsg msg attributes =
         UpdateWorks works ->
             { attributes | works = works }
 
-        UpdateTitle title ->
-            { attributes | title = title }
+        UpdateTitle title_ ->
+            { attributes | title = title_ }
 
 
 updateAppartmentBasedOnMsg : UpdateAppartmentMsg -> Appartment -> Appartment
@@ -512,10 +512,10 @@ updateAppartmentBasedOnMsg msg appartment =
         attributes =
             appartment.attributes
     in
-    { appartment
-        | attributes =
-            updateAppartmentAttributesBasedOnMsg msg attributes
-    }
+        { appartment
+            | attributes =
+                updateAppartmentAttributesBasedOnMsg msg attributes
+        }
 
 
 updateAppartmentHelper : Appartment -> UpdateAppartmentMsg -> Model -> Model
@@ -535,7 +535,7 @@ updateAppartmentHelper appartment msg model =
         newData =
             { data | appartments = newAppartments }
     in
-    { model | data = newData }
+        { model | data = newData }
 
 
 updateAppartment : Int -> UpdateAppartmentMsg -> Model -> Model
@@ -544,12 +544,12 @@ updateAppartment id customMsg model =
         maybeAppartment =
             model.data.appartments |> find_by .id id
     in
-    case maybeAppartment of
-        Nothing ->
-            model
+        case maybeAppartment of
+            Nothing ->
+                model
 
-        Just appartment ->
-            updateAppartmentHelper appartment customMsg model
+            Just appartment ->
+                updateAppartmentHelper appartment customMsg model
 
 
 updateAppartmentAttributes : UpdateAppartmentMsg -> Model -> Model
@@ -564,7 +564,7 @@ updateAppartmentAttributes customMsg model =
         newData =
             { data | draftAppartment = newAppartmentAttributes }
     in
-    { model | data = newData }
+        { model | data = newData }
 
 
 draftAppartmentToAppartment : { a | newId : Int, createdAt : Posix } -> AppartmentAttributes -> Appartment
@@ -596,7 +596,7 @@ saveAppartmentAttributes currentTime ({ data } as model) =
                 , draftAppartment = initAppartmentAttributes
             }
     in
-    { model | data = newData }
+        { model | data = newData }
 
 
 performSuccessfulTask : a -> Cmd a
@@ -613,7 +613,7 @@ destroyAppartment id model =
         newData =
             { data | appartments = data.appartments |> List.filter (\e -> e.id /= id) }
     in
-    { model | data = newData }
+        { model | data = newData }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -720,10 +720,10 @@ init =
     Router.initHistoryAndData AppartmentsIndex initData StandardHistoryWrapper
 
 
-main : Program Basics.Never Model Msg
+main : Program () Model Msg
 main =
     embed
-        { init = ( init, Cmd.none )
+        { init = \_ -> ( init, Cmd.none )
         , update = update
         , subscriptions = subscriptions
         , view = view

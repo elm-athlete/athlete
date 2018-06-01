@@ -1,13 +1,13 @@
 module Simplest exposing (..)
 
-import BodyBuilder as Builder exposing (Node)
+import BodyBuilder as Builder exposing (NodeWithStyle)
 
 
-view : Node msg
+view : NodeWithStyle msg
 view =
     Builder.node [] [ Builder.text "I'm a node and I like it!" ]
 
 
-main : Node msg
+main : Program () () msg
 main =
-    view
+    Builder.staticPage view
