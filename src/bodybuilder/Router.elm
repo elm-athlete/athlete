@@ -83,6 +83,7 @@ import Dimensions
 import Display
 import Elegant exposing (SizeUnit, percent, px)
 import Flex
+import Html
 import Modifiers exposing (..)
 import Overflow
 import Padding
@@ -581,18 +582,21 @@ historyView :
     -> History route msg
     -> NodeWithStyle msg
 historyView insidePageView_ history =
-    case history.transition of
-        Nothing ->
-            overflowHiddenContainer []
-                [ flexItem
-                    [ Attributes.style [ Style.flexItemProperties [ Flex.basis (percent 100) ] ] ]
-                    [ pageView insidePageView_ Nothing history.current ]
-                ]
+    div []
+        [ ( Html.node "style" [] [ Html.text "body {margin: 0px}" ], [] )
+        , case history.transition of
+            Nothing ->
+                overflowHiddenContainer []
+                    [ flexItem
+                        [ Attributes.style [ Style.flexItemProperties [ Flex.basis (percent 100) ] ] ]
+                        [ pageView insidePageView_ Nothing history.current ]
+                    ]
 
-        Just transition ->
-            case transition.kind of
-                CustomKind view_ ->
-                    view_ history insidePageView_
+            Just transition ->
+                case transition.kind of
+                    CustomKind view_ ->
+                        view_ history insidePageView_
+        ]
 
 
 {-| maybe transition subscription
