@@ -223,7 +223,7 @@ embed el =
                     ( viewWithoutStyle, styles ) =
                         el.view e
                 in
-                Html.div [] (Html.node "style" [] [ Html.text (String.join " " (styles |> List.Extra.unique)) ] :: [ viewWithoutStyle ])
+                Html.div [] (Html.node "style" [] [ Html.text (String.join "\n" (styles |> List.Extra.unique)) ] :: [ viewWithoutStyle ])
         }
 
 
