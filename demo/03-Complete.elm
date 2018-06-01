@@ -1,21 +1,20 @@
 module Demo exposing (..)
 
+import Block
 import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
+import Box
 import Color exposing (..)
 import Color.Manipulate as Color
-import Function exposing (..)
-import Elegant exposing (SizeUnit, px, pt, percent, vh)
-import Modifiers exposing (..)
 import Constants
-import Elegant
-import Box
-import Typography
-import Block
-import Style
 import Display
+import Elegant exposing (SizeUnit, percent, pt, px, vh)
 import Flex
+import Function exposing (..)
+import Modifiers exposing (..)
+import Style
+import Typography
 
 
 type Msg
@@ -76,7 +75,7 @@ buttonStyle color =
         |> compose
 
 
-exampleGridContent : String -> List (Node msg)
+exampleGridContent : String -> List (NodeWithStyle msg)
 exampleGridContent content =
     [ node
         [ boxStyle
@@ -97,7 +96,7 @@ exampleGridContent content =
     ]
 
 
-customCounter : String -> Int -> Int -> Int -> Int -> (Int -> msg) -> Node msg
+customCounter : String -> Int -> Int -> Int -> Int -> (Int -> msg) -> NodeWithStyle msg
 customCounter title min max step val msg =
     node
         [ blockStyle [ Block.alignCenter ] ]
@@ -137,7 +136,7 @@ customCounter title min max step val msg =
         ]
 
 
-view : Model -> Node Msg
+view : Model -> NodeWithStyle Msg
 view { color, columnWidth, gutterWidth, columnsNumber, bodybuilderState, bootstrapState } =
     node
         [ style

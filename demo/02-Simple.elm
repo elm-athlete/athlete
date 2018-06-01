@@ -1,12 +1,12 @@
 module Main exposing (..)
 
-import BodyBuilder as Builder exposing (Node)
-import BodyBuilder.Attributes as Attributes
-import Elegant exposing (px, Style)
-import Box
-import Typography
-import Style
 import Block
+import BodyBuilder as Builder exposing (NodeWithStyle)
+import BodyBuilder.Attributes as Attributes
+import Box
+import Elegant exposing (Style, px)
+import Style
+import Typography
 
 
 theFontSize : number
@@ -14,7 +14,7 @@ theFontSize =
     15
 
 
-view : a -> Node msg
+view : a -> NodeWithStyle msg
 view model =
     Builder.node
         [ Attributes.style
@@ -45,7 +45,7 @@ main : Program () Int msg
 main =
     Builder.embed
         { init = \_ -> ( 0, Cmd.none )
-        , update = (\msg model -> ( model, Cmd.none ))
+        , update = \msg model -> ( model, Cmd.none )
         , subscriptions = always Sub.none
         , view = view
         }
