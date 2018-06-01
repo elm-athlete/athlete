@@ -69,6 +69,7 @@ pages and history (backward and forward)
 -}
 
 -- import Native.BodyBuilder
+-- import Dom
 
 import AnimationFrame
 import Block
@@ -80,7 +81,6 @@ import Color
 import Cursor
 import Dimensions
 import Display
-import Dom
 import Elegant exposing (SizeUnit, percent, px)
 import Flex
 import Modifiers exposing (..)
@@ -89,7 +89,6 @@ import Padding
 import Position
 import Style
 import Task
-import Time exposing (Time)
 import Transform
 import Typography
 
@@ -102,13 +101,13 @@ type Easing
 type Kind route msg
     = CustomKind
         (History route msg
-         -> (Page route msg -> Maybe (Transition route msg) -> Node msg)
-         -> Node msg
+         -> (Page route msg -> Maybe (Transition route msg) -> NodeWithStyle msg)
+         -> NodeWithStyle msg
         )
 
 
 {-| -}
-customKind : (History route msg -> (Page route msg -> Maybe (Transition route msg) -> Node msg) -> Node msg) -> Kind route msg
+customKind : (History route msg -> (Page route msg -> Maybe (Transition route msg) -> NodeWithStyle msg) -> NodeWithStyle msg) -> Kind route msg
 customKind =
     CustomKind
 
@@ -156,7 +155,7 @@ type TransitionWrapper route msg
 type alias PageView route msg =
     Page route msg
     -> Maybe (Transition route msg)
-    -> Node msg
+    -> NodeWithStyle msg
 
 
 type Direction
@@ -181,9 +180,10 @@ Tick to handle transitions with RequestAnimationFrame
 Back to handle back buttons
 -}
 type StandardHistoryMsg
-    = Tick Time
+    = Tick Float
     | Back
-    | FocusMsg (Result Dom.Error ())
+      -- | FocusMsg (Result Dom.Error ())
+    | FocusMsg Int
 
 
 easingFun : Easing -> Float -> Float
@@ -235,13 +235,13 @@ getTransitionValue { direction, timer, length, easing } =
 
 
 isRunning : Maybe (Transition route msg) -> Bool
-isRunning transition =
-    case transition of
+isRunning transition_ =
+    case transition_ of
         Nothing ->
             False
 
-        Just transition ->
-            transition.timer > 0
+        Just transition__ ->
+            transition__.timer > 0
 
 
 timeDiff : Float -> Transition route msg -> Transition route msg
@@ -381,18 +381,18 @@ putHeadInListIfExists list =
 
 {-| -}
 visiblePages : History route msg -> List (Page route msg)
-visiblePages { transition, before, current, after } =
-    case transition of
+visiblePages history =
+    case history.transition of
         Nothing ->
-            [ current ]
+            [ history.current ]
 
-        Just transition ->
-            case transition.direction of
+        Just transition_ ->
+            case transition_.direction of
                 Forward ->
-                    putHeadInListIfExists before ++ [ current ]
+                    putHeadInListIfExists history.before ++ [ history.current ]
 
                 Backward ->
-                    current :: putHeadInListIfExists after
+                    history.current :: putHeadInListIfExists history.after
 
 
 {-| -}
@@ -437,7 +437,7 @@ afterTransition history =
 overflowHiddenContainer :
     Modifiers (Attributes.FlexContainerAttributes msg)
     -> List (FlexItem msg)
-    -> Node msg
+    -> NodeWithStyle msg
 overflowHiddenContainer attributes content =
     flex
         ([ style
@@ -454,10 +454,10 @@ overflowHiddenContainer attributes content =
 
 {-| -}
 pageView :
-    (a -> Maybe (Transition route msg) -> Node msg)
+    (a -> Maybe (Transition route msg) -> NodeWithStyle msg)
     -> Maybe (Transition route msg)
     -> a
-    -> Node msg
+    -> NodeWithStyle msg
 pageView insidePageView_ transition page =
     node
         [ Attributes.style
@@ -469,7 +469,7 @@ pageView insidePageView_ transition page =
 
 
 {-| -}
-pageWithHeader : Node msg -> Node msg -> Node msg
+pageWithHeader : NodeWithStyle msg -> NodeWithStyle msg -> NodeWithStyle msg
 pageWithHeader header page =
     flex
         [ style
@@ -484,7 +484,7 @@ pageWithHeader header page =
 
 
 {-| -}
-mainElement : Node msg -> Node msg
+mainElement : NodeWithStyle msg -> NodeWithStyle msg
 mainElement html =
     node
         [ style
@@ -498,7 +498,7 @@ mainElement html =
         ]
 
 
-slideUpView : History route msg -> PageView route msg -> Node msg
+slideUpView : History route msg -> PageView route msg -> NodeWithStyle msg
 slideUpView history insidePageView_ =
     let
         visiblePages_ =
@@ -536,7 +536,7 @@ slideUpView history insidePageView_ =
 slideLeftView :
     History route msg
     -> PageView route msg
-    -> Node msg
+    -> NodeWithStyle msg
 slideLeftView history insidePageView_ =
     let
         visiblePages_ =
@@ -576,9 +576,9 @@ slideLeftView history insidePageView_ =
 the history and its own routing system
 -}
 historyView :
-    (Page route msg -> Maybe (Transition route msg) -> Node msg)
+    (Page route msg -> Maybe (Transition route msg) -> NodeWithStyle msg)
     -> History route msg
-    -> Node msg
+    -> NodeWithStyle msg
 historyView insidePageView_ history =
     case history.transition of
         Nothing ->
@@ -597,9 +597,9 @@ historyView insidePageView_ history =
 {-| maybe transition subscription
 -}
 maybeTransitionSubscription : History route msg -> Sub msg
-maybeTransitionSubscription { standardHistoryWrapper, transition } =
-    transition
-        |> Maybe.map (\transition -> AnimationFrame.diffs (standardHistoryWrapper << Tick))
+maybeTransitionSubscription history =
+    history.transition
+        |> Maybe.map (\transition_ -> AnimationFrame.deltas (history.standardHistoryWrapper << Tick))
         |> Maybe.withDefault Sub.none
 
 
@@ -616,7 +616,7 @@ initHistory currentPage standardHistoryMsg =
 
 updateIdentity : model -> ( model, Cmd msg )
 updateIdentity model =
-    model ! []
+    ( model, Cmd.none )
 
 
 standardHandleHistory : StandardHistoryMsg -> History route msg -> ( History route msg, Cmd msg )
@@ -651,26 +651,26 @@ standardHandleHistory historyMsg history =
 focusChoosenElement : History route msg -> model -> ( model, Cmd msg )
 focusChoosenElement history model =
     ( model
-    , case history.currentPageHasFocusElement of
-        False ->
-            Cmd.none
-
-        True ->
-            history.current.maybeFocusedId
-                |> Maybe.withDefault ""
-                -- TODO Fix the scroll (using ports)
-                -- |> Native.BodyBuilder.focusWithoutScroll
-                |> Task.attempt (FocusMsg >> history.standardHistoryWrapper)
+    , Cmd.none
+      -- case history.currentPageHasFocusElement of
+      -- False ->
+      --     Cmd.none
+      -- True ->
+      --     history.current.maybeFocusedId
+      --         |> Maybe.withDefault ""
+      -- TODO Fix the scroll (using ports)
+      -- |> Native.BodyBuilder.focusWithoutScroll
+      -- |> Task.attempt (FocusMsg >> history.standardHistoryWrapper)
     )
 
 
 {-| handle model's history update using historyMsg
 -}
 handleStandardHistory : StandardHistoryMsg -> { a | history : History route msg } -> ( { a | history : History route msg }, Cmd msg )
-handleStandardHistory historyMsg ({ history } as model) =
-    history
+handleStandardHistory historyMsg model =
+    model.history
         |> standardHandleHistory historyMsg
-        |> (\( history, cmds ) -> { model | history = history } ! [ cmds ])
+        |> (\( history_, cmds ) -> ( { model | history = history_ }, cmds ))
 
 
 {-| initialize history and data based on the routing system
@@ -721,8 +721,8 @@ headerButtonStyleRight =
 {-| display header
 -}
 headerElement :
-    { a | center : Node msg, left : Node msg, right : Node msg }
-    -> Node msg
+    { a | center : NodeWithStyle msg, left : NodeWithStyle msg, right : NodeWithStyle msg }
+    -> NodeWithStyle msg
 headerElement { left, center, right } =
     node
         [ style
@@ -749,7 +749,7 @@ headerElement { left, center, right } =
 
 {-| display button
 -}
-headerButton : msg -> String -> Node msg
+headerButton : msg -> String -> NodeWithStyle msg
 headerButton msg content =
     node
         [ onClick <| msg

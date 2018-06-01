@@ -7,6 +7,9 @@ It is heavily inspired by the way iOS works, but the code is original :)
 I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 -}
 
+-- import Date exposing (Month(..))
+-- import Date.Extra as Date
+
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
@@ -16,8 +19,6 @@ import Color
 import Constants
 import Corner
 import Cursor
-import Date exposing (Month(..))
-import Date.Extra as Date
 import Dimensions
 import Display
 import Elegant exposing (SizeUnit, percent, pt, px, vh)
@@ -39,6 +40,7 @@ import Router
         , push
         )
 import Style
+import Time
 import Typography
 
 
@@ -79,7 +81,7 @@ type alias Blogpost =
     { id : Int
     , title : String
     , content : MarkdownString
-    , publishedAt : Maybe Date.Date
+    , publishedAt : Maybe Time.Posix
     , image : String
     }
 
@@ -96,7 +98,7 @@ gray =
     Color.grayscale 0.9
 
 
-titleView : Blogpost -> Node Msg
+titleView : Blogpost -> NodeWithStyle Msg
 titleView blogpost =
     button
         [ Events.onClick <| HistoryMsgWrapper <| BlogpostShow blogpost.id
@@ -105,7 +107,7 @@ titleView blogpost =
         [ text blogpost.title ]
 
 
-showView : { b | maybeBlogpost : Maybe Blogpost } -> Node Msg
+showView : { b | maybeBlogpost : Maybe Blogpost } -> NodeWithStyle Msg
 showView data =
     case data.maybeBlogpost of
         Nothing ->
@@ -122,7 +124,7 @@ showView data =
                 (blogpostView blogPost)
 
 
-blogpostView : Blogpost -> Node msg
+blogpostView : Blogpost -> NodeWithStyle msg
 blogpostView blogpost =
     node []
         [ img "" blogpost.image [ style [ Style.block [ Display.fullWidth ] ] ]
@@ -136,7 +138,7 @@ blogpostView blogpost =
         ]
 
 
-textToHtml : String -> List (Node msg)
+textToHtml : String -> List (NodeWithStyle msg)
 textToHtml =
     (>>)
         (String.split "\n")
@@ -168,7 +170,7 @@ standardCellStyle =
         ]
 
 
-blogpostsIndex : List Blogpost -> Node Msg
+blogpostsIndex : List Blogpost -> NodeWithStyle Msg
 blogpostsIndex blogposts =
     node
         [ style
@@ -179,12 +181,12 @@ blogpostsIndex blogposts =
         (blogposts |> List.map titleView)
 
 
-blogpostsShow : Int -> List Blogpost -> Node Msg
+blogpostsShow : Int -> List Blogpost -> NodeWithStyle Msg
 blogpostsShow id blogposts =
     node [] [ showView { maybeBlogpost = blogposts |> find_by .id id } ]
 
 
-pageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> Node Msg
+pageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> NodeWithStyle Msg
 pageView { blogposts } { route } transition =
     case route of
         BlogpostsIndex ->
@@ -194,7 +196,7 @@ pageView { blogposts } { route } transition =
             blogpostsShow id blogposts
 
 
-view : Model -> Node Msg
+view : Model -> NodeWithStyle Msg
 view ({ history, data } as model) =
     div
         [ style
@@ -228,14 +230,14 @@ initBlogposts : List Blogpost
 initBlogposts =
     [ { id = 1
       , title = "La cigale et la fourmi"
-      , publishedAt = Just <| Date.fromCalendarDate 2017 Aug 10
+      , publishedAt = Just <| Time.millisToPosix 1502323200
       , content = "La Cigale, ayant chanté\nTout l'Été,\nSe trouva fort dépourvue\nQuand la bise fut venue.\nPas un seul petit morceau\nDe mouche ou de vermisseau.\nElle alla crier famine\nChez la Fourmi sa voisine,\nLa priant de lui prêter\nQuelque grain pour subsister\nJusqu'à la saison nouvelle.\nJe vous paierai, lui dit-elle,\nAvant l'Oût, foi d'animal,\nIntérêt et principal.\nLa Fourmi n'est pas prêteuse ;\nC'est là son moindre défaut.\n« Que faisiez-vous au temps chaud ?\nDit-elle à cette emprunteuse.\n— Nuit et jour à tout venant\nJe chantais, ne vous déplaise.\n— Vous chantiez ? j'en suis fort aise.\nEh bien !dansez maintenant. »\n"
       , image = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Snodgrass_Magicicada_septendecim.jpg/1024px-Snodgrass_Magicicada_septendecim.jpg"
       }
     , { id = 2
       , title = "Le corbeau et le renard"
       , content = "Maître Corbeau, sur un arbre perché,\nTenait en son bec un fromage.\nMaître Renard, par l'odeur alléché,\nLui tint à peu près ce langage :\nEt bonjour, Monsieur du Corbeau.\nQue vous êtes joli ! que vous me semblez beau !\nSans mentir, si votre ramage\nSe rapporte à votre plumage,\nVous êtes le Phénix des hôtes de ces bois.\nÀ ces mots, le Corbeau ne se sent pas de joie ;\nEt pour montrer sa belle voix,\nIl ouvre un large bec, laisse tomber sa proie.\nLe Renard s'en saisit, et dit : Mon bon Monsieur,\nApprenez que tout flatteur\nVit aux dépens de celui qui l'écoute.\nCette leçon vaut bien un fromage, sans doute.\nLe Corbeau honteux et confus\nJura, mais un peu tard, qu'on ne l'y prendrait plus."
-      , publishedAt = Just <| Date.fromCalendarDate 2017 Aug 10
+      , publishedAt = Just <| Time.millisToPosix 1502323200
       , image = "https://upload.wikimedia.org/wikipedia/commons/4/47/Karga_9107.svg"
       }
     ]

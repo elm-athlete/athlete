@@ -31,12 +31,12 @@ import Router
         )
 import Style
 import Task
-import Time exposing (Time)
+import Time exposing (Posix)
 import Typography
 
 
 type alias Persisted a =
-    { id : Int, createdAt : Time, updatedAt : Time, attributes : a }
+    { id : Int, createdAt : Posix, updatedAt : Posix, attributes : a }
 
 
 type alias Appartment =
@@ -94,7 +94,7 @@ type Msg
     | UpdateAppartmentAttributes UpdateAppartmentMsg
     | DestroyAppartment Int
     | SaveAppartmentAttributes
-    | SaveAppartmentAttributesHelper Time
+    | SaveAppartmentAttributesHelper Posix
     | UpdateData Data
 
 
@@ -567,7 +567,7 @@ updateAppartmentAttributes customMsg model =
     { model | data = newData }
 
 
-draftAppartmentToAppartment : { a | newId : Int, createdAt : Time } -> AppartmentAttributes -> Appartment
+draftAppartmentToAppartment : { a | newId : Int, createdAt : Posix } -> AppartmentAttributes -> Appartment
 draftAppartmentToAppartment { newId, createdAt } draftAppartment =
     { id = newId
     , createdAt = createdAt
@@ -581,7 +581,7 @@ lastId =
     List.map .id >> List.maximum >> Maybe.withDefault 1
 
 
-saveAppartmentAttributes : Time.Time -> Model -> Model
+saveAppartmentAttributes : Posix -> Model -> Model
 saveAppartmentAttributes currentTime ({ data } as model) =
     let
         newData =
@@ -722,7 +722,7 @@ init =
 
 main : Program Basics.Never Model Msg
 main =
-    program
+    embed
         { init = ( init, Cmd.none )
         , update = update
         , subscriptions = subscriptions
