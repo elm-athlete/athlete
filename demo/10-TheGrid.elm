@@ -1,23 +1,23 @@
 module TheGrid exposing (..)
 
-import BodyBuilder as Builder exposing (Node)
+import Block
+import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
+import Box
 import Color exposing (Color)
-import Elegant exposing (px, vh, percent)
-import Style
+import Elegant exposing (percent, px, vh)
+import Flex
 import Grid
 import Grid.Extra
-import Box
-import Block
-import Flex
+import Style
 
 
-alignedCellWithPurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( Flex.Align, Flex.JustifyContent ) -> List (Node msg) -> Builder.GridItem msg
+alignedCellWithPurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( Flex.Align, Flex.JustifyContent ) -> List (NodeWithStyle msg) -> Builder.GridItem msg
 alignedCellWithPurpleBackground =
     Grid.Extra.alignedCell [ Style.box [ Box.backgroundColor Color.purple ] ]
 
 
-example : Node msg
+example : NodeWithStyle msg
 example =
     Builder.grid
         [ Attributes.style
@@ -54,11 +54,10 @@ example =
         ]
 
 
-content : String -> Node msg
+content : String -> NodeWithStyle msg
 content str =
     Builder.div [ Attributes.style [ Style.box [ Box.backgroundColor Color.yellow, Box.paddingAll (px 24) ] ] ] [ Builder.text str ]
 
 
-main : Node msg
 main =
-    example
+    Builder.staticPage example

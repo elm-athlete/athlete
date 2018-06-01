@@ -4,20 +4,21 @@ module Flex.Extra
         )
 
 {-|
+
 @docs alignedContent
+
 -}
 
-import BodyBuilder as Builder exposing (Node)
-import BodyBuilder.Attributes as Attributes
-import Style
 import Block
+import BodyBuilder as Builder exposing (NodeWithStyle)
+import BodyBuilder.Attributes as Attributes
 import Flex
+import Style
 
 
-{-|
-alignedContent is a way to align content inside a container.
+{-| alignedContent is a way to align content inside a container.
 -}
-alignedContent : ( Flex.Align, Flex.JustifyContent ) -> List (Node msg) -> Node msg
+alignedContent : ( Flex.Align, Flex.JustifyContent ) -> List (NodeWithStyle msg) -> NodeWithStyle msg
 alignedContent alignment content =
     Builder.flex
         [ Attributes.style
