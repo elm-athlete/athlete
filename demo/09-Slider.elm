@@ -1,7 +1,7 @@
 module Slider exposing (..)
 
 import Block
-import BodyBuilder as Builder exposing (Node)
+import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes exposing (style)
 import Border
 import Box
@@ -19,7 +19,7 @@ theFontSize =
     15
 
 
-view : a -> Node msg
+view : a -> NodeWithStyle msg
 view model =
     Builder.node
         [ Attributes.style
