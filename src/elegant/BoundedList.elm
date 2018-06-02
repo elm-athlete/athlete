@@ -1,5 +1,7 @@
 module BoundedList exposing (BoundedList, content, head, insert, new)
 
+import Function
+
 
 type BoundedList a
     = BoundedList
@@ -17,22 +19,22 @@ new length =
 
 
 insert : a -> BoundedList a -> BoundedList a
-insert elem (BoundedList ({ length, content } as boundedList)) =
-    content
+insert elem (BoundedList l) =
+    l.content
         |> (::) elem
-        |> List.take length
-        |> setContentIn boundedList
+        |> List.take l.length
+        |> setContentIn l
         |> BoundedList
 
 
 content : BoundedList a -> List a
-content (BoundedList { content }) =
-    content
+content (BoundedList l) =
+    l.content
 
 
 head : BoundedList a -> Maybe a
-head (BoundedList { content }) =
-    List.head content
+head (BoundedList l) =
+    List.head l.content
 
 
 
@@ -40,8 +42,8 @@ head (BoundedList { content }) =
 
 
 setContent : content -> { a | content : content } -> { a | content : content }
-setContent content record =
-    { record | content = content }
+setContent content_ record =
+    { record | content = content_ }
 
 
 setContentIn : { a | content : content } -> content -> { a | content : content }
