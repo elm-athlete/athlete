@@ -18,12 +18,14 @@
         "elm/virtual-dom": "1.0.0",
         "elm-community/dict-extra": "2.3.1",
         "elm-community/list-extra": "8.0.0",
+        "justinmimbs/date": "1.0.0",
         "mpizenberg/elm-pointer-events": "4.0.0",
         "ryannhg/date-format": "1.1.0"
     },
     "test-dependencies": {},
     "do-not-edit-this-by-hand": {
         "transitive-dependencies": {
+            "elm/parser": "1.0.0",
             "elm/url": "1.0.0"
         }
     }

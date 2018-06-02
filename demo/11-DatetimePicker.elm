@@ -1,6 +1,5 @@
 module DatePicker exposing (main)
 
--- import Date
 -- import SingleTouch
 
 import AnimationFrame
@@ -9,8 +8,10 @@ import BodyBuilder as Builder exposing (Node)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements.WheelPicker as Picker
 import Box
+import Date
 import Elegant exposing (px)
 import Flex
+import Function
 import Margin
 import Style
 import Touch
@@ -182,9 +183,9 @@ pickerView pickerId picker =
             PickerMsg pickerId << Picker.GetTouch
     in
     Builder.flexItem
-        [ Attributes.rawAttribute (SingleTouch.onStart (touchMsgWrapper << Picker.StartTouch))
-        , Attributes.rawAttribute (SingleTouch.onMove (touchMsgWrapper << Picker.HoldTouch))
-        , Attributes.rawAttribute (SingleTouch.onEnd (touchMsgWrapper << Picker.StopTouch))
+        [ Attributes.rawAttribute (Touch.onStart (touchMsgWrapper << Picker.StartTouch))
+        , Attributes.rawAttribute (Touch.onMove (touchMsgWrapper << Picker.HoldTouch))
+        , Attributes.rawAttribute (Touch.onEnd (touchMsgWrapper << Picker.StopTouch))
         ]
         [ Picker.view picker ]
 
@@ -203,14 +204,14 @@ pickerLabelView text =
 dateView : Date.Date -> String
 dateView date =
     (Date.day date |> toString)
-        |> flip (++) " "
-        |> flip (++) (Date.month date |> toString)
-        |> flip (++) " "
-        |> flip (++) (Date.year date |> toString)
-        |> flip (++) " at "
-        |> flip (++) (intToString 2 (Date.hour date))
-        |> flip (++) ":"
-        |> flip (++) (intToString 2 (Date.minute date))
+        |> Function.flip (++) " "
+        |> Function.flip (++) (Date.month date |> toString)
+        |> Function.flip (++) " "
+        |> Function.flip (++) (Date.year date |> toString)
+        |> Function.flip (++) " at "
+        |> Function.flip (++) (intToString 2 (Date.hour date))
+        |> Function.flip (++) ":"
+        |> Function.flip (++) (intToString 2 (Date.minute date))
 
 
 view : Model -> Node Msg
@@ -249,7 +250,7 @@ view model =
 
 main : Program Never Model Msg
 main =
-    Builder.program
+    Builder.embed
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -265,13 +266,13 @@ intToString : Int -> Int -> String
 intToString digitsNb value =
     let
         baseString =
-            toString value
+            String.fromInt value
 
         additionalZeros =
             baseString
                 |> String.length
                 |> (-) digitsNb
-                |> flip String.repeat "0"
+                |> Function.flip String.repeat "0"
     in
     String.append additionalZeros baseString
 
