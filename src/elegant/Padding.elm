@@ -43,7 +43,7 @@ module Elegant.Padding
 -}
 
 import Elegant.Helpers.Shared exposing (..)
-import Elegant.Surrounded exposing (Surrounded)
+import Elegant.Surrounded as Surrounded exposing (Surrounded)
 import Modifiers exposing (..)
 
 
@@ -74,57 +74,57 @@ default =
 -}
 top : SizeUnit -> Modifier (Surrounded Padding)
 top =
-    Elegant.Surrounded.top default << modifiersFrom
+    Surrounded.top default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify the bottom side of the padding.
 -}
 bottom : SizeUnit -> Modifier (Surrounded Padding)
 bottom =
-    Elegant.Surrounded.bottom default << modifiersFrom
+    Surrounded.bottom default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify the left side of the padding.
 -}
 left : SizeUnit -> Modifier (Surrounded Padding)
 left =
-    Elegant.Surrounded.left default << modifiersFrom
+    Surrounded.left default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify the right side of the padding.
 -}
 right : SizeUnit -> Modifier (Surrounded Padding)
 right =
-    Elegant.Surrounded.right default << modifiersFrom
+    Surrounded.right default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify both the top and the bottom side of the padding.
 -}
 horizontal : SizeUnit -> Modifier (Surrounded Padding)
 horizontal =
-    Elegant.Surrounded.horizontal default << modifiersFrom
+    Surrounded.horizontal default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify both the right and left side of the padding.
 -}
 vertical : SizeUnit -> Modifier (Surrounded Padding)
 vertical =
-    Elegant.Surrounded.vertical default << modifiersFrom
+    Surrounded.vertical default << modifiersFrom
 
 
 {-| Accepts a padding modifier, and modify the four sides of the padding.
 -}
 all : SizeUnit -> Modifier (Surrounded Padding)
 all =
-    Elegant.Surrounded.all default << modifiersFrom
+    Surrounded.all default << modifiersFrom
 
 
 {-| Compiles a `Surrounded Padding` record to the corresponding CSS list of tuples.
 Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
-paddingToCouples : Elegant.Surrounded Padding -> List ( String, String )
+paddingToCouples : Surrounded Padding -> List ( String, String )
 paddingToCouples =
-    Elegant.Surrounded.surroundedToCouples (Just "padding") paddingSideToCouples
+    Surrounded.surroundedToCouples (Just "padding") paddingSideToCouples
 
 
 

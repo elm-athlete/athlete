@@ -82,7 +82,7 @@ every style, for every element. Each element can be block, inline, flow or flex.
 
 -}
 
-import Elegant.Box
+import Elegant.Box as Box
 import Elegant.Dimensions
 import Elegant.Flex
 import Elegant.Grid
