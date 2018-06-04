@@ -83,13 +83,13 @@ every style, for every element. Each element can be block, inline, flow or flex.
 -}
 
 import Elegant.Box as Box
-import Elegant.Dimensions
-import Elegant.Flex
-import Elegant.Grid
+import Elegant.Dimensions as Dimensions
+import Elegant.Flex as Flex
+import Elegant.Grid as Grid
 import Elegant.Helpers.Css
 import Elegant.Helpers.Shared exposing (..)
 import Elegant.Internals.Setters exposing (..)
-import Elegant.Overflow
+import Elegant.Overflow as Overflow
 import Modifiers exposing (..)
 
 
