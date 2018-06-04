@@ -8,15 +8,15 @@ import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements.WheelPicker as Picker
 import Box
-import Date
 import Elegant exposing (px)
 import Flex
 import Function
 import Margin
 import Style
-import Time
+import Time exposing (Posix, Zone, Month(..))
 import Touch
 import Typography
+import DateFormat
 
 
 ---- CONSTANTS ----
@@ -38,44 +38,88 @@ toMs =
 
 
 
+---- HELPERS ----
+
+
+toYear : Posix -> Int
+toYear =
+    Time.toYear ourTimezone
+
+
+toMonth : Posix -> Time.Month
+toMonth =
+    Time.toMonth ourTimezone
+
+
+toMonthNumber : Posix -> Int
+toMonthNumber =
+    let
+        toMonthNumber_ list month =
+            case list of
+                x :: xs ->
+                    if x == month then
+                        List.length list
+                    else
+                        toMonthNumber_ xs month
+
+                _ ->
+                    0
+    in
+        toMonthNumber_ [ Dec, Nov, Oct, Sep, Aug, Jul, Jun, May, Apr, Mar, Feb, Jan ] << toMonth
+
+
+toDay : Posix -> Int
+toDay =
+    Time.toDay ourTimezone
+
+
+toHour : Posix -> Int
+toHour =
+    Time.toHour ourTimezone
+
+
+toMinute : Posix -> Int
+toMinute =
+    Time.toMinute ourTimezone
+
+
+
 ---- INIT ----
 
 
-ourFormatter : Zone -> Posix -> String
+ourFormatter : List DateFormat.Token
 ourFormatter =
-    DateFormat.format
-        [ DateFormat.monthNameFull
-        , DateFormat.text " "
-        , DateFormat.dayOfMonthSuffix
-        , DateFormat.text ", "
-        , DateFormat.yearNumber
-        ]
+    [ DateFormat.dayOfMonthNumber
+    , DateFormat.text " "
+    , DateFormat.monthNameFirstThree
+    , DateFormat.text " "
+    , DateFormat.yearNumber
+    ]
 
 
 ourTimezone : Zone
 ourTimezone =
-    utc
+    Time.utc
 
 
-ourPrettyDate : Posix -> String
-ourPrettyDate =
-    ourFormatter ourTimezone
-
-
-timeToString value =
-    value |> format
+dateToString : Int -> String
+dateToString date =
+    Time.millisToPosix date
+        |> DateFormat.format
+            ourFormatter
+            ourTimezone
 
 
 initDayPicker : Picker.WheelPicker
 initDayPicker =
     dateRange dayPickerLimits.start dayPickerLimits.end
-        |> List.map timeToString
+        |> List.map dateToString
         |> Picker.defaultWheelPicker 175
 
 
 initHourPicker : Picker.WheelPicker
 initHourPicker =
-    List.range 0 59
+    List.range 0 23
         |> List.map (\value -> intToString 2 value)
         |> Picker.defaultWheelPicker 60
 
@@ -87,14 +131,14 @@ initMinutePicker =
         |> Picker.defaultWheelPicker 60
 
 
-setDate : Date.Date -> Model -> Model
+setDate : Posix -> Model -> Model
 setDate date model =
     { model | date = date }
 
 
 initialModel : Model
 initialModel =
-    { date = Date.fromRataDie 0
+    { date = Time.millisToPosix 0
     , dayPicker = initDayPicker
     , hourPicker = initHourPicker
     , minutePicker = initMinutePicker
@@ -102,7 +146,7 @@ initialModel =
 
 
 type alias Model =
-    { date : Date.Date
+    { date : Posix
     , dayPicker : Picker.WheelPicker
     , hourPicker : Picker.WheelPicker
     , minutePicker : Picker.WheelPicker
@@ -133,24 +177,24 @@ updatePicker pickerId pickerMsg model =
         updateSpecificPicker picker =
             Picker.update pickerMsg picker
     in
-    case pickerId of
-        DayPicker ->
-            ( { model | dayPicker = Tuple.first (updateSpecificPicker model.dayPicker) }
-                |> setDate (dateFromPickers model)
-            , Cmd.map (PickerMsg DayPicker) (Tuple.second (updateSpecificPicker model.dayPicker))
-            )
+        case pickerId of
+            DayPicker ->
+                ( { model | dayPicker = Tuple.first (updateSpecificPicker model.dayPicker) }
+                    |> setDate (dateFromPickers model)
+                , Cmd.map (PickerMsg DayPicker) (Tuple.second (updateSpecificPicker model.dayPicker))
+                )
 
-        HourPicker ->
-            ( { model | hourPicker = Tuple.first (updateSpecificPicker model.hourPicker) }
-                |> setDate (dateFromPickers model)
-            , Cmd.map (PickerMsg HourPicker) (Tuple.second (updateSpecificPicker model.hourPicker))
-            )
+            HourPicker ->
+                ( { model | hourPicker = Tuple.first (updateSpecificPicker model.hourPicker) }
+                    |> setDate (dateFromPickers model)
+                , Cmd.map (PickerMsg HourPicker) (Tuple.second (updateSpecificPicker model.hourPicker))
+                )
 
-        MinutePicker ->
-            ( { model | minutePicker = Tuple.first (updateSpecificPicker model.minutePicker) }
-                |> setDate (dateFromPickers model)
-            , Cmd.map (PickerMsg MinutePicker) (Tuple.second (updateSpecificPicker model.minutePicker))
-            )
+            MinutePicker ->
+                ( { model | minutePicker = Tuple.first (updateSpecificPicker model.minutePicker) }
+                    |> setDate (dateFromPickers model)
+                , Cmd.map (PickerMsg MinutePicker) (Tuple.second (updateSpecificPicker model.minutePicker))
+                )
 
 
 type Msg
@@ -195,12 +239,12 @@ pickerView pickerId picker =
         touchMsgWrapper =
             PickerMsg pickerId << Picker.GetTouch
     in
-    Builder.flexItem
-        [ Attributes.rawAttribute (Touch.onStart (touchMsgWrapper << Picker.StartTouch))
-        , Attributes.rawAttribute (Touch.onMove (touchMsgWrapper << Picker.HoldTouch))
-        , Attributes.rawAttribute (Touch.onEnd (touchMsgWrapper << Picker.StopTouch))
-        ]
-        [ Picker.view picker ]
+        Builder.flexItem
+            [ Attributes.rawAttribute (Touch.onStart (touchMsgWrapper << Picker.StartTouch))
+            , Attributes.rawAttribute (Touch.onMove (touchMsgWrapper << Picker.HoldTouch))
+            , Attributes.rawAttribute (Touch.onEnd (touchMsgWrapper << Picker.StopTouch))
+            ]
+            [ Picker.view picker ]
 
 
 pickerLabelView : String -> Builder.FlexItem Msg
@@ -214,17 +258,22 @@ pickerLabelView text =
         ]
 
 
-dateView : Date.Date -> String
-dateView date =
-    (Date.day date |> String.fromInt)
-        |> Function.flip (++) " "
-        |> Function.flip (++) (Date.month date |> String.fromInt)
-        |> Function.flip (++) " "
-        |> Function.flip (++) (Date.year date |> String.fromInt)
-        |> Function.flip (++) " at "
-        |> Function.flip (++) (intToString 2 (Time.toHour Time.utc date))
-        |> Function.flip (++) ":"
-        |> Function.flip (++) (intToString 2 (Time.toMinute Time.utc date))
+dateView : Posix -> String
+dateView =
+    let
+        formatter =
+            [ DateFormat.monthNameFull
+            , DateFormat.text " "
+            , DateFormat.dayOfMonthSuffix
+            , DateFormat.text ", "
+            , DateFormat.yearNumber
+            , DateFormat.text " at "
+            , DateFormat.hourMilitaryFixed
+            , DateFormat.text ":"
+            , DateFormat.minuteFixed
+            ]
+    in
+        DateFormat.format formatter ourTimezone
 
 
 view : Model -> NodeWithStyle Msg
@@ -261,7 +310,7 @@ view model =
 ---- MAIN ----
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
     Builder.embed
         { init = \_ -> init
@@ -287,7 +336,7 @@ intToString digitsNb value =
                 |> (-) digitsNb
                 |> Function.flip String.repeat "0"
     in
-    String.append additionalZeros baseString
+        String.append additionalZeros baseString
 
 
 dateRange_ : Int -> Int -> List Int -> List Int
@@ -304,7 +353,7 @@ dateRange start end =
         |> List.reverse
 
 
-dateFromPickers : Model -> Date.Date
+dateFromPickers : Model -> Posix
 dateFromPickers model =
     let
         day =
@@ -316,5 +365,5 @@ dateFromPickers model =
         minute =
             Picker.getSelect model.minutePicker
     in
-    (dayPickerLimits.start + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
-        |> Date.fromRataDie
+        (dayPickerLimits.start + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
+            |> Time.millisToPosix
