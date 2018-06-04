@@ -1,4 +1,4 @@
-module Blog exposing (..)
+module Main exposing (..)
 
 {-| This code is something I always dreamt of being able to code with only html
 and styles. I thought it would have taken more time to create, but, in the
@@ -304,12 +304,12 @@ insidePageView data page transition =
         contacts =
             data.contacts
     in
-    case page.route of
-        ContactsIndex ->
-            contactsIndex contacts
+        case page.route of
+            ContactsIndex ->
+                contactsIndex contacts
 
-        ContactsShow id ->
-            contactsShow id contacts
+            ContactsShow id ->
+                contactsShow id contacts
 
 
 view : Model -> NodeWithStyle Msg

@@ -1,4 +1,4 @@
-module Counter exposing (..)
+module Main exposing (..)
 
 import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
