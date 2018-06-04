@@ -1,4 +1,4 @@
-module Helpers.Vector exposing (..)
+module Elegant.Helpers.Vector exposing (..)
 
 
 type alias Vector a =

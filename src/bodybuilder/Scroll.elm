@@ -1,4 +1,4 @@
-module Scroll exposing (..)
+module BodyBuilder.Scroll exposing (..)
 
 import BodyBuilder exposing (..)
 import Json.Decode as Decode
@@ -27,13 +27,13 @@ verticalParallax speed scrollEvent el =
         toto =
             Basics.max ((scrollEvent.scrollPos |> toFloat) * speed |> round) 0
     in
-        div [ style [ Elegant.positionAbsolute ] ]
-            [ div [ style [ Elegant.marginTop (Px -toto) ] ] []
-            , el
-            , div
-                [ style [ Elegant.marginTop (Px toto) ] ]
-                []
-            ]
+    div [ style [ Elegant.positionAbsolute ] ]
+        [ div [ style [ Elegant.marginTop (Px -toto) ] ] []
+        , el
+        , div
+            [ style [ Elegant.marginTop (Px toto) ] ]
+            []
+        ]
 
 
 type alias ScrollEvent =

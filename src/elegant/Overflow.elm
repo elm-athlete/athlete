@@ -1,15 +1,15 @@
-module Overflow
+module Elegant.Overflow
     exposing
-        ( overflowX
-        , overflowY
-        , overflowXY
-        , visible
-        , hidden
-        , auto
-        , scroll
-        , default
-        , FullOverflow
+        ( FullOverflow
         , Overflow(..)
+        , auto
+        , default
+        , hidden
+        , overflowX
+        , overflowXY
+        , overflowY
+        , scroll
+        , visible
         )
 
 {-| Handles Overflow
@@ -27,7 +27,7 @@ module Overflow
 
 -}
 
-import Helpers.Vector exposing (Vector)
+import Elegant.Helpers.Vector exposing (Vector)
 import Modifiers exposing (..)
 
 

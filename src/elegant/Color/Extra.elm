@@ -1,4 +1,4 @@
-module Color.Extra exposing (..)
+module Elegant.Color.Extra exposing (..)
 
 import Color
 

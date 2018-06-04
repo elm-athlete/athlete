@@ -1,20 +1,20 @@
-module Position
+module Elegant.Position
     exposing
-        ( Position
-        , Coordinates
-        , static
+        ( Coordinates
+        , Position
         , absolute
-        , relative
+        , all
+        , bottom
         , fixed
+        , horizontal
+        , left
+        , positionToCouples
+        , relative
+        , right
+        , static
         , sticky
         , top
-        , bottom
-        , left
-        , right
-        , horizontal
         , vertical
-        , all
-        , positionToCouples
         )
 
 {-| Position contains everything about position rendering.
@@ -53,8 +53,8 @@ module Position
 -}
 
 import Helpers.Shared exposing (..)
-import Surrounded exposing (Surrounded)
 import Modifiers exposing (..)
+import Surrounded exposing (Surrounded)
 
 
 {-| Represents a position, whih can be static, absolute, relative, fixed or sticky.
@@ -91,7 +91,7 @@ static =
 absolute : Modifiers Coordinates -> Position
 absolute =
     Surrounded.applyModifiersOnDefault
-        >> PositionDynamic (PositionAbsolute)
+        >> PositionDynamic PositionAbsolute
 
 
 {-| Position the element as relative, and requires coordinates.
@@ -99,7 +99,7 @@ absolute =
 relative : Modifiers Coordinates -> Position
 relative =
     Surrounded.applyModifiersOnDefault
-        >> PositionDynamic (PositionRelative)
+        >> PositionDynamic PositionRelative
 
 
 {-| Position the element as fixed, and requires coordinates.
@@ -107,7 +107,7 @@ relative =
 fixed : Modifiers Coordinates -> Position
 fixed =
     Surrounded.applyModifiersOnDefault
-        >> PositionDynamic (PositionFixed)
+        >> PositionDynamic PositionFixed
 
 
 {-| Position the element as sticky, and requires coordinates.
@@ -115,7 +115,7 @@ fixed =
 sticky : Modifiers Coordinates -> Position
 sticky =
     Surrounded.applyModifiersOnDefault
-        >> PositionDynamic (PositionSticky)
+        >> PositionDynamic PositionSticky
 
 
 defaultSizeUnit : SizeUnit

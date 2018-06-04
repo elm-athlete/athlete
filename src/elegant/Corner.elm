@@ -1,20 +1,20 @@
-module Corner
+module Elegant.Corner
     exposing
         ( Corner
-        , default
         , CornerSet
-        , circular
-        , elliptic
-        , top
-        , topLeft
-        , topRight
-        , right
+        , all
         , bottom
         , bottomLeft
         , bottomRight
-        , left
-        , all
+        , circular
         , cornerToCouples
+        , default
+        , elliptic
+        , left
+        , right
+        , top
+        , topLeft
+        , topRight
         )
 
 {-| Corner contains everything about corner radius (also called border radius in CSS).
@@ -56,8 +56,8 @@ module Corner
 
 -}
 
-import Helpers.Shared exposing (..)
 import Elegant.Setters as Setters
+import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 
 

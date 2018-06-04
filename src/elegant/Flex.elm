@@ -1,4 +1,4 @@
-module Flex
+module Elegant.Flex
     exposing
         ( Align
         , FlexContainerDetails

@@ -1,4 +1,4 @@
-module Helpers.Css
+module Elegant.Helpers.Css
     exposing
         ( addSuffixToClassName
         , applyCssFunction

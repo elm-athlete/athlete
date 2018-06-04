@@ -1,4 +1,4 @@
-module Transform
+module Elegant.Transform
     exposing
         ( Transform
         , backfaceVisibilityHidden

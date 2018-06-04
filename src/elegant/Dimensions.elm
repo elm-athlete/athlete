@@ -1,18 +1,19 @@
-module Dimensions
+module Elegant.Dimensions
     exposing
         ( Dimensions
-        , width
-        , height
-        , square
-        , minWidth
-        , maxWidth
-        , minHeight
-        , maxHeight
         , defaultDimensions
         , dimensionsToCouples
+        , height
+        , maxHeight
+        , maxWidth
+        , minHeight
+        , minWidth
+        , square
+        , width
         )
 
 {-|
+
 @docs width
 @docs height
 @docs square
@@ -23,10 +24,11 @@ module Dimensions
 @docs Dimensions
 @docs defaultDimensions
 @docs dimensionsToCouples
+
 -}
 
-import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
+import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 
 

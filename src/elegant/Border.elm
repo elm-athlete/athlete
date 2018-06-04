@@ -1,22 +1,22 @@
-module Border
+module Elegant.Border
     exposing
         ( Border
-        , default
         , BorderStyle
-        , none
-        , solid
-        , dashed
-        , thickness
-        , top
-        , bottom
-        , right
-        , left
-        , horizontal
-        , vertical
         , all
         , borderToCouples
-        , full
+        , bottom
         , color
+        , dashed
+        , default
+        , full
+        , horizontal
+        , left
+        , none
+        , right
+        , solid
+        , thickness
+        , top
+        , vertical
         )
 
 {-| Border contains everything about borders rendering.
@@ -68,10 +68,10 @@ module Border
 -}
 
 import Color exposing (Color)
-import Helpers.Shared exposing (..)
 import Elegant.Setters exposing (..)
-import Surrounded exposing (Surrounded)
+import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
+import Surrounded exposing (Surrounded)
 
 
 {-| The `Border` record contains everything about one border side.

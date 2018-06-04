@@ -1,39 +1,39 @@
-module Typography
+module Elegant.Typography
     exposing
-        ( Typography
-        , Capitalization
-        , Decoration
-        , WhiteSpaceWrap
-        , UserSelect
-        , Normal
-        , FontTilt
-        , FontFamily
+        ( Capitalization
         , CustomFontFamily
-        , default
+        , Decoration
+        , FontFamily
+        , FontTilt
+        , Normal
+        , Typography
+        , UserSelect
+        , WhiteSpaceWrap
+        , bold
         , capitalize
-        , lowercase
-        , uppercase
-        , underline
-        , lineThrough
-        , noDecoration
-        , whiteSpaceNoWrap
-        , userSelect
-        , weight
-        , tiltNormal
-        , italic
-        , oblique
-        , size
-        , systemFont
+        , color
         , customFont
+        , default
         , fontFamily
         , fontFamilyInherit
         , fontFamilySansSerif
-        , lineHeightNormal
-        , lineHeight
+        , italic
         , letterSpacing
+        , lineHeight
+        , lineHeightNormal
+        , lineThrough
+        , lowercase
+        , noDecoration
+        , oblique
+        , size
+        , systemFont
+        , tiltNormal
         , typographyToCouples
-        , bold
-        , color
+        , underline
+        , uppercase
+        , userSelect
+        , weight
+        , whiteSpaceNoWrap
         )
 
 {-| Typography contains everything about fonts and characters rendering.
@@ -139,9 +139,9 @@ module Typography
 
 import Color exposing (Color)
 import Either exposing (Either(..))
-import Helpers.Shared exposing (..)
-import Helpers.Css
 import Elegant.Setters exposing (..)
+import Helpers.Css
+import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 
 

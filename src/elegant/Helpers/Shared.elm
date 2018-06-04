@@ -1,4 +1,4 @@
-module Helpers.Shared exposing (..)
+module Elegant.Helpers.Shared exposing (..)
 
 {-| -}
 

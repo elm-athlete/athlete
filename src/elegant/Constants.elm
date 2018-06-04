@@ -1,6 +1,7 @@
-module Constants exposing (..)
+module Elegant.Constants exposing (..)
 
 {-|
+
 @docs huge
 @docs large
 @docs medium
@@ -17,6 +18,7 @@ module Constants exposing (..)
 @docs theta
 @docs iota
 @docs kappa
+
 -}
 
 import Helpers.Shared exposing (..)

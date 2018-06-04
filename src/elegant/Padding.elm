@@ -1,15 +1,15 @@
-module Padding
+module Elegant.Padding
     exposing
         ( Padding
-        , default
-        , top
-        , bottom
-        , left
-        , right
-        , horizontal
-        , vertical
         , all
+        , bottom
+        , default
+        , horizontal
+        , left
         , paddingToCouples
+        , right
+        , top
+        , vertical
         )
 
 {-| Padding contains everything about paddings rendering.
@@ -42,9 +42,9 @@ module Padding
 
 -}
 
-import Surrounded exposing (Surrounded)
 import Helpers.Shared exposing (..)
 import Modifiers exposing (..)
+import Surrounded exposing (Surrounded)
 
 
 {-| The `Padding` record contains everything about one padding side.

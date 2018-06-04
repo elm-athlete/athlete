@@ -1,4 +1,4 @@
-module Box
+module Elegant.Box
     exposing
         ( Box
         , Visibility

@@ -1,4 +1,4 @@
-module Cursor exposing (..)
+module Elegant.Cursor exposing (..)
 
 {-| Cursor contains everything about cursors rendering.
 

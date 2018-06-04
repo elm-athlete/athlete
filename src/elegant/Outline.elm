@@ -1,13 +1,13 @@
-module Outline
+module Elegant.Outline
     exposing
         ( Outline
-        , default
         , OutlineStyle
-        , none
-        , solid
         , dashed
-        , thickness
+        , default
+        , none
         , outlineToCouples
+        , solid
+        , thickness
         )
 
 {-| Outline contains everything about outline rendering.

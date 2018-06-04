@@ -1,4 +1,4 @@
-module Surrounded
+module Elegant.Surrounded
     exposing
         ( Surrounded
         , all

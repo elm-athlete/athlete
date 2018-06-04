@@ -1,4 +1,4 @@
-module Finders exposing (..)
+module Bodybuilder.Finders exposing (..)
 
 
 find_by : (a -> b) -> b -> List a -> Maybe a

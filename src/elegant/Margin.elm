@@ -1,17 +1,17 @@
-module Margin
+module Elegant.Margin
     exposing
         ( Margin
-        , default
-        , auto
-        , width
-        , top
-        , right
-        , bottom
-        , left
-        , horizontal
-        , vertical
         , all
+        , auto
+        , bottom
+        , default
+        , horizontal
+        , left
         , marginToCouples
+        , right
+        , top
+        , vertical
+        , width
         )
 
 {-| Margin contains everything about margins rendering.
@@ -52,8 +52,8 @@ module Margin
 
 import Either exposing (Either(..))
 import Helpers.Shared exposing (..)
-import Surrounded exposing (Surrounded)
 import Modifiers exposing (..)
+import Surrounded exposing (Surrounded)
 
 
 {-| The `Margin` record contains everything about one margin side.

@@ -1,4 +1,4 @@
-module Display
+module Elegant.Display
     exposing
         ( Alignment
         , BlockDetails
@@ -82,15 +82,15 @@ every style, for every element. Each element can be block, inline, flow or flex.
 
 -}
 
-import Box
-import Dimensions
-import Elegant.Setters exposing (..)
-import Flex
-import Grid
-import Helpers.Css
-import Helpers.Shared exposing (..)
+import Elegant.Box
+import Elegant.Dimensions
+import Elegant.Flex
+import Elegant.Grid
+import Elegant.Helpers.Css
+import Elegant.Helpers.Shared exposing (..)
+import Elegant.Internals.Setters exposing (..)
+import Elegant.Overflow
 import Modifiers exposing (..)
-import Overflow
 
 
 {-| Represents a box and contains all the style inside.

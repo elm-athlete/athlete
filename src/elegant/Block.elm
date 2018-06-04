@@ -1,4 +1,4 @@
-module Block exposing (..)
+module Elegant.Block exposing (..)
 
 {-|
 

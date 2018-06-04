@@ -1,4 +1,4 @@
-module Background
+module Elegant.Background
     exposing
         ( Angle
         , Background

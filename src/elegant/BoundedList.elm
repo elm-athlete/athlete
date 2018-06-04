@@ -1,4 +1,4 @@
-module BoundedList exposing (BoundedList, content, head, insert, new)
+module Elegant.BoundedList exposing (BoundedList, content, head, insert, new)
 
 import Function
 

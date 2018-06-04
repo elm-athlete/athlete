@@ -1,4 +1,4 @@
-module Grid
+module Elegant.Grid
     exposing
         ( GridContainerCoordinate
         , GridContainerDetails

@@ -1,4 +1,4 @@
-module Shadow
+module Elegant.Shadow
     exposing
         ( Shadow
         , blurRadius

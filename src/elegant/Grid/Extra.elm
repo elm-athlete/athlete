@@ -1,4 +1,4 @@
-module Grid.Extra
+module Elegant.Grid.Extra
     exposing
         ( alignedCell
         , cell

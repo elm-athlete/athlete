@@ -1,4 +1,4 @@
-module Router
+module BodyBuilder.Router
     exposing
         ( History
         , Page

@@ -1,4 +1,4 @@
-module Flex.Extra
+module Elegant.Flex.Extra
     exposing
         ( alignedContent
         )
@@ -9,11 +9,11 @@ module Flex.Extra
 
 -}
 
-import Block
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import Flex
-import Style
+import BodyBuilder.Style
+import Elegant.Block
+import Elegant.Flex
 
 
 {-| alignedContent is a way to align content inside a container.

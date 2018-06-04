@@ -1,6 +1,6 @@
-module Helpers.Style exposing (..)
+module Elegant.Helpers.Style exposing (..)
 
-import Display
+import Elegant.Display
 
 
 type alias Style =
