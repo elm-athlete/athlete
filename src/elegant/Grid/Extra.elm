@@ -13,9 +13,9 @@ module Elegant.Grid.Extra
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import Flex
-import Flex.Extra
-import Grid
+import Elegant.Flex
+import Elegant.Flex.Extra
+import Elegant.Grid
 import Style
 
 

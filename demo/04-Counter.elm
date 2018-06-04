@@ -4,14 +4,14 @@ import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events exposing (..)
 import Border
-import Box
 import Color
 import Color.Extra as Color
 import Constants
 import Dimensions
-import Display
 import Elegant exposing (percent, px, vh)
-import Flex
+import Elegant.Box
+import Elegant.Display
+import Elegant.Flex
 import Padding
 import Style
 import Typography

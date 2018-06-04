@@ -17,7 +17,7 @@ import Block
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
 import BoundedList exposing (BoundedList)
-import Box
+import Elegant.Box
 import Color
 import DateFormat
 import Elegant exposing (Style, deg, percent, px, vh)

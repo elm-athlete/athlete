@@ -4,11 +4,11 @@ import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (style)
 import BodyBuilder.Events
 import Border
-import Box
+import Elegant.Box
 import Color
 import Constants
 import Cursor
-import Display
+import Elegant.Display
 import Elegant exposing (SizeUnit, percent, pt, px, vh)
 import Finders exposing (..)
 import Json.Decode as Decode exposing (Decoder)

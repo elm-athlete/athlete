@@ -126,11 +126,11 @@ compileConditionalStyle { display, suffix, mediaQuery } =
 
 coupleToAtomicClass : Maybe String -> Maybe ( Maybe Int, Maybe Int ) -> ( String, String ) -> AtomicClass
 coupleToAtomicClass suffix mediaQuery property =
-    { mediaQuery = Maybe.map Helpers.Css.generateMediaQuery mediaQuery
-    , className = Helpers.Css.generateClassName suffix property
-    , mediaQueryId = Maybe.map Helpers.Css.generateMediaQueryId mediaQuery
-    , selector = Helpers.Css.generateSelector suffix
-    , property = Helpers.Css.generateProperty property
+    { mediaQuery = Maybe.map Elegant.Helpers.Css.generateMediaQuery mediaQuery
+    , className = Elegant.Helpers.Css.generateClassName suffix property
+    , mediaQueryId = Maybe.map Elegant.Helpers.Css.generateMediaQueryId mediaQuery
+    , selector = Elegant.Helpers.Css.generateSelector suffix
+    , property = Elegant.Helpers.Css.generateProperty property
     }
 
 
@@ -167,7 +167,7 @@ computeStyleToCss className mediaQueryId selector property =
         , className
         , Maybe.withDefault "" mediaQueryId
         , Maybe.withDefault "" selector
-        , Helpers.Css.surroundWithBraces property
+        , Elegant.Helpers.Css.surroundWithBraces property
         ]
 
 

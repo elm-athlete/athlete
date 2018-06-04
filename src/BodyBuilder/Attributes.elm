@@ -213,13 +213,13 @@ It is not compatible with Html.Attributes, though.
 -}
 
 import BodyBuilder.Events exposing (..)
-import BodyBuilder.Setters exposing (..)
-import BodyBuilder.Shared as Shared
+import BodyBuilder.Internals.Setters exposing (..)
+import BodyBuilder.Internals.Shared as Shared
 import Color exposing (Color)
 import Color.Convert
-import Display exposing (BlockDetails)
 import Elegant
 import Elegant.Box
+import Elegant.Display exposing (BlockDetails)
 import Elegant.Flex
 import Elegant.Grid
 import Elegant.Helpers.Shared exposing (..)

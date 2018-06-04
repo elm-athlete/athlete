@@ -111,14 +111,14 @@ It is possible to style those elements using `Style.blockProperties`.
 -}
 
 import BodyBuilder.Attributes exposing (..)
-import BodyBuilder.Convert
-import BodyBuilder.Shared as Shared
+import BodyBuilder.Internals.Convert
+import BodyBuilder.Internals.Shared as Shared
 import Browser
-import Display
 import Elegant
-import Flex exposing (FlexContainerDetails)
+import Elegant.Display
+import Elegant.Flex exposing (FlexContainerDetails)
+import Elegant.Grid
 import Function
-import Grid
 import Html exposing (Html)
 import Html.Attributes
 import List.Extra
@@ -1175,7 +1175,7 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                 defaultAttributes
 
         styles =
-            BodyBuilder.Convert.toElegantStyle
+            BodyBuilder.Internals.Convert.toElegantStyle
                 Nothing
                 Nothing
                 Nothing
@@ -1224,7 +1224,7 @@ computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers
                 defaultAttributes
 
         styleResult =
-            BodyBuilder.Convert.toElegantStyle
+            BodyBuilder.Internals.Convert.toElegantStyle
                 (flexModifiers attributes)
                 (flexItemModifiers attributes)
                 (gridModifiers attributes)

@@ -23,7 +23,7 @@ module BodyBuilder.Style exposing (..)
 -}
 
 import BodyBuilder.Attributes exposing (..)
-import BodyBuilder.Setters exposing (..)
+import BodyBuilder.Internals.Setters exposing (..)
 import Elegant.Box
 import Elegant.Display
 import Elegant.Flex

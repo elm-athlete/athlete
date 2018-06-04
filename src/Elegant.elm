@@ -66,10 +66,10 @@ module Elegant
 -}
 
 import BodyBuilder.Style as CommonStyle
-import Display exposing (DisplayBox)
+import Elegant.Display exposing (DisplayBox)
+import Elegant.Helpers.Shared exposing (..)
 import Elegant.Internals.Convert
 import Elegant.Internals.Setters exposing (..)
-import Helpers.Shared exposing (..)
 import Html exposing (Html)
 import Html.Attributes
 import Modifiers exposing (..)
@@ -254,7 +254,7 @@ toCommonStyle (Style style_) =
 
 {-| -}
 type alias SizeUnit =
-    Helpers.Shared.SizeUnit
+    Elegant.Helpers.Shared.SizeUnit
 
 
 {-| -}

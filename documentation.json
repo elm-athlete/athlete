@@ -2122,7 +2122,7 @@
         "name": "Coordinates",
         "comment": " Represents the coordinates of the element. There is top, bottom, left and right.\n",
         "args": [],
-        "type": "Surrounded.Surrounded Helpers.Shared.SizeUnit"
+        "type": "Surrounded.Surrounded Elegant.Helpers.Shared.SizeUnit"
       }
     ],
     "types": [
@@ -2271,7 +2271,7 @@
         "name": "Margin",
         "comment": " The `Margin` record contains everything about one margin side.\nYou probably won't use it as is, but instead using `Elegant.margin`\nwhich automatically generate an empty `Margin` record. You\ncan then use modifiers. I.E.\n\n    Elegant.margin\n        [ Margin.top <| Margin.width (px 30)\n        , Margin.vertical Margin.auto\n        ]\n\n",
         "args": [],
-        "type": "Either.Either Helpers.Shared.SizeUnit Helpers.Shared.Auto"
+        "type": "Either.Either Elegant.Helpers.Shared.SizeUnit Elegant.Helpers.Shared.Auto"
       }
     ],
     "types": [],
@@ -2342,7 +2342,7 @@
         "name": "Border",
         "comment": " The `Border` record contains everything about one border side.\nYou probably won't use it as is, but instead using `Elegant.border`\nwhich automatically generate an empty `Border` record. You\ncan then use modifiers. I.E.\n\n    Elegant.border\n        [ Border.solid\n        , Border.color Color.blue\n        ]\n\n",
         "args": [],
-        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Helpers.Shared.SizeUnit , style : Maybe.Maybe Border.BorderStyle }"
+        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Elegant.Helpers.Shared.SizeUnit , style : Maybe.Maybe Border.BorderStyle }"
       }
     ],
     "types": [
@@ -2435,7 +2435,7 @@
         "name": "Typography",
         "comment": " The `Typography` record contains everything about fonts rendering,\nincluding character rendering. You probably won't use it as is, but instead using\n`Box.typography` which automatically generate an empty `Typography` record. You\ncan then use modifiers. I.E.\n\n    Box.typography\n        [ Typography.color Color.white\n        , Typography.italic\n        ]\n\n",
         "args": [],
-        "type": "{ capitalization : Maybe.Maybe Typography.Capitalization , decoration : Maybe.Maybe Typography.Decoration , color : Maybe.Maybe Color.Color , whiteSpaceWrap : Maybe.Maybe Typography.WhiteSpaceWrap , userSelect : Maybe.Maybe Typography.UserSelect , lineHeight : Maybe.Maybe (Either.Either Helpers.Shared.SizeUnit Typography.Normal) , weight : Maybe.Maybe Int , tilt : Maybe.Maybe Typography.FontTilt , size : Maybe.Maybe Helpers.Shared.SizeUnit , family : Maybe.Maybe Typography.FontFamily , letterSpacing : Maybe.Maybe Helpers.Shared.SizeUnit }"
+        "type": "{ capitalization : Maybe.Maybe Typography.Capitalization , decoration : Maybe.Maybe Typography.Decoration , color : Maybe.Maybe Color.Color , whiteSpaceWrap : Maybe.Maybe Typography.WhiteSpaceWrap , userSelect : Maybe.Maybe Typography.UserSelect , lineHeight : Maybe.Maybe (Either.Either Elegant.Helpers.Shared.SizeUnit Typography.Normal) , weight : Maybe.Maybe Int , tilt : Maybe.Maybe Typography.FontTilt , size : Maybe.Maybe Elegant.Helpers.Shared.SizeUnit , family : Maybe.Maybe Typography.FontFamily , letterSpacing : Maybe.Maybe Elegant.Helpers.Shared.SizeUnit }"
       },
       {
         "name": "UserSelect",
@@ -2625,7 +2625,7 @@
         "name": "Transform",
         "comment": " The Transform record contains everything about transformations.\nYou probably won't use it as is, but instead using `Box.transform`\nwhich automatically generate an empty `Transform` record. You\ncan then use modifiers. I.E.\n\n    Box.transform\n        [ Transform.translateX (px 30)\n        , Transform.translateY (vw 30)\n        ]\n\n",
         "args": [],
-        "type": "{ translate : Transform.Triplet (Maybe.Maybe Helpers.Shared.SizeUnit) }"
+        "type": "{ translate : Transform.Triplet (Maybe.Maybe Elegant.Helpers.Shared.SizeUnit) }"
       }
     ],
     "types": [],
@@ -2746,7 +2746,7 @@
         "name": "Outline",
         "comment": " The `Outline` record contains everything about one outline side.\nYou probably won't use it as is, but instead using `Elegant.outline`\nwhich automatically generate an empty `Outline` record. You\ncan then use modifiers. I.E.\n\n    Elegant.outline\n        [ Outline.solid\n        , Elegant.color Color.blue\n        ]\n\n",
         "args": [],
-        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Helpers.Shared.SizeUnit , style : Maybe.Maybe Outline.OutlineStyle }"
+        "type": "{ color : Maybe.Maybe Color.Color , thickness : Maybe.Maybe Elegant.Helpers.Shared.SizeUnit , style : Maybe.Maybe Outline.OutlineStyle }"
       }
     ],
     "types": [
@@ -2860,7 +2860,7 @@
         "name": "Corner",
         "comment": " The `Corner` record contains everything about corner radius (also called border radius in CSS).\nYou probably won't use it as is, but instead using `Elegant.corner`\nwhich automatically generate an empty `Corner` record. You\ncan then use modifiers. I.E.\n\n    Elegant.corner\n        [ Corner.circular Corner.all (px 30) ]\n\n",
         "args": [],
-        "type": "{ topLeft : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , topRight : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , bottomRight : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) , bottomLeft : Maybe.Maybe ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) }"
+        "type": "{ topLeft : Maybe.Maybe ( Elegant.Helpers.Shared.SizeUnit, Elegant.Helpers.Shared.SizeUnit ) , topRight : Maybe.Maybe ( Elegant.Helpers.Shared.SizeUnit, Elegant.Helpers.Shared.SizeUnit ) , bottomRight : Maybe.Maybe ( Elegant.Helpers.Shared.SizeUnit, Elegant.Helpers.Shared.SizeUnit ) , bottomLeft : Maybe.Maybe ( Elegant.Helpers.Shared.SizeUnit, Elegant.Helpers.Shared.SizeUnit ) }"
       }
     ],
     "types": [
@@ -2895,7 +2895,7 @@
       {
         "name": "circular",
         "comment": " Set the corner(s) to be round (the two angles are the same).\n",
-        "type": "Corner.CornerSet -> Helpers.Shared.SizeUnit -> Modifiers.Modifier Corner.Corner"
+        "type": "Corner.CornerSet -> Elegant.Helpers.Shared.SizeUnit -> Modifiers.Modifier Corner.Corner"
       },
       {
         "name": "cornerToCouples",
@@ -2910,7 +2910,7 @@
       {
         "name": "elliptic",
         "comment": " Set the corner(s) to be elliptic, i.e. you can specify two different values\nfor the corner(s).\n",
-        "type": "Corner.CornerSet -> Helpers.Shared.SizeUnit -> Helpers.Shared.SizeUnit -> Modifiers.Modifier Corner.Corner"
+        "type": "Corner.CornerSet -> Elegant.Helpers.Shared.SizeUnit -> Elegant.Helpers.Shared.SizeUnit -> Modifiers.Modifier Corner.Corner"
       },
       {
         "name": "left",
@@ -2948,7 +2948,7 @@
         "name": "Shadow",
         "comment": " The Shadow record contains everything about box shadow.\nYou probably won't use it as is, but instead using `Elegant.boxShadow`\nwhich automatically generate an empty `Shadow` record. You\ncan then use modifiers. I.E.\n\n    Elegant.boxShadow\n        [ Shadow.inset True\n        , Shadow.spreadRadius (px 30)\n        ]\n\n",
         "args": [],
-        "type": "{ inset : Bool , spreadRadius : Helpers.Shared.SizeUnit , blurRadius : Helpers.Shared.SizeUnit , color : Color.Color , offset : ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) }"
+        "type": "{ inset : Bool , spreadRadius : Elegant.Helpers.Shared.SizeUnit , blurRadius : Elegant.Helpers.Shared.SizeUnit , color : Color.Color , offset : ( Elegant.Helpers.Shared.SizeUnit, Elegant.Helpers.Shared.SizeUnit ) }"
       }
     ],
     "types": [],
@@ -2961,7 +2961,7 @@
       {
         "name": "blurry",
         "comment": " Creates a plain boxShadow.\n",
-        "type": "Helpers.Shared.SizeUnit -> Helpers.Shared.SizeUnit -> Color.Color -> Modifiers.Modifier Shadow.Shadow"
+        "type": "Helpers.Shared.SizeUnit -> Elegant.Helpers.Shared.SizeUnit -> Color.Color -> Modifiers.Modifier Shadow.Shadow"
       },
       {
         "name": "boxShadowToCouple",
@@ -2986,12 +2986,12 @@
       {
         "name": "offset",
         "comment": " Set the offset of the Shadow.\n",
-        "type": "( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Modifiers.Modifier Shadow.Shadow"
+        "type": "( Elegant.Helpers.Shared.SizeUnit, Elegant.Helpers.Shared.SizeUnit ) -> Modifiers.Modifier Shadow.Shadow"
       },
       {
         "name": "plain",
         "comment": " Creates a plain boxShadow.\n",
-        "type": "( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Color.Color -> Modifiers.Modifier Shadow.Shadow"
+        "type": "( Elegant.Helpers.Shared.SizeUnit, Elegant.Helpers.Shared.SizeUnit ) -> Color.Color -> Modifiers.Modifier Shadow.Shadow"
       },
       {
         "name": "spreadRadius",
@@ -3001,7 +3001,7 @@
       {
         "name": "standard",
         "comment": " Defines a standard boxShadow.\n",
-        "type": "Helpers.Shared.SizeUnit -> Color.Color -> ( Helpers.Shared.SizeUnit, Helpers.Shared.SizeUnit ) -> Modifiers.Modifier Shadow.Shadow"
+        "type": "Helpers.Shared.SizeUnit -> Color.Color -> ( Elegant.Helpers.Shared.SizeUnit, Elegant.Helpers.Shared.SizeUnit ) -> Modifiers.Modifier Shadow.Shadow"
       }
     ],
     "generated-with-elm-version": "0.18.0"
@@ -3014,7 +3014,7 @@
         "name": "GridContainerCoordinate",
         "comment": " ",
         "args": [],
-        "type": "{ gutter : Maybe.Maybe Helpers.Shared.SizeUnit , align : Maybe.Maybe Grid.Align , alignItems : Maybe.Maybe Grid.AlignItems , template : Maybe.Maybe Grid.GridTemplate }"
+        "type": "{ gutter : Maybe.Maybe Elegant.Helpers.Shared.SizeUnit , align : Maybe.Maybe Grid.Align , alignItems : Maybe.Maybe Grid.AlignItems , template : Maybe.Maybe Grid.GridTemplate }"
       },
       {
         "name": "GridContainerDetails",
@@ -3087,7 +3087,7 @@
             "Repeat",
             [
               "Grid.RepeatOption",
-              "List Helpers.Shared.SizeUnit"
+              "List Elegant.Helpers.Shared.SizeUnit"
             ]
           ]
         ]
@@ -3234,7 +3234,7 @@
       {
         "name": "gutterToCouple",
         "comment": " ",
-        "type": "String -> Helpers.Shared.SizeUnit -> ( String, String )"
+        "type": "String -> Elegant.Helpers.Shared.SizeUnit -> ( String, String )"
       },
       {
         "name": "horizontal",
@@ -3274,7 +3274,7 @@
       {
         "name": "repeat",
         "comment": " ",
-        "type": "Grid.RepeatOption -> List Helpers.Shared.SizeUnit -> Grid.Repeatable"
+        "type": "Grid.RepeatOption -> List Elegant.Helpers.Shared.SizeUnit -> Grid.Repeatable"
       },
       {
         "name": "repeatOptionToString",
@@ -3386,7 +3386,7 @@
   },
   {
     "name": "Surrounded",
-    "comment": " Generic module for surrounded values.\n\n@docs Surrounded\n@docs all\n@docs bottom\n@docs default\n@docs horizontal\n@docs left\n@docs right\n@docs surroundedToCouples\n@docs top\n@docs vertical\n@docs applyModifiersOnDefault\n\n",
+    "comment": " Generic module for surrounded values.\n\n@docs Elegant.Surrounded\n@docs all\n@docs bottom\n@docs default\n@docs horizontal\n@docs left\n@docs right\n@docs surroundedToCouples\n@docs top\n@docs vertical\n@docs applyModifiersOnDefault\n\n",
     "aliases": [
       {
         "name": "Surrounded",
@@ -3407,7 +3407,7 @@
       {
         "name": "applyModifiersOnDefault",
         "comment": " ",
-        "type": "Modifiers.Modifiers (Surrounded.Surrounded a) -> Surrounded.Surrounded a"
+        "type": "Modifiers.Modifiers (Surrounded.Surrounded a) -> Elegant.Surrounded.Surrounded a"
       },
       {
         "name": "bottom",
@@ -3437,7 +3437,7 @@
       {
         "name": "surroundedToCouples",
         "comment": " ",
-        "type": "Maybe.Maybe String -> (a -> List ( String, String )) -> Surrounded.Surrounded a -> List ( String, String )"
+        "type": "Maybe.Maybe String -> (a -> List ( String, String )) -> Elegant.Surrounded.Surrounded a -> List ( String, String )"
       },
       {
         "name": "top",
@@ -3466,7 +3466,7 @@
         "name": "FlexItemDetails",
         "comment": " Contains all style which can be used on a flex item.\nThis contains flex-grow, flex-shrink, flex-basis and align-self.\n",
         "args": [],
-        "type": "{ grow : Maybe.Maybe Int , shrink : Maybe.Maybe Int , basis : Maybe.Maybe (Either.Either Helpers.Shared.SizeUnit Helpers.Shared.Auto) , alignSelf : Maybe.Maybe Flex.Align }"
+        "type": "{ grow : Maybe.Maybe Int , shrink : Maybe.Maybe Int , basis : Maybe.Maybe (Either.Either Elegant.Helpers.Shared.SizeUnit Elegant.Helpers.Shared.Auto) , alignSelf : Maybe.Maybe Flex.Align }"
       }
     ],
     "types": [
@@ -3907,13 +3907,13 @@
         "name": "BackgroundImage",
         "comment": " Represents a Background Image, i.e. an image in Background. Contrary to `Image`,\na `BackgroundImage` contains an image and a position. This position set the position of the image\non the background.\n",
         "args": [],
-        "type": "{ image : Maybe.Maybe Background.Image , position : Maybe.Maybe (Helpers.Vector.Vector Helpers.Shared.SizeUnit) }"
+        "type": "{ image : Maybe.Maybe Background.Image , position : Maybe.Maybe (Helpers.Vector.Vector Elegant.Helpers.Shared.SizeUnit) }"
       },
       {
         "name": "ColorStop",
         "comment": " Represents a CSS Color Stop, which contains a Color, and possibly a position.\nThis is automatically generated by `colorStop`.\n",
         "args": [],
-        "type": "{ position : Maybe.Maybe Helpers.Shared.SizeUnit , color : Color.Color }"
+        "type": "{ position : Maybe.Maybe Elegant.Helpers.Shared.SizeUnit , color : Color.Color }"
       },
       {
         "name": "Degree",

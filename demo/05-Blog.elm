@@ -14,14 +14,14 @@ import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
 import Border
-import Box
 import Color
 import Constants
 import Corner
 import Cursor
 import Dimensions
-import Display
 import Elegant exposing (SizeUnit, percent, pt, px, vh)
+import Elegant.Box
+import Elegant.Display
 import Finders exposing (..)
 import Modifiers exposing (..)
 import Outline

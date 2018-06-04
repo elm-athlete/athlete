@@ -76,13 +76,13 @@ import Block
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
-import Box
+import Elegant.Box
 import Color
 import Cursor
 import Dimensions
-import Display
+import Elegant.Display
 import Elegant exposing (SizeUnit, percent, px)
-import Flex
+import Elegant.Flex
 import Html
 import Modifiers exposing (..)
 import Overflow

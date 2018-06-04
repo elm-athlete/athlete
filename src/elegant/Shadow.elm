@@ -46,8 +46,8 @@ module Elegant.Shadow
 
 import Color exposing (Color)
 import Color.Convert
-import Elegant.Setters exposing (..)
-import Helpers.Shared exposing (..)
+import Elegant.Internals.Setters exposing (..)
+import Elegant.Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 
 

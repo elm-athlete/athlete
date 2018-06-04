@@ -139,9 +139,9 @@ module Elegant.Typography
 
 import Color exposing (Color)
 import Either exposing (Either(..))
-import Elegant.Setters exposing (..)
-import Helpers.Css
-import Helpers.Shared exposing (..)
+import Elegant.Helpers.Css
+import Elegant.Helpers.Shared exposing (..)
+import Elegant.Internals.Setters exposing (..)
 import Modifiers exposing (..)
 
 
@@ -586,7 +586,7 @@ extractFontName : CustomFontFamily -> String
 extractFontName customFont_ =
     case customFont_ of
         CustomFont fontName ->
-            Helpers.Css.surroundWithQuotes fontName
+            Elegant.Helpers.Css.surroundWithQuotes fontName
 
         SystemFont fontName ->
             fontName

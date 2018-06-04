@@ -2,10 +2,10 @@ module BodyBuilder.Elements exposing (..)
 
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes
-import Box
 import Dimensions
-import Display
 import Elegant exposing (..)
+import Elegant.Box
+import Elegant.Display
 import Function
 import Position
 import Style

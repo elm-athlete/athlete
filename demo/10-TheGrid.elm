@@ -3,12 +3,12 @@ module Main exposing (..)
 import Block
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import Box
 import Color exposing (Color)
 import Elegant exposing (percent, px, vh)
-import Flex
-import Grid
-import Grid.Extra
+import Elegant.Box
+import Elegant.Flex
+import Elegant.Grid
+import Elegant.Grid.Extra
 import Style
 
 

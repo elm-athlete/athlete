@@ -21,7 +21,7 @@ module Elegant.Constants exposing (..)
 
 -}
 
-import Helpers.Shared exposing (..)
+import Elegant.Helpers.Shared exposing (..)
 
 
 {-| -}

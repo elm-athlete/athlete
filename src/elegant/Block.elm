@@ -18,8 +18,8 @@ module Elegant.Block exposing (..)
 -}
 
 import Dimensions
-import Display
-import Helpers.Shared exposing (..)
+import Elegant.Display
+import Elegant.Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 import Overflow
 

@@ -52,9 +52,9 @@ module Elegant.Position
 
 -}
 
-import Helpers.Shared exposing (..)
+import Elegant.Helpers.Shared exposing (..)
+import Elegant.Surrounded exposing (Surrounded)
 import Modifiers exposing (..)
-import Surrounded exposing (Surrounded)
 
 
 {-| Represents a position, whih can be static, absolute, relative, fixed or sticky.
@@ -69,7 +69,7 @@ type Position
 {-| Represents the coordinates of the element. There is top, bottom, left and right.
 -}
 type alias Coordinates =
-    Surrounded SizeUnit
+    Elegant.Surrounded SizeUnit
 
 
 type DynamicPositionning
@@ -90,7 +90,7 @@ static =
 -}
 absolute : Modifiers Coordinates -> Position
 absolute =
-    Surrounded.applyModifiersOnDefault
+    Elegant.Surrounded.applyModifiersOnDefault
         >> PositionDynamic PositionAbsolute
 
 
@@ -98,7 +98,7 @@ absolute =
 -}
 relative : Modifiers Coordinates -> Position
 relative =
-    Surrounded.applyModifiersOnDefault
+    Elegant.Surrounded.applyModifiersOnDefault
         >> PositionDynamic PositionRelative
 
 
@@ -106,7 +106,7 @@ relative =
 -}
 fixed : Modifiers Coordinates -> Position
 fixed =
-    Surrounded.applyModifiersOnDefault
+    Elegant.Surrounded.applyModifiersOnDefault
         >> PositionDynamic PositionFixed
 
 
@@ -114,7 +114,7 @@ fixed =
 -}
 sticky : Modifiers Coordinates -> Position
 sticky =
-    Surrounded.applyModifiersOnDefault
+    Elegant.Surrounded.applyModifiersOnDefault
         >> PositionDynamic PositionSticky
 
 
@@ -127,49 +127,49 @@ defaultSizeUnit =
 -}
 top : SizeUnit -> Modifier Coordinates
 top =
-    Surrounded.top defaultSizeUnit << modifiersFrom
+    Elegant.Surrounded.top defaultSizeUnit << modifiersFrom
 
 
 {-| Accepts a size, and modify the bottom position.
 -}
 bottom : SizeUnit -> Modifier Coordinates
 bottom =
-    Surrounded.bottom defaultSizeUnit << modifiersFrom
+    Elegant.Surrounded.bottom defaultSizeUnit << modifiersFrom
 
 
 {-| Accepts a size, and modify the left position.
 -}
 left : SizeUnit -> Modifier Coordinates
 left =
-    Surrounded.left defaultSizeUnit << modifiersFrom
+    Elegant.Surrounded.left defaultSizeUnit << modifiersFrom
 
 
 {-| Accepts a size, and modify the right position.
 -}
 right : SizeUnit -> Modifier Coordinates
 right =
-    Surrounded.right defaultSizeUnit << modifiersFrom
+    Elegant.Surrounded.right defaultSizeUnit << modifiersFrom
 
 
 {-| Accepts a size, and modify both the top and bottom positions.
 -}
 horizontal : SizeUnit -> Modifier Coordinates
 horizontal =
-    Surrounded.horizontal defaultSizeUnit << modifiersFrom
+    Elegant.Surrounded.horizontal defaultSizeUnit << modifiersFrom
 
 
 {-| Accepts a size, and modify both the left and right positions.
 -}
 vertical : SizeUnit -> Modifier Coordinates
 vertical =
-    Surrounded.vertical defaultSizeUnit << modifiersFrom
+    Elegant.Surrounded.vertical defaultSizeUnit << modifiersFrom
 
 
 {-| Accepts a size, and modify the four positions.
 -}
 all : SizeUnit -> Modifier Coordinates
 all =
-    Surrounded.all defaultSizeUnit << modifiersFrom
+    Elegant.Surrounded.all defaultSizeUnit << modifiersFrom
 
 
 {-| Compiles a `Position` to the corresponding CSS list of tuples.
@@ -181,7 +181,7 @@ positionToCouples position =
         PositionDynamic dynamicPositionningType coordinates ->
             List.concat
                 [ [ ( "position", dynamicTypeToString dynamicPositionningType ) ]
-                , Surrounded.surroundedToCouples Nothing coordinatesToString coordinates
+                , Elegant.Surrounded.surroundedToCouples Nothing coordinatesToString coordinates
                 ]
 
         PositionStatic ->

@@ -328,7 +328,7 @@ extractDisplayBoxCouples val =
 outsideInsideDisplayToCouples : OutsideDisplay -> InsideDisplay -> List ( String, String )
 outsideInsideDisplayToCouples outsideDisplay =
     insideDisplayToCouples
-        >> Helpers.Css.joiner (outsideDisplayToCouples outsideDisplay)
+        >> Elegant.Helpers.Css.joiner (outsideDisplayToCouples outsideDisplay)
         >> convertDisplayToLegacyCss
 
 

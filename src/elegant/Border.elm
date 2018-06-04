@@ -68,10 +68,10 @@ module Elegant.Border
 -}
 
 import Color exposing (Color)
-import Elegant.Setters exposing (..)
-import Helpers.Shared exposing (..)
+import Elegant.Helpers.Shared exposing (..)
+import Elegant.Internals.Setters exposing (..)
+import Elegant.Surrounded exposing (Surrounded)
 import Modifiers exposing (..)
-import Surrounded exposing (Surrounded)
 
 
 {-| The `Border` record contains everything about one border side.
@@ -148,49 +148,49 @@ color =
 -}
 top : Modifiers Border -> Modifier (Surrounded Border)
 top =
-    Surrounded.top default
+    Elegant.Surrounded.top default
 
 
 {-| Accepts a list of border modifiers, and modify the bottom side of the border.
 -}
 bottom : Modifiers Border -> Modifier (Surrounded Border)
 bottom =
-    Surrounded.bottom default
+    Elegant.Surrounded.bottom default
 
 
 {-| Accepts a list of border modifiers, and modify the left side of the border.
 -}
 left : Modifiers Border -> Modifier (Surrounded Border)
 left =
-    Surrounded.left default
+    Elegant.Surrounded.left default
 
 
 {-| Accepts a list of border modifiers, and modify the right side of the border.
 -}
 right : Modifiers Border -> Modifier (Surrounded Border)
 right =
-    Surrounded.right default
+    Elegant.Surrounded.right default
 
 
 {-| Accepts a list of border modifiers, and modify both the top and the bottom side of the border.
 -}
 horizontal : Modifiers Border -> Modifier (Surrounded Border)
 horizontal =
-    Surrounded.horizontal default
+    Elegant.Surrounded.horizontal default
 
 
 {-| Accepts a list of border modifiers, and modify both the right and left side of the border.
 -}
 vertical : Modifiers Border -> Modifier (Surrounded Border)
 vertical =
-    Surrounded.vertical default
+    Elegant.Surrounded.vertical default
 
 
 {-| Accepts a list of border modifiers, and modify the four sides of the border.
 -}
 all : Modifiers Border -> Modifier (Surrounded Border)
 all =
-    Surrounded.all default
+    Elegant.Surrounded.all default
 
 
 {-| Accepts a color modifier
@@ -203,9 +203,9 @@ full borderColor =
 {-| Compiles a `Surrounded Border` record to the corresponding CSS list of tuples.
 Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
-borderToCouples : Surrounded Border -> List ( String, String )
+borderToCouples : Elegant.Surrounded Border -> List ( String, String )
 borderToCouples =
-    Surrounded.surroundedToCouples (Just "border") borderSideToCouples
+    Elegant.Surrounded.surroundedToCouples (Just "border") borderSideToCouples
 
 
 

@@ -51,9 +51,9 @@ module Elegant.Margin
 -}
 
 import Either exposing (Either(..))
-import Helpers.Shared exposing (..)
+import Elegant.Helpers.Shared exposing (..)
+import Elegant.Surrounded exposing (Surrounded)
 import Modifiers exposing (..)
-import Surrounded exposing (Surrounded)
 
 
 {-| The `Margin` record contains everything about one margin side.
@@ -97,57 +97,57 @@ width value margin =
 -}
 top : Modifier Margin -> Modifier (Surrounded Margin)
 top =
-    Surrounded.top default << List.singleton
+    Elegant.Surrounded.top default << List.singleton
 
 
 {-| Accepts a margin modifier, and modify the bottom side of the margin.
 -}
 bottom : Modifier Margin -> Modifier (Surrounded Margin)
 bottom =
-    Surrounded.bottom default << List.singleton
+    Elegant.Surrounded.bottom default << List.singleton
 
 
 {-| Accepts a margin modifier, and modify the left side of the margin.
 -}
 left : Modifier Margin -> Modifier (Surrounded Margin)
 left =
-    Surrounded.left default << List.singleton
+    Elegant.Surrounded.left default << List.singleton
 
 
 {-| Accepts a margin modifier, and modify the right side of the margin.
 -}
 right : Modifier Margin -> Modifier (Surrounded Margin)
 right =
-    Surrounded.right default << List.singleton
+    Elegant.Surrounded.right default << List.singleton
 
 
 {-| Accepts a margin modifier, and modify both the top and the bottom side of the margin.
 -}
 horizontal : Modifier Margin -> Modifier (Surrounded Margin)
 horizontal =
-    Surrounded.horizontal default << List.singleton
+    Elegant.Surrounded.horizontal default << List.singleton
 
 
 {-| Accepts a margin modifier, and modify both the right and left side of the margin.
 -}
 vertical : Modifier Margin -> Modifier (Surrounded Margin)
 vertical =
-    Surrounded.vertical default << List.singleton
+    Elegant.Surrounded.vertical default << List.singleton
 
 
 {-| Accepts a margin modifier, and modify the four sides of the margin.
 -}
 all : Modifier Margin -> Modifier (Surrounded Margin)
 all =
-    Surrounded.all default << List.singleton
+    Elegant.Surrounded.all default << List.singleton
 
 
 {-| Compiles a `Surrounded Margin` record to the corresponding CSS list of tuples.
 Compiles only styles which are defined, ignoring `Nothing` fields.
 -}
-marginToCouples : Surrounded Margin -> List ( String, String )
+marginToCouples : Elegant.Surrounded Margin -> List ( String, String )
 marginToCouples =
-    Surrounded.surroundedToCouples (Just "margin") marginSideToCouples
+    Elegant.Surrounded.surroundedToCouples (Just "margin") marginSideToCouples
 
 
 

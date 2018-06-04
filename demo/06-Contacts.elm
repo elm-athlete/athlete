@@ -12,17 +12,17 @@ import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements as Elements
 import BodyBuilder.Events as Events
 import Border
-import Box
+import Elegant.Box
 import Color
 import Constants
 import Cursor
 import Dict exposing (Dict)
 import Dict.Extra as Dict
 import Dimensions
-import Display
 import Elegant exposing (SizeUnit, percent, pt, px, vh)
+import Elegant.Display
+import Elegant.Flex
 import Finders exposing (..)
-import Flex
 import Function
 import Outline
 import Overflow
@@ -304,12 +304,12 @@ insidePageView data page transition =
         contacts =
             data.contacts
     in
-        case page.route of
-            ContactsIndex ->
-                contactsIndex contacts
+    case page.route of
+        ContactsIndex ->
+            contactsIndex contacts
 
-            ContactsShow id ->
-                contactsShow id contacts
+        ContactsShow id ->
+            contactsShow id contacts
 
 
 view : Model -> NodeWithStyle Msg

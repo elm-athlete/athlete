@@ -20,6 +20,7 @@ module BodyBuilder.Events
         , onCheck
         , onClick
         , onContextMenu
+        , onCustom
         , onDoubleClick
         , onEventToHtmlAttributes
         , onFocus
@@ -31,7 +32,6 @@ module BodyBuilder.Events
         , onMouseOver
         , onMouseUp
         , onSubmit
-        , onCustom
         , submitEventToHtmlEvent
         )
 
@@ -75,9 +75,9 @@ It is not compatible with Html, though.
 
 -}
 
-import BodyBuilder.Setters exposing (..)
+import BodyBuilder.Internals.Setters exposing (..)
 import Color exposing (Color)
-import Helpers.Shared exposing (..)
+import Elegant.Helpers.Shared exposing (..)
 import Html
 import Html.Events
 import Json.Decode exposing (Decoder)
@@ -324,7 +324,7 @@ onCustom event decoder attrs =
             , preventDefault = preventDefault
             }
     in
-        { attrs | onEvent = Just ( event, VirtualDom.Custom (Json.Decode.map syncRecord decoder) ) }
+    { attrs | onEvent = Just ( event, VirtualDom.Custom (Json.Decode.map syncRecord decoder) ) }
 
 
 {-| -}

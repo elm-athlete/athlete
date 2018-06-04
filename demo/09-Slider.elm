@@ -4,12 +4,12 @@ import Block
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes exposing (style)
 import Border
-import Box
 import Color
 import Constants
 import Dimensions
-import Display
 import Elegant exposing (px)
+import Elegant.Box
+import Elegant.Display
 import Padding
 import Style exposing (block, box)
 

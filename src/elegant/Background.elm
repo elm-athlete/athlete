@@ -65,10 +65,10 @@ and positionning them on the page.
 
 import Color exposing (Color)
 import Color.Convert
-import Elegant.Setters exposing (..)
-import Helpers.Css
-import Helpers.Shared exposing (..)
-import Helpers.Vector exposing (Vector)
+import Elegant.Helpers.Css
+import Elegant.Helpers.Shared exposing (..)
+import Elegant.Helpers.Vector exposing (Vector)
+import Elegant.Internals.Setters exposing (..)
 import Maybe.Extra
 import Modifiers exposing (..)
 
@@ -336,8 +336,8 @@ imageToString image_ =
 
         Source string ->
             string
-                |> Helpers.Css.surroundWithSingleQuotes
-                |> Helpers.Css.applyCssFunction "url"
+                |> Elegant.Helpers.Css.surroundWithSingleQuotes
+                |> Elegant.Helpers.Css.applyCssFunction "url"
 
 
 gradientToString : Gradient -> String
@@ -352,7 +352,7 @@ gradientToString gradient_ =
             ]
                 |> List.concat
                 |> String.join ", "
-                |> Helpers.Css.applyCssFunction "linear-gradient"
+                |> Elegant.Helpers.Css.applyCssFunction "linear-gradient"
 
         Radial { first, colorStops, last } ->
             [ [ colorStopToString first ]
@@ -361,7 +361,7 @@ gradientToString gradient_ =
             ]
                 |> List.concat
                 |> String.join ", "
-                |> Helpers.Css.applyCssFunction "radial-gradient"
+                |> Elegant.Helpers.Css.applyCssFunction "radial-gradient"
 
 
 colorStopsToList : Maybe (List ColorStop) -> List String

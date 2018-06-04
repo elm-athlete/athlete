@@ -4,13 +4,13 @@ import Background
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
 import Border
-import Box
 import Color exposing (Color)
 import Corner
 import Cursor
 import Dimensions
-import Display
 import Elegant exposing (px)
+import Elegant.Box
+import Elegant.Display
 import Html exposing (Html)
 import Margin
 import Outline

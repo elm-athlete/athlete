@@ -4,13 +4,13 @@ import Block
 import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
-import Box
+import Elegant.Box
 import Color exposing (..)
 import Color.Manipulate as Color
 import Constants
-import Display
+import Elegant.Display
 import Elegant exposing (SizeUnit, percent, pt, px, vh)
-import Flex
+import Elegant.Flex
 import Function exposing (..)
 import Modifiers exposing (..)
 import Style

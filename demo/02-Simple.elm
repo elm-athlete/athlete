@@ -3,8 +3,8 @@ module Main exposing (..)
 import Block
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import Box
 import Elegant exposing (Style, px)
+import Elegant.Box
 import Style
 import Typography
 

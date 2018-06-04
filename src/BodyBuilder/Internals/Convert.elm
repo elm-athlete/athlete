@@ -1,14 +1,14 @@
 module BodyBuilder.Internals.Convert exposing (..)
 
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Setters exposing (..)
-import Box
+import BodyBuilder.Internals.Setters exposing (..)
 import Dict exposing (Dict)
-import Display
 import Elegant
-import Flex
+import Elegant.Box
+import Elegant.Display
+import Elegant.Flex
+import Elegant.Grid
 import Function
-import Grid
 import List.Extra
 import Maybe.Extra
 import Modifiers exposing (..)

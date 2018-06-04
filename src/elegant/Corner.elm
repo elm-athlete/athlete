@@ -56,8 +56,8 @@ module Elegant.Corner
 
 -}
 
-import Elegant.Setters as Setters
-import Helpers.Shared exposing (..)
+import Elegant.Helpers.Shared exposing (..)
+import Elegant.Internals.Setters as Setters
 import Modifiers exposing (..)
 
 

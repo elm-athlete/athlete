@@ -123,7 +123,7 @@ module Elegant.Grid
 
 -}
 
-import Helpers.Shared exposing (..)
+import Elegant.Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 
 

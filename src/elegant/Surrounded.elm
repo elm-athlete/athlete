@@ -15,7 +15,7 @@ module Elegant.Surrounded
 
 {-| Generic module for surrounded values.
 
-@docs Surrounded
+@docs Elegant.Surrounded
 @docs all
 @docs bottom
 @docs default
@@ -29,15 +29,15 @@ module Elegant.Surrounded
 
 -}
 
-import Elegant.Setters exposing (..)
+import Elegant.Internals.Setters exposing (..)
 import Function
-import Helpers.Shared exposing (..)
+import Elegant.Helpers.Shared exposing (..)
 import List.Extra
 import Modifiers exposing (..)
 
 
 {-| -}
-type alias Surrounded surroundType =
+type alias Elegant.Surrounded surroundType =
     { top : Maybe surroundType
     , right : Maybe surroundType
     , bottom : Maybe surroundType
@@ -46,9 +46,9 @@ type alias Surrounded surroundType =
 
 
 {-| -}
-default : Surrounded a
+default : Elegant.Surrounded a
 default =
-    Surrounded Nothing Nothing Nothing Nothing
+    Elegant.Surrounded Nothing Nothing Nothing Nothing
 
 
 {-| -}
@@ -95,7 +95,7 @@ all default_ modifiers =
 
 
 {-| -}
-applyModifiersOnDefault : Modifiers (Surrounded a) -> Surrounded a
+applyModifiersOnDefault : Modifiers (Surrounded a) -> Elegant.Surrounded a
 applyModifiersOnDefault modifiers =
     default
         |> Function.compose modifiers
@@ -105,7 +105,7 @@ applyModifiersOnDefault modifiers =
 surroundedToCouples :
     Maybe String
     -> (a -> List ( String, String ))
-    -> Surrounded a
+    -> Elegant.Surrounded a
     -> List ( String, String )
 surroundedToCouples prefix toCouple border =
     [ unwrapToCouples .top toCouple

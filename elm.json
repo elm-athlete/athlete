@@ -4,12 +4,6 @@
     "summary": "Native looking apps builder on the web",
     "license": "BSD-3-Clause",
     "version": "1.0.0",
-    "source-directories": [
-        "src",
-        "src/elegant",
-        "src/bodybuilder",
-        "src/temporary_dependencies"
-    ],
     "exposed-modules": [
         "Modifiers",
         "Elegant",

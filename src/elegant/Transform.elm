@@ -52,8 +52,8 @@ module Elegant.Transform
 
 -}
 
-import Elegant.Setters exposing (..)
-import Helpers.Shared exposing (..)
+import Elegant.Internals.Setters exposing (..)
+import Elegant.Helpers.Shared exposing (..)
 import Modifiers exposing (..)
 
 

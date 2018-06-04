@@ -113,22 +113,22 @@ It contains only modifiers, and they can be found in the respective modules.
 
 -}
 
-import Background
-import Border
 import Color exposing (Color)
-import Corner
-import Cursor
-import Elegant.Setters exposing (..)
-import Helpers.Shared exposing (..)
-import Margin
+import Elegant.Background
+import Elegant.Border
+import Elegant.Corner
+import Elegant.Cursor
+import Elegant.Helpers.Shared exposing (..)
+import Elegant.Internals.Setters exposing (..)
+import Elegant.Margin
+import Elegant.Outline
+import Elegant.Padding
+import Elegant.Position
+import Elegant.Shadow
+import Elegant.Surrounded exposing (Surrounded)
+import Elegant.Transform
+import Elegant.Typography
 import Modifiers exposing (..)
-import Outline
-import Padding
-import Position
-import Shadow
-import Surrounded exposing (Surrounded)
-import Transform
-import Typography
 
 
 {-| Represents a box, handling the properties of blocks. They are automatically
@@ -206,7 +206,7 @@ background =
 -}
 border : Modifiers (Surrounded Border.Border) -> Modifier Box
 border =
-    getModifyAndSet .border setBorderIn Surrounded.default
+    getModifyAndSet .border setBorderIn Elegant.Surrounded.default
 
 
 {-| Accepts a list of modifiers for the `transform` and modifies the Box accordingly.
@@ -248,7 +248,7 @@ cursor =
 -}
 margin : Modifiers (Surrounded Margin.Margin) -> Modifier Box
 margin =
-    getModifyAndSet .margin setMarginIn Surrounded.default
+    getModifyAndSet .margin setMarginIn Elegant.Surrounded.default
 
 
 {-| Accepts a size for the `opacity` and modifies the Box accordingly.
@@ -278,7 +278,7 @@ outline =
 -}
 padding : Modifiers (Surrounded Padding.Padding) -> Modifier Box
 padding =
-    getModifyAndSet .padding setPaddingIn Surrounded.default
+    getModifyAndSet .padding setPaddingIn Elegant.Surrounded.default
 
 
 {-| Accepts a list of modifiers for the `Typography` and modifies the Box accordingly.
