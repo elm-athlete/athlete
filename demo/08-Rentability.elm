@@ -3,19 +3,8 @@ module Main exposing (..)
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (style)
 import BodyBuilder.Events
-import Border
-import Elegant.Box
-import Color
-import Constants
-import Cursor
-import Elegant.Display
-import Elegant exposing (SizeUnit, percent, pt, px, vh)
-import Finders exposing (..)
-import Json.Decode as Decode exposing (Decoder)
-import Modifiers exposing (..)
-import Outline
-import Padding
-import Router
+import BodyBuilder.Finders exposing (..)
+import BodyBuilder.Router
     exposing
         ( History
         , Page
@@ -29,10 +18,21 @@ import Router
         , pageWithHeader
         , push
         )
-import Style
+import BodyBuilder.Style
+import Color
+import Elegant exposing (SizeUnit, percent, pt, px, vh)
+import Elegant.Border
+import Elegant.Box
+import Elegant.Constants
+import Elegant.Cursor
+import Elegant.Display
+import Elegant.Outline
+import Elegant.Padding
+import Elegant.Typography
+import Json.Decode as Decode exposing (Decoder)
+import Modifiers exposing (..)
 import Task
 import Time exposing (Posix)
-import Typography
 
 
 type alias Persisted a =
@@ -248,7 +248,7 @@ monthlyBankDebt model =
         n =
             yearsOfDebt * 12
     in
-        (k * (t / 12)) / (1 - ((1 + t / 12) ^ -n)) |> round
+    (k * (t / 12)) / (1 - ((1 + t / 12) ^ -n)) |> round
 
 
 minSalary : AppartmentAttributes -> Int
@@ -457,21 +457,21 @@ insidePageView data page transition =
         appartments =
             data.appartments
     in
-        case page.route of
-            AppartmentsIndex ->
-                appartmentsIndex appartments
+    case page.route of
+        AppartmentsIndex ->
+            appartmentsIndex appartments
 
-            AppartmentsIndexEdit ->
-                appartmentsIndexEdit appartments
+        AppartmentsIndexEdit ->
+            appartmentsIndexEdit appartments
 
-            AppartmentsShow id ->
-                appartmentsShow id appartments
+        AppartmentsShow id ->
+            appartmentsShow id appartments
 
-            AppartmentsEdit id ->
-                appartmentsEdit id appartments
+        AppartmentsEdit id ->
+            appartmentsEdit id appartments
 
-            AppartmentsNew ->
-                appartmentsNew data.draftAppartment
+        AppartmentsNew ->
+            appartmentsNew data.draftAppartment
 
 
 view : Model -> NodeWithStyle Msg
@@ -512,10 +512,10 @@ updateAppartmentBasedOnMsg msg appartment =
         attributes =
             appartment.attributes
     in
-        { appartment
-            | attributes =
-                updateAppartmentAttributesBasedOnMsg msg attributes
-        }
+    { appartment
+        | attributes =
+            updateAppartmentAttributesBasedOnMsg msg attributes
+    }
 
 
 updateAppartmentHelper : Appartment -> UpdateAppartmentMsg -> Model -> Model
@@ -535,7 +535,7 @@ updateAppartmentHelper appartment msg model =
         newData =
             { data | appartments = newAppartments }
     in
-        { model | data = newData }
+    { model | data = newData }
 
 
 updateAppartment : Int -> UpdateAppartmentMsg -> Model -> Model
@@ -544,12 +544,12 @@ updateAppartment id customMsg model =
         maybeAppartment =
             model.data.appartments |> find_by .id id
     in
-        case maybeAppartment of
-            Nothing ->
-                model
+    case maybeAppartment of
+        Nothing ->
+            model
 
-            Just appartment ->
-                updateAppartmentHelper appartment customMsg model
+        Just appartment ->
+            updateAppartmentHelper appartment customMsg model
 
 
 updateAppartmentAttributes : UpdateAppartmentMsg -> Model -> Model
@@ -564,7 +564,7 @@ updateAppartmentAttributes customMsg model =
         newData =
             { data | draftAppartment = newAppartmentAttributes }
     in
-        { model | data = newData }
+    { model | data = newData }
 
 
 draftAppartmentToAppartment : { a | newId : Int, createdAt : Posix } -> AppartmentAttributes -> Appartment
@@ -596,7 +596,7 @@ saveAppartmentAttributes currentTime ({ data } as model) =
                 , draftAppartment = initAppartmentAttributes
             }
     in
-        { model | data = newData }
+    { model | data = newData }
 
 
 performSuccessfulTask : a -> Cmd a
@@ -613,7 +613,7 @@ destroyAppartment id model =
         newData =
             { data | appartments = data.appartments |> List.filter (\e -> e.id /= id) }
     in
-        { model | data = newData }
+    { model | data = newData }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

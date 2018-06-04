@@ -2,13 +2,13 @@ module BodyBuilder.Elements exposing (..)
 
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes
-import Dimensions
+import BodyBuilder.Style
 import Elegant exposing (..)
 import Elegant.Box
+import Elegant.Dimensions
 import Elegant.Display
+import Elegant.Position
 import Function
-import Position
-import Style
 
 
 stickyView :

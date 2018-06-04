@@ -13,20 +13,8 @@ I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
-import Border
-import Color
-import Constants
-import Corner
-import Cursor
-import Dimensions
-import Elegant exposing (SizeUnit, percent, pt, px, vh)
-import Elegant.Box
-import Elegant.Display
-import Finders exposing (..)
-import Modifiers exposing (..)
-import Outline
-import Padding
-import Router
+import BodyBuilder.Finders exposing (..)
+import BodyBuilder.Router
     exposing
         ( History
         , Page
@@ -39,9 +27,21 @@ import Router
         , pageWithDefaultTransition
         , push
         )
-import Style
+import BodyBuilder.Style
+import Color
+import Elegant exposing (SizeUnit, percent, pt, px, vh)
+import Elegant.Border
+import Elegant.Box
+import Elegant.Constants
+import Elegant.Corner
+import Elegant.Cursor
+import Elegant.Dimensions
+import Elegant.Display
+import Elegant.Outline
+import Elegant.Padding
+import Elegant.Typography
+import Modifiers exposing (..)
 import Time
-import Typography
 
 
 type Route

@@ -3,20 +3,20 @@ module Main exposing (main)
 -- import SingleTouch
 
 import AnimationFrame
-import Block
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements.WheelPicker as Picker
+import BodyBuilder.Style
 import DateFormat
 import Elegant exposing (px)
+import Elegant.Block
 import Elegant.Box
 import Elegant.Flex
+import Elegant.Margin
+import Elegant.Typography
 import Function
-import Margin
-import Style
 import Time exposing (Month(..), Posix, Zone)
 import Touch
-import Typography
 
 
 ---- CONSTANTS ----

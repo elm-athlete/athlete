@@ -11,24 +11,8 @@ import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements as Elements
 import BodyBuilder.Events as Events
-import Border
-import Elegant.Box
-import Color
-import Constants
-import Cursor
-import Dict exposing (Dict)
-import Dict.Extra as Dict
-import Dimensions
-import Elegant exposing (SizeUnit, percent, pt, px, vh)
-import Elegant.Display
-import Elegant.Flex
-import Finders exposing (..)
-import Function
-import Outline
-import Overflow
-import Padding
-import Position
-import Router
+import BodyBuilder.Finders exposing (..)
+import BodyBuilder.Router
     exposing
         ( History
         , Page
@@ -41,8 +25,24 @@ import Router
         , pageWithDefaultTransition
         , push
         )
-import Style
-import Typography
+import BodyBuilder.Style
+import Color
+import Dict exposing (Dict)
+import Dict.Extra as Dict
+import Elegant exposing (SizeUnit, percent, pt, px, vh)
+import Elegant.Border
+import Elegant.Box
+import Elegant.Constants
+import Elegant.Cursor
+import Elegant.Dimensions
+import Elegant.Display
+import Elegant.Flex
+import Elegant.Outline
+import Elegant.Overflow
+import Elegant.Padding
+import Elegant.Position
+import Elegant.Typography
+import Function
 
 
 type Route

@@ -1,21 +1,21 @@
 module Main exposing (..)
 
-import Background
-import Block
 import BodyBuilder as B exposing (Node)
 import BodyBuilder.Attributes as A
 import BodyBuilder.Events as E
-import Elegant.Box
+import BodyBuilder.Style as S
 import Color exposing (Color)
-import Constants as C
-import Elegant.Display
 import Elegant exposing (percent, px, vh)
+import Elegant.Background
+import Elegant.Block
+import Elegant.Box
+import Elegant.Constants as C
+import Elegant.Display
+import Elegant.Flex
 import Elegant.Grid
 import Elegant.Helpers.Shared
-import Elegant.Flex
+import Elegant.Shadow
 import Modifiers exposing (Modifier, Modifiers)
-import Shadow
-import Style as S
 import Update
 
 

@@ -17,11 +17,11 @@ module Elegant.Block exposing (..)
 
 -}
 
-import Dimensions
+import Elegant.Dimensions
 import Elegant.Display
 import Elegant.Helpers.Shared exposing (..)
+import Elegant.Overflow
 import Modifiers exposing (..)
-import Overflow
 
 
 {-| -}

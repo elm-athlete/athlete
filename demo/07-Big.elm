@@ -1,25 +1,25 @@
 module Main exposing (..)
 
-import Background
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import Border
+import BodyBuilder.Style
 import Color exposing (Color)
-import Corner
-import Cursor
-import Dimensions
 import Elegant exposing (px)
+import Elegant.Background
+import Elegant.Border
 import Elegant.Box
+import Elegant.Corner
+import Elegant.Cursor
+import Elegant.Dimensions
 import Elegant.Display
+import Elegant.Margin
+import Elegant.Outline
+import Elegant.Overflow
+import Elegant.Padding
+import Elegant.Position
+import Elegant.Shadow
+import Elegant.Typography
 import Html exposing (Html)
-import Margin
-import Outline
-import Overflow
-import Padding
-import Position
-import Shadow
-import Style
-import Typography
 
 
 main =

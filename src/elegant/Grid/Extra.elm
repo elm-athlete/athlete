@@ -13,10 +13,10 @@ module Elegant.Grid.Extra
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
+import BodyBuilder.Style
 import Elegant.Flex
 import Elegant.Flex.Extra
 import Elegant.Grid
-import Style
 
 
 {-| a cell inside a grid with alignement of it's content

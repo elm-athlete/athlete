@@ -3,18 +3,18 @@ module Main exposing (..)
 import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events exposing (..)
-import Border
+import BodyBuilder.Style
 import Color
-import Color.Extra as Color
-import Constants
-import Dimensions
 import Elegant exposing (percent, px, vh)
+import Elegant.Border
 import Elegant.Box
+import Elegant.Color.Extra as Color
+import Elegant.Constants
+import Elegant.Dimensions
 import Elegant.Display
 import Elegant.Flex
-import Padding
-import Style
-import Typography
+import Elegant.Padding
+import Elegant.Typography
 
 
 buttonStyle =

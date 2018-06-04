@@ -72,26 +72,26 @@ pages and history (backward and forward)
 -- import Dom
 
 import AnimationFrame
-import Block
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
-import Elegant.Box
+import BodyBuilder.Style
 import Color
-import Cursor
-import Dimensions
-import Elegant.Display
 import Elegant exposing (SizeUnit, percent, px)
+import Elegant.Block
+import Elegant.Box
+import Elegant.Cursor
+import Elegant.Dimensions
+import Elegant.Display
 import Elegant.Flex
+import Elegant.Overflow
+import Elegant.Padding
+import Elegant.Position
+import Elegant.Transform
+import Elegant.Typography
 import Html
 import Modifiers exposing (..)
-import Overflow
-import Padding
-import Position
-import Style
 import Task
-import Transform
-import Typography
 
 
 type Easing
