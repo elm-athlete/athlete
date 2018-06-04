@@ -24,8 +24,22 @@ import DateFormat
 
 dayPickerLimits : { start : Int, end : Int }
 dayPickerLimits =
-    { start = 1544828400000
-    , end = 1547506800000
+    { start = 1513299600000
+    , end = 1515891600000
+    }
+
+
+hourPickerLimits : { start : Int, end : Int }
+hourPickerLimits =
+    { start = 3600000
+    , end = 82800000
+    }
+
+
+minutePickerLimits : { start : Int, end : Int }
+minutePickerLimits =
+    { start = 0
+    , end = 3540000
     }
 
 
@@ -37,98 +51,53 @@ toMs =
     }
 
 
-
----- HELPERS ----
-
-
-toYear : Posix -> Int
-toYear =
-    Time.toYear ourTimezone
-
-
-toMonth : Posix -> Time.Month
-toMonth =
-    Time.toMonth ourTimezone
-
-
-toMonthNumber : Posix -> Int
-toMonthNumber =
-    let
-        toMonthNumber_ list month =
-            case list of
-                x :: xs ->
-                    if x == month then
-                        List.length list
-                    else
-                        toMonthNumber_ xs month
-
-                _ ->
-                    0
-    in
-        toMonthNumber_ [ Dec, Nov, Oct, Sep, Aug, Jul, Jun, May, Apr, Mar, Feb, Jan ] << toMonth
-
-
-toDay : Posix -> Int
-toDay =
-    Time.toDay ourTimezone
-
-
-toHour : Posix -> Int
-toHour =
-    Time.toHour ourTimezone
-
-
-toMinute : Posix -> Int
-toMinute =
-    Time.toMinute ourTimezone
+ourTimezone : Zone
+ourTimezone =
+    Time.utc
 
 
 
 ---- INIT ----
 
 
-ourFormatter : List DateFormat.Token
-ourFormatter =
-    [ DateFormat.dayOfMonthNumber
-    , DateFormat.text " "
-    , DateFormat.monthNameFirstThree
-    , DateFormat.text " "
-    , DateFormat.yearNumber
-    ]
-
-
-ourTimezone : Zone
-ourTimezone =
-    Time.utc
-
-
-dateToString : Int -> String
-dateToString date =
-    Time.millisToPosix date
-        |> DateFormat.format
-            ourFormatter
-            ourTimezone
-
-
 initDayPicker : Picker.WheelPicker
 initDayPicker =
-    dateRange dayPickerLimits.start dayPickerLimits.end
-        |> List.map dateToString
-        |> Picker.defaultWheelPicker 175
+    let
+        format =
+            Time.millisToPosix
+                >> formatTime
+                    [ DateFormat.dayOfMonthNumber
+                    , DateFormat.text " "
+                    , DateFormat.monthNameFirstThree
+                    , DateFormat.text " "
+                    , DateFormat.yearNumber
+                    ]
+    in
+        dateRange dayPickerLimits.start dayPickerLimits.end toMs.day
+            |> List.map format
+            |> Picker.defaultWheelPicker 175
 
 
 initHourPicker : Picker.WheelPicker
 initHourPicker =
-    List.range 0 23
-        |> List.map (\value -> intToString 2 value)
-        |> Picker.defaultWheelPicker 60
+    let
+        format =
+            Time.millisToPosix >> formatTime [ DateFormat.hourMilitaryFixed ]
+    in
+        dateRange hourPickerLimits.start hourPickerLimits.end toMs.hour
+            |> List.map format
+            |> Picker.defaultWheelPicker 60
 
 
 initMinutePicker : Picker.WheelPicker
 initMinutePicker =
-    List.range 0 59
-        |> List.map (\value -> intToString 2 value)
-        |> Picker.defaultWheelPicker 60
+    let
+        format =
+            Time.millisToPosix >> formatTime [ DateFormat.minuteFixed ]
+    in
+        dateRange minutePickerLimits.start minutePickerLimits.end toMs.minute
+            |> List.map format
+            |> Picker.defaultWheelPicker 60
 
 
 setDate : Posix -> Model -> Model
@@ -273,7 +242,7 @@ dateView =
             , DateFormat.minuteFixed
             ]
     in
-        DateFormat.format formatter ourTimezone
+        formatTime formatter
 
 
 view : Model -> NodeWithStyle Msg
@@ -324,33 +293,17 @@ main =
 ---- HELPERS ----
 
 
-intToString : Int -> Int -> String
-intToString digitsNb value =
+dateRange : Int -> Int -> Int -> List Int
+dateRange start end increment =
     let
-        baseString =
-            String.fromInt value
-
-        additionalZeros =
-            baseString
-                |> String.length
-                |> (-) digitsNb
-                |> Function.flip String.repeat "0"
+        dateRange_ start_ end_ increment_ acc_ =
+            if start_ <= end_ then
+                dateRange_ (start_ + increment_) end_ increment_ (start_ :: acc_)
+            else
+                acc_
     in
-        String.append additionalZeros baseString
-
-
-dateRange_ : Int -> Int -> List Int -> List Int
-dateRange_ start end acc =
-    if start < end then
-        dateRange_ (start + toMs.day) end (start :: acc)
-    else
-        acc
-
-
-dateRange : Int -> Int -> List Int
-dateRange start end =
-    dateRange_ start end []
-        |> List.reverse
+        dateRange_ start end increment []
+            |> List.reverse
 
 
 dateFromPickers : Model -> Posix
@@ -367,3 +320,8 @@ dateFromPickers model =
     in
         (dayPickerLimits.start + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
             |> Time.millisToPosix
+
+
+formatTime : List DateFormat.Token -> Posix -> String
+formatTime formatter value =
+    DateFormat.format formatter ourTimezone value
