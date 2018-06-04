@@ -1,4 +1,4 @@
-module Demo exposing (..)
+module Main exposing (..)
 
 import Block
 import BodyBuilder as Builder exposing (..)

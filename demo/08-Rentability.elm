@@ -1,4 +1,4 @@
-module Rentability exposing (..)
+module Main exposing (..)
 
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (style)

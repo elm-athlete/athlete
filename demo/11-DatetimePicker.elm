@@ -1,4 +1,4 @@
-module DatePicker exposing (main)
+module Main exposing (main)
 
 -- import SingleTouch
 

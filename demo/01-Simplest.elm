@@ -1,4 +1,4 @@
-module Simplest exposing (..)
+module Main exposing (..)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 
