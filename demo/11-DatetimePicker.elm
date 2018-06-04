@@ -4,7 +4,7 @@ module DatePicker exposing (main)
 
 import AnimationFrame
 import Block
-import BodyBuilder as Builder exposing (Node)
+import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements.WheelPicker as Picker
 import Box
@@ -14,6 +14,7 @@ import Flex
 import Function
 import Margin
 import Style
+import Time
 import Touch
 import Typography
 
@@ -40,23 +41,35 @@ toMs =
 ---- INIT ----
 
 
+ourFormatter : Zone -> Posix -> String
+ourFormatter =
+    DateFormat.format
+        [ DateFormat.monthNameFull
+        , DateFormat.text " "
+        , DateFormat.dayOfMonthSuffix
+        , DateFormat.text ", "
+        , DateFormat.yearNumber
+        ]
+
+
+ourTimezone : Zone
+ourTimezone =
+    utc
+
+
+ourPrettyDate : Posix -> String
+ourPrettyDate =
+    ourFormatter ourTimezone
+
+
+timeToString value =
+    value |> format
+
+
 initDayPicker : Picker.WheelPicker
 initDayPicker =
-    let
-        valueToDate value =
-            value
-                |> toFloat
-                |> Date.fromTime
-
-        valueToString value =
-            [ value |> valueToDate |> Date.day |> toString
-            , value |> valueToDate |> Date.month |> toString
-            , value |> valueToDate |> Date.year |> toString
-            ]
-                |> String.join " "
-    in
     dateRange dayPickerLimits.start dayPickerLimits.end
-        |> List.map valueToString
+        |> List.map timeToString
         |> Picker.defaultWheelPicker 175
 
 
@@ -81,7 +94,7 @@ setDate date model =
 
 initialModel : Model
 initialModel =
-    { date = Date.fromTime 0
+    { date = Date.fromRataDie 0
     , dayPicker = initDayPicker
     , hourPicker = initHourPicker
     , minutePicker = initMinutePicker
@@ -203,18 +216,18 @@ pickerLabelView text =
 
 dateView : Date.Date -> String
 dateView date =
-    (Date.day date |> toString)
+    (Date.day date |> String.fromInt)
         |> Function.flip (++) " "
-        |> Function.flip (++) (Date.month date |> toString)
+        |> Function.flip (++) (Date.month date |> String.fromInt)
         |> Function.flip (++) " "
-        |> Function.flip (++) (Date.year date |> toString)
+        |> Function.flip (++) (Date.year date |> String.fromInt)
         |> Function.flip (++) " at "
-        |> Function.flip (++) (intToString 2 (Date.hour date))
+        |> Function.flip (++) (intToString 2 (Time.toHour Time.utc date))
         |> Function.flip (++) ":"
-        |> Function.flip (++) (intToString 2 (Date.minute date))
+        |> Function.flip (++) (intToString 2 (Time.toMinute Time.utc date))
 
 
-view : Model -> Node Msg
+view : Model -> NodeWithStyle Msg
 view model =
     Builder.div
         [ Attributes.style
@@ -251,7 +264,7 @@ view model =
 main : Program Never Model Msg
 main =
     Builder.embed
-        { init = init
+        { init = \_ -> init
         , update = update
         , subscriptions = subscriptions
         , view = view
@@ -304,5 +317,4 @@ dateFromPickers model =
             Picker.getSelect model.minutePicker
     in
     (dayPickerLimits.start + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
-        |> toFloat
-        |> Date.fromTime
+        |> Date.fromRataDie
