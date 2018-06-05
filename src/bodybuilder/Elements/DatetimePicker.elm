@@ -119,10 +119,14 @@ type alias Model =
 ---- UPDATE ----
 
 
+type TimeUnit
+    = Day
+    | Hour
+    | Minute
+
+
 type Msg
-    = DayPickerMsg Picker.Msg
-    | HourPickerMsg Picker.Msg
-    | MinutePickerMsg Picker.Msg
+    = PickerMsg TimeUnit Picker.Msg
 
 
 updateSpecificPicker : Picker.Msg -> Picker.WheelPicker -> ( Picker.WheelPicker, Cmd Picker.Msg )
@@ -142,38 +146,58 @@ pickerSubscriptions2 model wrapper =
     Sub.map wrapper (subscriptions model)
 
 
+getter timeUnit =
+    case timeUnit of
+        Day ->
+            .dayPicker
+
+        Hour ->
+            .hourPicker
+
+        Minute ->
+            .minutePicker
+
+
+setDayPicker val model =
+    { model | dayPicker = val }
+
+
+setHourPicker val model =
+    { model | hourPicker = val }
+
+
+setMinutePicker val model =
+    { model | minutePicker = val }
+
+
+setter timeUnit =
+    case timeUnit of
+        Day ->
+            setDayPicker
+
+        Hour ->
+            setHourPicker
+
+        Minute ->
+            setMinutePicker
+
+
+updateTimeUnitPicker timeUnit pickerMsg model =
+    let
+        ( pickerModel, pickerCmdMsg ) =
+            updateSpecificPicker pickerMsg (model |> getter timeUnit)
+    in
+    ( setter timeUnit pickerModel model
+        |> setDate (dateFromPickers model)
+    , Cmd.map (PickerMsg timeUnit) pickerCmdMsg
+    )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        DayPickerMsg pickerMsg ->
-            let
-                ( pickerModel, pickerCmdMsg ) =
-                    updateSpecificPicker pickerMsg model.dayPicker
-            in
-            ( { model | dayPicker = pickerModel }
-                |> setDate (dateFromPickers model)
-            , Cmd.map DayPickerMsg pickerCmdMsg
-            )
-
-        HourPickerMsg pickerMsg ->
-            let
-                ( pickerModel, pickerCmdMsg ) =
-                    updateSpecificPicker pickerMsg model.hourPicker
-            in
-            ( { model | hourPicker = pickerModel }
-                |> setDate (dateFromPickers model)
-            , Cmd.map HourPickerMsg pickerCmdMsg
-            )
-
-        MinutePickerMsg pickerMsg ->
-            let
-                ( pickerModel, pickerCmdMsg ) =
-                    updateSpecificPicker pickerMsg model.minutePicker
-            in
-            ( { model | minutePicker = pickerModel }
-                |> setDate (dateFromPickers model)
-            , Cmd.map MinutePickerMsg pickerCmdMsg
-            )
+        PickerMsg timeUnit pickerMsg ->
+            updateTimeUnitPicker timeUnit pickerMsg model
 
 
 
@@ -191,9 +215,9 @@ pickerSubscriptions msg picker =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ pickerSubscriptions DayPickerMsg model.dayPicker
-        , pickerSubscriptions HourPickerMsg model.hourPicker
-        , pickerSubscriptions MinutePickerMsg model.minutePicker
+        [ pickerSubscriptions (PickerMsg Day) model.dayPicker
+        , pickerSubscriptions (PickerMsg Hour) model.hourPicker
+        , pickerSubscriptions (PickerMsg Minute) model.minutePicker
         ]
 
 
@@ -241,11 +265,11 @@ view msgWrapper model =
                 ]
             ]
         ]
-        [ pickerView (msgWrapper << DayPickerMsg) model.dayPicker
+        [ pickerView (msgWrapper << PickerMsg Day) model.dayPicker
         , pickerLabelView " at "
-        , pickerView (msgWrapper << HourPickerMsg) model.hourPicker
+        , pickerView (msgWrapper << PickerMsg Hour) model.hourPicker
         , pickerLabelView ":"
-        , pickerView (msgWrapper << MinutePickerMsg) model.minutePicker
+        , pickerView (msgWrapper << PickerMsg Minute) model.minutePicker
         ]
 
 
