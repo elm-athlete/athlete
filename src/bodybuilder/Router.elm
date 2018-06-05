@@ -637,39 +637,33 @@ standardHandleHistory historyMsg history =
                 history
 
         Tick diff ->
-            focusChoosenElement history <|
-                case history.transition of
-                    Nothing ->
-                        history
-
-                    Just transition ->
-                        let
-                            newTransition =
-                                transition |> timeDiff diff
-                        in
-                        if newTransition.timer > 0 then
-                            { history | transition = Just newTransition }
-                        else
-                            { history | transition = Nothing }
-
-
-focusChoosenElement : History route msg -> model -> ( model, Cmd msg )
-focusChoosenElement history model =
-    ( model
-    , case history.currentPageHasFocusElement of
-        False ->
-            Cmd.none
-
-        True ->
-            case history.current.maybeFocusedId of
+            case history.transition of
                 Nothing ->
-                    Cmd.none
+                    ( history, Cmd.none )
 
-                Just maybeFocusedId_ ->
-                    Task.attempt
-                        (FocusMsg >> history.standardHistoryWrapper)
-                        (Browser.focus maybeFocusedId_)
-    )
+                Just transition ->
+                    let
+                        newTransition =
+                            transition |> timeDiff diff
+                    in
+                    if newTransition.timer > 0 then
+                        ( { history | transition = Just newTransition }, Cmd.none )
+                    else
+                        ( { history | transition = Nothing }
+                        , case history.currentPageHasFocusElement of
+                            False ->
+                                Cmd.none
+
+                            True ->
+                                case history.current.maybeFocusedId of
+                                    Nothing ->
+                                        Cmd.none
+
+                                    Just maybeFocusedId_ ->
+                                        Task.attempt
+                                            (FocusMsg >> history.standardHistoryWrapper)
+                                            (Browser.focus maybeFocusedId_)
+                        )
 
 
 {-| handle model's history update using historyMsg
