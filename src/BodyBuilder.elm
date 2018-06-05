@@ -1235,6 +1235,7 @@ computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers
                 (blockModifiers attributes)
                 attributes.box
                 |> List.concatMap Elegant.styleToCss
+                |> List.append (Maybe.withDefault [] (Maybe.map Elegant.commonStyleToCss attributes.rawStyle))
     in
     ( Html.node tag
         (styleResult
