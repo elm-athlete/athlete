@@ -103,6 +103,8 @@ setDate date model =
     { model | date = date }
 
 
+{-| The init function of the DateTime Picker
+-}
 init : ( RataDie, RataDie ) -> Model
 init dayLimits =
     let
@@ -139,6 +141,8 @@ type TimeUnit
     | Minute
 
 
+{-| Msg of the DateTime Picker
+-}
 type Msg
     = PickerMsg TimeUnit Picker.Msg
 
@@ -148,6 +152,9 @@ updateSpecificPicker pickerMsg picker =
     Picker.update pickerMsg picker
 
 
+{-| The update function of the DateTime Picker
+-}
+update : Msg -> Model -> (Msg -> msg) -> ( Model, Cmd msg )
 update pickerMsg model pickerWrapper =
     let
         ( pickerModel, pickerCmdMsg ) =
@@ -156,6 +163,9 @@ update pickerMsg model pickerWrapper =
     ( pickerModel, Cmd.map pickerWrapper pickerCmdMsg )
 
 
+{-| The subscriptions function of the DateTime Picker
+-}
+subscriptions : Model -> (Msg -> msg) -> Sub msg
 subscriptions model wrapper =
     Sub.map wrapper (internalSubscriptions model)
 
@@ -264,6 +274,8 @@ pickerLabelView text =
         ]
 
 
+{-| The view function of the DateTime Picker
+-}
 view : (Msg -> msg) -> Model -> NodeWithStyle msg
 view msgWrapper model =
     Builder.flex
