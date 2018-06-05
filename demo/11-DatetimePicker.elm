@@ -2,44 +2,31 @@ module Main exposing (main)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Elements.DateTimePicker as Picker
 import BodyBuilder.Events as Events
-import Date.RataDie exposing (RataDie)
+import BodyBuilder.Elements.DatetimePicker as Picker
+import Date.RataDie as RataDie exposing (RataDie)
+import DateFormat
+import Elegant.Block as Block
+import BodyBuilder.Style as Style
+import Elegant.Box as Box
+import Elegant.Margin as Margin
+import Elegant exposing (px)
+import Elegant.Typography as Typography
+import Time exposing (Posix)
 
 
---------------------------------------------------------------------------------
--- INIT                                                                       --
---------------------------------------------------------------------------------
----- Model ----
-
-
-type DateRangeType
-    = StartDate
-    | StopDate
-
-
-type alias DateRange =
-    { year : Int
-    , month : Int
-    , day : Int
-    , type_ : DateRangeType
-    }
+---- INIT ----
 
 
 initModel =
-    { datetimePicker = Picker.initDatetimePicker
-    , datesRange = ( DateRange 0 0 0 StartDate, DateRange 0 0 0 StopDate )
-    }
+    Picker.initModel
+        ( RataDie.fromCalendarDate 2017 RataDie.Dec 15
+        , RataDie.fromCalendarDate 2018 RataDie.Jan 14
+        )
 
 
 type alias Model =
-    { datetimePicker : Picker.Model
-    , datesRange : ( DateRange, DateRange )
-    }
-
-
-
----- Init ----
+    Picker.Model
 
 
 init : ( Model, Cmd Msg )
@@ -48,87 +35,76 @@ init =
 
 
 
---------------------------------------------------------------------------------
--- SUBSCRIPTIONS                                                              --
---------------------------------------------------------------------------------
+---- SUBSCRIPTIONS ----
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.map PickerMsg (Picker.subscriptions model)
 
 
 
---------------------------------------------------------------------------------
--- UPDATE                                                                     --
---------------------------------------------------------------------------------
----- Msg ----
+---- UPDATE ----
 
 
 type Msg
-    = NoOp
-
-
-
----- Update ----
+    = PickerMsg Picker.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
+        PickerMsg pickerMsg ->
+            let
+                ( pickerModel, pickerCmdMsg ) =
+                    Picker.update pickerMsg model
+            in
+                ( pickerModel, Cmd.map PickerMsg pickerCmdMsg )
 
 
 
---------------------------------------------------------------------------------
--- VIEW                                                                       --
---------------------------------------------------------------------------------
+---- VIEW ----
 
 
-dateRangeFormView : DateRange -> NodeWithStyle Msg
-dateRangeFormView dateRangeLimit =
-    Builder.div []
-        [ Builder.inputText
-            [ Events.onClick <| DateRangeMsg InputYear dateRangeLimit.type_
-            , Attributes.value dateRangeLimit.year
-            ]
-        , Builder.inputText
-            [ Events.onClick <| DateRangeMsg InputMonth dateRangeLimit.type_
-            , Attributes.value dateRangeLimit.month
-            ]
-        , Builder.inputText
-            [ Events.onClick <| DateRangeMsg Inputday dateRangeLimit.type_
-            , Attributes.value dateRangeLimit.day
-            ]
+dateView : Posix -> String
+dateView =
+    DateFormat.format
+        [ DateFormat.monthNameFull
+        , DateFormat.text " "
+        , DateFormat.dayOfMonthSuffix
+        , DateFormat.text ", "
+        , DateFormat.yearNumber
+        , DateFormat.text " at "
+        , DateFormat.hourMilitaryFixed
+        , DateFormat.text ":"
+        , DateFormat.minuteFixed
         ]
-
-
-datesRangeFormView : ( DateRange, DateRange ) -> NodeWithStyle Msg
-datesRangeFormView ( startDate, stopDate ) =
-    Builder.div []
-        [ dateRangeFormView startDate
-        , dateRangeFormView stopDate
-        , Builder.button [] [ Builder.text "Done" ]
-        ]
-
-
-
----- Main View ----
+        Time.utc
 
 
 view : Model -> NodeWithStyle Msg
 view model =
-    Builder.div []
-        [ datesRangeFormView model.datesRange
-        , datePickerView model.datetimePicker
+    Builder.div
+        [ Attributes.style
+            [ Style.blockProperties [ Block.alignCenter ]
+            , Style.box [ Box.margin [ Margin.top <| Margin.width (px 200) ] ]
+            ]
+        ]
+        [ Picker.view PickerMsg model
+        , Builder.div
+            [ Attributes.style
+                [ Style.box
+                    [ Box.margin [ Margin.top <| Margin.width (px 20) ]
+                    , Box.typography [ Typography.size (px 30) ]
+                    ]
+                ]
+            ]
+            [ Builder.text ("Selected: " ++ dateView model.date) ]
         ]
 
 
 
---------------------------------------------------------------------------------
--- MAIN                                                                       --
---------------------------------------------------------------------------------
+---- MAIN ----
 
 
 main : Program () Model Msg
