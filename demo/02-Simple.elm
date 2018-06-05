@@ -2,11 +2,11 @@ module Main exposing (..)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Style
+import BodyBuilder.Style as Style
 import Elegant exposing (Style, px)
-import Elegant.Block
-import Elegant.Box
-import Elegant.Typography
+import Elegant.Block as Block
+import Elegant.Box as Box
+import Elegant.Typography as Typography
 
 
 theFontSize : number

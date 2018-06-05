@@ -28,9 +28,9 @@ classesNamesFromStyle ({ screenWidths, display, suffix } as style) =
                 |> Maybe.withDefault []
                 |> classesNameGeneration suffix
     in
-        screenWidths
-            |> List.concatMap (screenWidthToClassesNames suffix)
-            |> List.append standardClassesNames
+    screenWidths
+        |> List.concatMap (screenWidthToClassesNames suffix)
+        |> List.append standardClassesNames
 
 
 classesNameGeneration : Maybe String -> List ( String, String ) -> List String
@@ -49,14 +49,14 @@ screenWidthToClassesNames suffix { min, max, style } =
                 Just int ->
                     String.fromInt int
     in
-        -- TODO : Fix that (it's very ugly)
-        style
-            |> computeStyle
-            |> classesNameGeneration suffix
-            |> List.map
-                (addScreenWidthToClassName
-                    (Elegant.Helpers.Css.cssValidName (toString min ++ toString max))
-                )
+    -- TODO : Fix that (it's very ugly)
+    style
+        |> computeStyle
+        |> classesNameGeneration suffix
+        |> List.map
+            (addScreenWidthToClassName
+                (Elegant.Helpers.Css.cssValidName (toString min ++ toString max))
+            )
 
 
 addScreenWidthToClassName : String -> String -> String
@@ -150,7 +150,7 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
             computeStyleToCss className mediaQueryId selector property
                 |> inMediaQuery mediaQuery
     in
-        ( classNameComplete, test )
+    ( classNameComplete, test )
 
 
 inMediaQuery : Maybe String -> String -> String

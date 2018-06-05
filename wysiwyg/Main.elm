@@ -1,31 +1,32 @@
 module Main exposing (..)
 
-import BodyBuilder as B exposing (Node)
+import BodyBuilder as B exposing (NodeWithStyle)
 import BodyBuilder.Attributes as A
 import BodyBuilder.Events as E
 import BodyBuilder.Style as S
 import Color exposing (Color)
 import Elegant exposing (percent, px, vh)
-import Elegant.Background
-import Elegant.Block
-import Elegant.Box
+import Elegant.Background as Background
+import Elegant.Block as Block
+import Elegant.Box as Box
 import Elegant.Constants as C
-import Elegant.Display
-import Elegant.Flex
-import Elegant.Grid
+import Elegant.Display as Display
+import Elegant.Flex as Flex
+import Elegant.Grid as Grid
 import Elegant.Helpers.Shared
-import Elegant.Shadow
+import Elegant.Shadow as Shadow
+import Function
 import Modifiers exposing (Modifier, Modifiers)
-import Update
 
 
 init : ( Model, Cmd Msg )
 init =
-    { element = defaultGridContainer 1
-    , selectedId = 1
-    , autoIncrement = 2
-    }
-        ! []
+    ( { element = defaultGridContainer 1
+      , selectedId = 1
+      , autoIncrement = 2
+      }
+    , Cmd.none
+    )
 
 
 subscriptions : Model -> Sub Msg
@@ -79,58 +80,58 @@ createElement msg model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    Update.identity
-        (model
-            |> (case msg of
-                    CreateElement msg ->
-                        createElement msg
+    ( model
+        |> (case msg of
+                CreateElement msg_ ->
+                    createElement msg_
 
-                    SelectEl id ->
-                        setSelectedId id
+                SelectEl id ->
+                    setSelectedId id
 
-                    ChangeBoxStyle action ->
-                        handleBoxChange action
+                ChangeBoxStyle action ->
+                    handleBoxChange action
 
-                    ChangeText text ->
-                        changeTextOfCurrentElement text
+                ChangeText text ->
+                    changeTextOfCurrentElement text
 
-                    AddColumn ->
-                        addColumnInGrid
+                AddColumn ->
+                    addColumnInGrid
 
-                    AddRow ->
-                        addRowInGrid
+                AddRow ->
+                    addRowInGrid
 
-                    ChangeGridItemPlacementX value ->
-                        changeGridItemPlacementXOfCurrentElement (value + 1)
+                ChangeGridItemPlacementX value ->
+                    changeGridItemPlacementXOfCurrentElement (value + 1)
 
-                    ChangeGridItemPlacementY value ->
-                        changeGridItemPlacementYOfCurrentElement (value + 1)
+                ChangeGridItemPlacementY value ->
+                    changeGridItemPlacementYOfCurrentElement (value + 1)
 
-                    ChangeGridItemSizeX value ->
-                        changeGridItemSizeXOfCurrentElement value
+                ChangeGridItemSizeX value ->
+                    changeGridItemSizeXOfCurrentElement value
 
-                    ChangeGridItemSizeY value ->
-                        changeGridItemSizeYOfCurrentElement value
+                ChangeGridItemSizeY value ->
+                    changeGridItemSizeYOfCurrentElement value
 
-                    ToggleGridItemPlacementX value ->
-                        toggleGridItemPlacementXOfCurrentElement value
+                ToggleGridItemPlacementX value ->
+                    toggleGridItemPlacementXOfCurrentElement value
 
-                    ToggleGridItemPlacementY value ->
-                        toggleGridItemPlacementYOfCurrentElement value
+                ToggleGridItemPlacementY value ->
+                    toggleGridItemPlacementYOfCurrentElement value
 
-                    ChangeColumnSize columnNumber size ->
-                        changeGridColumnSizeOfCurrentElement columnNumber size
+                ChangeColumnSize columnNumber size ->
+                    changeGridColumnSizeOfCurrentElement columnNumber size
 
-                    ChangeColumnUnit columnNumber unit ->
-                        changeGridColumnUnitOfCurrentElement columnNumber unit
+                ChangeColumnUnit columnNumber unit ->
+                    changeGridColumnUnitOfCurrentElement columnNumber unit
 
-                    ChangeRowSize rowNumber size ->
-                        changeGridRowSizeOfCurrentElement rowNumber size
+                ChangeRowSize rowNumber size ->
+                    changeGridRowSizeOfCurrentElement rowNumber size
 
-                    ChangeRowUnit rowNumber unit ->
-                        changeGridRowUnitOfCurrentElement rowNumber unit
-               )
-        )
+                ChangeRowUnit rowNumber unit ->
+                    changeGridRowUnitOfCurrentElement rowNumber unit
+           )
+    , Cmd.none
+    )
 
 
 addChildToElement : Element msg -> Element msg -> Element msg
@@ -368,7 +369,7 @@ addSimpleToTemplate : Grid.GridContainerCoordinate -> Grid.GridContainerCoordina
 addSimpleToTemplate ({ template } as coordinates) =
     template
         |> Maybe.withDefault []
-        |> flip List.append [ Grid.simple (Grid.Fr 1) ]
+        |> Function.flip List.append [ Grid.simple (Grid.Fr 1) ]
         |> Just
         |> setTemplateIn coordinates
 
@@ -441,16 +442,16 @@ updateSizeOfRepeatable repeatable size =
                     Grid.Simple x ->
                         Grid.Simple <|
                             case x of
-                                Grid.Fr x ->
+                                Grid.Fr x_ ->
                                     Grid.Fr size
 
                                 Grid.SizeUnitVal sizeUnit ->
                                     Grid.SizeUnitVal <|
                                         case sizeUnit of
-                                            Elegant.Helpers.Shared.Px x ->
+                                            Elegant.Helpers.Shared.Px x__ ->
                                                 Elegant.Helpers.Shared.Px size
 
-                                            Elegant.Helpers.Shared.Percent x ->
+                                            Elegant.Helpers.Shared.Percent x__ ->
                                                 Elegant.Helpers.Shared.Percent (toFloat size)
 
                                             elem ->
@@ -546,7 +547,7 @@ updateGridItemInOutsideDisplay modifier outsideDisplay =
         Display.GridItem gridItemDetails boxDetails ->
             gridItemDetails
                 |> Maybe.map modifier
-                |> flip Display.GridItem boxDetails
+                |> Function.flip Display.GridItem boxDetails
 
         _ ->
             outsideDisplay
@@ -610,7 +611,7 @@ mapChildren elementModifier =
 
 addChildToTree : Element msg -> Tree msg -> Tree msg
 addChildToTree child =
-    applyToChildren (flip List.append [ child ])
+    applyToChildren (Function.flip List.append [ child ])
 
 
 updateChildren : (a -> a) -> { b | children : a } -> { b | children : a }
@@ -709,84 +710,84 @@ changeTextOfCurrentElement text ({ element, selectedId } as model) =
         |> setElementIn model
 
 
-setBackground : a -> { c | background : b } -> { c | background : a }
+setBackground : a -> { c | background : a } -> { c | background : a }
 setBackground elem record =
     { record | background = elem }
 
 
-setBackgroundIn : { c | background : b } -> a -> { c | background : a }
+setBackgroundIn : { c | background : a } -> a -> { c | background : a }
 setBackgroundIn =
-    flip setBackground
+    Function.flip setBackground
 
 
-setInsideDisplay : a -> { c | insideDisplay : b } -> { c | insideDisplay : a }
+setInsideDisplay : a -> { c | insideDisplay : a } -> { c | insideDisplay : a }
 setInsideDisplay elem record =
     { record | insideDisplay = elem }
 
 
-setInsideDisplayIn : { c | insideDisplay : b } -> a -> { c | insideDisplay : a }
+setInsideDisplayIn : { c | insideDisplay : a } -> a -> { c | insideDisplay : a }
 setInsideDisplayIn =
-    flip setInsideDisplay
+    Function.flip setInsideDisplay
 
 
-setOutsideDisplay : a -> { c | outsideDisplay : b } -> { c | outsideDisplay : a }
+setOutsideDisplay : a -> { c | outsideDisplay : a } -> { c | outsideDisplay : a }
 setOutsideDisplay elem record =
     { record | outsideDisplay = elem }
 
 
-setOutsideDisplayIn : { c | outsideDisplay : b } -> a -> { c | outsideDisplay : a }
+setOutsideDisplayIn : { c | outsideDisplay : a } -> a -> { c | outsideDisplay : a }
 setOutsideDisplayIn =
-    flip setOutsideDisplay
+    Function.flip setOutsideDisplay
 
 
-setColor : a -> { c | color : b } -> { c | color : a }
+setColor : a -> { c | color : a } -> { c | color : a }
 setColor elem record =
     { record | color = elem }
 
 
-setColorIn : { c | color : b } -> a -> { c | color : a }
+setColorIn : { c | color : a } -> a -> { c | color : a }
 setColorIn =
-    flip setColor
+    Function.flip setColor
 
 
-setOpacity : a -> { c | opacity : b } -> { c | opacity : a }
+setOpacity : a -> { c | opacity : a } -> { c | opacity : a }
 setOpacity elem record =
     { record | opacity = elem }
 
 
-setOpacityIn : { c | opacity : b } -> a -> { c | opacity : a }
+setOpacityIn : { c | opacity : a } -> a -> { c | opacity : a }
 setOpacityIn =
-    flip setOpacity
+    Function.flip setOpacity
 
 
-setX : a -> { c | x : b } -> { c | x : a }
+setX : a -> { c | x : a } -> { c | x : a }
 setX elem record =
     { record | x = elem }
 
 
-setXIn : { c | x : b } -> a -> { c | x : a }
+setXIn : { c | x : a } -> a -> { c | x : a }
 setXIn =
-    flip setX
+    Function.flip setX
 
 
-setY : a -> { c | y : b } -> { c | y : a }
+setY : a -> { c | y : a } -> { c | y : a }
 setY elem record =
     { record | y = elem }
 
 
-setYIn : { c | y : b } -> a -> { c | y : a }
+setYIn : { c | y : a } -> a -> { c | y : a }
 setYIn =
-    flip setY
+    Function.flip setY
 
 
-setTemplate : a -> { c | template : b } -> { c | template : a }
+setTemplate : a -> { c | template : a } -> { c | template : a }
 setTemplate elem record =
     { record | template = elem }
 
 
-setTemplateIn : { c | template : b } -> a -> { c | template : a }
+setTemplateIn : { c | template : a } -> a -> { c | template : a }
 setTemplateIn =
-    flip setTemplate
+    Function.flip setTemplate
 
 
 type alias Element msg =
@@ -896,7 +897,7 @@ gridItemBase =
         , size = Nothing
         }
         |> Just
-        |> flip Display.GridItem (Just Display.defaultBlockDetails)
+        |> Function.flip Display.GridItem (Just Display.defaultBlockDetails)
 
 
 gridItemStyle : { style : Elegant.CommonStyle }
@@ -915,8 +916,8 @@ type alias BlockAttributes msg =
     { tag : String
     , constructor :
         Modifiers (A.BlockAttributes msg)
-        -> List (Node msg)
-        -> Node msg
+        -> List (NodeWithStyle msg)
+        -> NodeWithStyle msg
     , attributes : { style : Elegant.CommonStyle }
     , children : List (Element msg)
     }
@@ -926,8 +927,8 @@ type alias NodeAttributes msg =
     { tag : String
     , constructor :
         Modifiers (A.NodeAttributes msg)
-        -> List (Node msg)
-        -> Node msg
+        -> List (NodeWithStyle msg)
+        -> NodeWithStyle msg
     , attributes : { style : Elegant.CommonStyle }
     , children : List (Element msg)
     }
@@ -950,7 +951,7 @@ setStyleIn record elem =
 
 defaultBlockAttributes :
     String
-    -> (Modifiers (A.BlockAttributes msg) -> List (Node msg) -> Node msg)
+    -> (Modifiers (A.BlockAttributes msg) -> List (NodeWithStyle msg) -> NodeWithStyle msg)
     -> BlockAttributes msg
 defaultBlockAttributes tag constructor =
     BlockAttributes tag constructor blockStyle []
@@ -958,7 +959,7 @@ defaultBlockAttributes tag constructor =
 
 defaultInlineAttributes :
     String
-    -> (Modifiers (A.NodeAttributes msg) -> List (Node msg) -> Node msg)
+    -> (Modifiers (A.NodeAttributes msg) -> List (NodeWithStyle msg) -> NodeWithStyle msg)
     -> NodeAttributes msg
 defaultInlineAttributes tag constructor =
     NodeAttributes tag constructor inlineStyle []
@@ -1052,22 +1053,22 @@ type alias Model =
     }
 
 
-setElement : a -> { c | element : b } -> { c | element : a }
+setElement : a -> { c | element : a } -> { c | element : a }
 setElement id model =
     { model | element = id }
 
 
-setElementIn : { c | element : b } -> a -> { c | element : a }
+setElementIn : { c | element : a } -> a -> { c | element : a }
 setElementIn =
-    flip setElement
+    Function.flip setElement
 
 
-setSelectedId : a -> { c | selectedId : b } -> { c | selectedId : a }
+setSelectedId : a -> { c | selectedId : a } -> { c | selectedId : a }
 setSelectedId id model =
     { model | selectedId = id }
 
 
-setAutoIncrement : a -> { c | autoIncrement : b } -> { c | autoIncrement : a }
+setAutoIncrement : a -> { c | autoIncrement : a } -> { c | autoIncrement : a }
 setAutoIncrement id model =
     { model | autoIncrement = id }
 
@@ -1101,7 +1102,7 @@ type Msg
     | ChangeRowUnit Int String
 
 
-view : Model -> Node Msg
+view : Model -> NodeWithStyle Msg
 view model =
     B.grid
         [ A.style
@@ -1141,7 +1142,7 @@ item :
     Modifier Box.Box
     -> ( Int, Int )
     -> ( Grid.GridItemSize, Grid.GridItemSize )
-    -> List (Node msg)
+    -> List (NodeWithStyle msg)
     -> B.GridItem msg
 item color ( x, y ) ( width, height ) =
     B.gridItem
@@ -1163,12 +1164,12 @@ item color ( x, y ) ( width, height ) =
         ]
 
 
-transparentItem : ( Int, Int ) -> ( Grid.GridItemSize, Grid.GridItemSize ) -> List (Node msg) -> B.GridItem msg
+transparentItem : ( Int, Int ) -> ( Grid.GridItemSize, Grid.GridItemSize ) -> List (NodeWithStyle msg) -> B.GridItem msg
 transparentItem =
     item (Box.backgroundColor (Color.rgba 0 0 0 0))
 
 
-creationView : Model -> Node Msg
+creationView : Model -> NodeWithStyle Msg
 creationView model =
     let
         selectedElement : Maybe (Element Msg)
@@ -1246,7 +1247,7 @@ creationView model =
         )
 
 
-contentView : Model -> Node Msg
+contentView : Model -> NodeWithStyle Msg
 contentView { element, selectedId } =
     B.grid [ A.style [ S.block [ Block.fullHeight ], S.box [ Box.background [ Background.images [ Background.image "/transparent.png" ] ] ] ] ]
         [ B.gridItem [ A.style [ S.block [ Block.overflowHidden ] ] ]
@@ -1283,10 +1284,16 @@ selection :
     -> Int
     -> List (Modifier (A.VisibleAttributesAndEvents Msg a))
 selection element id selectedId =
-    [ A.class [ Elegant.commonStyleToCss element.attributes.style ] ] ++ selectOrSelected id selectedId
+    [ A.class
+        (Elegant.commonStyleToCss
+            element.attributes.style
+            |> List.map Tuple.first
+        )
+    ]
+        ++ selectOrSelected id selectedId
 
 
-contentViewEl : Int -> Element Msg -> Node Msg
+contentViewEl : Int -> Element Msg -> NodeWithStyle Msg
 contentViewEl selectedId { tree, id } =
     case tree of
         Grid grid ->
@@ -1424,7 +1431,7 @@ extractGridItemAttributes style =
                             Nothing
 
 
-textEditor : String -> Int -> Node Msg
+textEditor : String -> Int -> NodeWithStyle Msg
 textEditor text id =
     B.inputText [ A.value text, E.onInput ChangeText ]
 
@@ -1432,7 +1439,7 @@ textEditor text id =
 whiteItem :
     ( Int, Int )
     -> ( Grid.GridItemSize, Grid.GridItemSize )
-    -> List (Node msg)
+    -> List (NodeWithStyle msg)
     -> B.GridItem msg
 whiteItem =
     item (Box.backgroundColor Color.white)
@@ -1440,7 +1447,7 @@ whiteItem =
 
 gridEditor :
     GridAttributes Msg
-    -> Node Msg
+    -> NodeWithStyle Msg
 gridEditor ({ attributes, children } as grid) =
     let
         xTemplate =
@@ -1585,7 +1592,7 @@ gridView :
     { c | attributes : { a | style : Elegant.CommonStyle }, children : b }
     -> List d
     -> List e
-    -> Node msg
+    -> NodeWithStyle msg
 gridView { attributes, children } xTemplate yTemplate =
     B.grid
         [ attributes.style
@@ -1601,8 +1608,8 @@ arrowSelection :
     List Grid.Repeatable
     -> List (A.StyleModifier (A.NodeAttributes msg))
     -> (Modifiers Grid.GridContainerCoordinate -> Modifier Grid.GridContainerDetails)
-    -> (Int -> String -> Int -> Node msg)
-    -> Node msg
+    -> (Int -> String -> Int -> NodeWithStyle msg)
+    -> NodeWithStyle msg
 arrowSelection repeatables styleModifiers selector content =
     B.grid
         [ A.style
@@ -1627,7 +1634,7 @@ arrowSelection repeatables styleModifiers selector content =
 
 generateSizeModifier :
     List (A.StyleModifier (A.NodeAttributes msg))
-    -> (Int -> String -> Int -> Node msg)
+    -> (Int -> String -> Int -> NodeWithStyle msg)
     -> Grid.Repeatable
     -> ( Int, List (B.GridItem msg) )
     -> ( Int, List (B.GridItem msg) )
@@ -1667,14 +1674,14 @@ generateSizeModifier styleModifiers content repeatable ( placement, acc ) =
     )
 
 
-addButton : Msg -> Flex.FlexDirection -> Node Msg
+addButton : Msg -> Flex.FlexDirection -> NodeWithStyle Msg
 addButton msg orientation =
     B.flex
         [ A.style [ S.flexContainerProperties [ Flex.direction orientation ] ] ]
         [ B.flexItem [] [ B.button [ E.onClick msg ] [ B.text "+" ] ] ]
 
 
-inspectorView : Model -> Node Msg
+inspectorView : Model -> NodeWithStyle Msg
 inspectorView model =
     let
         selectedElement : Maybe (Element Msg)
@@ -1723,7 +1730,7 @@ inspectorView model =
                 ]
 
 
-gridItemEditor : GridAttributes Msg -> Node Msg
+gridItemEditor : GridAttributes Msg -> NodeWithStyle Msg
 gridItemEditor { attributes, children } =
     let
         gridItemAttributes =
@@ -1750,7 +1757,7 @@ gridItemEditor { attributes, children } =
             , B.node [] [ B.text "placement X" ]
             , B.node []
                 [ B.inputNumber
-                    ([ A.value (Tuple.first placementXY |> Maybe.withDefault 1 |> flip (-) 1)
+                    ([ A.value (Tuple.first placementXY |> Maybe.withDefault 1 |> Function.flip (-) 1)
                      , E.onInput ChangeGridItemPlacementX
                      ]
                         ++ (if Tuple.first placementXY |> isJust then
@@ -1767,7 +1774,7 @@ gridItemEditor { attributes, children } =
             , B.node [] [ B.text " placement Y " ]
             , B.node []
                 [ B.inputNumber
-                    ([ A.value (Tuple.second placementXY |> Maybe.withDefault 1 |> flip (-) 1)
+                    ([ A.value (Tuple.second placementXY |> Maybe.withDefault 1 |> Function.flip (-) 1)
                      , E.onInput ChangeGridItemPlacementY
                      ]
                         ++ (if Tuple.second placementXY |> isJust then
@@ -1839,7 +1846,7 @@ extractPlacementFromAttributes { x, y } =
     Just ( x |> Maybe.andThen .placement, y |> Maybe.andThen .placement )
 
 
-treeView : Model -> Node Msg
+treeView : Model -> NodeWithStyle Msg
 treeView { selectedId, element } =
     B.div [ A.style [ S.box [ Box.paddingAll C.medium ] ] ]
         [ B.h1 [] [ B.text "Tree view" ]
@@ -1847,7 +1854,7 @@ treeView { selectedId, element } =
         ]
 
 
-treeViewElement : Int -> Int -> String -> List (Element msg) -> List (Node Msg)
+treeViewElement : Int -> Int -> String -> List (Element msg) -> List (NodeWithStyle Msg)
 treeViewElement id selectedId tag =
     List.map (displayTreeView selectedId)
         >> (::) (B.div (selectOrSelected id selectedId) [ B.text tag ])
@@ -1855,7 +1862,7 @@ treeViewElement id selectedId tag =
         >> List.singleton
 
 
-displayTreeView : Int -> Element msg -> Node Msg
+displayTreeView : Int -> Element msg -> NodeWithStyle Msg
 displayTreeView selectedId { id, tree } =
     B.div [] <|
         foldOnTagAndChildren
@@ -1953,10 +1960,10 @@ foldOnTagAndChildren default fun element =
             default
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    B.program
-        { init = init
+    B.embed
+        { init = \_ -> init
         , update = update
         , subscriptions = subscriptions
         , view = view

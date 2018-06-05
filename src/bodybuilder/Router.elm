@@ -75,20 +75,20 @@ import AnimationFrame
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
-import BodyBuilder.Style
+import BodyBuilder.Style as Style
 import Color
 import Elegant exposing (SizeUnit, percent, px)
-import Elegant.Block
-import Elegant.Box
-import Elegant.Cursor
-import Elegant.Dimensions
-import Elegant.Display
-import Elegant.Flex
-import Elegant.Overflow
-import Elegant.Padding
-import Elegant.Position
-import Elegant.Transform
-import Elegant.Typography
+import Elegant.Block as Block
+import Elegant.Box as Box
+import Elegant.Cursor as Cursor
+import Elegant.Dimensions as Dimensions
+import Elegant.Display as Display
+import Elegant.Flex as Flex
+import Elegant.Overflow as Overflow
+import Elegant.Padding as Padding
+import Elegant.Position as Position
+import Elegant.Transform as Transform
+import Elegant.Typography as Typography
 import Html
 import Modifiers exposing (..)
 import Task

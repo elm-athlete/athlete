@@ -1,6 +1,8 @@
 module Elegant.Block exposing (..)
 
-{-| @docs overflowHidden
+{-|
+
+@docs overflowHidden
 @docs alignCenter
 @docs alignRight
 @docs alignLeft
@@ -12,6 +14,7 @@ module Elegant.Block exposing (..)
 @docs height
 @docs fullWidth
 @docs fullHeight
+
 -}
 
 import Elegant.Dimensions as Dimensions

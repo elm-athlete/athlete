@@ -4,7 +4,7 @@ import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (style)
 import BodyBuilder.Events
 import BodyBuilder.Finders exposing (..)
-import BodyBuilder.Router
+import BodyBuilder.Router as Router
     exposing
         ( History
         , Page
@@ -18,17 +18,17 @@ import BodyBuilder.Router
         , pageWithHeader
         , push
         )
-import BodyBuilder.Style
+import BodyBuilder.Style as Style
 import Color
 import Elegant exposing (SizeUnit, percent, pt, px, vh)
-import Elegant.Border
-import Elegant.Box
-import Elegant.Constants
-import Elegant.Cursor
-import Elegant.Display
-import Elegant.Outline
-import Elegant.Padding
-import Elegant.Typography
+import Elegant.Border as Border
+import Elegant.Box as Box
+import Elegant.Constants as Constants
+import Elegant.Cursor as Cursor
+import Elegant.Display as Display
+import Elegant.Outline as Outline
+import Elegant.Padding as Padding
+import Elegant.Typography as Typography
 import Json.Decode as Decode exposing (Decoder)
 import Modifiers exposing (..)
 import Task

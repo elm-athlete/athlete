@@ -2,23 +2,23 @@ module Main exposing (..)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Style
+import BodyBuilder.Style as Style
 import Color exposing (Color)
 import Elegant exposing (px)
-import Elegant.Background
-import Elegant.Border
-import Elegant.Box
-import Elegant.Corner
-import Elegant.Cursor
-import Elegant.Dimensions
-import Elegant.Display
-import Elegant.Margin
-import Elegant.Outline
-import Elegant.Overflow
-import Elegant.Padding
-import Elegant.Position
-import Elegant.Shadow
-import Elegant.Typography
+import Elegant.Background as Background
+import Elegant.Border as Border
+import Elegant.Box as Box
+import Elegant.Corner as Corner
+import Elegant.Cursor as Cursor
+import Elegant.Dimensions as Dimensions
+import Elegant.Display as Display
+import Elegant.Margin as Margin
+import Elegant.Outline as Outline
+import Elegant.Overflow as Overflow
+import Elegant.Padding as Padding
+import Elegant.Position as Position
+import Elegant.Shadow as Shadow
+import Elegant.Typography as Typography
 import Html exposing (Html)
 
 

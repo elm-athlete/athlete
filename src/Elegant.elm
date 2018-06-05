@@ -31,7 +31,9 @@ module Elegant
         , withScreenWidth
         )
 
-{-| @docs CommonStyle
+{-|
+
+@docs CommonStyle
 @docs commonStyle
 @docs commonStyleToCss
 @docs commonStyleToStyle
@@ -60,11 +62,12 @@ module Elegant
 @docs vh
 @docs vw
 @docs withScreenWidth
+
 -}
 
-import Elegant.Helpers.Style as CommonStyle
-import Elegant.Display exposing (DisplayBox)
+import Elegant.Display as Display exposing (DisplayBox)
 import Elegant.Helpers.Shared exposing (..)
+import Elegant.Helpers.Style as CommonStyle
 import Elegant.Internals.Convert
 import Elegant.Internals.Setters exposing (..)
 import Html exposing (Html)

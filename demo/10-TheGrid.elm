@@ -2,19 +2,19 @@ module Main exposing (..)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Style
+import BodyBuilder.Style as Style
 import Color exposing (Color)
 import Elegant exposing (percent, px, vh)
-import Elegant.Block
-import Elegant.Box
-import Elegant.Flex
-import Elegant.Grid
-import Elegant.Grid.Extra
+import Elegant.Block as Block
+import Elegant.Box as Box
+import Elegant.Flex as Flex
+import Elegant.Grid as Grid
+import Elegant.Grid.Extra as GridExtra
 
 
 alignedCellWithPurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( Flex.Align, Flex.JustifyContent ) -> List (NodeWithStyle msg) -> Builder.GridItem msg
 alignedCellWithPurpleBackground =
-    Grid.Extra.alignedCell [ Style.box [ Box.backgroundColor Color.purple ] ]
+    GridExtra.alignedCell [ Style.box [ Box.backgroundColor Color.purple ] ]
 
 
 example : NodeWithStyle msg

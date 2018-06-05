@@ -13,10 +13,10 @@ module Elegant.Grid.Extra
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Style
-import Elegant.Flex
-import Elegant.Flex.Extra
-import Elegant.Grid
+import BodyBuilder.Style as Style
+import Elegant.Flex as Flex
+import Elegant.Flex.Extra as FlexExtra
+import Elegant.Grid as Grid
 
 
 {-| a cell inside a grid with alignement of it's content
@@ -29,7 +29,7 @@ alignedCell :
     -> List (NodeWithStyle msg)
     -> Builder.GridItem msg
 alignedCell cellStyle ( x, y ) ( width, height ) alignment content =
-    cell cellStyle ( x, y ) ( width, height ) [ Flex.Extra.alignedContent alignment content ]
+    cell cellStyle ( x, y ) ( width, height ) [ FlexExtra.alignedContent alignment content ]
 
 
 {-| a cell inside a grid with beginning coordinates and size

@@ -3,16 +3,16 @@ module Main exposing (..)
 import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events
-import BodyBuilder.Style
+import BodyBuilder.Style as Style
 import Color exposing (..)
 import Color.Manipulate as Color
 import Elegant exposing (SizeUnit, percent, pt, px, vh)
-import Elegant.Block
-import Elegant.Box
-import Elegant.Constants
-import Elegant.Display
-import Elegant.Flex
-import Elegant.Typography
+import Elegant.Block as Block
+import Elegant.Box as Box
+import Elegant.Constants as Constants
+import Elegant.Display as Display
+import Elegant.Flex as Flex
+import Elegant.Typography as Typography
 import Function exposing (..)
 import Modifiers exposing (..)
 

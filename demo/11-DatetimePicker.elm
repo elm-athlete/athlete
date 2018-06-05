@@ -2,8 +2,8 @@ module Main exposing (main)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
+import BodyBuilder.Elements.DatetimePicker as Picker
 import BodyBuilder.Events as Events
-import BodyBuilder.Elements.DatetimePicker as Picker exposing (DatetimePicker)
 import Date.RataDie exposing (RataDie)
 
 
@@ -33,8 +33,8 @@ initModel =
 
 
 type alias Model =
-    { datetimePicker : DatetimePicker
-    , datesRange : ( DateRangeLimit, DateRangeLimit )
+    { datetimePicker : Picker.Model
+    , datesRange : ( DateRange, DateRange )
     }
 
 

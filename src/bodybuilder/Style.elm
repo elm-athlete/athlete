@@ -1,6 +1,8 @@
 module BodyBuilder.Style exposing (..)
 
-{-| @docs box
+{-|
+
+@docs box
 @docs block
 @docs blockProperties
 @docs flexContainerProperties
@@ -17,6 +19,7 @@ module BodyBuilder.Style exposing (..)
 @docs setPseudoClass
 @docs hover
 @docs focus
+
 -}
 
 import BodyBuilder.Attributes exposing (..)

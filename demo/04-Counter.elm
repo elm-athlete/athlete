@@ -3,18 +3,18 @@ module Main exposing (..)
 import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events as Events exposing (..)
-import BodyBuilder.Style
+import BodyBuilder.Style as Style
 import Color
 import Elegant exposing (percent, px, vh)
-import Elegant.Border
-import Elegant.Box
+import Elegant.Border as Border
+import Elegant.Box as Box
 import Elegant.Color.Extra as Color
-import Elegant.Constants
-import Elegant.Dimensions
-import Elegant.Display
-import Elegant.Flex
-import Elegant.Padding
-import Elegant.Typography
+import Elegant.Constants as Constants
+import Elegant.Dimensions as Dimensions
+import Elegant.Display as Display
+import Elegant.Flex as Flex
+import Elegant.Padding as Padding
+import Elegant.Typography as Typography
 
 
 buttonStyle =
@@ -29,7 +29,7 @@ buttonStyle =
     ]
 
 
-counter : Int -> Node Msg
+counter : Int -> NodeWithStyle Msg
 counter model =
     flex
         [ style
@@ -71,7 +71,7 @@ counter model =
         ]
 
 
-windowCentered : Node msg -> Node msg
+windowCentered : NodeWithStyle msg -> NodeWithStyle msg
 windowCentered content =
     Builder.flex
         [ style
@@ -82,7 +82,7 @@ windowCentered content =
         [ flexItem [ style [ Style.block [] ] ] [ content ] ]
 
 
-view : Int -> Node Msg
+view : Int -> NodeWithStyle Msg
 view model =
     windowCentered (counter model)
 
