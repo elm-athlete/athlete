@@ -55,9 +55,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         PickerMsg pickerMsg ->
-            ( Tuple.first <| Picker.update pickerMsg model
-            , Cmd.map PickerMsg (Tuple.second <| Picker.update pickerMsg model)
-            )
+            let
+                ( pickerModel, pickerCmdMsg ) =
+                    Picker.update pickerMsg model
+            in
+                ( pickerModel, Cmd.map PickerMsg pickerCmdMsg )
 
 
 

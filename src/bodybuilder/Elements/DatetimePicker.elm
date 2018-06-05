@@ -126,22 +126,34 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         DayPickerMsg pickerMsg ->
-            ( { model | dayPicker = Tuple.first (updateSpecificPicker pickerMsg model.dayPicker) }
-                |> setDate (dateFromPickers model)
-            , Cmd.map DayPickerMsg (Tuple.second (updateSpecificPicker pickerMsg model.dayPicker))
-            )
+            let
+                ( pickerModel, pickerCmdMsg ) =
+                    updateSpecificPicker pickerMsg model.dayPicker
+            in
+                ( { model | dayPicker = pickerModel }
+                    |> setDate (dateFromPickers model)
+                , Cmd.map DayPickerMsg pickerCmdMsg
+                )
 
         HourPickerMsg pickerMsg ->
-            ( { model | hourPicker = Tuple.first (updateSpecificPicker pickerMsg model.hourPicker) }
-                |> setDate (dateFromPickers model)
-            , Cmd.map HourPickerMsg (Tuple.second (updateSpecificPicker pickerMsg model.hourPicker))
-            )
+            let
+                ( pickerModel, pickerCmdMsg ) =
+                    updateSpecificPicker pickerMsg model.hourPicker
+            in
+                ( { model | hourPicker = pickerModel }
+                    |> setDate (dateFromPickers model)
+                , Cmd.map HourPickerMsg pickerCmdMsg
+                )
 
         MinutePickerMsg pickerMsg ->
-            ( { model | minutePicker = Tuple.first (updateSpecificPicker pickerMsg model.minutePicker) }
-                |> setDate (dateFromPickers model)
-            , Cmd.map MinutePickerMsg (Tuple.second (updateSpecificPicker pickerMsg model.minutePicker))
-            )
+            let
+                ( pickerModel, pickerCmdMsg ) =
+                    updateSpecificPicker pickerMsg model.minutePicker
+            in
+                ( { model | minutePicker = pickerModel }
+                    |> setDate (dateFromPickers model)
+                , Cmd.map MinutePickerMsg pickerCmdMsg
+                )
 
 
 
