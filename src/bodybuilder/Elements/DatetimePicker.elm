@@ -1,4 +1,4 @@
-module BodyBuilder.Elements.DatetimePicker
+module BodyBuilder.Elements.DateTimePicker
     exposing
         ( Model
         , Msg(..)
