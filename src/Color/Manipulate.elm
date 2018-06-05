@@ -10,7 +10,6 @@ module Color.Manipulate exposing (darken, desaturate, fadeIn, fadeOut, grayscale
 -}
 
 import Color exposing (Color, hsla, rgba, toHsl, toRgb)
-import Debug exposing (log)
 
 
 limit : Float -> Float

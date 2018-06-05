@@ -1225,31 +1225,37 @@ creationView model =
                         _ ->
                             []
     in
-    B.flex
-        [ A.style
-            [ S.block [ Block.height (percent 100) ]
+        B.flex
+            [ A.style
+                [ S.block [ Block.height (percent 100) ]
+                ]
             ]
-        ]
-        (insidePossibilities
-            |> List.map
-                (\( msg, str ) ->
-                    B.flexItem []
-                        [ B.button
-                            [ A.style
-                                [ S.block [ Block.height (percent 100), Block.width (px 50) ]
-                                , S.box [ Box.borderNone, Box.backgroundColor (Color.rgba 0 0 0 0) ]
+            (insidePossibilities
+                |> List.map
+                    (\( msg, str ) ->
+                        B.flexItem []
+                            [ B.button
+                                [ A.style
+                                    [ S.block [ Block.height (percent 100), Block.width (px 50) ]
+                                    , S.box [ Box.borderNone, Box.backgroundColor (Color.rgba 0 0 0 0) ]
+                                    ]
+                                , E.onClick (CreateElement msg)
                                 ]
-                            , E.onClick (CreateElement msg)
+                                [ B.text str ]
                             ]
-                            [ B.text str ]
-                        ]
-                )
-        )
+                    )
+            )
 
 
 contentView : Model -> NodeWithStyle Msg
 contentView { element, selectedId } =
-    B.grid [ A.style [ S.block [ Block.fullHeight ], S.box [ Box.background [ Background.images [ Background.image "/transparent.png" ] ] ] ] ]
+    B.grid
+        [ A.style
+            [ S.block [ Block.fullHeight ]
+            , S.box
+                [ Box.background [ Background.images [ Background.image "/transparent.png" ] ] ]
+            ]
+        ]
         [ B.gridItem [ A.style [ S.block [ Block.overflowHidden ] ] ]
             [ B.div []
                 [ contentViewEl selectedId element ]
@@ -1284,12 +1290,7 @@ selection :
     -> Int
     -> List (Modifier (A.VisibleAttributesAndEvents Msg a))
 selection element id selectedId =
-    [ A.class
-        (Elegant.commonStyleToCss
-            element.attributes.style
-            |> List.map Tuple.first
-        )
-    ]
+    [ A.rawStyle element.attributes.style ]
         ++ selectOrSelected id selectedId
 
 
@@ -1456,102 +1457,102 @@ gridEditor ({ attributes, children } as grid) =
         yTemplate =
             extractGridTemplateFromStyle .y attributes.style |> Maybe.withDefault []
     in
-    B.grid
-        [ A.style
-            [ S.gridContainerProperties
-                [ Grid.columns
-                    [ Grid.template
-                        [ Grid.simple (Grid.sizeUnitVal (px 25))
-                        , Grid.simple (Grid.fractionOfAvailableSpace 1)
-                        , Grid.simple (Grid.sizeUnitVal (px 25))
+        B.grid
+            [ A.style
+                [ S.gridContainerProperties
+                    [ Grid.columns
+                        [ Grid.template
+                            [ Grid.simple (Grid.sizeUnitVal (px 25))
+                            , Grid.simple (Grid.fractionOfAvailableSpace 1)
+                            , Grid.simple (Grid.sizeUnitVal (px 25))
+                            ]
+                        , Grid.gap (px 10)
                         ]
-                    , Grid.gap (px 10)
-                    ]
-                , Grid.rows
-                    [ Grid.template
-                        [ Grid.simple (Grid.sizeUnitVal (px 25))
-                        , Grid.simple (Grid.fractionOfAvailableSpace 1)
-                        , Grid.simple (Grid.sizeUnitVal (px 25))
+                    , Grid.rows
+                        [ Grid.template
+                            [ Grid.simple (Grid.sizeUnitVal (px 25))
+                            , Grid.simple (Grid.fractionOfAvailableSpace 1)
+                            , Grid.simple (Grid.sizeUnitVal (px 25))
+                            ]
+                        , Grid.gap (px 10)
                         ]
-                    , Grid.gap (px 10)
                     ]
+                , S.block []
                 ]
-            , S.block []
             ]
-        ]
-        [ whiteItem ( 1, 0 )
-            ( Grid.span 1, Grid.span 1 )
-            [ arrowSelection xTemplate
-                [ S.block [ Block.width (px (round (240 / (List.length xTemplate |> toFloat)))), Block.alignCenter ] ]
-                Grid.columns
-                (\value type_ columnNumber ->
-                    B.flex []
-                        [ B.flexItem []
-                            [ B.inputNumber
-                                [ A.value value
-                                , E.onInput (ChangeColumnSize columnNumber)
-                                , A.style
-                                    [ S.block
-                                        [ Block.width (px 40) ]
+            [ whiteItem ( 1, 0 )
+                ( Grid.span 1, Grid.span 1 )
+                [ arrowSelection xTemplate
+                    [ S.block [ Block.width (px (round (240 / (List.length xTemplate |> toFloat)))), Block.alignCenter ] ]
+                    Grid.columns
+                    (\value type_ columnNumber ->
+                        B.flex []
+                            [ B.flexItem []
+                                [ B.inputNumber
+                                    [ A.value value
+                                    , E.onInput (ChangeColumnSize columnNumber)
+                                    , A.style
+                                        [ S.block
+                                            [ Block.width (px 40) ]
+                                        ]
+                                    ]
+                                ]
+                            , B.flexItem []
+                                [ B.select [ E.onInput (ChangeColumnUnit columnNumber) ]
+                                    [ B.option "fr" "fr" ("fr" == type_)
+                                    , B.option "px" "px" ("px" == type_)
+                                    , B.option "%" "%" ("%" == type_)
                                     ]
                                 ]
                             ]
-                        , B.flexItem []
-                            [ B.select [ E.onInput (ChangeColumnUnit columnNumber) ]
-                                [ B.option "fr" "fr" ("fr" == type_)
-                                , B.option "px" "px" ("px" == type_)
-                                , B.option "%" "%" ("%" == type_)
-                                ]
-                            ]
-                        ]
-                )
-            ]
-        , whiteItem
-            ( 0, 1 )
-            ( Grid.span 1, Grid.span 1 )
-            [ arrowSelection yTemplate
-                [ S.block
-                    [ Block.height (px (round (240 / (List.length yTemplate |> toFloat)))) ]
+                    )
                 ]
-                Grid.rows
-                (\value type_ rowNumber ->
-                    B.flex
-                        [ A.style
-                            [ S.flexContainerProperties
-                                [ Flex.align Flex.alignCenter
-                                , Flex.justifyContent Flex.justifyContentCenter
-                                , Flex.direction Flex.column
-                                ]
-                            , S.block
-                                [ Block.height (percent 100)
-                                , Block.width (percent 100)
-                                ]
-                            ]
-                        ]
-                        [ B.flexItem []
-                            [ B.inputNumber
-                                [ A.value value
-                                , E.onInput (ChangeRowSize rowNumber)
-                                , A.style
-                                    [ S.block
-                                        [ Block.width (px 40) ]
+            , whiteItem
+                ( 0, 1 )
+                ( Grid.span 1, Grid.span 1 )
+                [ arrowSelection yTemplate
+                    [ S.block
+                        [ Block.height (px (round (240 / (List.length yTemplate |> toFloat)))) ]
+                    ]
+                    Grid.rows
+                    (\value type_ rowNumber ->
+                        B.flex
+                            [ A.style
+                                [ S.flexContainerProperties
+                                    [ Flex.align Flex.alignCenter
+                                    , Flex.justifyContent Flex.justifyContentCenter
+                                    , Flex.direction Flex.column
+                                    ]
+                                , S.block
+                                    [ Block.height (percent 100)
+                                    , Block.width (percent 100)
                                     ]
                                 ]
                             ]
-                        , B.flexItem []
-                            [ B.select [ E.onInput (ChangeRowUnit rowNumber) ]
-                                [ B.option "fr" "fr" ("fr" == type_)
-                                , B.option "px" "px" ("px" == type_)
-                                , B.option "%" "%" ("%" == type_)
+                            [ B.flexItem []
+                                [ B.inputNumber
+                                    [ A.value value
+                                    , E.onInput (ChangeRowSize rowNumber)
+                                    , A.style
+                                        [ S.block
+                                            [ Block.width (px 40) ]
+                                        ]
+                                    ]
+                                ]
+                            , B.flexItem []
+                                [ B.select [ E.onInput (ChangeRowUnit rowNumber) ]
+                                    [ B.option "fr" "fr" ("fr" == type_)
+                                    , B.option "px" "px" ("px" == type_)
+                                    , B.option "%" "%" ("%" == type_)
+                                    ]
                                 ]
                             ]
-                        ]
-                )
+                    )
+                ]
+            , transparentItem ( 1, 1 ) ( Grid.span 1, Grid.span 1 ) [ gridView grid xTemplate yTemplate ]
+            , whiteItem ( 2, 1 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddColumn Flex.column ]
+            , whiteItem ( 1, 2 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddRow Flex.row ]
             ]
-        , transparentItem ( 1, 1 ) ( Grid.span 1, Grid.span 1 ) [ gridView grid xTemplate yTemplate ]
-        , whiteItem ( 2, 1 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddColumn Flex.column ]
-        , whiteItem ( 1, 2 ) ( Grid.span 1, Grid.span 1 ) [ addButton AddRow Flex.row ]
-        ]
 
 
 replaceTemplateByOneFraction : Grid.GridContainerDetails -> Grid.GridContainerDetails
@@ -1597,7 +1598,6 @@ gridView { attributes, children } xTemplate yTemplate =
     B.grid
         [ attributes.style
             |> updateGridContainerInStyle replaceTemplateByOneFraction
-            |> Elegant.commonStyleToStyle
             |> A.rawStyle
         , A.style [ S.block [ Block.fullHeight ] ]
         ]
@@ -1664,14 +1664,14 @@ generateSizeModifier styleModifiers content repeatable ( placement, acc ) =
                 _ ->
                     ( 1, "fr" )
     in
-    ( placement - 1
-    , B.gridItem []
-        [ B.node
-            [ A.style styleModifiers ]
-            [ content size unit placement ]
-        ]
-        :: acc
-    )
+        ( placement - 1
+        , B.gridItem []
+            [ B.node
+                [ A.style styleModifiers ]
+                [ content size unit placement ]
+            ]
+            :: acc
+        )
 
 
 addButton : Msg -> Flex.FlexDirection -> NodeWithStyle Msg
@@ -1689,45 +1689,45 @@ inspectorView model =
             model.element
                 |> getById model.selectedId
     in
-    case selectedElement of
-        Nothing ->
-            B.div [] [ B.text "Nothing" ]
+        case selectedElement of
+            Nothing ->
+                B.div [] [ B.text "Nothing" ]
 
-        Just { id, tree } ->
-            B.div [ A.style [ S.box [ Box.paddingAll C.medium ] ] ]
-                [ B.h1 [] [ B.text "Inspector" ]
-                , case tree of
-                    Text t ->
-                        B.none
+            Just { id, tree } ->
+                B.div [ A.style [ S.box [ Box.paddingAll C.medium ] ] ]
+                    [ B.h1 [] [ B.text "Inspector" ]
+                    , case tree of
+                        Text t ->
+                            B.none
 
-                    _ ->
-                        B.div []
-                            [ B.div []
-                                [ B.text "Box Attributes" ]
-                            , B.div []
+                        _ ->
+                            B.div []
                                 [ B.div []
-                                    [ B.text "Box color" ]
+                                    [ B.text "Box Attributes" ]
                                 , B.div []
-                                    [ B.inputColor [ E.onInput (ChangeBoxStyle << ChangeColor), A.value (getColorFromElement tree) ] ]
-                                , B.div []
-                                    [ B.text "Box opacity" ]
-                                , B.div []
-                                    [ B.inputRange [ A.min 0, A.max 1000, E.onInput (ChangeBoxStyle << ChangeOpacity), A.value (1000 * getOpacityFromElement tree |> round) ] ]
+                                    [ B.div []
+                                        [ B.text "Box color" ]
+                                    , B.div []
+                                        [ B.inputColor [ E.onInput (ChangeBoxStyle << ChangeColor), A.value (getColorFromElement tree) ] ]
+                                    , B.div []
+                                        [ B.text "Box opacity" ]
+                                    , B.div []
+                                        [ B.inputRange [ A.min 0, A.max 1000, E.onInput (ChangeBoxStyle << ChangeOpacity), A.value (1000 * getOpacityFromElement tree |> round) ] ]
+                                    ]
                                 ]
-                            ]
-                , case tree of
-                    Grid grid ->
-                        gridEditor grid
+                    , case tree of
+                        Grid grid ->
+                            gridEditor grid
 
-                    Text text ->
-                        textEditor text id
+                        Text text ->
+                            textEditor text id
 
-                    GridItem gridItem ->
-                        gridItemEditor gridItem
+                        GridItem gridItem ->
+                            gridItemEditor gridItem
 
-                    _ ->
-                        B.text ""
-                ]
+                        _ ->
+                            B.text ""
+                    ]
 
 
 gridItemEditor : GridAttributes Msg -> NodeWithStyle Msg
@@ -1748,60 +1748,60 @@ gridItemEditor { attributes, children } =
                 |> Maybe.andThen extractSizeFromAttributes
                 |> Maybe.withDefault ( Nothing, Nothing )
     in
-    B.div []
-        [ B.div []
-            [ B.inputCheckbox
-                [ A.checked (Tuple.first placementXY |> isJust)
-                , E.onCheck ToggleGridItemPlacementX
-                ]
-            , B.node [] [ B.text "placement X" ]
-            , B.node []
-                [ B.inputNumber
-                    ([ A.value (Tuple.first placementXY |> Maybe.withDefault 1 |> Function.flip (-) 1)
-                     , E.onInput ChangeGridItemPlacementX
-                     ]
-                        ++ (if Tuple.first placementXY |> isJust then
-                                []
-                            else
-                                [ A.disabled ]
-                           )
-                    )
-                ]
-            , B.inputCheckbox
-                [ A.checked (Tuple.second placementXY |> isJust)
-                , E.onCheck ToggleGridItemPlacementY
-                ]
-            , B.node [] [ B.text " placement Y " ]
-            , B.node []
-                [ B.inputNumber
-                    ([ A.value (Tuple.second placementXY |> Maybe.withDefault 1 |> Function.flip (-) 1)
-                     , E.onInput ChangeGridItemPlacementY
-                     ]
-                        ++ (if Tuple.second placementXY |> isJust then
-                                Debug.log "not disable" []
-                            else
-                                Debug.log "disable" [ A.disabled ]
-                           )
-                    )
-                ]
-            ]
-        , B.div []
-            [ B.node [] [ B.text "size X" ]
-            , B.node []
-                [ B.inputNumber
-                    [ A.value (Tuple.first sizeXY |> Maybe.withDefault 1)
-                    , E.onInput ChangeGridItemSizeX
+        B.div []
+            [ B.div []
+                [ B.inputCheckbox
+                    [ A.checked (Tuple.first placementXY |> isJust)
+                    , E.onCheck ToggleGridItemPlacementX
+                    ]
+                , B.node [] [ B.text "placement X" ]
+                , B.node []
+                    [ B.inputNumber
+                        ([ A.value (Tuple.first placementXY |> Maybe.withDefault 1 |> Function.flip (-) 1)
+                         , E.onInput ChangeGridItemPlacementX
+                         ]
+                            ++ (if Tuple.first placementXY |> isJust then
+                                    []
+                                else
+                                    [ A.disabled ]
+                               )
+                        )
+                    ]
+                , B.inputCheckbox
+                    [ A.checked (Tuple.second placementXY |> isJust)
+                    , E.onCheck ToggleGridItemPlacementY
+                    ]
+                , B.node [] [ B.text " placement Y " ]
+                , B.node []
+                    [ B.inputNumber
+                        ([ A.value (Tuple.second placementXY |> Maybe.withDefault 1 |> Function.flip (-) 1)
+                         , E.onInput ChangeGridItemPlacementY
+                         ]
+                            ++ (if Tuple.second placementXY |> isJust then
+                                    []
+                                else
+                                    [ A.disabled ]
+                               )
+                        )
                     ]
                 ]
-            , B.node [] [ B.text " size Y " ]
-            , B.node []
-                [ B.inputNumber
-                    [ A.value (Tuple.second sizeXY |> Maybe.withDefault 1)
-                    , E.onInput ChangeGridItemSizeY
+            , B.div []
+                [ B.node [] [ B.text "size X" ]
+                , B.node []
+                    [ B.inputNumber
+                        [ A.value (Tuple.first sizeXY |> Maybe.withDefault 1)
+                        , E.onInput ChangeGridItemSizeX
+                        ]
+                    ]
+                , B.node [] [ B.text " size Y " ]
+                , B.node []
+                    [ B.inputNumber
+                        [ A.value (Tuple.second sizeXY |> Maybe.withDefault 1)
+                        , E.onInput ChangeGridItemSizeY
+                        ]
                     ]
                 ]
             ]
-        ]
 
 
 isJust : Maybe a -> Bool

@@ -408,7 +408,7 @@ type alias VisibleAttributes a =
     { a
         | box : List ( Modifiers Box.Box, StyleSelector )
         , universal : UniversalAttributes
-        , rawStyle : Maybe Elegant.Style
+        , rawStyle : Maybe Elegant.CommonStyle
     }
 
 
@@ -437,7 +437,7 @@ type alias VisibleAttributesAndEvents msg a =
         , onFocusEvent : Maybe msg
         , box : List ( Modifiers Box.Box, StyleSelector )
         , universal : UniversalAttributes
-        , rawStyle : Maybe Elegant.Style
+        , rawStyle : Maybe Elegant.CommonStyle
         , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -463,7 +463,7 @@ type alias SelectAttributes msg =
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     , onInputEvent : Maybe (String -> msg)
     , fromStringInput : String -> String
@@ -488,7 +488,7 @@ type alias FlowAttributes msg =
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -503,7 +503,7 @@ type alias NodeAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -522,7 +522,7 @@ type alias FlexContainerAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -541,7 +541,7 @@ type alias FlexItemAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -560,7 +560,7 @@ type alias GridContainerAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -579,7 +579,7 @@ type alias GridItemAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -597,7 +597,7 @@ type alias BlockAttributes msg =
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -617,7 +617,7 @@ type alias ButtonAttributes msg =
     , onFocusEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -633,7 +633,7 @@ type alias AAttributes msg =
     , href : Maybe String
     , target : Maybe String
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -651,7 +651,7 @@ type alias TextareaAttributes msg =
     , fromStringInput : String -> String
     , name : Maybe String
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -669,7 +669,7 @@ type alias ImgAttributes msg =
     , width : Maybe Int
     , height : Maybe Int
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -684,7 +684,7 @@ type alias AudioAttributes msg =
     , universal : UniversalAttributes
     , src : String
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -698,7 +698,7 @@ type alias ProgressAttributes msg =
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -713,7 +713,7 @@ type alias ScriptAttributes msg =
     , universal : UniversalAttributes
     , src : String
     , data : List ( String, String )
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -738,7 +738,7 @@ type alias LabelAttributes msg =
     , universal : UniversalAttributes
     , position : Position
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -756,7 +756,7 @@ type alias InputRadioAttributes msg =
     , value : Maybe String
     , block : Maybe (List ( Modifiers Display.BlockDetails, StyleSelector ))
     , label : Maybe (Shared.Label msg)
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -776,7 +776,7 @@ type alias InputCheckboxAttributes msg =
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , checked : Bool
     , onCheckEvent : Maybe (Bool -> msg)
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -798,7 +798,7 @@ type alias InputTextAttributes msg =
     , onInputEvent : Maybe (String -> msg)
     , fromStringInput : String -> String
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -821,7 +821,7 @@ type alias InputSubmitAttributes msg =
     , onSubmitEvent : Maybe msg
     , box : List ( Modifiers Box.Box, StyleSelector )
     , universal : UniversalAttributes
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     }
 
@@ -842,7 +842,7 @@ type alias InputNumberAttributes msg =
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , label : Maybe (Shared.Label msg)
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     , value : Maybe Int
     , onInputEvent : Maybe (Int -> msg)
@@ -866,7 +866,7 @@ type alias InputColorAttributes msg =
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , label : Maybe (Shared.Label msg)
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     , value : Maybe Color
     , onInputEvent : Maybe (Color -> msg)
@@ -886,7 +886,7 @@ type alias InputFileAttributes msg =
     , onBlurEvent : Maybe msg
     , onFocusEvent : Maybe msg
     , label : Maybe (Shared.Label msg)
-    , rawStyle : Maybe Elegant.Style
+    , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     }
@@ -1017,9 +1017,9 @@ visibleAttributesToHtmlAttributes visibleAttributes =
 
 
 {-| -}
-rawStyleToHtmlAttributes : Elegant.Style -> List (Html.Attribute msg)
+rawStyleToHtmlAttributes : Elegant.CommonStyle -> List (Html.Attribute msg)
 rawStyleToHtmlAttributes style_ =
-    [ Html.Attributes.class (Elegant.styleToCss style_ |> List.map Tuple.first |> String.join " ") ]
+    [ Html.Attributes.class (Elegant.commonStyleToCss style_ |> List.map Tuple.first |> String.join " ") ]
 
 
 {-| -}
