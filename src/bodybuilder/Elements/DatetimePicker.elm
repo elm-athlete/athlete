@@ -1,4 +1,4 @@
-module BodyBuilder.Elements.DateTimePicker exposing (Model, initialModel, main)
+module BodyBuilder.Elements.DatetimePicker exposing (Model, Msg(..), initModel, subscriptions, update, view)
 
 import AnimationFrame
 import BodyBuilder as Builder exposing (NodeWithStyle)
@@ -15,30 +15,10 @@ import Elegant.Typography as Typography
 import Function
 import Time exposing (Month(..), Posix, Zone)
 import Touch
+import Date.RataDie as Date exposing (RataDie)
 
 
 ---- CONSTANTS ----
-
-
-dayPickerLimits : { start : Int, end : Int }
-dayPickerLimits =
-    { start = 1513299600000
-    , end = 1515891600000
-    }
-
-
-hourPickerLimits : { start : Int, end : Int }
-hourPickerLimits =
-    { start = 3600000
-    , end = 82800000
-    }
-
-
-minutePickerLimits : { start : Int, end : Int }
-minutePickerLimits =
-    { start = 0
-    , end = 3540000
-    }
 
 
 toMs : { day : Int, hour : Int, minute : Int }
@@ -49,17 +29,17 @@ toMs =
     }
 
 
-ourTimezone : Zone
-ourTimezone =
-    Time.utc
+rataAtPosixZero : Int
+rataAtPosixZero =
+    719163
 
 
 
 ---- INIT ----
 
 
-initDayPicker : Picker.WheelPicker
-initDayPicker =
+initDayPicker : ( RataDie, RataDie ) -> Picker.WheelPicker
+initDayPicker ( dayLimitStart, dayLimitStop ) =
     let
         format =
             Time.millisToPosix
@@ -71,9 +51,9 @@ initDayPicker =
                     , DateFormat.yearNumber
                     ]
     in
-    dateRange dayPickerLimits.start dayPickerLimits.end toMs.day
-        |> List.map format
-        |> Picker.defaultWheelPicker 175
+        dateRange (rataDieToMillis dayLimitStart) (rataDieToMillis dayLimitStop) toMs.day
+            |> List.map format
+            |> Picker.defaultWheelPicker 175
 
 
 initHourPicker : Picker.WheelPicker
@@ -82,9 +62,9 @@ initHourPicker =
         format =
             Time.millisToPosix >> formatTime [ DateFormat.hourMilitaryFixed ]
     in
-    dateRange hourPickerLimits.start hourPickerLimits.end toMs.hour
-        |> List.map format
-        |> Picker.defaultWheelPicker 60
+        dateRange 3600000 82800000 toMs.hour
+            |> List.map format
+            |> Picker.defaultWheelPicker 60
 
 
 initMinutePicker : Picker.WheelPicker
@@ -93,9 +73,9 @@ initMinutePicker =
         format =
             Time.millisToPosix >> formatTime [ DateFormat.minuteFixed ]
     in
-    dateRange minutePickerLimits.start minutePickerLimits.end toMs.minute
-        |> List.map format
-        |> Picker.defaultWheelPicker 60
+        dateRange 0 3540000 toMs.minute
+            |> List.map format
+            |> Picker.defaultWheelPicker 60
 
 
 setDate : Posix -> Model -> Model
@@ -103,86 +83,75 @@ setDate date model =
     { model | date = date }
 
 
-initialModel : Model
-initialModel =
-    { date = Time.millisToPosix 0
-    , dayPicker = initDayPicker
-    , hourPicker = initHourPicker
-    , minutePicker = initMinutePicker
-    }
+initModel : ( RataDie, RataDie ) -> Model
+initModel dayLimits =
+    let
+        initialModel =
+            { date = Time.millisToPosix 0
+            , dayLimits = dayLimits
+            , dayPicker = initDayPicker dayLimits
+            , hourPicker = initHourPicker
+            , minutePicker = initMinutePicker
+            }
+    in
+        initialModel
+            |> setDate (dateFromPickers initialModel)
 
 
 type alias Model =
     { date : Posix
+    , dayLimits : ( RataDie, RataDie )
     , dayPicker : Picker.WheelPicker
     , hourPicker : Picker.WheelPicker
     , minutePicker : Picker.WheelPicker
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( initialModel
-        |> setDate (dateFromPickers initialModel)
-    , Cmd.none
-    )
-
-
 
 ---- UPDATE ----
 
 
-type PickerId
-    = DayPicker
-    | HourPicker
-    | MinutePicker
-
-
-updatePicker : PickerId -> Picker.Msg -> Model -> ( Model, Cmd Msg )
-updatePicker pickerId pickerMsg model =
-    let
-        updateSpecificPicker picker =
-            Picker.update pickerMsg picker
-    in
-    case pickerId of
-        DayPicker ->
-            ( { model | dayPicker = Tuple.first (updateSpecificPicker model.dayPicker) }
-                |> setDate (dateFromPickers model)
-            , Cmd.map (PickerMsg DayPicker) (Tuple.second (updateSpecificPicker model.dayPicker))
-            )
-
-        HourPicker ->
-            ( { model | hourPicker = Tuple.first (updateSpecificPicker model.hourPicker) }
-                |> setDate (dateFromPickers model)
-            , Cmd.map (PickerMsg HourPicker) (Tuple.second (updateSpecificPicker model.hourPicker))
-            )
-
-        MinutePicker ->
-            ( { model | minutePicker = Tuple.first (updateSpecificPicker model.minutePicker) }
-                |> setDate (dateFromPickers model)
-            , Cmd.map (PickerMsg MinutePicker) (Tuple.second (updateSpecificPicker model.minutePicker))
-            )
-
-
 type Msg
-    = PickerMsg PickerId Picker.Msg
+    = DayPickerMsg Picker.Msg
+    | HourPickerMsg Picker.Msg
+    | MinutePickerMsg Picker.Msg
+
+
+updateSpecificPicker : Picker.Msg -> Picker.WheelPicker -> ( Picker.WheelPicker, Cmd Picker.Msg )
+updateSpecificPicker pickerMsg picker =
+    Picker.update pickerMsg picker
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        PickerMsg pickerId pickerMsg ->
-            updatePicker pickerId pickerMsg model
+        DayPickerMsg pickerMsg ->
+            ( { model | dayPicker = Tuple.first (updateSpecificPicker pickerMsg model.dayPicker) }
+                |> setDate (dateFromPickers model)
+            , Cmd.map DayPickerMsg (Tuple.second (updateSpecificPicker pickerMsg model.dayPicker))
+            )
+
+        HourPickerMsg pickerMsg ->
+            ( { model | hourPicker = Tuple.first (updateSpecificPicker pickerMsg model.hourPicker) }
+                |> setDate (dateFromPickers model)
+            , Cmd.map HourPickerMsg (Tuple.second (updateSpecificPicker pickerMsg model.hourPicker))
+            )
+
+        MinutePickerMsg pickerMsg ->
+            ( { model | minutePicker = Tuple.first (updateSpecificPicker pickerMsg model.minutePicker) }
+                |> setDate (dateFromPickers model)
+            , Cmd.map MinutePickerMsg (Tuple.second (updateSpecificPicker pickerMsg model.minutePicker))
+            )
 
 
 
 ---- SUBSCRIPTIONS ----
 
 
-pickerSubscriptions : PickerId -> Picker.WheelPicker -> Sub Msg
-pickerSubscriptions pickerId picker =
+pickerSubscriptions : (Picker.Msg -> Msg) -> Picker.WheelPicker -> Sub Msg
+pickerSubscriptions msg picker =
     if Picker.isAnimationFrameNeeded picker then
-        AnimationFrame.times (PickerMsg pickerId << Picker.NewFrame)
+        AnimationFrame.times (msg << Picker.NewFrame)
     else
         Sub.none
 
@@ -190,9 +159,9 @@ pickerSubscriptions pickerId picker =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ pickerSubscriptions DayPicker model.dayPicker
-        , pickerSubscriptions HourPicker model.hourPicker
-        , pickerSubscriptions MinutePicker model.minutePicker
+        [ pickerSubscriptions DayPickerMsg model.dayPicker
+        , pickerSubscriptions HourPickerMsg model.hourPicker
+        , pickerSubscriptions MinutePickerMsg model.minutePicker
         ]
 
 
@@ -200,21 +169,21 @@ subscriptions model =
 ---- VIEW ----
 
 
-pickerView : PickerId -> Picker.WheelPicker -> Builder.FlexItem Msg
-pickerView pickerId picker =
-    let
-        touchMsgWrapper =
-            PickerMsg pickerId << Picker.GetTouch
-    in
+pickerView : (Picker.Msg -> msg) -> Picker.WheelPicker -> Builder.FlexItem msg
+pickerView msg picker =
+    -- let
+    --     touchMsgWrapper =
+    --         msgWrapper pickerId << Picker.GetTouch
+    -- in
     Builder.flexItem
-        [ Attributes.rawAttribute (Touch.onStart (touchMsgWrapper << Picker.StartTouch))
-        , Attributes.rawAttribute (Touch.onMove (touchMsgWrapper << Picker.HoldTouch))
-        , Attributes.rawAttribute (Touch.onEnd (touchMsgWrapper << Picker.StopTouch))
+        [ Attributes.rawAttribute (Touch.onStart (msg << Picker.GetTouch << Picker.StartTouch))
+        , Attributes.rawAttribute (Touch.onMove (msg << Picker.GetTouch << Picker.HoldTouch))
+        , Attributes.rawAttribute (Touch.onEnd (msg << Picker.GetTouch << Picker.StopTouch))
         ]
         [ Picker.view picker ]
 
 
-pickerLabelView : String -> Builder.FlexItem Msg
+pickerLabelView : String -> Builder.FlexItem msg
 pickerLabelView text =
     Builder.flexItem []
         [ Builder.div
@@ -225,70 +194,27 @@ pickerLabelView text =
         ]
 
 
-dateView : Posix -> String
-dateView =
-    let
-        formatter =
-            [ DateFormat.monthNameFull
-            , DateFormat.text " "
-            , DateFormat.dayOfMonthSuffix
-            , DateFormat.text ", "
-            , DateFormat.yearNumber
-            , DateFormat.text " at "
-            , DateFormat.hourMilitaryFixed
-            , DateFormat.text ":"
-            , DateFormat.minuteFixed
-            ]
-    in
-    formatTime formatter
-
-
-view : Model -> NodeWithStyle Msg
-view model =
-    Builder.div
+view : (Msg -> msg) -> Model -> NodeWithStyle msg
+view msgWrapper model =
+    Builder.flex
         [ Attributes.style
-            [ Style.blockProperties [ Block.alignCenter ]
-            , Style.box [ Box.margin [ Margin.top <| Margin.width (px 200) ] ]
-            ]
+            [ Style.flexContainerProperties [ Flex.direction Flex.row, Flex.align Flex.alignCenter ] ]
         ]
-        [ Builder.flex
-            [ Attributes.style
-                [ Style.flexContainerProperties [ Flex.direction Flex.row, Flex.align Flex.alignCenter ] ]
-            ]
-            [ pickerView DayPicker model.dayPicker
-            , pickerLabelView " at "
-            , pickerView HourPicker model.hourPicker
-            , pickerLabelView ":"
-            , pickerView MinutePicker model.minutePicker
-            ]
-        , Builder.div
-            [ Attributes.style
-                [ Style.box
-                    [ Box.margin [ Margin.top <| Margin.width (px 20) ]
-                    , Box.typography [ Typography.size (px 30) ]
-                    ]
-                ]
-            ]
-            [ Builder.text ("Selected: " ++ dateView model.date) ]
+        [ pickerView (msgWrapper << DayPickerMsg) model.dayPicker
+        , pickerLabelView " at "
+        , pickerView (msgWrapper << HourPickerMsg) model.hourPicker
+        , pickerLabelView ":"
+        , pickerView (msgWrapper << MinutePickerMsg) model.minutePicker
         ]
-
-
-
----- MAIN ----
-
-
-main : Program () Model Msg
-main =
-    Builder.embed
-        { init = \_ -> init
-        , update = update
-        , subscriptions = subscriptions
-        , view = view
-        }
 
 
 
 ---- HELPERS ----
+
+
+rataDieToMillis : RataDie -> Int
+rataDieToMillis rata =
+    (rata - rataAtPosixZero) * toMs.day
 
 
 dateRange : Int -> Int -> Int -> List Int
@@ -300,8 +226,8 @@ dateRange start end increment =
             else
                 acc_
     in
-    dateRange_ start end increment []
-        |> List.reverse
+        dateRange_ start end increment []
+            |> List.reverse
 
 
 dateFromPickers : Model -> Posix
@@ -311,15 +237,15 @@ dateFromPickers model =
             Picker.getSelect model.dayPicker
 
         hour =
-            Picker.getSelect model.hourPicker
+            1 + Picker.getSelect model.hourPicker
 
         minute =
             Picker.getSelect model.minutePicker
     in
-    (dayPickerLimits.start + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
-        |> Time.millisToPosix
+        ((Tuple.first model.dayLimits |> rataDieToMillis) + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
+            |> Time.millisToPosix
 
 
 formatTime : List DateFormat.Token -> Posix -> String
 formatTime formatter value =
-    DateFormat.format formatter ourTimezone value
+    DateFormat.format formatter Time.utc value
