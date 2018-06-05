@@ -2,11 +2,23 @@ module BodyBuilder.Elements.DateTimePicker
     exposing
         ( Model
         , Msg(..)
-        , initModel
-        , pickerSubscriptions2
-        , pickerUpdate
+        , init
+        , subscriptions
+        , update
         , view
         )
+
+{-|
+
+    mobile like date time picker
+    @docs Model
+    @docs Msg
+    @docs init
+    @docs subscriptions
+    @docs update
+    @docs view
+
+-}
 
 import AnimationFrame
 import BodyBuilder as Builder exposing (NodeWithStyle)
@@ -91,8 +103,8 @@ setDate date model =
     { model | date = date }
 
 
-initModel : ( RataDie, RataDie ) -> Model
-initModel dayLimits =
+init : ( RataDie, RataDie ) -> Model
+init dayLimits =
     let
         initialModel =
             { date = Time.millisToPosix 0
@@ -134,16 +146,16 @@ updateSpecificPicker pickerMsg picker =
     Picker.update pickerMsg picker
 
 
-pickerUpdate pickerMsg model pickerWrapper =
+update pickerMsg model pickerWrapper =
     let
         ( pickerModel, pickerCmdMsg ) =
-            update pickerMsg model
+            internalUpdate pickerMsg model
     in
     ( pickerModel, Cmd.map pickerWrapper pickerCmdMsg )
 
 
-pickerSubscriptions2 model wrapper =
-    Sub.map wrapper (subscriptions model)
+subscriptions model wrapper =
+    Sub.map wrapper (internalSubscriptions model)
 
 
 getter timeUnit =
@@ -193,8 +205,8 @@ updateTimeUnitPicker timeUnit pickerMsg model =
     )
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+internalUpdate : Msg -> Model -> ( Model, Cmd Msg )
+internalUpdate msg model =
     case msg of
         PickerMsg timeUnit pickerMsg ->
             updateTimeUnitPicker timeUnit pickerMsg model
@@ -212,8 +224,8 @@ pickerSubscriptions msg picker =
         Sub.none
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
+internalSubscriptions : Model -> Sub Msg
+internalSubscriptions model =
     Sub.batch
         [ pickerSubscriptions (PickerMsg Day) model.dayPicker
         , pickerSubscriptions (PickerMsg Hour) model.hourPicker

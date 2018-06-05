@@ -1,8 +1,8 @@
-module Main exposing (main)
+module DateTimePicker exposing (main)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Elements.DatetimePicker as Picker
+import BodyBuilder.Elements.DateTimePicker as Picker
 import BodyBuilder.Events as Events
 import BodyBuilder.Style as Style
 import Date.RataDie as RataDie exposing (RataDie)
@@ -44,7 +44,7 @@ init =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Picker.pickerSubscriptions2 model PickerMsg
+    Picker.subscriptions model PickerMsg
 
 
 
@@ -55,7 +55,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         PickerMsg pickerMsg ->
-            Picker.pickerUpdate pickerMsg model PickerMsg
+            Picker.update pickerMsg model PickerMsg
 
 
 
