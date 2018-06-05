@@ -115,9 +115,9 @@ import BodyBuilder.Internals.Convert
 import BodyBuilder.Internals.Shared as Shared
 import Browser
 import Elegant
-import Elegant.Display
-import Elegant.Flex exposing (FlexContainerDetails)
-import Elegant.Grid
+import Elegant.Display as Display
+import Elegant.Flex as Flex exposing (FlexContainerDetails)
+import Elegant.Grid as Grid
 import Function
 import Html exposing (Html)
 import Html.Attributes
@@ -208,16 +208,16 @@ stylise view_ e =
         ( viewWithoutStyle, styles ) =
             view_ e
     in
-    Html.div []
-        (Html.node "style"
-            []
-            [ Html.text
-                (String.join "\n"
-                    (styles |> List.Extra.unique)
-                )
-            ]
-            :: [ viewWithoutStyle ]
-        )
+        Html.div []
+            (Html.node "style"
+                []
+                [ Html.text
+                    (String.join "\n"
+                        (styles |> List.Extra.unique)
+                    )
+                ]
+                :: [ viewWithoutStyle ]
+            )
 
 
 {-| Creates a program, like you could with Html. This allows you to completely
@@ -1194,15 +1194,15 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                 )
                 []
     in
-    case attributes.label of
-        Nothing ->
-            ( computedInput
-            , styles
-                |> List.map Tuple.second
-            )
+        case attributes.label of
+            Nothing ->
+                ( computedInput
+                , styles
+                    |> List.map Tuple.second
+                )
 
-        Just label ->
-            ( Shared.extractLabel label computedInput, [] )
+            Just label ->
+                ( Shared.extractLabel label computedInput, [] )
 
 
 computeBlock :
@@ -1233,18 +1233,18 @@ computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers
                 attributes.box
                 |> List.concatMap Elegant.styleToCss
     in
-    ( Html.node tag
-        (styleResult
-            |> List.map Tuple.first
-            |> String.join " "
-            |> Html.Attributes.class
-            |> Function.flip (::) (attributesToHtmlAttributes attributes)
+        ( Html.node tag
+            (styleResult
+                |> List.map Tuple.first
+                |> String.join " "
+                |> Html.Attributes.class
+                |> Function.flip (::) (attributesToHtmlAttributes attributes)
+            )
+            (content
+                |> List.map Tuple.first
+            )
+        , (styleResult |> List.map Tuple.second) ++ (content |> List.map Tuple.second |> List.concat)
         )
-        (content
-            |> List.map Tuple.first
-        )
-    , (styleResult |> List.map Tuple.second) ++ (content |> List.map Tuple.second |> List.concat)
-    )
 
 
 type alias NodeWithStyle msg =

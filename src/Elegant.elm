@@ -31,9 +31,7 @@ module Elegant
         , withScreenWidth
         )
 
-{-|
-
-@docs CommonStyle
+{-| @docs CommonStyle
 @docs commonStyle
 @docs commonStyleToCss
 @docs commonStyleToStyle
@@ -62,10 +60,9 @@ module Elegant
 @docs vh
 @docs vw
 @docs withScreenWidth
-
 -}
 
-import BodyBuilder.Style as CommonStyle
+import Elegant.Helpers.Style as CommonStyle
 import Elegant.Display exposing (DisplayBox)
 import Elegant.Helpers.Shared exposing (..)
 import Elegant.Internals.Convert
@@ -185,7 +182,7 @@ screenWidthLE max lessStyle (Style style_) =
 toInlineStyles : Style -> List ( String, String )
 toInlineStyles (Style style_) =
     style_.display
-        |> Maybe.map Elegant.Convert.computeStyle
+        |> Maybe.map Elegant.Internals.Convert.computeStyle
         |> Maybe.withDefault []
 
 
@@ -217,7 +214,7 @@ inlineStyle =
 classes : Style -> String
 classes (Style style_) =
     style_
-        |> Elegant.Convert.classesNamesFromStyle
+        |> Elegant.Internals.Convert.classesNamesFromStyle
         |> String.join " "
 
 
@@ -226,14 +223,14 @@ classes (Style style_) =
 -- stylesToCss styles =
 --     styles
 --         |> List.map toCommonStyle
---         |> Elegant.Convert.stylesToCss
+--         |> Elegant.Internals.Convert.stylesToCss
 
 
 {-| -}
 commonStyleToCss : CommonStyle -> List ( String, String )
 commonStyleToCss style_ =
     style_
-        |> Elegant.Convert.fetchStylesOrCompute ""
+        |> Elegant.Internals.Convert.fetchStylesOrCompute ""
 
 
 {-| -}

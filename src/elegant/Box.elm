@@ -114,20 +114,20 @@ It contains only modifiers, and they can be found in the respective modules.
 -}
 
 import Color exposing (Color)
-import Elegant.Background
-import Elegant.Border
-import Elegant.Corner
-import Elegant.Cursor
+import Elegant.Background as Background
+import Elegant.Border as Border
+import Elegant.Corner as Corner
+import Elegant.Cursor as Cursor
 import Elegant.Helpers.Shared exposing (..)
 import Elegant.Internals.Setters exposing (..)
-import Elegant.Margin
-import Elegant.Outline
-import Elegant.Padding
-import Elegant.Position
-import Elegant.Shadow
+import Elegant.Margin as Margin
+import Elegant.Outline as Outline
+import Elegant.Padding as Padding
+import Elegant.Position as Position
+import Elegant.Shadow as Shadow
 import Elegant.Surrounded exposing (Surrounded)
-import Elegant.Transform
-import Elegant.Typography
+import Elegant.Transform as Transform
+import Elegant.Typography as Typography
 import Modifiers exposing (..)
 
 

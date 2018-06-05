@@ -218,10 +218,10 @@ import BodyBuilder.Internals.Shared as Shared
 import Color exposing (Color)
 import Color.Convert
 import Elegant
-import Elegant.Box
-import Elegant.Display exposing (BlockDetails)
-import Elegant.Flex
-import Elegant.Grid
+import Elegant.Box as Box
+import Elegant.Display as Display exposing (BlockDetails)
+import Elegant.Flex as Flex
+import Elegant.Grid as Grid
 import Elegant.Helpers.Shared exposing (..)
 import Function
 import Html exposing (Html)

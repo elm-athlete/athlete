@@ -1,6 +1,6 @@
 module Elegant.Internals.Convert exposing (..)
 
-import Elegant.Display
+import Elegant.Display as Display
 import Elegant.Helpers.Css
 import Elegant.Helpers.Style exposing (..)
 import Function
@@ -28,14 +28,14 @@ classesNamesFromStyle ({ screenWidths, display, suffix } as style) =
                 |> Maybe.withDefault []
                 |> classesNameGeneration suffix
     in
-    screenWidths
-        |> List.concatMap (screenWidthToClassesNames suffix)
-        |> List.append standardClassesNames
+        screenWidths
+            |> List.concatMap (screenWidthToClassesNames suffix)
+            |> List.append standardClassesNames
 
 
 classesNameGeneration : Maybe String -> List ( String, String ) -> List String
 classesNameGeneration suffix =
-    List.map (Helpers.Css.generateClassName suffix)
+    List.map (Elegant.Helpers.Css.generateClassName suffix)
 
 
 screenWidthToClassesNames : Maybe String -> ScreenWidth -> List String
@@ -49,14 +49,14 @@ screenWidthToClassesNames suffix { min, max, style } =
                 Just int ->
                     String.fromInt int
     in
-    -- TODO : Fix that (it's very ugly)
-    style
-        |> computeStyle
-        |> classesNameGeneration suffix
-        |> List.map
-            (addScreenWidthToClassName
-                (Helpers.Css.cssValidName (toString min ++ toString max))
-            )
+        -- TODO : Fix that (it's very ugly)
+        style
+            |> computeStyle
+            |> classesNameGeneration suffix
+            |> List.map
+                (addScreenWidthToClassName
+                    (Elegant.Helpers.Css.cssValidName (toString min ++ toString max))
+                )
 
 
 addScreenWidthToClassName : String -> String -> String
@@ -150,13 +150,13 @@ computeAtomicClass ({ mediaQuery, className, mediaQueryId, selector, property } 
             computeStyleToCss className mediaQueryId selector property
                 |> inMediaQuery mediaQuery
     in
-    ( classNameComplete, test )
+        ( classNameComplete, test )
 
 
 inMediaQuery : Maybe String -> String -> String
 inMediaQuery mediaQuery content =
     mediaQuery
-        |> Maybe.map (Function.flip (++) (Helpers.Css.surroundWithBraces content))
+        |> Maybe.map (Function.flip (++) (Elegant.Helpers.Css.surroundWithBraces content))
         |> Maybe.withDefault content
 
 
