@@ -3,8 +3,8 @@ module BodyBuilder.Elements.DatetimePicker
         ( Model
         , Msg(..)
         , initModel
-        , pickerSubscriptions
-        , updatePicker
+        , pickerSubscriptions2
+        , pickerUpdate
         , view
         )
 
@@ -133,13 +133,13 @@ updateSpecificPicker pickerMsg picker =
 pickerUpdate pickerMsg model pickerWrapper =
     let
         ( pickerModel, pickerCmdMsg ) =
-            Picker.update pickerMsg model
+            update pickerMsg model
     in
     ( pickerModel, Cmd.map pickerWrapper pickerCmdMsg )
 
 
-pickerSubscriptions model wrapper =
-    Sub.map PickerMsg (Picker.subscriptions model)
+pickerSubscriptions2 model wrapper =
+    Sub.map wrapper (subscriptions model)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -230,7 +230,16 @@ view : (Msg -> msg) -> Model -> NodeWithStyle msg
 view msgWrapper model =
     Builder.flex
         [ Attributes.style
-            [ Style.flexContainerProperties [ Flex.direction Flex.row, Flex.align Flex.alignCenter ] ]
+            [ Style.flexContainerProperties
+                [ Flex.direction Flex.row
+                , Flex.align Flex.alignCenter
+                ]
+            , Style.box
+                [ Box.typography
+                    [ Typography.userSelect False
+                    ]
+                ]
+            ]
         ]
         [ pickerView (msgWrapper << DayPickerMsg) model.dayPicker
         , pickerLabelView " at "

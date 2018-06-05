@@ -22,6 +22,10 @@ type alias Model =
     Picker.Model
 
 
+type Msg
+    = PickerMsg Picker.Msg
+
+
 initModel =
     Picker.initModel
         ( RataDie.fromCalendarDate 2017 RataDie.Dec 15
@@ -40,22 +44,18 @@ init =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    pickerSubscriptions model PickerMsg
+    Picker.pickerSubscriptions2 model PickerMsg
 
 
 
 ---- UPDATE ----
 
 
-type Msg
-    = PickerMsg Picker.Msg
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         PickerMsg pickerMsg ->
-            pickerUpdate pickerMsg model PickerMsg
+            Picker.pickerUpdate pickerMsg model PickerMsg
 
 
 
