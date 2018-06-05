@@ -1,10 +1,19 @@
-module BodyBuilder.Elements.DatetimePicker exposing (Model, Msg(..), initModel, subscriptions, update, view)
+module BodyBuilder.Elements.DatetimePicker
+    exposing
+        ( Model
+        , Msg(..)
+        , initModel
+        , pickerSubscriptions
+        , updatePicker
+        , view
+        )
 
 import AnimationFrame
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements.WheelPicker as Picker
 import BodyBuilder.Style as Style
+import Date.RataDie as Date exposing (RataDie)
 import DateFormat
 import Elegant exposing (px)
 import Elegant.Block as Block
@@ -15,7 +24,6 @@ import Elegant.Typography as Typography
 import Function
 import Time exposing (Month(..), Posix, Zone)
 import Touch
-import Date.RataDie as Date exposing (RataDie)
 
 
 ---- CONSTANTS ----
@@ -51,9 +59,9 @@ initDayPicker ( dayLimitStart, dayLimitStop ) =
                     , DateFormat.yearNumber
                     ]
     in
-        dateRange (rataDieToMillis dayLimitStart) (rataDieToMillis dayLimitStop) toMs.day
-            |> List.map format
-            |> Picker.defaultWheelPicker 175
+    dateRange (rataDieToMillis dayLimitStart) (rataDieToMillis dayLimitStop) toMs.day
+        |> List.map format
+        |> Picker.defaultWheelPicker 175
 
 
 initHourPicker : Picker.WheelPicker
@@ -62,9 +70,9 @@ initHourPicker =
         format =
             Time.millisToPosix >> formatTime [ DateFormat.hourMilitaryFixed ]
     in
-        dateRange 3600000 82800000 toMs.hour
-            |> List.map format
-            |> Picker.defaultWheelPicker 60
+    dateRange 3600000 82800000 toMs.hour
+        |> List.map format
+        |> Picker.defaultWheelPicker 60
 
 
 initMinutePicker : Picker.WheelPicker
@@ -73,9 +81,9 @@ initMinutePicker =
         format =
             Time.millisToPosix >> formatTime [ DateFormat.minuteFixed ]
     in
-        dateRange 0 3540000 toMs.minute
-            |> List.map format
-            |> Picker.defaultWheelPicker 60
+    dateRange 0 3540000 toMs.minute
+        |> List.map format
+        |> Picker.defaultWheelPicker 60
 
 
 setDate : Posix -> Model -> Model
@@ -94,8 +102,8 @@ initModel dayLimits =
             , minutePicker = initMinutePicker
             }
     in
-        initialModel
-            |> setDate (dateFromPickers initialModel)
+    initialModel
+        |> setDate (dateFromPickers initialModel)
 
 
 type alias Model =
@@ -122,6 +130,18 @@ updateSpecificPicker pickerMsg picker =
     Picker.update pickerMsg picker
 
 
+pickerUpdate pickerMsg model pickerWrapper =
+    let
+        ( pickerModel, pickerCmdMsg ) =
+            Picker.update pickerMsg model
+    in
+    ( pickerModel, Cmd.map pickerWrapper pickerCmdMsg )
+
+
+pickerSubscriptions model wrapper =
+    Sub.map PickerMsg (Picker.subscriptions model)
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -130,30 +150,30 @@ update msg model =
                 ( pickerModel, pickerCmdMsg ) =
                     updateSpecificPicker pickerMsg model.dayPicker
             in
-                ( { model | dayPicker = pickerModel }
-                    |> setDate (dateFromPickers model)
-                , Cmd.map DayPickerMsg pickerCmdMsg
-                )
+            ( { model | dayPicker = pickerModel }
+                |> setDate (dateFromPickers model)
+            , Cmd.map DayPickerMsg pickerCmdMsg
+            )
 
         HourPickerMsg pickerMsg ->
             let
                 ( pickerModel, pickerCmdMsg ) =
                     updateSpecificPicker pickerMsg model.hourPicker
             in
-                ( { model | hourPicker = pickerModel }
-                    |> setDate (dateFromPickers model)
-                , Cmd.map HourPickerMsg pickerCmdMsg
-                )
+            ( { model | hourPicker = pickerModel }
+                |> setDate (dateFromPickers model)
+            , Cmd.map HourPickerMsg pickerCmdMsg
+            )
 
         MinutePickerMsg pickerMsg ->
             let
                 ( pickerModel, pickerCmdMsg ) =
                     updateSpecificPicker pickerMsg model.minutePicker
             in
-                ( { model | minutePicker = pickerModel }
-                    |> setDate (dateFromPickers model)
-                , Cmd.map MinutePickerMsg pickerCmdMsg
-                )
+            ( { model | minutePicker = pickerModel }
+                |> setDate (dateFromPickers model)
+            , Cmd.map MinutePickerMsg pickerCmdMsg
+            )
 
 
 
@@ -238,8 +258,8 @@ dateRange start end increment =
             else
                 acc_
     in
-        dateRange_ start end increment []
-            |> List.reverse
+    dateRange_ start end increment []
+        |> List.reverse
 
 
 dateFromPickers : Model -> Posix
@@ -254,8 +274,8 @@ dateFromPickers model =
         minute =
             Picker.getSelect model.minutePicker
     in
-        ((Tuple.first model.dayLimits |> rataDieToMillis) + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
-            |> Time.millisToPosix
+    ((Tuple.first model.dayLimits |> rataDieToMillis) + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
+        |> Time.millisToPosix
 
 
 formatTime : List DateFormat.Token -> Posix -> String

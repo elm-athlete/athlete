@@ -2,15 +2,15 @@ module Main exposing (main)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Events as Events
 import BodyBuilder.Elements.DatetimePicker as Picker
+import BodyBuilder.Events as Events
+import BodyBuilder.Style as Style
 import Date.RataDie as RataDie exposing (RataDie)
 import DateFormat
+import Elegant exposing (px)
 import Elegant.Block as Block
-import BodyBuilder.Style as Style
 import Elegant.Box as Box
 import Elegant.Margin as Margin
-import Elegant exposing (px)
 import Elegant.Typography as Typography
 import Time exposing (Posix)
 
@@ -18,15 +18,15 @@ import Time exposing (Posix)
 ---- INIT ----
 
 
+type alias Model =
+    Picker.Model
+
+
 initModel =
     Picker.initModel
         ( RataDie.fromCalendarDate 2017 RataDie.Dec 15
         , RataDie.fromCalendarDate 2018 RataDie.Jan 14
         )
-
-
-type alias Model =
-    Picker.Model
 
 
 init : ( Model, Cmd Msg )
@@ -40,7 +40,7 @@ init =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.map PickerMsg (Picker.subscriptions model)
+    pickerSubscriptions model PickerMsg
 
 
 
@@ -55,11 +55,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         PickerMsg pickerMsg ->
-            let
-                ( pickerModel, pickerCmdMsg ) =
-                    Picker.update pickerMsg model
-            in
-                ( pickerModel, Cmd.map PickerMsg pickerCmdMsg )
+            pickerUpdate pickerMsg model PickerMsg
 
 
 
