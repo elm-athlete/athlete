@@ -32,7 +32,6 @@
         "BodyBuilder",
         "BodyBuilder.Attributes",
         "BodyBuilder.Events",
-        "BodyBuilder.Elements.DateTimePicker",
         "BodyBuilder.Router",
         "BodyBuilder.Style"
     ],

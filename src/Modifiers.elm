@@ -1,4 +1,4 @@
-module Modifiers exposing (..)
+module Modifiers exposing (Modifier, Modifiers)
 
 {-| Modifiers for shorter types signatures.
 

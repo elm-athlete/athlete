@@ -1,4 +1,23 @@
-module BodyBuilder.Style exposing (..)
+module BodyBuilder.Style
+    exposing
+        ( between
+        , block
+        , blockProperties
+        , box
+        , flexContainerProperties
+        , flexItemProperties
+        , focus
+        , greater
+        , gridContainerProperties
+        , gridItemProperties
+        , hover
+        , lesser
+        , media
+        , pseudoClass
+        , setMedia
+        , setPseudoClass
+        , waitForStyleSelector
+        )
 
 {-|
 

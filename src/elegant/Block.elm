@@ -1,4 +1,18 @@
-module Elegant.Block exposing (..)
+module Elegant.Block
+    exposing
+        ( alignCenter
+        , alignLeft
+        , alignRight
+        , fullHeight
+        , fullWidth
+        , height
+        , maxHeight
+        , maxWidth
+        , minHeight
+        , minWidth
+        , overflowHidden
+        , width
+        )
 
 {-|
 

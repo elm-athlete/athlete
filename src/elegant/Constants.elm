@@ -1,4 +1,22 @@
-module Elegant.Constants exposing (..)
+module Elegant.Constants
+    exposing
+        ( alpha
+        , beta
+        , delta
+        , epsilon
+        , eta
+        , gamma
+        , huge
+        , iota
+        , kappa
+        , large
+        , medium
+        , small
+        , theta
+        , tiny
+        , zero
+        , zeta
+        )
 
 {-|
 

@@ -72,7 +72,7 @@ It is perfectly compatible with Html, though.
 
 ## Elements Types
 
-@docs Node, FlexItem, GridItem, Option
+@docs Node, FlexItem, GridItem, Option, NodeWithStyle
 
 
 ## Attributes
@@ -104,9 +104,10 @@ It is possible to style those elements using `Style.blockProperties`.
 @docs div, header, footer, nav, section, article, aside, h1, h2, h3, h4, h5, h6, p
 
 
-# Embed
+# Programs
 
 @docs embed
+@docs staticPage
 
 -}
 
@@ -241,6 +242,8 @@ embed el =
         }
 
 
+{-| a BodyBuilder static page
+-}
 staticPage : NodeWithStyle msg -> Program () () msg
 staticPage el =
     Browser.staticPage (stylise (\_ -> el) ())
@@ -1248,5 +1251,9 @@ computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers
     )
 
 
+{-| NodeWithStyle is allowing BodyBuilder to have Nodes with styles inside them.
+It is the central type of Bodybuilder, and inside that type resides the key asset of
+BodyBuilder and Elegant
+-}
 type alias NodeWithStyle msg =
     ( Node msg, List String )

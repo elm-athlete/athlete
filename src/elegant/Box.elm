@@ -98,6 +98,7 @@ It contains only modifiers, and they can be found in the respective modules.
 @docs fontFamilySansSerif
 @docs systemFont
 @docs textColor
+@docs willChange
 
 
 # Values
@@ -258,6 +259,9 @@ opacity =
     setMaybeValue setOpacity
 
 
+{-| WillChange helps the browser to know which property will change.
+It's very useful for the optimization of animations
+-}
 willChange : List WillChange -> Modifier Box
 willChange =
     setMaybeValue setWillChange
