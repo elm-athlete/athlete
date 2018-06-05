@@ -8,15 +8,14 @@ module BodyBuilder.Elements.DateTimePicker
         , view
         )
 
-{-|
+{-| Mobile like date time picker
 
-    mobile like date time picker
-    @docs Model
-    @docs Msg
-    @docs init
-    @docs subscriptions
-    @docs update
-    @docs view
+@docs Model
+@docs Msg
+@docs init
+@docs subscriptions
+@docs update
+@docs view
 
 -}
 
