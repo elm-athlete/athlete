@@ -29,6 +29,7 @@ module Elegant.Dimensions
 
 import Elegant.Helpers.Shared exposing (..)
 import Elegant.Internals.Setters exposing (..)
+import Function exposing (callOn)
 import Modifiers exposing (..)
 
 

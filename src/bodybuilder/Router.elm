@@ -76,6 +76,7 @@ import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
 import BodyBuilder.Style as Style
+import Browser
 import Color
 import Elegant exposing (SizeUnit, percent, px)
 import Elegant.Block as Block
@@ -183,8 +184,7 @@ Back to handle back buttons
 type StandardHistoryMsg
     = Tick Float
     | Back
-      -- | FocusMsg (Result Dom.Error ())
-    | FocusMsg Int
+    | FocusMsg (Result Browser.DomError ())
 
 
 easingFun : Easing -> Float -> Float
@@ -656,16 +656,19 @@ standardHandleHistory historyMsg history =
 focusChoosenElement : History route msg -> model -> ( model, Cmd msg )
 focusChoosenElement history model =
     ( model
-    , Cmd.none
-      -- case history.currentPageHasFocusElement of
-      -- False ->
-      --     Cmd.none
-      -- True ->
-      --     history.current.maybeFocusedId
-      --         |> Maybe.withDefault ""
-      -- TODO Fix the scroll (using ports)
-      -- |> Native.BodyBuilder.focusWithoutScroll
-      -- |> Task.attempt (FocusMsg >> history.standardHistoryWrapper)
+    , case history.currentPageHasFocusElement of
+        False ->
+            Cmd.none
+
+        True ->
+            case history.current.maybeFocusedId of
+                Nothing ->
+                    Cmd.none
+
+                Just maybeFocusedId_ ->
+                    Task.attempt
+                        (FocusMsg >> history.standardHistoryWrapper)
+                        (Browser.focus maybeFocusedId_)
     )
 
 

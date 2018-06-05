@@ -153,20 +153,6 @@ keepJustValue ( property, value ) =
             [ ( property, val ) ]
 
 
-
--- TODO move in Function
-
-
-call : (a -> b) -> a -> b
-call fun =
-    fun
-
-
-callOn : a -> (a -> b) -> b
-callOn var fun =
-    fun var
-
-
 colorToCouple : Color -> ( String, String )
 colorToCouple color =
     ( "color", Color.Convert.colorToCssRgba color )

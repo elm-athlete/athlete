@@ -129,6 +129,7 @@ import Elegant.Shadow as Shadow
 import Elegant.Surrounded exposing (Surrounded)
 import Elegant.Transform as Transform
 import Elegant.Typography as Typography
+import Function exposing (callOn)
 import Modifiers exposing (..)
 
 

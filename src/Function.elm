@@ -1,4 +1,4 @@
-module Function exposing (compose, flip)
+module Function exposing (callOn, compose, flip)
 
 {-|
 
@@ -19,3 +19,13 @@ compose =
 
 flip f b a =
     f a b
+
+
+call : (a -> b) -> a -> b
+call fun =
+    fun
+
+
+callOn : a -> (a -> b) -> b
+callOn var fun =
+    fun var

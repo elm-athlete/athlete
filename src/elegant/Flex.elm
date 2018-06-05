@@ -121,8 +121,9 @@ module Elegant.Flex
 -}
 
 import Either exposing (Either(..))
-import Elegant.Internals.Setters exposing (..)
 import Elegant.Helpers.Shared exposing (..)
+import Elegant.Internals.Setters exposing (..)
+import Function exposing (callOn)
 import Modifiers exposing (..)
 
 

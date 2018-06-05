@@ -78,6 +78,7 @@ It is not compatible with Html, though.
 import BodyBuilder.Internals.Setters exposing (..)
 import Color exposing (Color)
 import Elegant.Helpers.Shared exposing (..)
+import Function exposing (callOn)
 import Html
 import Html.Events
 import Json.Decode exposing (Decoder)

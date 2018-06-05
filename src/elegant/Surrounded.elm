@@ -29,9 +29,9 @@ module Elegant.Surrounded
 
 -}
 
-import Elegant.Internals.Setters exposing (..)
-import Function
 import Elegant.Helpers.Shared exposing (..)
+import Elegant.Internals.Setters exposing (..)
+import Function exposing (callOn)
 import List.Extra
 import Modifiers exposing (..)
 
@@ -144,4 +144,4 @@ addPrefix qualifier orientation ( selector, value ) =
                         Just qual ->
                             [ qual, orientation, name_ ]
     in
-        ( name |> String.join "-", value )
+    ( name |> String.join "-", value )

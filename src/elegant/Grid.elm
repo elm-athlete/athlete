@@ -124,6 +124,7 @@ module Elegant.Grid
 -}
 
 import Elegant.Helpers.Shared exposing (..)
+import Function exposing (callOn)
 import Modifiers exposing (..)
 
 

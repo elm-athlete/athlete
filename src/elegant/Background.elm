@@ -69,6 +69,7 @@ import Elegant.Helpers.Css
 import Elegant.Helpers.Shared exposing (..)
 import Elegant.Helpers.Vector exposing (Vector)
 import Elegant.Internals.Setters exposing (..)
+import Function exposing (callOn)
 import Maybe.Extra
 import Modifiers exposing (..)
 

@@ -223,7 +223,7 @@ import Elegant.Display as Display exposing (BlockDetails)
 import Elegant.Flex as Flex
 import Elegant.Grid as Grid
 import Elegant.Helpers.Shared exposing (..)
-import Function
+import Function exposing (callOn)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events

@@ -58,6 +58,7 @@ module Elegant.Corner
 
 import Elegant.Helpers.Shared exposing (..)
 import Elegant.Internals.Setters as Setters
+import Function exposing (callOn)
 import Modifiers exposing (..)
 
 
