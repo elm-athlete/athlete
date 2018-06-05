@@ -118,6 +118,8 @@ init dayLimits =
         |> setDate (dateFromPickers initialModel)
 
 
+{-| Model of the DateTime Picker
+-}
 type alias Model =
     { date : Posix
     , dayLimits : ( RataDie, RataDie )
