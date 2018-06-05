@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
-import BodyBuilder.Elements.DatetimePicker as Picker
+import BodyBuilder.Elements.DateTimePicker as Picker
 import BodyBuilder.Events as Events
 import Date.RataDie exposing (RataDie)
 

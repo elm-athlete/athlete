@@ -1,4 +1,4 @@
-module BodyBuilder.Elements.DatetimePicker exposing (Model, initialModel, main)
+module BodyBuilder.Elements.DateTimePicker exposing (Model, initialModel, main)
 
 import AnimationFrame
 import BodyBuilder as Builder exposing (NodeWithStyle)
