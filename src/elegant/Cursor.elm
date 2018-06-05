@@ -1,4 +1,27 @@
-module Elegant.Cursor exposing (..)
+module Elegant.Cursor
+    exposing
+        ( Cursor
+        , auto
+        , cell
+        , contextMenu
+        , crosshair
+        , cursorToCouple
+        , default
+        , grab
+        , grabbing
+        , help
+        , move
+        , noDrop
+        , none
+        , notAllowed
+        , pointer
+        , progress
+        , text
+        , verticalText
+        , wait
+        , zoomIn
+        , zoomOut
+        )
 
 {-| Cursor contains everything about cursors rendering.
 

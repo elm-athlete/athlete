@@ -196,19 +196,19 @@ It is not compatible with Html.Attributes, though.
 @docs SelectAttributes, defaultSelectAttributes, selectAttributesToHtmlAttributes
 @docs LabelAttributes, label, PositionAttribute, Position
 @docs InputAttributes, value, disabled, name, disabledAttributeToHtmlAttributes, inputAttributesToHtmlAttributes, inputVisibleToHtmlAttributes
-@docs InputHiddenAttributes, name, defaultInputHiddenAttributes, inputHiddenAttributesToHtmlAttributes
-@docs InputPasswordAttributes, name, defaultInputPasswordAttributes, inputPasswordAttributesToHtmlAttributes
-@docs InputRangeAttributes, name, step, max, min, defaultInputRangeAttributes, inputRangeAttributesToHtmlAttributes
-@docs InputRadioAttributes, name, defaultInputRadioAttributes, inputRadioAttributesToHtmlAttributes
-@docs InputCheckboxAttributes, name, checked, defaultInputCheckboxAttributes, inputCheckboxAttributesToHtmlAttributes
-@docs InputTextAttributes, name, autocomplete, placeholder, defaultInputTextAttributes, inputTextAttributesToHtmlAttributes
+@docs InputHiddenAttributes, defaultInputHiddenAttributes, inputHiddenAttributesToHtmlAttributes
+@docs InputPasswordAttributes, defaultInputPasswordAttributes, inputPasswordAttributesToHtmlAttributes
+@docs InputRangeAttributes, step, defaultInputRangeAttributes, inputRangeAttributesToHtmlAttributes
+@docs InputRadioAttributes, defaultInputRadioAttributes, inputRadioAttributesToHtmlAttributes
+@docs InputCheckboxAttributes, checked, defaultInputCheckboxAttributes, inputCheckboxAttributesToHtmlAttributes
+@docs InputTextAttributes, autocomplete, defaultInputTextAttributes, inputTextAttributesToHtmlAttributes
 @docs InputTelAttributes, defaultInputTelAttributes
-@docs InputSubmitAttributes, name, defaultInputSubmitAttributes, inputSubmitAttributesToHtmlAttributes
-@docs InputUrlAttributes, name, placeholder, defaultInputUrlAttributes, inputUrlAttributesToHtmlAttributes
-@docs InputNumberAttributes, name, step, max, min, defaultInputNumberAttributes, inputNumberAttributesToHtmlAttributes
-@docs InputColorAttributes, name, defaultInputColorAttributes, inputColorAttributesToHtmlAttributes
-@docs InputFileAttributes, name, defaultInputFileAttributes, inputFileAttributesToHtmlAttributes
-@docs TextareaAttributes, autocomplete, placeholder, defaultTextareaAttributes, textareaAttributesToHtmlAttributes
+@docs InputSubmitAttributes, defaultInputSubmitAttributes, inputSubmitAttributesToHtmlAttributes
+@docs InputUrlAttributes, defaultInputUrlAttributes, inputUrlAttributesToHtmlAttributes
+@docs InputNumberAttributes, max, min, defaultInputNumberAttributes, inputNumberAttributesToHtmlAttributes
+@docs InputColorAttributes, defaultInputColorAttributes, inputColorAttributesToHtmlAttributes
+@docs InputFileAttributes, defaultInputFileAttributes, inputFileAttributesToHtmlAttributes
+@docs TextareaAttributes, placeholder, defaultTextareaAttributes, textareaAttributesToHtmlAttributes
 
 -}
 
