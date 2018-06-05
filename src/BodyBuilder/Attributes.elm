@@ -266,6 +266,7 @@ style styles =
 
 
 {-| -}
+rawStyle : b -> { a | rawStyle : Maybe b } -> { a | rawStyle : Maybe b }
 rawStyle theStyle attrs =
     { attrs | rawStyle = Just theStyle }
 

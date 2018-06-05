@@ -100,10 +100,12 @@ comes with a light and dark version.
 
 These colors are a compatible series of shades of grey, fitting nicely
 with the Tango palette.
+
 @docs white, lightGrey, grey, darkGrey, lightCharcoal, charcoal, darkCharcoal, black
 
 These are identical to the _grey_ versions. It seems the spelling is regional, but
 that has never helped me remember which one I should be writing.
+
 @docs lightGray, gray, darkGray
 
 -}
@@ -268,8 +270,10 @@ rgbToHsl red_ green_ blue_ =
             degrees 60
                 * (if cMax == r then
                     fmod ((g - b) / c) 6
+
                    else if cMax == g then
                     ((b - r) / c) + 2
+
                    else
                     {- cMax == b -}
                     ((r - g) / c) + 4
@@ -281,6 +285,7 @@ rgbToHsl red_ green_ blue_ =
         saturation =
             if lightness == 0 then
                 0
+
             else
                 c / (1 - abs (2 * lightness - 1))
     in
@@ -302,18 +307,25 @@ hslToRgb hue saturation lightness =
         ( r, g, b ) =
             if normHue < 0 then
                 ( 0, 0, 0 )
+
             else if normHue < 1 then
                 ( chroma, x, 0 )
+
             else if normHue < 2 then
                 ( x, chroma, 0 )
+
             else if normHue < 3 then
                 ( 0, chroma, x )
+
             else if normHue < 4 then
                 ( 0, x, chroma )
+
             else if normHue < 5 then
                 ( x, 0, chroma )
+
             else if normHue < 6 then
                 ( chroma, 0, x )
+
             else
                 ( 0, 0, 0 )
 
