@@ -27,7 +27,7 @@ type Msg
 
 
 initModel =
-    Picker.initModel
+    Picker.init
         ( RataDie.fromCalendarDate 2017 RataDie.Dec 15
         , RataDie.fromCalendarDate 2018 RataDie.Jan 14
         )
