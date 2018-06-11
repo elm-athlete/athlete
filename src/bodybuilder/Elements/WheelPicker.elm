@@ -384,6 +384,7 @@ view ((WheelPicker picker) as wheelPicker) =
                         , Transform.origin ( px 0, px picker.radiusOut, px (negate picker.radiusOut) )
                         , Transform.translateZ (px (negate picker.radiusOut))
                         ]
+                    , Box.willChange [ "transform", "transform-origin" ]
                     , Box.typography
                         [ Typography.size (px pickerFontSize)
                         , Typography.lineHeight (px (round pickerFaceHeight))
