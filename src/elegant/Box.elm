@@ -504,7 +504,7 @@ opacityToCouple opacity_ =
 
 willChangeToCouples : List WillChange -> ( String, String )
 willChangeToCouples willChange_ =
-    ( "will-change", String.join " " willChange_ )
+    ( "will-change", String.join ", " willChange_ )
 
 
 visibilityToCouple : Visibility -> ( String, String )

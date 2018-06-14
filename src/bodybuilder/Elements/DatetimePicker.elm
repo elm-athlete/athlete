@@ -37,6 +37,7 @@ import Time exposing (Month(..), Posix, Zone)
 import Touch
 
 
+
 ---- CONSTANTS ----
 
 
@@ -72,7 +73,7 @@ initDayPicker ( dayLimitStart, dayLimitStop ) =
     in
     dateRange (rataDieToMillis dayLimitStart) (rataDieToMillis dayLimitStop) toMs.day
         |> List.map format
-        |> Picker.defaultWheelPicker 175
+        |> Picker.defaultWheelPicker 230
 
 
 initHourPicker : Picker.WheelPicker
@@ -231,6 +232,7 @@ pickerSubscriptions : (Picker.Msg -> Msg) -> Picker.WheelPicker -> Sub Msg
 pickerSubscriptions msg picker =
     if Picker.isAnimationFrameNeeded picker then
         AnimationFrame.times (msg << Picker.NewFrame)
+
     else
         Sub.none
 
@@ -313,6 +315,7 @@ dateRange start end increment =
         dateRange_ start_ end_ increment_ acc_ =
             if start_ <= end_ then
                 dateRange_ (start_ + increment_) end_ increment_ (start_ :: acc_)
+
             else
                 acc_
     in

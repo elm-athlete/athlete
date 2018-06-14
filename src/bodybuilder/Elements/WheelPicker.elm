@@ -32,6 +32,7 @@ import Touch
 import Tuple
 
 
+
 ---- CONSTANTS ----
 
 
@@ -314,6 +315,7 @@ wheelPickerView (WheelPicker picker) =
         faceColorOpacity faceIndex =
             if ((elementsToDrop faceIndex |> toFloat) - picker.angle) >= 80 then
                 0
+
             else
                 (80 - ((elementsToDrop faceIndex |> toFloat) * angleBetweenFaces picker.faces - picker.angle |> abs)) / 80
 
@@ -333,6 +335,7 @@ wheelPickerView (WheelPicker picker) =
                             ]
                         , if (elementsToDrop faceIndex - picker.select) == 0 then
                             Box.textColor <| Color.rgb 0 0 0
+
                           else
                             Box.textColor <| Color.rgba 180 180 180 (faceColorOpacity faceIndex)
                         ]
@@ -340,6 +343,7 @@ wheelPickerView (WheelPicker picker) =
                 ]
                 [ if elementsToDrop faceIndex < 0 then
                     Builder.text ""
+
                   else
                     picker.dataList
                         |> List.drop (elementsToDrop faceIndex)
@@ -384,7 +388,7 @@ view ((WheelPicker picker) as wheelPicker) =
                         , Transform.origin ( px 0, px picker.radiusOut, px (negate picker.radiusOut) )
                         , Transform.translateZ (px (negate picker.radiusOut))
                         ]
-                    , Box.willChange [ "transform", "transform-origin" ]
+                    , Box.willChange [ "transform" ]
                     , Box.typography
                         [ Typography.size (px pickerFontSize)
                         , Typography.lineHeight (px (round pickerFaceHeight))
@@ -443,10 +447,12 @@ applyLimitAngles (WheelPicker picker) =
         WheelPicker picker
             |> setAngle 0
             |> setState stopIfFree
+
     else if picker.angle > maxAngle then
         WheelPicker picker
             |> setAngle maxAngle
             |> setState stopIfFree
+
     else
         WheelPicker picker
 
@@ -470,6 +476,7 @@ setStateFromNewFrame currentTime (WheelPicker picker) =
                 WheelPicker picker
                     |> setAngle speedState.finalAngle
                     |> setState Stopped
+
             else
                 WheelPicker picker
                     |> setState (Free speedState)
@@ -493,6 +500,7 @@ speedToReachAFace pickerAngle pickerAngleBetweenFaces speed =
         direction =
             if finalAngle >= pickerAngle then
                 1
+
             else
                 -1
     in
