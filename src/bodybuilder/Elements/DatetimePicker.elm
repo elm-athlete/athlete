@@ -37,7 +37,6 @@ import Time exposing (Month(..), Posix, Zone)
 import Touch
 
 
-
 ---- CONSTANTS ----
 
 
@@ -71,9 +70,9 @@ initDayPicker ( dayLimitStart, dayLimitStop ) =
                     , DateFormat.yearNumber
                     ]
     in
-    dateRange (rataDieToMillis dayLimitStart) (rataDieToMillis dayLimitStop) toMs.day
-        |> List.map format
-        |> Picker.defaultWheelPicker 230
+        dateRange (rataDieToMillis dayLimitStart) (rataDieToMillis dayLimitStop) toMs.day
+            |> List.map format
+            |> Picker.defaultWheelPicker 230
 
 
 initHourPicker : Picker.WheelPicker
@@ -82,9 +81,9 @@ initHourPicker =
         format =
             Time.millisToPosix >> formatTime [ DateFormat.hourMilitaryFixed ]
     in
-    dateRange 3600000 82800000 toMs.hour
-        |> List.map format
-        |> Picker.defaultWheelPicker 60
+        dateRange 3600000 82800000 toMs.hour
+            |> List.map format
+            |> Picker.defaultWheelPicker 60
 
 
 initMinutePicker : Picker.WheelPicker
@@ -93,9 +92,9 @@ initMinutePicker =
         format =
             Time.millisToPosix >> formatTime [ DateFormat.minuteFixed ]
     in
-    dateRange 0 3540000 toMs.minute
-        |> List.map format
-        |> Picker.defaultWheelPicker 60
+        dateRange 0 3540000 toMs.minute
+            |> List.map format
+            |> Picker.defaultWheelPicker 60
 
 
 setDate : Posix -> Model -> Model
@@ -116,8 +115,8 @@ init dayLimits =
             , minutePicker = initMinutePicker
             }
     in
-    initialModel
-        |> setDate (dateFromPickers initialModel)
+        initialModel
+            |> setDate (dateFromPickers initialModel)
 
 
 {-| Model of the DateTime Picker
@@ -160,7 +159,7 @@ update pickerMsg model pickerWrapper =
         ( pickerModel, pickerCmdMsg ) =
             internalUpdate pickerMsg model
     in
-    ( pickerModel, Cmd.map pickerWrapper pickerCmdMsg )
+        ( pickerModel, Cmd.map pickerWrapper pickerCmdMsg )
 
 
 {-| The subscriptions function of the DateTime Picker
@@ -211,10 +210,10 @@ updateTimeUnitPicker timeUnit pickerMsg model =
         ( pickerModel, pickerCmdMsg ) =
             updateSpecificPicker pickerMsg (model |> getter timeUnit)
     in
-    ( setter timeUnit pickerModel model
-        |> setDate (dateFromPickers model)
-    , Cmd.map (PickerMsg timeUnit) pickerCmdMsg
-    )
+        ( setter timeUnit pickerModel model
+            |> setDate (dateFromPickers model)
+        , Cmd.map (PickerMsg timeUnit) pickerCmdMsg
+        )
 
 
 internalUpdate : Msg -> Model -> ( Model, Cmd Msg )
@@ -232,7 +231,6 @@ pickerSubscriptions : (Picker.Msg -> Msg) -> Picker.WheelPicker -> Sub Msg
 pickerSubscriptions msg picker =
     if Picker.isAnimationFrameNeeded picker then
         AnimationFrame.times (msg << Picker.NewFrame)
-
     else
         Sub.none
 
@@ -252,10 +250,6 @@ internalSubscriptions model =
 
 pickerView : (Picker.Msg -> msg) -> Picker.WheelPicker -> Builder.FlexItem msg
 pickerView msg picker =
-    -- let
-    --     touchMsgWrapper =
-    --         msgWrapper pickerId << Picker.GetTouch
-    -- in
     Builder.flexItem
         [ Attributes.rawAttribute (Touch.onStart (msg << Picker.GetTouch << Picker.StartTouch))
         , Attributes.rawAttribute (Touch.onMove (msg << Picker.GetTouch << Picker.HoldTouch))
@@ -315,12 +309,11 @@ dateRange start end increment =
         dateRange_ start_ end_ increment_ acc_ =
             if start_ <= end_ then
                 dateRange_ (start_ + increment_) end_ increment_ (start_ :: acc_)
-
             else
                 acc_
     in
-    dateRange_ start end increment []
-        |> List.reverse
+        dateRange_ start end increment []
+            |> List.reverse
 
 
 dateFromPickers : Model -> Posix
@@ -335,8 +328,8 @@ dateFromPickers model =
         minute =
             Picker.getSelect model.minutePicker
     in
-    ((Tuple.first model.dayLimits |> rataDieToMillis) + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
-        |> Time.millisToPosix
+        ((Tuple.first model.dayLimits |> rataDieToMillis) + toMs.day * day + toMs.hour * hour + toMs.minute * minute)
+            |> Time.millisToPosix
 
 
 formatTime : List DateFormat.Token -> Posix -> String

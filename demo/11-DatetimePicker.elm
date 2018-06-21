@@ -83,7 +83,10 @@ view model =
     Builder.div
         [ Attributes.style
             [ Style.blockProperties [ Block.alignCenter ]
-            , Style.box [ Box.margin [ Margin.top <| Margin.width (px 200) ] ]
+            , Style.box
+                [ Box.margin [ Margin.top <| Margin.width (px 200) ]
+                , Box.fontFamilySansSerif
+                ]
             ]
         ]
         [ Picker.view PickerMsg model
