@@ -108,7 +108,7 @@ view model =
 
 main : Program () Model Msg
 main =
-    Builder.embed
+    Builder.element
         { init = \_ -> init
         , update = update
         , subscriptions = subscriptions
