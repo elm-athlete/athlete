@@ -13,7 +13,7 @@ module BodyBuilder
         , br
         , button
         , div
-        , embed
+        , element
         , flex
         , flexItem
         , footer
@@ -48,6 +48,7 @@ module BodyBuilder
         , section
         , select
         , span
+        , sandbox
         , staticPage
         , text
         , textarea
@@ -106,7 +107,8 @@ It is possible to style those elements using `Style.blockProperties`.
 
 # Programs
 
-@docs embed
+@docs element
+@docs sandbox
 @docs staticPage
 
 -}
@@ -239,6 +241,20 @@ element el =
         , view =
             \e ->
                 stylise el.view e
+        }
+
+sandbox el =
+    Browser.sandbox
+        { init = el.init
+        , view = \e -> stylise el.view e
+        , update = el.update
+        }
+
+staticPage view =
+    sandbox
+        { view = always view
+        , init = ()
+        , update = \_ _-> ()
         }
 
 
