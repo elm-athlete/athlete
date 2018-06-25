@@ -71,7 +71,7 @@ pages and history (backward and forward)
 -- import Native.BodyBuilder
 -- import Dom
 
-import AnimationFrame
+import Browser.Events
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
@@ -604,7 +604,7 @@ historyView insidePageView_ history =
 maybeTransitionSubscription : History route msg -> Sub msg
 maybeTransitionSubscription history =
     history.transition
-        |> Maybe.map (\transition_ -> AnimationFrame.deltas (history.standardHistoryWrapper << Tick))
+        |> Maybe.map (\transition_ -> Browser.Events.onAnimationFrameDelta (history.standardHistoryWrapper << Tick))
         |> Maybe.withDefault Sub.none
 
 

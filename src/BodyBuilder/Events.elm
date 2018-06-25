@@ -312,7 +312,7 @@ onBlurEventToHtmlAttributes =
 {-| -}
 on : String -> Decoder msg -> Modifier (OnEvent msg a)
 on event decoder attrs =
-    { attrs | onEvent = Just ( event, VirtualDom.Normal (Json.Decode.map VirtualDom.Sync decoder) ) }
+    { attrs | onEvent = Just ( event, VirtualDom.Normal decoder ) }
 
 
 {-| -}
@@ -320,7 +320,7 @@ onCustom : String -> Decoder { message : msg, stopPropagation : Bool, preventDef
 onCustom event decoder attrs =
     let
         syncRecord { message, stopPropagation, preventDefault } =
-            { message = VirtualDom.Sync message
+            { message = message
             , stopPropagation = stopPropagation
             , preventDefault = preventDefault
             }

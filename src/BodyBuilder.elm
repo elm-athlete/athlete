@@ -209,30 +209,30 @@ stylise view_ e =
         ( viewWithoutStyle, styles ) =
             view_ e
     in
-    Html.div []
-        (Html.node "style"
-            []
-            [ Html.text
-                (String.join "\n"
-                    (styles |> List.Extra.unique)
-                )
-            ]
-            :: [ viewWithoutStyle ]
-        )
+        Html.div []
+            (Html.node "style"
+                []
+                [ Html.text
+                    (String.join "\n"
+                        (styles |> List.Extra.unique)
+                    )
+                ]
+                :: [ viewWithoutStyle ]
+            )
 
 
 {-| Creates a program, like you could with Html. This allows you to completely
 overrides Html to focus on BodyBuilder.
 -}
-embed :
+element :
     { init : flags -> ( model, Cmd msg )
     , subscriptions : model -> Sub msg
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> NodeWithStyle msg
     }
     -> Program flags model msg
-embed el =
-    Browser.embed
+element el =
+    Browser.element
         { init = el.init
         , subscriptions = el.subscriptions
         , update = el.update
@@ -240,13 +240,6 @@ embed el =
             \e ->
                 stylise el.view e
         }
-
-
-{-| a BodyBuilder static page
--}
-staticPage : NodeWithStyle msg -> Program () () msg
-staticPage el =
-    Browser.staticPage (stylise (\_ -> el) ())
 
 
 inlineNode : String -> Modifiers (NodeAttributes msg) -> List (NodeWithStyle msg) -> NodeWithStyle msg
@@ -1197,15 +1190,15 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                 )
                 []
     in
-    case attributes.label of
-        Nothing ->
-            ( computedInput
-            , styles
-                |> List.map Tuple.second
-            )
+        case attributes.label of
+            Nothing ->
+                ( computedInput
+                , styles
+                    |> List.map Tuple.second
+                )
 
-        Just label ->
-            ( Shared.extractLabel label computedInput, [] )
+            Just label ->
+                ( Shared.extractLabel label computedInput, [] )
 
 
 computeBlock :
@@ -1237,18 +1230,18 @@ computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers
                 |> List.concatMap Elegant.styleToCss
                 |> List.append (Maybe.withDefault [] (Maybe.map Elegant.commonStyleToCss attributes.rawStyle))
     in
-    ( Html.node tag
-        (styleResult
-            |> List.map Tuple.first
-            |> String.join " "
-            |> Html.Attributes.class
-            |> Function.flip (::) (attributesToHtmlAttributes attributes)
+        ( Html.node tag
+            (styleResult
+                |> List.map Tuple.first
+                |> String.join " "
+                |> Html.Attributes.class
+                |> Function.flip (::) (attributesToHtmlAttributes attributes)
+            )
+            (content
+                |> List.map Tuple.first
+            )
+        , (styleResult |> List.map Tuple.second) ++ (content |> List.map Tuple.second |> List.concat)
         )
-        (content
-            |> List.map Tuple.first
-        )
-    , (styleResult |> List.map Tuple.second) ++ (content |> List.map Tuple.second |> List.concat)
-    )
 
 
 {-| NodeWithStyle is allowing BodyBuilder to have Nodes with styles inside them.

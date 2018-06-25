@@ -19,7 +19,7 @@ module BodyBuilder.Elements.DateTimePicker
 
 -}
 
-import AnimationFrame
+import Browser.Events
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements.WheelPicker as Picker
@@ -230,7 +230,7 @@ internalUpdate msg model =
 pickerSubscriptions : (Picker.Msg -> Msg) -> Picker.WheelPicker -> Sub Msg
 pickerSubscriptions msg picker =
     if Picker.isAnimationFrameNeeded picker then
-        AnimationFrame.times (msg << Picker.NewFrame)
+        Browser.Events.onAnimationFrame (msg << Picker.NewFrame)
     else
         Sub.none
 
