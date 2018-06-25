@@ -206,6 +206,7 @@ br =
     ( Html.br [] [], [] )
 
 
+stylise : (model -> NodeWithStyle msg) -> model -> Node msg
 stylise view_ e =
     let
         ( viewWithoutStyle, styles ) =
@@ -243,6 +244,15 @@ element el =
                 stylise el.view e
         }
 
+
+{-| Creates a sandbox program exactly like VirtualDom.
+-}
+sandbox :
+    { init : model
+    , view : model -> NodeWithStyle msg
+    , update : msg -> model -> model
+    }
+    -> Program () model msg
 sandbox el =
     Browser.sandbox
         { init = el.init
@@ -250,11 +260,15 @@ sandbox el =
         , update = el.update
         }
 
+
+{-| Creates a static page in HTML.
+-}
+staticPage : NodeWithStyle msg -> Program () () msg
 staticPage view =
     sandbox
         { view = always view
         , init = ()
-        , update = \_ _-> ()
+        , update = \_ _ -> ()
         }
 
 
