@@ -47,7 +47,7 @@ defaultPickerRadiusOut =
 
 touchesHistoryLength : Int
 touchesHistoryLength =
-    20
+    5
 
 
 friction : Float
@@ -515,6 +515,7 @@ speedToReachAFace pickerAngle pickerAngleBetweenFaces speed =
         )
 
 
+touchesSample : BoundedList ( Posix, MouseY ) -> ( ( Posix, MouseY ), ( Posix, MouseY ) )
 touchesSample touches =
     ( touches
         |> BoundedList.head
@@ -540,7 +541,10 @@ newStateFromTouchesHistory (WheelPicker picker) touchesHistory =
             }
 
         touchesSampleToSpeed ( ( lastTime, lastMouseY ), ( firstTime, firstMouseY ) ) =
-            degPerPx picker.radiusOut * (firstMouseY - lastMouseY) / (Time.posixToMillis lastTime - Time.posixToMillis firstTime |> toFloat)
+            if Time.posixToMillis lastTime - Time.posixToMillis firstTime == 0 then
+                0.01
+            else
+                degPerPx picker.radiusOut * (firstMouseY - lastMouseY) / (Time.posixToMillis lastTime - Time.posixToMillis firstTime |> toFloat)
 
         currentTime =
             touchesHistory.touches
