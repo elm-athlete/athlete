@@ -3,7 +3,7 @@
     "name": "elm-athlete/athlete",
     "summary": "Native looking apps builder on the web",
     "license": "BSD-3-Clause",
-    "version": "1.0.1",
+    "version": "1.2.0",
     "exposed-modules": [
         "Modifiers",
         "Elegant",
