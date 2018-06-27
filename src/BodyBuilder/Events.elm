@@ -5,6 +5,7 @@ module BodyBuilder.Events
         , OnColorInputEvent
         , OnEvent
         , OnFocusEvent
+        , OnInputEvent
         , OnIntInputEvent
         , OnMouseEvents
         , OnMouseEventsInside
@@ -59,6 +60,7 @@ It is not compatible with Html, though.
 @docs onFocus
 @docs OnFocusEvent
 @docs onInput
+@docs OnInputEvent
 @docs OnIntInputEvent
 @docs onMouseDown
 @docs onMouseEnter
@@ -197,6 +199,7 @@ type alias OnMouseEventsInside msg =
     }
 
 
+{-| -}
 type alias OnInputEvent b msg a =
     { a
         | onInputEvent : Maybe (b -> msg)
@@ -325,7 +328,7 @@ onCustom event decoder attrs =
             , preventDefault = preventDefault
             }
     in
-    { attrs | onEvent = Just ( event, VirtualDom.Custom (Json.Decode.map syncRecord decoder) ) }
+        { attrs | onEvent = Just ( event, VirtualDom.Custom (Json.Decode.map syncRecord decoder) ) }
 
 
 {-| -}
