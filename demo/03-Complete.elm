@@ -424,7 +424,7 @@ update msg model =
 
 main : Program () Model Msg
 main =
-    embed
+    element
         { init =
             \_ ->
                 ( { color = Color.green

@@ -77,6 +77,7 @@ import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
 import BodyBuilder.Style as Style
 import Browser
+import Browser.Dom
 import Color
 import Elegant exposing (SizeUnit, percent, px)
 import Elegant.Block as Block
@@ -184,7 +185,7 @@ Back to handle back buttons
 type StandardHistoryMsg
     = Tick Float
     | Back
-    | FocusMsg (Result Browser.DomError ())
+    | FocusMsg (Result Browser.Dom.Error ())
 
 
 easingFun : Easing -> Float -> Float
@@ -662,7 +663,7 @@ standardHandleHistory historyMsg history =
                                     Just maybeFocusedId_ ->
                                         Task.attempt
                                             (FocusMsg >> history.standardHistoryWrapper)
-                                            (Browser.focus maybeFocusedId_)
+                                            (Browser.Dom.focus maybeFocusedId_)
                         )
 
 

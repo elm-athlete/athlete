@@ -108,7 +108,7 @@ update msg model =
 
 main : Program () Int Msg
 main =
-    embed
+    element
         { init = \_ -> ( 0, Cmd.none )
         , update = update
         , subscriptions = always Sub.none
