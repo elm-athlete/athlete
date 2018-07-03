@@ -34,7 +34,7 @@ import Elegant.Margin as Margin
 import Elegant.Typography as Typography
 import Function
 import Time exposing (Month(..), Posix, Zone)
-import Touch
+import Events.Extra.Touch as Touch
 
 
 ---- CONSTANTS ----

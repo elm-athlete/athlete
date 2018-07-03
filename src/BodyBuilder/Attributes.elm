@@ -44,7 +44,7 @@ module BodyBuilder.Attributes
         , NameAttribute
         , NodeAttributes
         , PlaceholderAttribute
-        , Position
+        , Position(..)
         , PositionAttribute
         , ProgressAttributes
         , ScriptAttributes
