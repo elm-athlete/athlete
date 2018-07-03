@@ -34,7 +34,7 @@ import Elegant.Margin as Margin
 import Elegant.Typography as Typography
 import Function
 import Time exposing (Month(..), Posix, Zone)
-import Touch
+import Events.Extra.Touch as Touch
 
 
 ---- CONSTANTS ----
@@ -229,10 +229,13 @@ internalUpdate msg model =
 
 pickerSubscriptions : (Picker.Msg -> Msg) -> Picker.WheelPicker -> Sub Msg
 pickerSubscriptions msg picker =
-    if Picker.isAnimationFrameNeeded picker then
-        Browser.Events.onAnimationFrame (msg << Picker.NewFrame)
-    else
-        Sub.none
+    -- if Picker.isAnimationFrameNeeded picker then
+    Browser.Events.onAnimationFrame (msg << Picker.NewFrame)
+
+
+
+-- else
+--     Sub.none
 
 
 internalSubscriptions : Model -> Sub Msg

@@ -28,7 +28,7 @@ import Elegant.Typography as Typography
 import Function
 import Task
 import Time exposing (Posix, Zone, utc)
-import Touch
+import Events.Extra.Touch as Touch
 import Tuple
 
 
@@ -73,7 +73,6 @@ type State
     = Stopped
     | Free SpeedState
     | Held TouchesHistory
-    | Approach
 
 
 type alias Speed =
@@ -570,9 +569,6 @@ updateAngle currentTime (WheelPicker picker) =
                 Held touchesHistory ->
                     setAngle (angleFromTouchesHistory picker.radiusOut picker.angle touchesHistory)
 
-                Approach ->
-                    identity
-
                 Stopped ->
                     identity
            )
@@ -617,5 +613,5 @@ isAnimationFrameNeeded (WheelPicker picker) =
         Stopped ->
             False
 
-        _ ->
+        Free _ ->
             True
