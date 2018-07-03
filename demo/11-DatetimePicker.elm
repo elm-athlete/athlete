@@ -13,7 +13,8 @@ import Elegant.Box as Box
 import Elegant.Margin as Margin
 import Elegant.Typography as Typography
 import Time exposing (Posix)
-
+import Html
+import Html.Attributes
 
 ---- INIT ----
 
@@ -80,26 +81,34 @@ dateView =
 
 view : Model -> NodeWithStyle Msg
 view model =
-    Builder.div
-        [ Attributes.style
-            [ Style.blockProperties [ Block.alignCenter ]
-            , Style.box
-                [ Box.margin [ Margin.top <| Margin.width (px 200) ]
-                , Box.fontFamilySansSerif
+    Builder.div [] [
+        (Html.node "meta"
+                [ Html.Attributes.name "viewport"
+                , Html.Attributes.attribute "content"
+                    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
                 ]
-            ]
-        ]
-        [ Picker.view PickerMsg model
+                [],  [])
         , Builder.div
             [ Attributes.style
-                [ Style.box
-                    [ Box.margin [ Margin.top <| Margin.width (px 20) ]
-                    , Box.typography [ Typography.size (px 30) ]
+                [ Style.blockProperties [ Block.alignCenter ]
+                , Style.box
+                    [ Box.margin [ Margin.top <| Margin.width (px 200) ]
+                    , Box.fontFamilySansSerif
                     ]
                 ]
             ]
-            [ Builder.text ("Selected: " ++ dateView model.date) ]
-        ]
+            [ Picker.view PickerMsg model
+            , Builder.div
+                [ Attributes.style
+                    [ Style.box
+                        [ Box.margin [ Margin.top <| Margin.width (px 20) ]
+                        , Box.typography [ Typography.size (px 30) ]
+                        ]
+                    ]
+                ]
+                [ Builder.text ("Selected: " ++ dateView model.date) ]
+            ]
+    ]
 
 
 
