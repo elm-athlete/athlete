@@ -72,7 +72,7 @@ initDayPicker ( dayLimitStart, dayLimitStop ) =
     in
         dateRange (rataDieToMillis dayLimitStart) (rataDieToMillis dayLimitStop) toMs.day
             |> List.map format
-            |> Picker.defaultWheelPicker 230
+            |> Picker.defaultWheelPicker 200
 
 
 initHourPicker : Picker.WheelPicker

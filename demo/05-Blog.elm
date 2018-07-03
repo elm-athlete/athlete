@@ -255,7 +255,7 @@ init =
 
 main : Program () Model Msg
 main =
-    embed
+    element
         { init = \_ -> ( init, Cmd.none )
         , update = update
         , subscriptions = subscriptions

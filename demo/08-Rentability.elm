@@ -638,7 +638,7 @@ update msg model =
             ( model, Task.perform SaveAppartmentAttributesHelper Time.now )
 
         SaveAppartmentAttributesHelper time ->
-            ( model |> saveAppartmentAttributes time, performSuccessfulTask (StandardHistoryWrapper Router.Back) )
+            model |> saveAppartmentAttributes time |> Router.handleStandardHistory Router.Back
 
         DestroyAppartment id ->
             ( model |> destroyAppartment id, Cmd.none )
@@ -722,7 +722,7 @@ init =
 
 main : Program () Model Msg
 main =
-    embed
+    element
         { init = \_ -> ( init, Cmd.none )
         , update = update
         , subscriptions = subscriptions

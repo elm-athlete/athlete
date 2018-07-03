@@ -43,7 +43,7 @@ view model =
 
 main : Program () Int msg
 main =
-    Builder.embed
+    Builder.element
         { init = \_ -> ( 0, Cmd.none )
         , update = \msg model -> ( model, Cmd.none )
         , subscriptions = always Sub.none

@@ -6,6 +6,7 @@ module BodyBuilder
         , Node
         , NodeWithStyle
         , Option
+        , Document
         , a
         , article
         , aside
@@ -48,6 +49,8 @@ module BodyBuilder
         , section
         , select
         , span
+        , application
+        , document
         , sandbox
         , staticPage
         , text
@@ -74,6 +77,8 @@ It is perfectly compatible with Html, though.
 ## Elements Types
 
 @docs Node, FlexItem, GridItem, Option, NodeWithStyle
+
+@docs Document
 
 
 ## Attributes
@@ -110,6 +115,8 @@ It is possible to style those elements using `Style.blockProperties`.
 @docs element
 @docs sandbox
 @docs staticPage
+@docs application
+@docs document
 
 -}
 
@@ -117,6 +124,7 @@ import BodyBuilder.Attributes exposing (..)
 import BodyBuilder.Internals.Convert
 import BodyBuilder.Internals.Shared as Shared
 import Browser
+import Browser.Navigation
 import Elegant
 import Elegant.Display as Display
 import Elegant.Flex as Flex exposing (FlexContainerDetails)
@@ -126,6 +134,7 @@ import Html exposing (Html)
 import Html.Attributes
 import List.Extra
 import Modifiers exposing (..)
+import Url exposing (Url)
 
 
 {-| The main type of BodyBuilder. It is an alias to Html, in order to keep
@@ -208,20 +217,79 @@ br =
 
 stylise : (model -> NodeWithStyle msg) -> model -> Node msg
 stylise view_ e =
-    let
-        ( viewWithoutStyle, styles ) =
-            view_ e
-    in
-        Html.div []
-            (Html.node "style"
-                []
-                [ Html.text
-                    (String.join "\n"
-                        (styles |> List.Extra.unique)
-                    )
-                ]
-                :: [ viewWithoutStyle ]
-            )
+    styliseNodeWithStyle (view_ e)
+
+
+styliseNodeWithStyle : NodeWithStyle msg -> Node msg
+styliseNodeWithStyle ( viewWithoutStyle, styles ) =
+    Html.div []
+        (Html.node "style"
+            []
+            [ Html.text
+                (String.join "\n"
+                    (styles |> List.Extra.unique)
+                )
+            ]
+            :: [ viewWithoutStyle ]
+        )
+
+
+{-| Document, like in Browser, but for BodyBuilder.
+-}
+type alias Document msg =
+    { title : String
+    , body : NodeWithStyle msg
+    }
+
+
+{-| Creates a program, like you could with Html.
+-}
+application :
+    { init : flags -> Url -> Browser.Navigation.Key -> ( model, Cmd msg )
+    , view : model -> Document msg
+    , update : msg -> model -> ( model, Cmd msg )
+    , subscriptions : model -> Sub msg
+    , onUrlRequest : Browser.UrlRequest -> msg
+    , onUrlChange : Url -> msg
+    }
+    -> Program flags model msg
+application options =
+    Browser.application
+        { init = options.init
+        , view =
+            options.view
+                >> \{ title, body } ->
+                    { title = title
+                    , body = [ styliseNodeWithStyle body ]
+                    }
+        , update = options.update
+        , subscriptions = options.subscriptions
+        , onUrlRequest = options.onUrlRequest
+        , onUrlChange = options.onUrlChange
+        }
+
+
+{-| Creates a progarm, like Html.
+-}
+document :
+    { init : flags -> ( model, Cmd msg )
+    , view : model -> Document msg
+    , update : msg -> model -> ( model, Cmd msg )
+    , subscriptions : model -> Sub msg
+    }
+    -> Program flags model msg
+document options =
+    Browser.document
+        { init = options.init
+        , view =
+            options.view
+                >> \{ title, body } ->
+                    { title = title
+                    , body = [ styliseNodeWithStyle body ]
+                    }
+        , update = options.update
+        , subscriptions = options.subscriptions
+        }
 
 
 {-| Creates a program, like you could with Html. This allows you to completely
