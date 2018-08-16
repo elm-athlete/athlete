@@ -489,12 +489,6 @@ view { history, data } =
             ]
         ]
         [ Router.historyView (insidePageView data) history
-        , (Html.node "meta"
-                [ Html.Attributes.name "viewport"
-                , Html.Attributes.attribute "content"
-                    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-                ]
-                [],  [])
         ]
 
 

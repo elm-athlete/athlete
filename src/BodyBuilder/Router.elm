@@ -30,6 +30,7 @@ module BodyBuilder.Router
         , push
         , slideUp
         , visiblePages
+        , mobileMeta
         )
 
 {-| Router based on BodyBuilder and Elegant implementing transitions between
@@ -96,6 +97,7 @@ import Elegant.Position as Position
 import Elegant.Transform as Transform
 import Elegant.Typography as Typography
 import Html
+import Html.Attributes
 import Modifiers exposing (..)
 import Task
 
@@ -589,6 +591,7 @@ historyView :
 historyView insidePageView_ history =
     div []
         [ ( Html.node "style" [] [ Html.text "body {margin: 0px}" ], [] )
+        , mobileMeta
         , case history.transition of
             Nothing ->
                 overflowHiddenContainer []
@@ -766,3 +769,12 @@ headerButton msg content =
         ]
         [ text content
         ]
+
+
+mobileMeta =
+    (Html.node "meta"
+        [ Html.Attributes.name "viewport"
+        , Html.Attributes.attribute "content"
+        "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        ]
+    [],  [])
