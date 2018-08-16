@@ -480,7 +480,7 @@ pageWithHeader header page =
     flex
         [ style
             [ Style.flexContainerProperties [ Flex.direction Flex.column ]
-            , Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100) ] ]
+            , Style.block [ Display.dimensions [ Dimensions.width (Elegant.percent 100) ] ]
             , Style.box [ Box.background [ Elegant.color Color.white ] ]
             ]
         ]
