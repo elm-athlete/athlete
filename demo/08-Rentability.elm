@@ -33,7 +33,8 @@ import Json.Decode as Decode exposing (Decoder)
 import Modifiers exposing (..)
 import Task
 import Time exposing (Posix)
-
+import Html
+import Html.Attributes
 
 type alias Persisted a =
     { id : Int, createdAt : Posix, updatedAt : Posix, attributes : a }
@@ -441,7 +442,7 @@ appartmentsNew draftAppartment =
         (Router.headerElement
             { left = Router.headerButton (StandardHistoryWrapper Router.Back) "cancel"
             , center = title draftAppartment.title
-            , right = Router.headerButton SaveAppartmentAttributes "save"
+            , right = Router.headerButton (SaveAppartmentAttributes) "save"
             }
         )
         (node
@@ -487,7 +488,14 @@ view { history, data } =
                 ]
             ]
         ]
-        [ Router.historyView (insidePageView data) history ]
+        [ Router.historyView (insidePageView data) history
+        , (Html.node "meta"
+                [ Html.Attributes.name "viewport"
+                , Html.Attributes.attribute "content"
+                    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+                ]
+                [],  [])
+        ]
 
 
 updateAppartmentAttributesBasedOnMsg : UpdateAppartmentMsg -> AppartmentAttributes -> AppartmentAttributes
@@ -635,14 +643,21 @@ update msg model =
             ( { model | data = data }, Cmd.none )
 
         SaveAppartmentAttributes ->
-            ( model, Task.perform SaveAppartmentAttributesHelper Time.now )
+            model
+                |> update (StandardHistoryWrapper Back)
+                |> addCmd (Task.perform SaveAppartmentAttributesHelper Time.now)
 
         SaveAppartmentAttributesHelper time ->
-            model |> saveAppartmentAttributes time |> Router.handleStandardHistory Router.Back
+            (model |> saveAppartmentAttributes time, Cmd.none)
 
         DestroyAppartment id ->
             ( model |> destroyAppartment id, Cmd.none )
 
+
+
+addCmd : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
+addCmd cmd ( model, cmds ) =
+    ( model, Cmd.batch [ cmd, cmds ] )
 
 fetchData : Decoder a -> (a -> msg) -> Sub msg
 fetchData decoder msg =
