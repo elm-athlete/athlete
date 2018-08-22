@@ -28,7 +28,7 @@ import Elegant.Typography as Typography
 import Function
 import Task
 import Time exposing (Posix, Zone, utc)
-import Events.Extra.Touch as Touch
+import Html.Events.Extra.Touch as Touch
 import Tuple
 
 

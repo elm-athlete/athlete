@@ -68,6 +68,7 @@ pages and history (backward and forward)
 @docs pageWithHeader
 @docs headerButton
 @docs historyView
+@docs mobileMeta
 
 -}
 
@@ -656,24 +657,24 @@ standardHandleHistory historyMsg history =
                         newTransition =
                             transition |> timeDiff diff
                     in
-                    if newTransition.timer > 0 then
-                        ( { history | transition = Just newTransition }, Cmd.none )
-                    else
-                        ( { history | transition = Nothing }
-                        , case history.currentPageHasFocusElement of
-                            False ->
-                                Cmd.none
+                        if newTransition.timer > 0 then
+                            ( { history | transition = Just newTransition }, Cmd.none )
+                        else
+                            ( { history | transition = Nothing }
+                            , case history.currentPageHasFocusElement of
+                                False ->
+                                    Cmd.none
 
-                            True ->
-                                case history.current.maybeFocusedId of
-                                    Nothing ->
-                                        Cmd.none
+                                True ->
+                                    case history.current.maybeFocusedId of
+                                        Nothing ->
+                                            Cmd.none
 
-                                    Just maybeFocusedId_ ->
-                                        Task.attempt
-                                            (FocusMsg >> history.standardHistoryWrapper)
-                                            (Browser.Dom.focus maybeFocusedId_)
-                        )
+                                        Just maybeFocusedId_ ->
+                                            Task.attempt
+                                                (FocusMsg >> history.standardHistoryWrapper)
+                                                (Browser.Dom.focus maybeFocusedId_)
+                            )
 
 
 {-| handle model's history update using historyMsg
@@ -771,10 +772,15 @@ headerButton msg content =
         ]
 
 
+{-| meta tag for a correct display on mobile devices
+-}
+mobileMeta : NodeWithStyle msg
 mobileMeta =
-    (Html.node "meta"
+    ( Html.node "meta"
         [ Html.Attributes.name "viewport"
         , Html.Attributes.attribute "content"
-        "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+            "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
         ]
-    [],  [])
+        []
+    , []
+    )
