@@ -51,6 +51,7 @@ type alias AppartmentAttributes =
     , collocs : Int
     , works : Int
     , rate : Float
+    , renta : Float
     }
 
 
@@ -86,6 +87,7 @@ type UpdateAppartmentMsg
     | UpdateMonthlyRent Int
     | UpdateWorks Int
     | UpdateTitle String
+    | UpdateRenta String
 
 
 type Msg
@@ -209,27 +211,27 @@ defaultCollocs =
     3
 
 
-rentaSimple : Float
-rentaSimple =
-    8.0
+-- rentaSimple : Float
+-- rentaSimple =
+--     8.0
 
 
-rentaColloc : Float
-rentaColloc =
-    10.0
+-- rentaColloc : Float
+-- rentaColloc =
+--     10.0
 
 
-renta : Int -> Float
-renta collocs =
-    if collocs > 1 then
-        rentaColloc
-    else
-        rentaSimple
+-- renta : Int -> Float
+-- renta collocs =
+--     if collocs > 1 then
+--         rentaColloc
+--     else
+--         rentaSimple
 
 
 maxPrice : AppartmentAttributes -> Float
 maxPrice appartment =
-    (yearlyRent appartment |> toFloat) / (renta appartment.collocs / 100)
+    (yearlyRent appartment |> toFloat) / (appartment.renta / 100)
 
 
 yearsOfDebt : number
@@ -291,7 +293,14 @@ collocNumberId =
 appartmentEditBodyView : Appartment -> NodeWithStyle Msg
 appartmentEditBodyView ({ attributes } as appartment) =
     node []
-        [ result "Renta standard en % : " (renta attributes.collocs)
+        [ node [ pad ]
+            [ node [ style [ Style.block [] ] ] [ text "Renta" ]
+            , inputText
+                [ Attributes.value (String.fromFloat attributes.renta)
+                , BodyBuilder.Events.onInput (UpdateAppartment appartment.id << UpdateRenta)
+                ]
+            ]
+            -- result "Renta standard en % : " (renta attributes.collocs)
         , node [ pad ]
             [ node [ style [ Style.block [] ] ]
                 [ text
@@ -507,6 +516,10 @@ updateAppartmentAttributesBasedOnMsg msg attributes =
         UpdateTitle title_ ->
             { attributes | title = title_ }
 
+        UpdateRenta renta_ ->
+            { attributes | renta = ((String.toFloat renta_) |> Maybe.withDefault 10.0)}
+
+
 
 updateAppartmentBasedOnMsg : UpdateAppartmentMsg -> Appartment -> Appartment
 updateAppartmentBasedOnMsg msg appartment =
@@ -714,6 +727,7 @@ initAppartmentAttributes =
     , rate = 0.0175
     , monthlyRent = defaultMonthlyRent
     , collocs = defaultCollocs
+    , renta = 10
     }
 
 
