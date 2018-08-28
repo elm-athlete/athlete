@@ -1,61 +1,16 @@
-module BodyBuilder
-    exposing
-        ( BlockAttributes
-        , FlexItem
-        , GridItem
-        , Node
-        , NodeWithStyle
-        , Option
-        , Document
-        , a
-        , article
-        , aside
-        , audio
-        , br
-        , button
-        , div
-        , element
-        , flex
-        , flexItem
-        , footer
-        , grid
-        , gridItem
-        , h1
-        , h2
-        , h3
-        , h4
-        , h5
-        , h6
-        , header
-        , img
-        , inputCheckbox
-        , inputColor
-        , inputFile
-        , inputHidden
-        , inputNumber
-        , inputPassword
-        , inputRadio
-        , inputRange
-        , inputSubmit
-        , inputTel
-        , inputText
-        , inputUrl
-        , nav
-        , node
-        , none
-        , option
-        , p
-        , progress
-        , section
-        , select
-        , span
-        , application
-        , document
-        , sandbox
-        , staticPage
-        , text
-        , textarea
-        )
+module BodyBuilder exposing
+    ( Node, FlexItem, GridItem, Option, NodeWithStyle
+    , Document
+    , BlockAttributes
+    , text, none, flexItem, gridItem, option, br
+    , node, span, flex, grid, a, button, img, audio, inputColor, inputFile, inputHidden, inputNumber, inputCheckbox, inputPassword, inputRadio, inputRange, inputSubmit, inputTel, inputText, inputUrl, progress, select, textarea
+    , div, header, footer, nav, section, article, aside, h1, h2, h3, h4, h5, h6, p
+    , element
+    , sandbox
+    , staticPage
+    , application
+    , document
+    )
 
 {-| This module entirely replaces Html, providing a type-safer alternatives.
 This also manages inlining styling through Elegant.
@@ -258,10 +213,11 @@ application options =
         { init = options.init
         , view =
             options.view
-                >> \{ title, body } ->
-                    { title = title
-                    , body = [ styliseNodeWithStyle body ]
-                    }
+                >> (\{ title, body } ->
+                        { title = title
+                        , body = [ styliseNodeWithStyle body ]
+                        }
+                   )
         , update = options.update
         , subscriptions = options.subscriptions
         , onUrlRequest = options.onUrlRequest
@@ -283,10 +239,11 @@ document options =
         { init = options.init
         , view =
             options.view
-                >> \{ title, body } ->
-                    { title = title
-                    , body = [ styliseNodeWithStyle body ]
-                    }
+                >> (\{ title, body } ->
+                        { title = title
+                        , body = [ styliseNodeWithStyle body ]
+                        }
+                   )
         , update = options.update
         , subscriptions = options.subscriptions
         }
@@ -1288,15 +1245,15 @@ inputAndLabel defaultAttributes attributesToHtmlAttributes modifiers =
                 )
                 []
     in
-        case attributes.label of
-            Nothing ->
-                ( computedInput
-                , styles
-                    |> List.map Tuple.second
-                )
+    case attributes.label of
+        Nothing ->
+            ( computedInput
+            , styles
+                |> List.map Tuple.second
+            )
 
-            Just label ->
-                ( Shared.extractLabel label computedInput, [] )
+        Just label ->
+            ( Shared.extractLabel label computedInput, [] )
 
 
 computeBlock :
@@ -1328,18 +1285,18 @@ computeBlock tag flexModifiers flexItemModifiers gridModifiers gridItemModifiers
                 |> List.concatMap Elegant.styleToCss
                 |> List.append (Maybe.withDefault [] (Maybe.map Elegant.commonStyleToCss attributes.rawStyle))
     in
-        ( Html.node tag
-            (styleResult
-                |> List.map Tuple.first
-                |> String.join " "
-                |> Html.Attributes.class
-                |> Function.flip (::) (attributesToHtmlAttributes attributes)
-            )
-            (content
-                |> List.map Tuple.first
-            )
-        , (styleResult |> List.map Tuple.second) ++ (content |> List.map Tuple.second |> List.concat)
+    ( Html.node tag
+        (styleResult
+            |> List.map Tuple.first
+            |> String.join " "
+            |> Html.Attributes.class
+            |> Function.flip (::) (attributesToHtmlAttributes attributes)
         )
+        (content
+            |> List.map Tuple.first
+        )
+    , (styleResult |> List.map Tuple.second) ++ (content |> List.map Tuple.second |> List.concat)
+    )
 
 
 {-| NodeWithStyle is allowing BodyBuilder to have Nodes with styles inside them.

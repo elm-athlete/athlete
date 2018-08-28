@@ -25,11 +25,12 @@ import Elegant.Box as Box
 import Elegant.Position as Position
 import Elegant.Transform as Transform
 import Elegant.Typography as Typography
+import Events.Extra.Touch as Touch
 import Function
 import Task
 import Time exposing (Posix, Zone, utc)
-import Events.Extra.Touch as Touch
 import Tuple
+
 
 
 ---- CONSTANTS ----
@@ -197,15 +198,15 @@ updateGetTouch getTouchMsg wheelPicker =
                 |> Maybe.withDefault ( 0, 0 )
                 |> Tuple.second
     in
-        case getTouchMsg of
-            StartTouch { changedTouches } ->
-                ( wheelPicker, recordTouch (changedTouches |> toMouseY) StartTouching )
+    case getTouchMsg of
+        StartTouch { changedTouches } ->
+            ( wheelPicker, recordTouch (changedTouches |> toMouseY) StartTouching )
 
-            HoldTouch { changedTouches } ->
-                ( wheelPicker, recordTouch (changedTouches |> toMouseY) HoldTouching )
+        HoldTouch { changedTouches } ->
+            ( wheelPicker, recordTouch (changedTouches |> toMouseY) HoldTouching )
 
-            StopTouch { changedTouches } ->
-                ( wheelPicker, recordTouch (changedTouches |> toMouseY) StopTouching )
+        StopTouch { changedTouches } ->
+            ( wheelPicker, recordTouch (changedTouches |> toMouseY) StopTouching )
 
 
 type TouchState
@@ -261,16 +262,16 @@ update msg wheelPicker =
             , newCmdMsg
             )
     in
-        updateSelect <|
-            case msg of
-                GetTouch getTouchMsg ->
-                    updateGetTouch getTouchMsg wheelPicker
+    updateSelect <|
+        case msg of
+            GetTouch getTouchMsg ->
+                updateGetTouch getTouchMsg wheelPicker
 
-                RecordTouch mouseY touchState currentTime ->
-                    updateRecordTouch mouseY touchState currentTime wheelPicker
+            RecordTouch mouseY touchState currentTime ->
+                updateRecordTouch mouseY touchState currentTime wheelPicker
 
-                NewFrame currentTime ->
-                    updateNewFrame currentTime wheelPicker
+            NewFrame currentTime ->
+                updateNewFrame currentTime wheelPicker
 
 
 
@@ -313,6 +314,7 @@ wheelPickerView (WheelPicker picker) =
         faceColorOpacity faceIndex =
             if ((elementsToDrop faceIndex |> toFloat) - picker.angle) >= 80 then
                 0
+
             else
                 (80 - ((elementsToDrop faceIndex |> toFloat) * angleBetweenFaces picker.faces - picker.angle |> abs)) / 80
 
@@ -332,6 +334,7 @@ wheelPickerView (WheelPicker picker) =
                             ]
                         , if (elementsToDrop faceIndex - picker.select) == 0 then
                             Box.textColor <| Color.rgb 0 0 0
+
                           else
                             Box.textColor <| Color.rgba 180 180 180 (faceColorOpacity faceIndex)
                         ]
@@ -339,6 +342,7 @@ wheelPickerView (WheelPicker picker) =
                 ]
                 [ if elementsToDrop faceIndex < 0 then
                     Builder.text ""
+
                   else
                     picker.dataList
                         |> List.drop (elementsToDrop faceIndex)
@@ -347,7 +351,7 @@ wheelPickerView (WheelPicker picker) =
                         |> Builder.text
                 ]
     in
-        List.map pickerViewFace (List.range 0 (picker.faces - 1))
+    List.map pickerViewFace (List.range 0 (picker.faces - 1))
 
 
 view : WheelPicker -> NodeWithStyle msg
@@ -359,12 +363,22 @@ view ((WheelPicker picker) as wheelPicker) =
         pickerFontSize =
             fontSize pickerFaceHeight
     in
-        Builder.div
+    Builder.div
+        [ Attributes.style
+            [ Style.box
+                [ Box.transform
+                    [ Transform.perspective (px 500)
+                    , Transform.perspectiveOrigin ( percent 50, percent 50 )
+                    , Transform.preserve3d
+                    ]
+                ]
+            ]
+        ]
+        [ Builder.div
             [ Attributes.style
                 [ Style.box
                     [ Box.transform
-                        [ Transform.perspective (px 500)
-                        , Transform.perspectiveOrigin ( percent 50, percent 50 )
+                        [ Transform.translateZ (px (negate picker.radiusOut))
                         , Transform.preserve3d
                         ]
                     ]
@@ -372,36 +386,26 @@ view ((WheelPicker picker) as wheelPicker) =
             ]
             [ Builder.div
                 [ Attributes.style
-                    [ Style.box
+                    [ Style.blockProperties
+                        [ Block.height (px (2 * picker.radiusOut))
+                        , Block.width (px picker.width)
+                        ]
+                    , Style.box
                         [ Box.transform
-                            [ Transform.translateZ (px (negate picker.radiusOut))
+                            [ Transform.rotateX (deg picker.angle)
                             , Transform.preserve3d
                             ]
-                        ]
-                    ]
-                ]
-                [ Builder.div
-                    [ Attributes.style
-                        [ Style.blockProperties
-                            [ Block.height (px (2 * picker.radiusOut))
-                            , Block.width (px picker.width)
-                            ]
-                        , Style.box
-                            [ Box.transform
-                                [ Transform.rotateX (deg picker.angle)
-                                , Transform.preserve3d
-                                ]
-                            , Box.willChange [ "transform" ]
-                            , Box.typography
-                                [ Typography.size (px pickerFontSize)
-                                , Typography.lineHeight (px (round pickerFaceHeight))
-                                ]
+                        , Box.willChange [ "transform" ]
+                        , Box.typography
+                            [ Typography.size (px pickerFontSize)
+                            , Typography.lineHeight (px (round pickerFaceHeight))
                             ]
                         ]
                     ]
-                    (wheelPickerView wheelPicker)
                 ]
+                (wheelPickerView wheelPicker)
             ]
+        ]
 
 
 
@@ -447,16 +451,18 @@ applyLimitAngles (WheelPicker picker) =
                 _ ->
                     picker.state
     in
-        if picker.angle < 0 then
-            WheelPicker picker
-                |> setAngle 0
-                |> setState stopIfFree
-        else if picker.angle > maxAngle then
-            WheelPicker picker
-                |> setAngle maxAngle
-                |> setState stopIfFree
-        else
-            WheelPicker picker
+    if picker.angle < 0 then
+        WheelPicker picker
+            |> setAngle 0
+            |> setState stopIfFree
+
+    else if picker.angle > maxAngle then
+        WheelPicker picker
+            |> setAngle maxAngle
+            |> setState stopIfFree
+
+    else
+        WheelPicker picker
 
 
 setStateWhenStopTouching : WheelPicker -> WheelPicker
@@ -478,6 +484,7 @@ setStateFromNewFrame currentTime (WheelPicker picker) =
                 WheelPicker picker
                     |> setAngle speedState.finalAngle
                     |> setState Stopped
+
             else
                 WheelPicker picker
                     |> setState (Free speedState)
@@ -501,17 +508,18 @@ speedToReachAFace pickerAngle pickerAngleBetweenFaces speed =
         direction =
             if finalAngle >= pickerAngle then
                 1
+
             else
                 -1
     in
-        ( finalAngle
-            |> (-) pickerAngle
-            |> abs
-            |> (*) (2 * friction)
-            |> sqrt
-        , direction
-        , finalAngle
-        )
+    ( finalAngle
+        |> (-) pickerAngle
+        |> abs
+        |> (*) (2 * friction)
+        |> sqrt
+    , direction
+    , finalAngle
+    )
 
 
 touchesSample : BoundedList ( Posix, MouseY ) -> ( ( Posix, MouseY ), ( Posix, MouseY ) )
@@ -542,6 +550,7 @@ newStateFromTouchesHistory (WheelPicker picker) touchesHistory =
         touchesSampleToSpeed ( ( lastTime, lastMouseY ), ( firstTime, firstMouseY ) ) =
             if Time.posixToMillis lastTime - Time.posixToMillis firstTime == 0 then
                 0.01
+
             else
                 degPerPx picker.radiusOut * (firstMouseY - lastMouseY) / (Time.posixToMillis lastTime - Time.posixToMillis firstTime |> toFloat)
 
@@ -551,12 +560,12 @@ newStateFromTouchesHistory (WheelPicker picker) touchesHistory =
                 |> Maybe.withDefault ( Time.millisToPosix 0, 0 )
                 |> Tuple.first
     in
-        touchesHistory.touches
-            |> touchesSample
-            |> touchesSampleToSpeed
-            |> speedToReachAFace picker.angle (angleBetweenFaces picker.faces)
-            |> speedToSpeedState
-            |> Free
+    touchesHistory.touches
+        |> touchesSample
+        |> touchesSampleToSpeed
+        |> speedToReachAFace picker.angle (angleBetweenFaces picker.faces)
+        |> speedToSpeedState
+        |> Free
 
 
 updateAngle : Posix -> WheelPicker -> WheelPicker
@@ -596,7 +605,7 @@ angleFromSpeedState currentTime speedState =
         deltaTime =
             Time.posixToMillis currentTime - Time.posixToMillis speedState.startTime
     in
-        speedState.startAngle - speedState.direction * (0.5 * (friction * (deltaTime ^ 2 |> toFloat)) - speedState.startSpeed * (deltaTime |> toFloat))
+    speedState.startAngle - speedState.direction * (0.5 * (friction * (deltaTime ^ 2 |> toFloat)) - speedState.startSpeed * (deltaTime |> toFloat))
 
 
 resolveSelect : WheelPicker -> Int

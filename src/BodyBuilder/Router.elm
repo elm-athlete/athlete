@@ -1,37 +1,36 @@
-module BodyBuilder.Router
-    exposing
-        ( History
-        , Page
-        , PageView
-        , StandardHistoryMsg(..)
-        , Transition
-        , afterTransition
-        , beforeTransition
-        , customKind
-        , customTransition
-        , easeInOut
-        , focusedElement
-        , forward
-        , getMaybeTransitionValue
-        , handleStandardHistory
-        , headerButton
-        , headerElement
-        , historyView
-        , initHistory
-        , initHistoryAndData
-        , maybeTransitionSubscription
-        , overflowHiddenContainer
-        , pageView
-        , pageWithDefaultTransition
-        , pageWithHeader
-        , pageWithTransition
-        , pageWithoutTransition
-        , percentage
-        , push
-        , slideUp
-        , visiblePages
-        , mobileMeta
-        )
+module BodyBuilder.Router exposing
+    ( History
+    , StandardHistoryMsg(..)
+    , Page
+    , Transition
+    , PageView
+    , handleStandardHistory
+    , maybeTransitionSubscription
+    , initHistory
+    , initHistoryAndData
+    , push
+    , slideUp
+    , forward
+    , pageWithDefaultTransition
+    , pageWithTransition
+    , pageWithoutTransition
+    , customTransition
+    , easeInOut
+    , customKind
+    , overflowHiddenContainer
+    , pageView
+    , beforeTransition
+    , percentage
+    , getMaybeTransitionValue
+    , afterTransition
+    , visiblePages
+    , focusedElement
+    , headerElement
+    , pageWithHeader
+    , headerButton
+    , historyView
+    , mobileMeta
+    )
 
 {-| Router based on BodyBuilder and Elegant implementing transitions between
 pages and history (backward and forward)
@@ -74,15 +73,13 @@ pages and history (backward and forward)
 -- import Native.BodyBuilder
 -- import Dom
 
-import Browser
-import Browser.Dom
-import Browser.Events
 import BodyBuilder exposing (..)
 import BodyBuilder.Attributes as Attributes exposing (..)
 import BodyBuilder.Events exposing (..)
 import BodyBuilder.Style as Style
 import Browser
 import Browser.Dom
+import Browser.Events
 import Color
 import Elegant exposing (SizeUnit, percent, px)
 import Elegant.Block as Block
@@ -208,6 +205,7 @@ easeInOutFun : Float -> Float
 easeInOutFun t =
     if t < 0.5 then
         2 * t * t
+
     else
         -1 + (4 - 2 * t) * t
 
@@ -258,10 +256,11 @@ timeDiff diff ({ timer } as transition) =
         newTimer =
             if timer - diff <= 0 then
                 0
+
             else
                 timer - diff
     in
-        { transition | timer = newTimer }
+    { transition | timer = newTimer }
 
 
 basicDuration : number
@@ -281,6 +280,7 @@ push : Page route msg -> History route msg -> History route msg
 push el ({ transition, before, current, after } as history) =
     if isRunning transition then
         history
+
     else
         { history
             | before = current :: before
@@ -356,6 +356,7 @@ pull : History route msg -> History route msg
 pull ({ transition, before, current, after } as history) =
     if isRunning transition then
         history
+
     else
         case before of
             [] ->
@@ -423,6 +424,7 @@ beforeTransition history =
         Just transition ->
             if transition.direction == Backward then
                 [ history.current ]
+
             else
                 putHeadInListIfExists history.before
 
@@ -437,6 +439,7 @@ afterTransition history =
         Just transition ->
             if transition.direction == Backward then
                 putHeadInListIfExists history.after
+
             else
                 [ history.current ]
 
@@ -512,33 +515,33 @@ slideUpView history insidePageView_ =
         visiblePages_ =
             visiblePages history
     in
-        overflowHiddenContainer
+    overflowHiddenContainer
+        [ style
+            [ Style.block
+                [ Display.dimensions [ Dimensions.height <| Elegant.vh <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
+            , Style.box
+                [ Box.transform
+                    [ Transform.translateY (Elegant.vh <| percentage (0 - getMaybeTransitionValue history.transition))
+                    ]
+                ]
+            , Style.flexContainerProperties [ Flex.direction Flex.column ]
+            ]
+        ]
+        [ flexItem
             [ style
-                [ Style.block
-                    [ Display.dimensions [ Dimensions.height <| Elegant.vh <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
-                , Style.box
-                    [ Box.transform
-                        [ Transform.translateY (Elegant.vh <| percentage (0 - getMaybeTransitionValue history.transition))
-                        ]
-                    ]
-                , Style.flexContainerProperties [ Flex.direction Flex.column ]
+                [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
+                , Style.flexItemProperties [ Flex.basis (percent 100) ]
                 ]
             ]
-            [ flexItem
-                [ style
-                    [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
-                    , Style.flexItemProperties [ Flex.basis (percent 100) ]
-                    ]
+            (List.map (pageView insidePageView_ history.transition) (history |> beforeTransition))
+        , flexItem
+            [ style
+                [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
+                , Style.flexItemProperties [ Flex.basis (percent 100) ]
                 ]
-                (List.map (pageView insidePageView_ history.transition) (history |> beforeTransition))
-            , flexItem
-                [ style
-                    [ Style.block [ Display.dimensions [ Dimensions.height (Elegant.vh 100), Dimensions.width (Elegant.vw 100) ] ]
-                    , Style.flexItemProperties [ Flex.basis (percent 100) ]
-                    ]
-                ]
-                (List.map (pageView insidePageView_ history.transition) (history |> afterTransition))
             ]
+            (List.map (pageView insidePageView_ history.transition) (history |> afterTransition))
+        ]
 
 
 slideLeftView :
@@ -550,35 +553,35 @@ slideLeftView history insidePageView_ =
         visiblePages_ =
             visiblePages history
     in
-        overflowHiddenContainer
-            [ style
-                [ Style.block
-                    [ Display.dimensions [ Dimensions.width <| Elegant.vw <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
-                , Style.box
-                    [ Box.transform
-                        [ Transform.translateX (Elegant.vw <| percentage (0 - getMaybeTransitionValue history.transition))
-                        ]
-                    , Box.willChange [ "transform" ]
-
-                    -- , Box.position
-                    -- (Position.relative
-                    --     ([ Position.right (percentage (getMaybeTransitionValue history.transition)) ])
-                    -- )
+    overflowHiddenContainer
+        [ style
+            [ Style.block
+                [ Display.dimensions [ Dimensions.width <| Elegant.vw <| percentage <| toFloat <| List.length <| visiblePages_ ] ]
+            , Style.box
+                [ Box.transform
+                    [ Transform.translateX (Elegant.vw <| percentage (0 - getMaybeTransitionValue history.transition))
                     ]
+                , Box.willChange [ "transform" ]
+
+                -- , Box.position
+                -- (Position.relative
+                --     ([ Position.right (percentage (getMaybeTransitionValue history.transition)) ])
+                -- )
                 ]
             ]
-            (List.map
-                (BodyBuilder.flexItem
-                    [ Attributes.style
-                        [ Style.flexItemProperties
-                            [ Flex.basis (percent 100)
-                            ]
+        ]
+        (List.map
+            (BodyBuilder.flexItem
+                [ Attributes.style
+                    [ Style.flexItemProperties
+                        [ Flex.basis (percent 100)
                         ]
                     ]
-                    << List.singleton
-                )
-                (List.map (pageView insidePageView_ history.transition) visiblePages_)
+                ]
+                << List.singleton
             )
+            (List.map (pageView insidePageView_ history.transition) visiblePages_)
+        )
 
 
 {-| display the current possible transition from one page to the other using
@@ -590,7 +593,7 @@ historyView :
     -> NodeWithStyle msg
 historyView insidePageView_ history =
     div []
-        [ ( Html.node "style" [] [ Html.text "body {margin: 0px}" ], [] )
+        [ ( Html.node "style" [] [ Html.text "body {margin: 0px}\n*{box-sizing: border-box;}" ], [] )
         , mobileMeta
         , case history.transition of
             Nothing ->
@@ -658,6 +661,7 @@ standardHandleHistory historyMsg history =
                     in
                     if newTransition.timer > 0 then
                         ( { history | transition = Just newTransition }, Cmd.none )
+
                     else
                         ( { history | transition = Nothing }
                         , case history.currentPageHasFocusElement of
@@ -772,9 +776,11 @@ headerButton msg content =
 
 
 mobileMeta =
-    (Html.node "meta"
+    ( Html.node "meta"
         [ Html.Attributes.name "viewport"
         , Html.Attributes.attribute "content"
-        "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+            "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
         ]
-    [],  [])
+        []
+    , []
+    )
