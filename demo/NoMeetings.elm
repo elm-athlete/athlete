@@ -18,7 +18,6 @@ module Main exposing
     , destroyGoal
     , draftGoalToGoal
     , goalsIndex
-    , goalsNew
     , gray
     , handleHistory
     , init
@@ -29,7 +28,6 @@ module Main exposing
     , lastId
     , main
     , pad
-    , participantEdit
     , performSuccessfulTask
     , result
     , saveGoalAttributes
@@ -135,7 +133,8 @@ type alias Model =
 
 
 type HistoryMsg
-    = GoToNotesIndex
+    = GoToGoalsIndex
+    | GoToNotesIndex
     | GoToGoalsCompletionsIndex
 
 
@@ -152,6 +151,7 @@ type Msg
     | SaveGoalAttributes
     | SaveGoalAttributesHelper Posix
     | UpdateData Data
+    | Restart
 
 
 type alias MarkdownString =
@@ -161,6 +161,9 @@ type alias MarkdownString =
 handleHistory : HistoryMsg -> History Route Msg -> History Route Msg
 handleHistory route history =
     case route of
+        GoToGoalsIndex ->
+            history |> Router.push (Router.pageWithDefaultTransition GoalsIndex)
+
         GoToNotesIndex ->
             history |> Router.push (Router.pageWithDefaultTransition NotesIndex)
 
@@ -222,6 +225,7 @@ titleView goal =
                         ]
                     ]
                 , A.value goal.attributes.title
+                , E.onInput (UpdateGoal goal.id << UpdateTitle)
                 ]
             ]
         ]
@@ -337,7 +341,7 @@ linePercent numerator denominator =
         ]
 
 
-nextButton numerator denominator =
+nextButton numerator denominator nextPage =
     flex
         [ style
             [ Style.flexContainerProperties
@@ -353,7 +357,7 @@ nextButton numerator denominator =
             , linePercent numerator denominator
             ]
         , flexItem [ style [ Style.box [ Box.paddingAll Constants.large ] ] ]
-            [ text ">"
+            [ a [ E.onClick (HistoryMsgWrapper nextPage) ] [ text ">" ]
             ]
         ]
 
@@ -370,75 +374,9 @@ noMargin =
     style [ Style.box [ Box.margin [ Margin.all (Margin.width (px 0)) ] ] ]
 
 
-appHeader =
-    largePadder
-        [ h1 [ noMargin ] [ grayScaledText 0.8 "Before" ]
-        , p [ noMargin ] [ grayScaledText 0.4 "Set meeting objectives" ]
-        ]
-
-
-goalsIndex : List Goal -> NodeWithStyle Msg
-goalsIndex goals =
-    flex
-        [ style
-            [ Style.flexContainerProperties
-                [ Flex.direction Flex.column
-                , Flex.justifyContent Flex.spaceBetween
-                ]
-            , Style.block [ Block.minHeight (vh 100) ]
-            , Style.box
-                [ backgroundColor gray
-                ]
-            ]
-        ]
-        [ flexItem []
-            [ div
-                [ style
-                    [ Style.box
-                        [ backgroundColor Color.white
-                        , Box.border [ Border.bottom [ Border.color (Color.grayscale 0.2), Border.solid, Border.thickness (px 1) ] ]
-                        ]
-                    ]
-                ]
-                [ Router.headerElement
-                    { left = text ""
-                    , center = appTitle
-                    , right = title "restart"
-                    }
-                , appHeader
-                ]
-            , div
-                [ style
-                    [ Style.box
-                        [ Box.paddingTop Constants.large
-                        ]
-                    ]
-                ]
-                (goals |> List.reverse |> List.map titleView)
-            ]
-        , flexItem [] [ nextButton 1 3 ]
-        ]
-
-
 alignedCellWithPurpleBackground : ( Int, Int ) -> ( Int, Int ) -> ( Flex.Align, Flex.JustifyContent ) -> List (NodeWithStyle msg) -> B.GridItem msg
 alignedCellWithPurpleBackground =
     GridExtra.alignedCell [ Style.box [ Box.backgroundColor Color.purple ] ]
-
-
-goalsNew : GoalAttributes -> NodeWithStyle Msg
-goalsNew draftGoal =
-    pageWithHeader
-        (Router.headerElement
-            { left = Router.headerButton (StandardHistoryWrapper Router.Back) "cancel"
-            , center = title draftGoal.title
-            , right = Router.headerButton SaveGoalAttributes "save"
-            }
-        )
-        (node
-            []
-            [ inputText [ A.value draftGoal.title, E.onInput (UpdateGoalAttributes << UpdateTitle) ]
-            ]
-        )
 
 
 insidePageView : Data -> Router.Page Route Msg -> Maybe (Router.Transition Route Msg) -> NodeWithStyle Msg
@@ -451,12 +389,115 @@ insidePageView data page transition =
         GoalsIndex ->
             goalsIndex goals
 
-        _ ->
-            text "HERE"
+        NotesIndex ->
+            notesIndex data.notes
+
+        GoalsCompletionsIndex ->
+            goalsCompletionsIndex goals data.notes
 
 
-participantEdit goalId participantId =
-    text "HERE2"
+blank =
+    text ""
+
+
+goalsIndex : List Goal -> NodeWithStyle Msg
+goalsIndex goals =
+    wizardView
+        1
+        GoToNotesIndex
+        [ Router.headerElement
+            { left = blank
+            , center = appTitle
+            , right = blank
+            }
+        , largePadder
+            [ h1 [ noMargin ] [ grayScaledText 0.8 "Before" ]
+            , p [ noMargin ] [ grayScaledText 0.4 "Set meeting objectives" ]
+            ]
+        ]
+        (goals
+            |> List.sortBy .id
+            |> List.map titleView
+        )
+
+
+notesIndex : String -> NodeWithStyle Msg
+notesIndex notes =
+    wizardView
+        2
+        GoToGoalsCompletionsIndex
+        [ Router.headerElement
+            { left = backButton
+            , center = blank
+            , right = restartButton
+            }
+        ]
+        [ text "TODO" ]
+
+
+goalsCompletionsIndex goals notes =
+    wizardView
+        3
+        GoToGoalsIndex
+        [ Router.headerElement
+            { left = backButton
+            , center = blank
+            , right = restartButton
+            }
+        ]
+        [ text "TODO" ]
+
+
+backButton =
+    menuLinkTo (StandardHistoryWrapper Router.Back) "< back"
+
+
+restartButton =
+    menuLinkTo Restart "restart"
+
+
+menuLinkTo msg label =
+    a [ E.onClick msg ] [ title label ]
+
+
+wizardView step nextPage pageTitle pageContent =
+    flex
+        [ style
+            [ Style.flexContainerProperties
+                [ Flex.direction Flex.column
+                , Flex.justifyContent Flex.spaceBetween
+                ]
+            , Style.block [ Block.minHeight (vh 100) ]
+            , Style.box [ backgroundColor gray ]
+            ]
+        ]
+        [ flexItem []
+            [ div
+                [ style
+                    [ Style.box
+                        [ backgroundColor Color.white
+                        , Box.border
+                            [ Border.bottom
+                                [ Border.color (Color.grayscale 0.2)
+                                , Border.solid
+                                , Border.thickness (px 1)
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+                pageTitle
+            , div
+                [ style
+                    [ Style.box
+                        [ Box.paddingTop Constants.large
+                        ]
+                    ]
+                ]
+                pageContent
+            ]
+        , flexItem [] [ nextButton step 3 nextPage ]
+        ]
 
 
 view : Model -> NodeWithStyle Msg
@@ -622,6 +663,9 @@ update msg model =
         DestroyGoal id ->
             ( model |> destroyGoal id, Cmd.none )
 
+        Restart ->
+            init
+
 
 addCmd : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
 addCmd cmd ( model, cmds ) =
@@ -655,9 +699,13 @@ initData =
     }
 
 
-init : Model
-init =
+initModel : Model
+initModel =
     Router.initHistoryAndData GoalsIndex initData StandardHistoryWrapper
+
+
+
+-- Router.initHistoryAndData NotesIndex initData StandardHistoryWrapper
 
 
 withAGoal =
@@ -668,10 +716,15 @@ withThreeGoals =
     withAGoal << withAGoal << withAGoal
 
 
+init =
+    ( initModel, Cmd.none )
+        |> withThreeGoals
+
+
 main : Program () Model Msg
 main =
     element
-        { init = \_ -> ( init, Cmd.none ) |> withThreeGoals
+        { init = \_ -> init
         , update = update
         , subscriptions = subscriptions
         , view = view
