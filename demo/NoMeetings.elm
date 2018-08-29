@@ -214,7 +214,10 @@ checkView goal =
                     , E.onCheck (UpdateGoal goal.id << UpdateCompletion)
                     ]
                 ]
-            , flexItem [ E.onClick (UpdateGoal goal.id SwitchCompletion) ]
+            , flexItem
+                [ style [ Style.box [ Box.cursorPointer ] ]
+                , E.onClick (UpdateGoal goal.id SwitchCompletion)
+                ]
                 [ grayScaledText
                     (if goal.attributes.achieved then
                         0.5
