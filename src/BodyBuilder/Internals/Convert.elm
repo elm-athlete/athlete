@@ -92,18 +92,19 @@ toElegantStyle flexModifiers flexItemModifiers gridModifiers gridItemModifiers b
             , computedBoxDetails = computedBoxDetails
             }
     in
-    separatedComponentsToElegantStyle
-        computedFlexContainerDetails
-        computedFlexItemDetails
-        computedGridContainerDetails
-        computedGridItemDetails
-        computedBlockDetails
-        computedBoxDetails
+        separatedComponentsToElegantStyle
+            computedFlexContainerDetails
+            computedFlexItemDetails
+            computedGridContainerDetails
+            computedGridItemDetails
+            computedBlockDetails
+            computedBoxDetails
 
 
 groupByStyleSelectorAndCompute : a -> List ( Modifiers a, Attributes.StyleSelector ) -> List ( Attributes.StyleSelector, a )
 groupByStyleSelectorAndCompute default =
     List.Extra.groupWhile (\x y -> Tuple.second x == Tuple.second y)
+        >> List.map (\( a, list ) -> a :: list)
         >> List.concatMap mergeModifiersAndSwap
         >> List.map (Tuple.mapSecond (\modifiers -> Function.compose modifiers default))
 
@@ -139,6 +140,7 @@ separatedComponentsToElegantStyle flexModifiers flexItemModifiers gridModifiers 
         |> insertStyleComponents (Just boxModifiers) setMediaBox
         |> Dict.values
         |> List.Extra.groupWhile samePseudoClass
+        |> List.map (\( a, list ) -> a :: list)
         |> List.map (componentsToElegantStyle (Maybe.Extra.isJust blockModifiers) (Maybe.Extra.isJust flexModifiers) (Maybe.Extra.isJust gridModifiers))
 
 
@@ -180,7 +182,7 @@ serializeStyleSelector styleSelector =
                 Just pc ->
                     "pseudoClass:Just " ++ pc
     in
-    media_ ++ " | " ++ pseudoClass_
+        media_ ++ " | " ++ pseudoClass_
 
 
 appendInStyleComponent :
@@ -193,14 +195,14 @@ appendInStyleComponent setter ( styleSelector, elem ) results =
         key =
             serializeStyleSelector styleSelector
     in
-    Dict.get key results
-        |> Maybe.Extra.unwrap
-            (defaultStyleComponents
-                |> setter elem
-                |> Tuple.pair styleSelector
-            )
-            (Tuple.mapSecond (setter elem))
-        |> Function.flip (Dict.insert key) results
+        Dict.get key results
+            |> Maybe.Extra.unwrap
+                (defaultStyleComponents
+                    |> setter elem
+                    |> Tuple.pair styleSelector
+                )
+                (Tuple.mapSecond (setter elem))
+            |> Function.flip (Dict.insert key) results
 
 
 samePseudoClass :
@@ -227,11 +229,11 @@ componentsToElegantStyle isBlock isFlex isGrid components =
         computedDisplay =
             List.map (componentsToParameteredDisplayBox isBlock isFlex isGrid) components
     in
-    computedDisplay
-        |> List.Extra.find noMediaQueries
-        |> Maybe.Extra.unwrap Elegant.emptyStyle (Tuple.second >> Elegant.style)
-        |> Maybe.Extra.unwrap identity Elegant.setSuffix suffix
-        |> Elegant.withScreenWidth (List.concatMap toScreenWidth computedDisplay)
+        computedDisplay
+            |> List.Extra.find noMediaQueries
+            |> Maybe.Extra.unwrap Elegant.emptyStyle (Tuple.second >> Elegant.style)
+            |> Maybe.Extra.unwrap identity Elegant.setSuffix suffix
+            |> Elegant.withScreenWidth (List.concatMap toScreenWidth computedDisplay)
 
 
 componentsToParameteredDisplayBox :

@@ -67,6 +67,7 @@ pages and history (backward and forward)
 @docs pageWithHeader
 @docs headerButton
 @docs historyView
+@docs mobileMeta
 
 -}
 
@@ -775,6 +776,9 @@ headerButton msg content =
         ]
 
 
+{-| meta tag for a correct display on mobile devices
+-}
+mobileMeta : NodeWithStyle msg
 mobileMeta =
     ( Html.node "meta"
         [ Html.Attributes.name "viewport"

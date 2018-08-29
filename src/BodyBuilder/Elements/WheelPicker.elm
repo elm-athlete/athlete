@@ -1,15 +1,14 @@
-module BodyBuilder.Elements.WheelPicker
-    exposing
-        ( GetTouchMsg(..)
-        , Msg(..)
-        , WheelPicker
-        , defaultWheelPicker
-        , getSelect
-        , isAnimationFrameNeeded
-        , speedToReachAFace
-        , update
-        , view
-        )
+module BodyBuilder.Elements.WheelPicker exposing
+    ( GetTouchMsg(..)
+    , Msg(..)
+    , WheelPicker
+    , defaultWheelPicker
+    , getSelect
+    , isAnimationFrameNeeded
+    , speedToReachAFace
+    , update
+    , view
+    )
 
 -- import Date exposing (Date)
 
@@ -27,6 +26,7 @@ import Elegant.Transform as Transform
 import Elegant.Typography as Typography
 import Events.Extra.Touch as Touch
 import Function
+import Html.Events.Extra.Touch as Touch
 import Task
 import Time exposing (Posix, Zone, utc)
 import Tuple

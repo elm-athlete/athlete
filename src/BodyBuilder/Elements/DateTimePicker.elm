@@ -1,12 +1,11 @@
-module BodyBuilder.Elements.DateTimePicker
-    exposing
-        ( Model
-        , Msg(..)
-        , init
-        , subscriptions
-        , update
-        , view
-        )
+module BodyBuilder.Elements.DateTimePicker exposing
+    ( Model
+    , Msg(..)
+    , init
+    , subscriptions
+    , update
+    , view
+    )
 
 {-| Mobile like date time picker
 
@@ -34,6 +33,7 @@ import Elegant.Margin as Margin
 import Elegant.Typography as Typography
 import Events.Extra.Touch as Touch
 import Function
+import Html.Events.Extra.Touch as Touch
 import Time exposing (Month(..), Posix, Zone)
 
 
