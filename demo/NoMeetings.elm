@@ -415,9 +415,17 @@ goalsIndex goals =
             , p [ noMargin ] [ grayScaledText 0.4 "Set meeting objectives" ]
             ]
         ]
-        (goals
-            |> List.sortBy .id
-            |> List.map titleView
+        (div
+            [ style
+                [ Style.box
+                    [ Box.paddingTop Constants.large
+                    ]
+                ]
+            ]
+            (goals
+                |> List.sortBy .id
+                |> List.map titleView
+            )
         )
 
 
@@ -431,8 +439,26 @@ notesIndex notes =
             , center = blank
             , right = restartButton
             }
+        , largePadder
+            [ h1 [ noMargin ] [ grayScaledText 0.8 "During" ]
+            , p [ noMargin ] [ grayScaledText 0.4 "Take notes" ]
+            ]
         ]
-        [ text "TODO" ]
+        (div [ style [ Style.blockProperties [ Block.height (percent 100) ] ] ]
+            [ B.textarea
+                [ style
+                    [ Style.block
+                        [ Block.width (percent 100)
+                        , Block.height (percent 100)
+                        ]
+                    , Style.box
+                        [ Box.border [ Border.all [ Border.none ] ]
+                        ]
+                    ]
+                , A.placeholder "Blah"
+                ]
+            ]
+        )
 
 
 goalsCompletionsIndex goals notes =
@@ -445,7 +471,9 @@ goalsCompletionsIndex goals notes =
             , right = restartButton
             }
         ]
-        [ text "TODO" ]
+        (text
+            "TODO"
+        )
 
 
 backButton =
@@ -487,14 +515,7 @@ wizardView step nextPage pageTitle pageContent =
                     ]
                 ]
                 pageTitle
-            , div
-                [ style
-                    [ Style.box
-                        [ Box.paddingTop Constants.large
-                        ]
-                    ]
-                ]
-                pageContent
+            , pageContent
             ]
         , flexItem [] [ nextButton step 3 nextPage ]
         ]
@@ -699,13 +720,14 @@ initData =
     }
 
 
+homePage =
+    -- GoalsIndex
+    NotesIndex
+
+
 initModel : Model
 initModel =
-    Router.initHistoryAndData GoalsIndex initData StandardHistoryWrapper
-
-
-
--- Router.initHistoryAndData NotesIndex initData StandardHistoryWrapper
+    Router.initHistoryAndData homePage initData StandardHistoryWrapper
 
 
 withAGoal =
