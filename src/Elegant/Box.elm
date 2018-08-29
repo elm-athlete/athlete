@@ -250,6 +250,7 @@ cursor =
 
 {-| Because we always need to set the cursor to pointer !
 -}
+cursorPointer : Modifier Box
 cursorPointer =
     cursor Cursor.pointer
 
