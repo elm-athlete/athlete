@@ -336,7 +336,11 @@ type Position
 {-| Computed :
 -}
 type alias VisibleAttributes a =
-    BoxContainer (UniversalContainer a)
+    { a
+        | box : List ( Modifiers Box.Box, StyleSelector )
+        , universal : UniversalAttributes
+        , rawStyle : Maybe Elegant.CommonStyle
+    }
 
 
 {-| -}
@@ -577,6 +581,7 @@ type alias TextareaAttributes msg =
     , onInputEvent : Maybe (String -> msg)
     , fromStringInput : String -> String
     , name : Maybe String
+    , placeholder : Maybe String
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     , rawStyle : Maybe Elegant.CommonStyle
     , rawAttributes : List (Html.Attribute msg)
@@ -1183,6 +1188,7 @@ defaultTextareaAttributes =
     , onFocusEvent = Nothing
     , rawStyle = Nothing
     , rawAttributes = []
+    , placeholder = Nothing
     }
 
 
@@ -1191,6 +1197,7 @@ textareaAttributesToHtmlAttributes : TextareaAttributes msg -> List (Html.Attrib
 textareaAttributesToHtmlAttributes attributes =
     [ unwrapMaybeAttribute Html.Attributes.value << .value
     , unwrapMaybeAttribute Html.Attributes.name << .name
+    , unwrapMaybeAttribute Html.Attributes.placeholder << .placeholder
     ]
         |> List.concatMap (callOn attributes)
         |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))

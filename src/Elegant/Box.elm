@@ -1,49 +1,49 @@
-module Elegant.Box
-    exposing
-        ( Box
-        , Visibility
-        , appearanceNone
-        , background
-        , backgroundColor
-        , border
-        , borderColor
-        , borderNone
-        , borderSolid
-        , borderWidth
-        , boxShadow
-        , boxToCouples
-        , corner
-        , cornerRadius
-        , cornerRound
-        , cursor
-        , default
-        , fontFamilySansSerif
-        , hidden
-        , margin
-        , marginAuto
-        , opacity
-        , outline
-        , outlineNone
-        , padding
-        , paddingAll
-        , paddingBottom
-        , paddingHorizontal
-        , paddingLeft
-        , paddingRight
-        , paddingTop
-        , paddingVertical
-        , position
-        , shadow
-        , shadowCenteredBlurry
-        , systemFont
-        , textColor
-        , transform
-        , typography
-        , visibility
-        , visible
-        , willChange
-        , zIndex
-        )
+module Elegant.Box exposing
+    ( Box
+    , Visibility
+    , appearanceNone
+    , background
+    , border
+    , boxShadow
+    , shadow
+    , corner
+    , cursor
+    , margin
+    , opacity
+    , outline
+    , padding
+    , position
+    , typography
+    , visibility
+    , transform
+    , zIndex
+    , outlineNone
+    , backgroundColor
+    , cornerRound
+    , cornerRadius
+    , borderNone
+    , borderColor
+    , borderWidth
+    , borderSolid
+    , paddingAll
+    , paddingHorizontal
+    , paddingVertical
+    , paddingTop
+    , paddingRight
+    , paddingBottom
+    , paddingLeft
+    , shadowCenteredBlurry
+    , marginAuto
+    , fontFamilySansSerif
+    , systemFont
+    , textColor
+    , willChange
+    , cursorPointer
+    , default
+    , visible
+    , hidden
+    , boxToCouples
+    )
 
 {-| Handles all modifications for the box. You don't need to instanciate one,
 as it's automatically done by Elegant and the different display elements.
@@ -99,6 +99,7 @@ It contains only modifiers, and they can be found in the respective modules.
 @docs systemFont
 @docs textColor
 @docs willChange
+@docs cursorPointer
 
 
 # Values
@@ -139,6 +140,7 @@ in respective modules.
 
     Elegant.displayBlock []
         [ Box.cursor Cursor.default
+
         -- You can use any Box functions here to add custom style...
         ]
 
@@ -244,6 +246,12 @@ corner =
 cursor : Cursor.Cursor -> Modifier Box
 cursor =
     setMaybeValue setCursor
+
+
+{-| Because we always need to set the cursor to pointer !
+-}
+cursorPointer =
+    cursor Cursor.pointer
 
 
 {-| Accepts a list of modifiers for the `Margin` and modifies the Box accordingly.
