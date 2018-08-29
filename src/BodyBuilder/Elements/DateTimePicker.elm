@@ -31,7 +31,6 @@ import Elegant.Box as Box
 import Elegant.Flex as Flex
 import Elegant.Margin as Margin
 import Elegant.Typography as Typography
-import Events.Extra.Touch as Touch
 import Function
 import Html.Events.Extra.Touch as Touch
 import Time exposing (Month(..), Posix, Zone)

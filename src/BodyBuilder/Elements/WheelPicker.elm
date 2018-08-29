@@ -24,7 +24,6 @@ import Elegant.Box as Box
 import Elegant.Position as Position
 import Elegant.Transform as Transform
 import Elegant.Typography as Typography
-import Events.Extra.Touch as Touch
 import Function
 import Html.Events.Extra.Touch as Touch
 import Task
