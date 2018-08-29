@@ -140,6 +140,13 @@ type HistoryMsg
 
 type UpdateGoalMsg
     = UpdateTitle String
+    | UpdateCompletion Bool
+    | SwitchCompletion
+
+
+type LinkType route
+    = Goto route
+    | Share String
 
 
 type Msg
@@ -151,6 +158,7 @@ type Msg
     | SaveGoalAttributes
     | SaveGoalAttributesHelper Posix
     | UpdateData Data
+    | UpdateNotes String
     | Restart
 
 
@@ -192,6 +200,29 @@ standardCellStyle =
             , Box.typography
                 [ Typography.fontFamilyInherit
                 , Typography.size Constants.zeta
+                ]
+            ]
+        ]
+
+
+checkView goal =
+    largePadderHorizontalAndBottom
+        [ flex [ style [ Style.block [] ] ]
+            [ flexItem []
+                [ B.inputCheckbox
+                    [ A.checked goal.attributes.achieved
+                    , E.onCheck (UpdateGoal goal.id << UpdateCompletion)
+                    ]
+                ]
+            , flexItem [ E.onClick (UpdateGoal goal.id SwitchCompletion) ]
+                [ grayScaledText
+                    (if goal.attributes.achieved then
+                        0.5
+
+                     else
+                        1
+                    )
+                    goal.attributes.title
                 ]
             ]
         ]
@@ -341,7 +372,7 @@ linePercent numerator denominator =
         ]
 
 
-nextButton numerator denominator nextPage =
+nextButton numerator denominator nextPage linkText =
     flex
         [ style
             [ Style.flexContainerProperties
@@ -357,13 +388,57 @@ nextButton numerator denominator nextPage =
             , linePercent numerator denominator
             ]
         , flexItem [ style [ Style.box [ Box.paddingAll Constants.large ] ] ]
-            [ a [ E.onClick (HistoryMsgWrapper nextPage) ] [ text ">" ]
+            [ a
+                [ style
+                    [ Style.box
+                        [ Box.cursorPointer
+                        , Box.textColor Color.white
+                        , Box.typography [ Typography.noDecoration ]
+                        ]
+                    ]
+                , case nextPage of
+                    Goto a ->
+                        E.onClick a
+
+                    Share content ->
+                        A.href
+                            ("mailto:?subject=Meeting defriefing&body="
+                                ++ (content |> String.replace "\n" "%0D%0A")
+                            )
+                ]
+                [ text linkText ]
+            ]
+        ]
+
+
+largePadderHorizontalAndBottom =
+    div
+        [ style
+            [ Style.box
+                [ Box.paddingHorizontal Constants.large
+                , Box.paddingBottom Constants.large
+                ]
+            ]
+        ]
+
+
+largePadderTop =
+    div
+        [ style
+            [ Style.box
+                [ Box.paddingTop Constants.large
+                ]
             ]
         ]
 
 
 largePadder =
-    div [ style [ Style.box [ Box.paddingHorizontal Constants.large, Box.paddingBottom Constants.large ] ] ]
+    div
+        [ style
+            [ Style.box
+                [ Box.paddingAll Constants.large ]
+            ]
+        ]
 
 
 grayScaledText shade content =
@@ -404,42 +479,37 @@ goalsIndex : List Goal -> NodeWithStyle Msg
 goalsIndex goals =
     wizardView
         1
-        GoToNotesIndex
+        (Goto (HistoryMsgWrapper GoToNotesIndex))
         [ Router.headerElement
             { left = blank
             , center = appTitle
             , right = blank
             }
-        , largePadder
+        , largePadderHorizontalAndBottom
             [ h1 [ noMargin ] [ grayScaledText 0.8 "Before" ]
             , p [ noMargin ] [ grayScaledText 0.4 "Set meeting objectives" ]
             ]
         ]
-        (div
-            [ style
-                [ Style.box
-                    [ Box.paddingTop Constants.large
-                    ]
-                ]
-            ]
+        (largePadder
             (goals
                 |> List.sortBy .id
                 |> List.map titleView
             )
         )
+        ">"
 
 
 notesIndex : String -> NodeWithStyle Msg
 notesIndex notes =
     wizardView
         2
-        GoToGoalsCompletionsIndex
+        (Goto (HistoryMsgWrapper GoToGoalsCompletionsIndex))
         [ Router.headerElement
             { left = backButton
             , center = blank
             , right = restartButton
             }
-        , largePadder
+        , largePadderHorizontalAndBottom
             [ h1 [ noMargin ] [ grayScaledText 0.8 "During" ]
             , p [ noMargin ] [ grayScaledText 0.4 "Take notes" ]
             ]
@@ -449,31 +519,56 @@ notesIndex notes =
                 [ style
                     [ Style.block
                         [ Block.width (percent 100)
-                        , Block.height (percent 100)
+                        , Block.height (px 200)
                         ]
                     , Style.box
                         [ Box.border [ Border.all [ Border.none ] ]
+                        , Box.paddingAll (px 24)
                         ]
                     ]
-                , A.placeholder "Blah"
+                , A.placeholder "Start typing..."
+                , A.value notes
+                , E.onInput UpdateNotes
                 ]
             ]
         )
+        ">"
 
 
+goalsCompletionsIndex : List Goal -> String -> NodeWithStyle Msg
 goalsCompletionsIndex goals notes =
     wizardView
         3
-        GoToGoalsIndex
+        (Share
+            ((goals
+                |> List.filter (\e -> e.attributes.achieved)
+                |> List.map .attributes
+                |> List.map .title
+                |> List.map (\e -> "Goal achieved: " ++ e)
+                |> String.join "\n"
+             )
+                ++ "\n"
+                ++ notes
+            )
+        )
+        -- (HistoryMsgWrapper GoToGoalsIndex)
         [ Router.headerElement
             { left = backButton
             , center = blank
             , right = restartButton
             }
+        , largePadderHorizontalAndBottom
+            [ h1 [ noMargin ] [ grayScaledText 0.8 "After" ]
+            , p [ noMargin ] [ grayScaledText 0.4 "Review goals and share notes" ]
+            ]
         ]
-        (text
-            "TODO"
+        (largePadder
+            (goals
+                |> List.sortBy .id
+                |> List.map checkView
+            )
         )
+        "share"
 
 
 backButton =
@@ -485,10 +580,18 @@ restartButton =
 
 
 menuLinkTo msg label =
-    a [ E.onClick msg ] [ title label ]
+    a
+        [ style
+            [ Style.box
+                [ Box.cursorPointer
+                ]
+            ]
+        , E.onClick msg
+        ]
+        [ title label ]
 
 
-wizardView step nextPage pageTitle pageContent =
+wizardView step nextPage pageTitle pageContent linkText =
     flex
         [ style
             [ Style.flexContainerProperties
@@ -517,7 +620,7 @@ wizardView step nextPage pageTitle pageContent =
                 pageTitle
             , pageContent
             ]
-        , flexItem [] [ nextButton step 3 nextPage ]
+        , flexItem [] [ nextButton step 3 nextPage linkText ]
         ]
 
 
@@ -543,6 +646,12 @@ updateGoalAttributesBasedOnMsg msg attributes =
     case msg of
         UpdateTitle title_ ->
             { attributes | title = title_ }
+
+        UpdateCompletion achieved_ ->
+            { attributes | achieved = achieved_ }
+
+        SwitchCompletion ->
+            { attributes | achieved = not attributes.achieved }
 
 
 updateGoalBasedOnMsg : UpdateGoalMsg -> Goal -> Goal
@@ -673,6 +782,13 @@ update msg model =
         UpdateData data ->
             ( { model | data = data }, Cmd.none )
 
+        UpdateNotes notes ->
+            let
+                data =
+                    model.data
+            in
+            update (UpdateData { data | notes = notes }) model
+
         SaveGoalAttributes ->
             model
                 |> update (StandardHistoryWrapper Back)
@@ -721,8 +837,12 @@ initData =
 
 
 homePage =
-    -- GoalsIndex
-    NotesIndex
+    GoalsIndex
+
+
+
+-- NotesIndex
+-- GoalsCompletionsIndex
 
 
 initModel : Model
