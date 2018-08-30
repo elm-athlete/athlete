@@ -456,6 +456,7 @@ overflowHiddenContainer attributes content =
             [ Style.block
                 [ Display.overflow
                     [ Overflow.overflowXY Overflow.hidden ]
+                , Block.height (percent 100)
                 ]
             ]
          ]
@@ -471,11 +472,12 @@ pageView :
     -> a
     -> NodeWithStyle msg
 pageView insidePageView_ transition page =
-    node
+    div
         [ Attributes.style
-            [ Style.block
+            [ Style.blockProperties
                 [ Display.dimensions [ Dimensions.width (percent 100) ] ]
             ]
+        , height100StyleBlock
         ]
         [ insidePageView_ page transition ]
 
@@ -585,6 +587,14 @@ slideLeftView history insidePageView_ =
         )
 
 
+height100StyleBlock =
+    style [ Style.blockProperties [ Block.height (percent 100) ] ]
+
+
+height100StyleInline =
+    style [ Style.block [ Block.height (percent 100) ] ]
+
+
 {-| display the current possible transition from one page to the other using
 the history and its own routing system
 -}
@@ -593,14 +603,14 @@ historyView :
     -> History route msg
     -> NodeWithStyle msg
 historyView insidePageView_ history =
-    div []
-        [ ( Html.node "style" [] [ Html.text "body {margin: 0px}\n*{box-sizing: border-box;}" ], [] )
+    div [ height100StyleBlock ]
+        [ ( Html.node "style" [] [ Html.text "body {margin: 0px; height: 100%}\n body>div{height:100%}\n*{box-sizing: border-box;}\nhtml {height: 100%}" ], [] )
         , mobileMeta
         , case history.transition of
             Nothing ->
-                overflowHiddenContainer []
+                overflowHiddenContainer [ height100StyleInline ]
                     [ flexItem
-                        [ Attributes.style [ Style.flexItemProperties [ Flex.basis (percent 100) ] ] ]
+                        [ Attributes.style [ Style.flexItemProperties [ Flex.basis (percent 100) ] ], height100StyleInline ]
                         [ pageView insidePageView_ Nothing history.current ]
                     ]
 

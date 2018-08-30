@@ -1,56 +1,8 @@
-module Main exposing
-    ( Data
-    , Goal
-    , GoalAttributes
-    , HistoryMsg(..)
-    , MarkdownString
-    , Model
-    , Msg(..)
-    , Participant
-    , Persisted
-    , Route(..)
-    , TimeInterval
-    , UpdateGoalMsg(..)
-    , addCmd
-    , appTitle
-    , backgroundColor
-    , collocNumberId
-    , destroyGoal
-    , draftGoalToGoal
-    , goalsIndex
-    , gray
-    , handleHistory
-    , init
-    , initData
-    , initGoalAttributes
-    , initGoals
-    , insidePageView
-    , lastId
-    , main
-    , pad
-    , performSuccessfulTask
-    , result
-    , saveGoalAttributes
-    , standardCellStyle
-    , subscriptions
-    , textToHtml
-    , title
-    , titleView
-    , titleViewWithDelete
-    , toPositiveInt
-    , update
-    , updateGoal
-    , updateGoalAttributes
-    , updateGoalAttributesBasedOnMsg
-    , updateGoalBasedOnMsg
-    , updateGoalHelper
-    , view
-    )
+module Main exposing (main)
 
 import BodyBuilder as B exposing (..)
 import BodyBuilder.Attributes as A exposing (style)
 import BodyBuilder.Events as E
-import BodyBuilder.Finders exposing (..)
 import BodyBuilder.Router as Router
     exposing
         ( History
@@ -83,6 +35,7 @@ import Elegant.Padding as Padding
 import Elegant.Typography as Typography
 import Html
 import Html.Attributes
+import Html.Events.Extra.Touch as Touch
 import Json.Decode as Decode exposing (Decoder)
 import Modifiers exposing (..)
 import Task
@@ -215,15 +168,16 @@ checkView goal =
                     ]
                 ]
             , flexItem
-                [ style [ Style.box [ Box.cursorPointer ] ]
-                , E.onClick (UpdateGoal goal.id SwitchCompletion)
-                ]
+                ([ style [ Style.box [ Box.cursorPointer ] ]
+                 ]
+                    ++ touchOrClickEvent (UpdateGoal goal.id SwitchCompletion)
+                )
                 [ grayScaledText
                     (if goal.attributes.achieved then
-                        0.5
+                        1
 
                      else
-                        1
+                        0.5
                     )
                     goal.attributes.title
                 ]
@@ -265,71 +219,11 @@ titleView goal =
         ]
 
 
-titleViewWithDelete :
-    Goal
-    -> NodeWithStyle Msg
-titleViewWithDelete goal =
-    button
-        [ standardCellStyle ]
-        [ flex
-            []
-            [ flexItem [ E.onClick <| DestroyGoal goal.id ] [ text "⛔" ]
-            , flexItem [ style [ Style.box [ Box.padding [ Padding.left Constants.medium ] ] ] ]
-                [ text goal.attributes.title ]
-            ]
-        ]
-
-
-
--- rentrer des apparts, des photos, nom d'appart, plus les données, parking
-
-
-pad : Modifier (A.BoxContainer (A.MaybeBlockContainer a))
-pad =
-    style
-        [ Style.block []
-        , Style.box [ Box.padding [ Padding.all Constants.medium ] ]
-        ]
-
-
-result : String -> Float -> NodeWithStyle msg
-result label value =
-    node [ pad ]
-        [ text <| label
-        , br
-        , text (value |> String.fromFloat)
-        ]
-
-
-collocNumberId =
-    "collocNumber"
-
-
-toPositiveInt : Int -> Int
-toPositiveInt i =
-    if i < 1 then
-        1
-
-    else
-        i
-
-
-
--- assurance : Generali
-
-
 {-| returns a background with a color
 -}
 backgroundColor : Color.Color -> Modifier Box.Box
 backgroundColor color =
     Box.background [ Elegant.color color ]
-
-
-textToHtml : String -> List (NodeWithStyle msg)
-textToHtml =
-    (>>)
-        (String.split "\n")
-        (List.foldr (\e accu -> accu ++ [ text e, br ]) [])
 
 
 title : String -> NodeWithStyle msg
@@ -375,6 +269,18 @@ linePercent numerator denominator =
         ]
 
 
+linkStyle =
+    style
+        [ Style.box
+            [ Box.cursorPointer
+            , Box.textColor Color.white
+            , Box.typography [ Typography.noDecoration ]
+            , Box.paddingAll Constants.large
+            ]
+        , Style.block []
+        ]
+
+
 nextButton numerator denominator nextPage linkText =
     flex
         [ style
@@ -390,28 +296,34 @@ nextButton numerator denominator nextPage linkText =
             [ div [ style [ Style.box [ Box.paddingBottom Constants.medium ] ] ] [ text (String.fromInt numerator ++ " of " ++ String.fromInt denominator) ]
             , linePercent numerator denominator
             ]
-        , flexItem [ style [ Style.box [ Box.paddingAll Constants.large ] ] ]
-            [ a
-                [ style
-                    [ Style.box
-                        [ Box.cursorPointer
-                        , Box.textColor Color.white
-                        , Box.typography [ Typography.noDecoration ]
-                        ]
-                    ]
-                , case nextPage of
-                    Goto a ->
-                        E.onClick a
+        , flexItem []
+            [ case nextPage of
+                Goto to ->
+                    span
+                        ([ linkStyle
+                         ]
+                            ++ touchOrClickEvent to
+                        )
+                        [ text linkText ]
 
-                    Share content ->
-                        A.href
+                Share content ->
+                    a
+                        [ A.href
                             ("mailto:?subject=Meeting defriefing&body="
                                 ++ (content |> String.replace "\n" "%0D%0A")
                             )
-                ]
-                [ text linkText ]
+                        , linkStyle
+                        ]
+                        [ text linkText ]
             ]
         ]
+
+
+textToHtml : String -> List (NodeWithStyle msg)
+textToHtml =
+    (>>)
+        (String.split "\n")
+        (List.foldr (\e accu -> accu ++ [ text e, br ]) [])
 
 
 largePadderHorizontalAndBottom =
@@ -490,7 +402,7 @@ goalsIndex goals =
             }
         , largePadderHorizontalAndBottom
             [ h1 [ noMargin ] [ grayScaledText 0.8 "Before" ]
-            , p [ noMargin ] [ grayScaledText 0.4 "Set meeting objectives" ]
+            , p [ noMargin ] [ grayScaledText 0.4 "Set meeting goals" ]
             ]
         ]
         (largePadder
@@ -522,7 +434,7 @@ notesIndex notes =
                 [ style
                     [ Style.block
                         [ Block.width (percent 100)
-                        , Block.height (px 200)
+                        , Block.height (percent 100)
                         ]
                     , Style.box
                         [ Box.border [ Border.all [ Border.none ] ]
@@ -543,14 +455,16 @@ goalsCompletionsIndex goals notes =
     wizardView
         3
         (Share
-            ((goals
-                |> List.filter (\e -> e.attributes.achieved)
-                |> List.map .attributes
-                |> List.map .title
-                |> List.map (\e -> "Goal achieved: " ++ e)
-                |> String.join "\n"
-             )
-                ++ "\n"
+            ("# Achievements:\n\n"
+                ++ (goals
+                        |> List.filter (\e -> e.attributes.achieved)
+                        |> List.map .attributes
+                        |> List.map .title
+                        |> List.map (\e -> "- " ++ e)
+                        |> String.join "\n"
+                   )
+                ++ "\n\n\n"
+                ++ "# Notes:\n\n"
                 ++ notes
             )
         )
@@ -566,12 +480,20 @@ goalsCompletionsIndex goals notes =
             ]
         ]
         (largePadder
-            (goals
-                |> List.sortBy .id
-                |> List.map checkView
-            )
+            [ div []
+                (goals
+                    |> List.filter (\e -> not (String.isEmpty e.attributes.title))
+                    |> List.sortBy .id
+                    |> List.map checkView
+                )
+            , div [] (notes |> textToHtml)
+            ]
         )
         "share"
+
+
+touchOrClickEvent msg =
+    [ A.rawAttribute (Touch.onStart (\_ -> msg)), E.onClick msg ]
 
 
 backButton =
@@ -584,13 +506,14 @@ restartButton =
 
 menuLinkTo msg label =
     a
-        [ style
+        ([ style
             [ Style.box
                 [ Box.cursorPointer
                 ]
             ]
-        , E.onClick msg
-        ]
+         ]
+            ++ touchOrClickEvent msg
+        )
         [ title label ]
 
 
@@ -601,27 +524,38 @@ wizardView step nextPage pageTitle pageContent linkText =
                 [ Flex.direction Flex.column
                 , Flex.justifyContent Flex.spaceBetween
                 ]
-            , Style.block [ Block.minHeight (vh 100) ]
+            , Style.block [ Block.height (percent 100) ]
             , Style.box [ backgroundColor gray ]
             ]
         ]
-        [ flexItem []
-            [ div
+        [ flexItem [ style [ Style.block [ Block.height (percent 100) ] ] ]
+            [ flex
                 [ style
-                    [ Style.box
-                        [ backgroundColor Color.white
-                        , Box.border
-                            [ Border.bottom
-                                [ Border.color (Color.grayscale 0.2)
-                                , Border.solid
-                                , Border.thickness (px 1)
+                    [ Style.flexContainerProperties
+                        [ Flex.direction Flex.column
+                        , Flex.justifyContent Flex.spaceBetween
+                        ]
+                    , Style.block [ Block.height (percent 100) ]
+                    ]
+                ]
+                [ flexItem
+                    [ style
+                        [ Style.box
+                            [ backgroundColor Color.white
+                            , Box.border
+                                [ Border.bottom
+                                    [ Border.color (Color.grayscale 0.2)
+                                    , Border.solid
+                                    , Border.thickness (px 1)
+                                    ]
                                 ]
                             ]
                         ]
                     ]
+                    pageTitle
+                , flexItem [ style [ Style.block [ Block.height (percent 100) ] ] ]
+                    [ pageContent ]
                 ]
-                pageTitle
-            , pageContent
             ]
         , flexItem [] [ nextButton step 3 nextPage linkText ]
         ]
@@ -629,9 +563,9 @@ wizardView step nextPage pageTitle pageContent linkText =
 
 view : Model -> NodeWithStyle Msg
 view { history, data } =
-    node
+    div
         [ style
-            [ Style.block []
+            [ Style.blockProperties [ Block.height (percent 100) ]
             , Style.box
                 [ Box.typography
                     [ Typography.fontFamilySansSerif
@@ -669,6 +603,10 @@ updateGoalBasedOnMsg msg goal =
     }
 
 
+eounah =
+    2
+
+
 updateGoalHelper : Goal -> UpdateGoalMsg -> Model -> Model
 updateGoalHelper goal msg model =
     let
@@ -687,6 +625,12 @@ updateGoalHelper goal msg model =
             { data | goals = newGoals }
     in
     { model | data = newData }
+
+
+find_by : (a -> b) -> b -> List a -> Maybe a
+find_by insideDataFun data =
+    List.filter (\e -> insideDataFun e == data)
+        >> List.head
 
 
 updateGoal : Int -> UpdateGoalMsg -> Model -> Model
@@ -748,11 +692,6 @@ saveGoalAttributes currentTime ({ data } as model) =
             }
     in
     { model | data = newData }
-
-
-performSuccessfulTask : a -> Cmd a
-performSuccessfulTask msg =
-    Task.perform identity (Task.succeed msg)
 
 
 destroyGoal : Int -> Model -> Model
