@@ -172,7 +172,7 @@ br =
     ( Html.br [] [], [] )
 
 
-lazy : (model -> NodeWithStyle msg) -> model -> NodeWithStyle msg
+lazy : (a -> NodeWithStyle msg) -> a -> NodeWithStyle msg
 lazy view_ model =
     ( Html.Lazy.lazy (styliseNodeWithStyle << view_) model, [] )
 
