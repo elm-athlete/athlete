@@ -343,8 +343,7 @@ subscriptions model =
     maybeTransitionSubscription model.history
 
 
-initContacts : List Contact
-initContacts =
+pokemons =
     [ { name = "Bulbasaurdagger", id = 1, phoneNumber = "+33389399383" }
     , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
     , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
@@ -392,6 +391,11 @@ initContacts =
     , { name = "Ivysaur", id = 2, phoneNumber = "+33389399383" }
     , { name = "Venusaur", id = 3, phoneNumber = "+33389399383" }
     ]
+
+
+initContacts : List Contact
+initContacts =
+    pokemons
 
 
 initData : Data
