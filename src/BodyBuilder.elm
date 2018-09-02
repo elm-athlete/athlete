@@ -10,6 +10,7 @@ module BodyBuilder exposing
     , staticPage
     , application
     , document
+    , lazy
     )
 
 {-| This module entirely replaces Html, providing a type-safer alternatives.
@@ -87,6 +88,7 @@ import Elegant.Grid as Grid
 import Function
 import Html exposing (Html)
 import Html.Attributes
+import Html.Lazy
 import List.Extra
 import Modifiers exposing (..)
 import Url exposing (Url)
@@ -168,6 +170,11 @@ you want br to insert a carriage return.
 br : NodeWithStyle msg
 br =
     ( Html.br [] [], [] )
+
+
+lazy : (model -> NodeWithStyle msg) -> model -> NodeWithStyle msg
+lazy view_ model =
+    ( Html.Lazy.lazy (styliseNodeWithStyle << view_) model, [] )
 
 
 stylise : (model -> NodeWithStyle msg) -> model -> Node msg
