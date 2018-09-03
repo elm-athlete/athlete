@@ -10,7 +10,10 @@ module BodyBuilder exposing
     , staticPage
     , application
     , document
-    , lazy, lazy2, stylise, stylise2
+    , lazy
+    , lazy2
+    , stylise
+    , stylise2
     )
 
 {-| This module entirely replaces Html, providing a type-safer alternatives.
@@ -73,6 +76,14 @@ It is possible to style those elements using `Style.blockProperties`.
 @docs staticPage
 @docs application
 @docs document
+
+
+# Lazy
+
+@docs lazy
+@docs lazy2
+@docs stylise
+@docs stylise2
 
 -}
 
@@ -172,25 +183,29 @@ br =
     ( Html.br [] [], [] )
 
 
-
--- lazy : (a -> NodeWithStyle msg) -> a -> NodeWithStyle msg
--- lazy view_ model =
---     ( Html.Lazy.lazy (styliseNodeWithStyle << view_) model, [] )
-
-
+{-| Allows app developers to use the power of easy directly inside athlete programs
+-}
+lazy : (a -> Html msg) -> a -> NodeWithStyle msg
 lazy fun val =
     ( Html.Lazy.lazy fun val, [] )
 
 
+{-| Same as lazy, but with 2 arguments
+-}
+lazy2 : (a -> b -> Html msg) -> a -> b -> NodeWithStyle msg
 lazy2 fun val1 val2 =
     ( Html.Lazy.lazy2 fun val1 val2, [] )
 
 
+{-| resulting html of a parameterized athlete structure
+-}
 stylise : (model -> NodeWithStyle msg) -> model -> Node msg
 stylise view_ e =
     styliseNodeWithStyle (view_ e)
 
 
+{-| resulting html of a parameterized athlete structure (with two arguments)
+-}
 stylise2 : (a -> b -> NodeWithStyle msg) -> a -> b -> Node msg
 stylise2 view_ a_ b_ =
     styliseNodeWithStyle (view_ a_ b_)
