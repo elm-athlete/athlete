@@ -213,7 +213,7 @@ stylise2 view_ a_ b_ =
 
 styliseNodeWithStyle : NodeWithStyle msg -> Node msg
 styliseNodeWithStyle ( viewWithoutStyle, styles ) =
-    Html.div []
+    Html.div [ Html.Attributes.style "height" "100%", Html.Attributes.style "overflow" "scroll" ]
         (Html.node "style"
             []
             [ Html.text

@@ -756,8 +756,7 @@ headerElement { left, center, right } =
             [ Style.block
                 [ Display.dimensions [ Dimensions.width <| percent 100 ] ]
             , Style.box
-                [ Box.position <| Position.sticky []
-                , Box.background [ Elegant.color Color.white ]
+                [ Box.background [ Elegant.color Color.white ]
                 ]
             ]
         ]
