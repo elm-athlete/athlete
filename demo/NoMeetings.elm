@@ -46,8 +46,8 @@ type alias Persisted a =
     { id : Int, createdAt : Posix, updatedAt : Posix, attributes : a }
 
 
-type alias Goal =
-    Persisted GoalAttributes
+type alias Objective =
+    Persisted ObjectiveAttributes
 
 
 type alias TimeInterval =
@@ -60,23 +60,23 @@ type alias Participant =
     }
 
 
-type alias GoalAttributes =
+type alias ObjectiveAttributes =
     { title : String
     , achieved : Bool
     }
 
 
 type alias Data =
-    { goals : List Goal
-    , draftGoal : GoalAttributes
+    { objectives : List Objective
+    , draftObjective : ObjectiveAttributes
     , notes : String
     }
 
 
 type Route
-    = GoalsIndex
+    = ObjectivesIndex
     | NotesIndex
-    | GoalsCompletionsIndex
+    | ObjectivesCompletionsIndex
 
 
 type alias Model =
@@ -86,12 +86,12 @@ type alias Model =
 
 
 type HistoryMsg
-    = GoToGoalsIndex
+    = GoToObjectivesIndex
     | GoToNotesIndex
-    | GoToGoalsCompletionsIndex
+    | GoToObjectivesCompletionsIndex
 
 
-type UpdateGoalMsg
+type UpdateObjectiveMsg
     = UpdateTitle String
     | UpdateCompletion Bool
     | SwitchCompletion
@@ -105,11 +105,11 @@ type LinkType route
 type Msg
     = HistoryMsgWrapper HistoryMsg
     | StandardHistoryWrapper StandardHistoryMsg
-    | UpdateGoal Int UpdateGoalMsg
-    | UpdateGoalAttributes UpdateGoalMsg
-    | DestroyGoal Int
-    | SaveGoalAttributes
-    | SaveGoalAttributesHelper Posix
+    | UpdateObjective Int UpdateObjectiveMsg
+    | UpdateObjectiveAttributes UpdateObjectiveMsg
+    | DestroyObjective Int
+    | SaveObjectiveAttributes
+    | SaveObjectiveAttributesHelper Posix
     | UpdateData Data
     | UpdateNotes String
     | Restart
@@ -122,14 +122,14 @@ type alias MarkdownString =
 handleHistory : HistoryMsg -> History Route Msg -> History Route Msg
 handleHistory route history =
     case route of
-        GoToGoalsIndex ->
-            history |> Router.push (Router.pageWithDefaultTransition GoalsIndex)
+        GoToObjectivesIndex ->
+            history |> Router.push (Router.pageWithDefaultTransition ObjectivesIndex)
 
         GoToNotesIndex ->
             history |> Router.push (Router.pageWithDefaultTransition NotesIndex)
 
-        GoToGoalsCompletionsIndex ->
-            history |> Router.push (Router.pageWithDefaultTransition GoalsCompletionsIndex)
+        GoToObjectivesCompletionsIndex ->
+            history |> Router.push (Router.pageWithDefaultTransition ObjectivesCompletionsIndex)
 
 
 gray : Color.Color
@@ -158,35 +158,35 @@ standardCellStyle =
         ]
 
 
-checkView goal =
+checkView objective =
     largePadderHorizontalAndBottom
         [ flex [ style [ Style.block [] ] ]
             [ flexItem []
                 [ B.inputCheckbox
-                    [ A.checked goal.attributes.achieved
-                    , E.onCheck (UpdateGoal goal.id << UpdateCompletion)
+                    [ A.checked objective.attributes.achieved
+                    , E.onCheck (UpdateObjective objective.id << UpdateCompletion)
                     ]
                 ]
             , flexItem
                 ([ style [ Style.box [ Box.cursorPointer ] ]
                  ]
-                    ++ touchOrClickEvent (UpdateGoal goal.id SwitchCompletion)
+                    ++ touchOrClickEvent (UpdateObjective objective.id SwitchCompletion)
                 )
                 [ grayScaledText
-                    (if goal.attributes.achieved then
+                    (if objective.attributes.achieved then
                         1
 
                      else
                         0.5
                     )
-                    goal.attributes.title
+                    objective.attributes.title
                 ]
             ]
         ]
 
 
-titleView : Goal -> NodeWithStyle Msg
-titleView goal =
+titleView : Objective -> NodeWithStyle Msg
+titleView objective =
     node
         [ standardCellStyle
         ]
@@ -201,7 +201,7 @@ titleView goal =
                     ]
                 ]
                 [ text
-                    ("GOAL " ++ (goal.id |> String.fromInt))
+                    ("OBJECTIVE " ++ (objective.id |> String.fromInt))
                 ]
             , B.inputText
                 [ style
@@ -212,8 +212,8 @@ titleView goal =
                         [ Box.paddingAll Constants.medium
                         ]
                     ]
-                , A.value goal.attributes.title
-                , E.onInput (UpdateGoal goal.id << UpdateTitle)
+                , A.value objective.attributes.title
+                , E.onInput (UpdateObjective objective.id << UpdateTitle)
                 ]
             ]
         ]
@@ -369,44 +369,56 @@ alignedCellWithPurpleBackground =
     GridExtra.alignedCell [ Style.box [ Box.backgroundColor Color.purple ] ]
 
 
+objectivesIndexToHtml =
+    B.stylise objectivesIndex
+
+
+notesIndexToHtml =
+    B.stylise notesIndex
+
+
+objectivesCompletionsIndexToHtml =
+    B.stylise2 objectivesCompletionsIndex
+
+
 insidePageView : Data -> Router.Page Route Msg -> Maybe (Router.Transition Route Msg) -> NodeWithStyle Msg
 insidePageView data page transition =
     let
-        goals =
-            data.goals
+        objectives =
+            data.objectives
     in
     case page.route of
-        GoalsIndex ->
-            goalsIndex goals
+        ObjectivesIndex ->
+            B.lazy objectivesIndexToHtml objectives
 
         NotesIndex ->
-            notesIndex data.notes
+            B.lazy notesIndexToHtml data.notes
 
-        GoalsCompletionsIndex ->
-            goalsCompletionsIndex goals data.notes
+        ObjectivesCompletionsIndex ->
+            B.lazy2 objectivesCompletionsIndexToHtml objectives data.notes
 
 
 blank =
     text ""
 
 
-goalsIndex : List Goal -> NodeWithStyle Msg
-goalsIndex goals =
+objectivesIndex : List Objective -> NodeWithStyle Msg
+objectivesIndex objectives =
     wizardView
         1
         (Goto (HistoryMsgWrapper GoToNotesIndex))
         [ Router.headerElement
             { left = blank
             , center = appTitle
-            , right = blank
+            , right = contactButton
             }
         , largePadderHorizontalAndBottom
             [ h1 [ noMargin ] [ grayScaledText 0.8 "Before" ]
-            , p [ noMargin ] [ grayScaledText 0.4 "Set meeting goals" ]
+            , p [ noMargin ] [ grayScaledText 0.4 "Set meeting objectives" ]
             ]
         ]
         (largePadder
-            (goals
+            (objectives
                 |> List.sortBy .id
                 |> List.map titleView
             )
@@ -418,7 +430,7 @@ notesIndex : String -> NodeWithStyle Msg
 notesIndex notes =
     wizardView
         2
-        (Goto (HistoryMsgWrapper GoToGoalsCompletionsIndex))
+        (Goto (HistoryMsgWrapper GoToObjectivesCompletionsIndex))
         [ Router.headerElement
             { left = backButton
             , center = blank
@@ -435,6 +447,7 @@ notesIndex notes =
                     [ Style.block
                         [ Block.width (percent 100)
                         , Block.height (percent 100)
+                        , Block.minHeight (px 300)
                         ]
                     , Style.box
                         [ Box.border [ Border.all [ Border.none ] ]
@@ -450,13 +463,13 @@ notesIndex notes =
         ">"
 
 
-goalsCompletionsIndex : List Goal -> String -> NodeWithStyle Msg
-goalsCompletionsIndex goals notes =
+objectivesCompletionsIndex : List Objective -> String -> NodeWithStyle Msg
+objectivesCompletionsIndex objectives notes =
     wizardView
         3
         (Share
             ("# Achievements:\n\n"
-                ++ (goals
+                ++ (objectives
                         |> List.filter (\e -> e.attributes.achieved)
                         |> List.map .attributes
                         |> List.map .title
@@ -468,7 +481,7 @@ goalsCompletionsIndex goals notes =
                 ++ notes
             )
         )
-        -- (HistoryMsgWrapper GoToGoalsIndex)
+        -- (HistoryMsgWrapper GoToObjectivesIndex)
         [ Router.headerElement
             { left = backButton
             , center = blank
@@ -476,12 +489,12 @@ goalsCompletionsIndex goals notes =
             }
         , largePadderHorizontalAndBottom
             [ h1 [ noMargin ] [ grayScaledText 0.8 "After" ]
-            , p [ noMargin ] [ grayScaledText 0.4 "Review goals and share notes" ]
+            , p [ noMargin ] [ grayScaledText 0.4 "Review objectives and share notes" ]
             ]
         ]
         (largePadder
             [ div []
-                (goals
+                (objectives
                     |> List.filter (\e -> not (String.isEmpty e.attributes.title))
                     |> List.sortBy .id
                     |> List.map checkView
@@ -500,12 +513,28 @@ backButton =
     menuLinkTo (StandardHistoryWrapper Router.Back) "< back"
 
 
+contactButton =
+    menuLinkToHref "https://notonlymeetings.com" "contact us"
+
+
 restartButton =
     menuLinkTo Restart "restart"
 
 
-menuLinkTo msg label =
+menuLinkToHref href label =
     a
+        [ style
+            [ Style.box
+                [ Box.cursorPointer
+                ]
+            ]
+        , A.href href
+        ]
+        [ title label ]
+
+
+menuLinkTo msg label =
+    div
         ([ style
             [ Style.box
                 [ Box.cursorPointer
@@ -524,11 +553,17 @@ wizardView step nextPage pageTitle pageContent linkText =
                 [ Flex.direction Flex.column
                 , Flex.justifyContent Flex.spaceBetween
                 ]
-            , Style.block [ Block.height (percent 100) ]
+            , Style.block [ Block.minHeight (percent 100) ]
             , Style.box [ backgroundColor gray ]
             ]
         ]
-        [ flexItem [ style [ Style.block [ Block.height (percent 100) ] ] ]
+        [ flexItem
+            [ style
+                [ Style.flexItemProperties
+                    [ Flex.grow 1
+                    ]
+                ]
+            ]
             [ flex
                 [ style
                     [ Style.flexContainerProperties
@@ -553,11 +588,24 @@ wizardView step nextPage pageTitle pageContent linkText =
                         ]
                     ]
                     pageTitle
-                , flexItem [ style [ Style.block [ Block.height (percent 100) ] ] ]
+                , flexItem
+                    [ style
+                        [ Style.flexItemProperties
+                            [ Flex.grow 1
+                            ]
+                        ]
+                    ]
                     [ pageContent ]
                 ]
             ]
-        , flexItem [] [ nextButton step 3 nextPage linkText ]
+        , flexItem
+            [ style
+                [ Style.flexItemProperties
+                    [ Flex.shrink 0
+                    ]
+                ]
+            ]
+            [ nextButton step 3 nextPage linkText ]
         ]
 
 
@@ -578,8 +626,8 @@ view { history, data } =
         ]
 
 
-updateGoalAttributesBasedOnMsg : UpdateGoalMsg -> GoalAttributes -> GoalAttributes
-updateGoalAttributesBasedOnMsg msg attributes =
+updateObjectiveAttributesBasedOnMsg : UpdateObjectiveMsg -> ObjectiveAttributes -> ObjectiveAttributes
+updateObjectiveAttributesBasedOnMsg msg attributes =
     case msg of
         UpdateTitle title_ ->
             { attributes | title = title_ }
@@ -591,15 +639,15 @@ updateGoalAttributesBasedOnMsg msg attributes =
             { attributes | achieved = not attributes.achieved }
 
 
-updateGoalBasedOnMsg : UpdateGoalMsg -> Goal -> Goal
-updateGoalBasedOnMsg msg goal =
+updateObjectiveBasedOnMsg : UpdateObjectiveMsg -> Objective -> Objective
+updateObjectiveBasedOnMsg msg objective =
     let
         attributes =
-            goal.attributes
+            objective.attributes
     in
-    { goal
+    { objective
         | attributes =
-            updateGoalAttributesBasedOnMsg msg attributes
+            updateObjectiveAttributesBasedOnMsg msg attributes
     }
 
 
@@ -607,22 +655,22 @@ eounah =
     2
 
 
-updateGoalHelper : Goal -> UpdateGoalMsg -> Model -> Model
-updateGoalHelper goal msg model =
+updateObjectiveHelper : Objective -> UpdateObjectiveMsg -> Model -> Model
+updateObjectiveHelper objective msg model =
     let
-        newGoal =
-            updateGoalBasedOnMsg msg goal
+        newObjective =
+            updateObjectiveBasedOnMsg msg objective
 
         data =
             model.data
 
-        newGoals =
-            data.goals
-                |> List.filter (\e -> e.id /= goal.id)
-                |> (::) newGoal
+        newObjectives =
+            data.objectives
+                |> List.filter (\e -> e.id /= objective.id)
+                |> (::) newObjective
 
         newData =
-            { data | goals = newGoals }
+            { data | objectives = newObjectives }
     in
     { model | data = newData }
 
@@ -633,41 +681,41 @@ find_by insideDataFun data =
         >> List.head
 
 
-updateGoal : Int -> UpdateGoalMsg -> Model -> Model
-updateGoal id customMsg model =
+updateObjective : Int -> UpdateObjectiveMsg -> Model -> Model
+updateObjective id customMsg model =
     let
-        maybeGoal =
-            model.data.goals |> find_by .id id
+        maybeObjective =
+            model.data.objectives |> find_by .id id
     in
-    case maybeGoal of
+    case maybeObjective of
         Nothing ->
             model
 
-        Just goal ->
-            updateGoalHelper goal customMsg model
+        Just objective ->
+            updateObjectiveHelper objective customMsg model
 
 
-updateGoalAttributes : UpdateGoalMsg -> Model -> Model
-updateGoalAttributes customMsg model =
+updateObjectiveAttributes : UpdateObjectiveMsg -> Model -> Model
+updateObjectiveAttributes customMsg model =
     let
-        newGoalAttributes =
-            updateGoalAttributesBasedOnMsg customMsg model.data.draftGoal
+        newObjectiveAttributes =
+            updateObjectiveAttributesBasedOnMsg customMsg model.data.draftObjective
 
         data =
             model.data
 
         newData =
-            { data | draftGoal = newGoalAttributes }
+            { data | draftObjective = newObjectiveAttributes }
     in
     { model | data = newData }
 
 
-draftGoalToGoal : { a | newId : Int, createdAt : Posix } -> GoalAttributes -> Goal
-draftGoalToGoal { newId, createdAt } draftGoal =
+draftObjectiveToObjective : { a | newId : Int, createdAt : Posix } -> ObjectiveAttributes -> Objective
+draftObjectiveToObjective { newId, createdAt } draftObjective =
     { id = newId
     , createdAt = createdAt
     , updatedAt = createdAt
-    , attributes = draftGoal
+    , attributes = draftObjective
     }
 
 
@@ -676,32 +724,32 @@ lastId =
     List.map .id >> List.maximum >> Maybe.withDefault 0
 
 
-saveGoalAttributes : Posix -> Model -> Model
-saveGoalAttributes currentTime ({ data } as model) =
+saveObjectiveAttributes : Posix -> Model -> Model
+saveObjectiveAttributes currentTime ({ data } as model) =
     let
         newData =
             { data
-                | goals =
-                    draftGoalToGoal
-                        { newId = lastId data.goals + 1
+                | objectives =
+                    draftObjectiveToObjective
+                        { newId = lastId data.objectives + 1
                         , createdAt = currentTime
                         }
-                        data.draftGoal
-                        :: data.goals
-                , draftGoal = initGoalAttributes
+                        data.draftObjective
+                        :: data.objectives
+                , draftObjective = initObjectiveAttributes
             }
     in
     { model | data = newData }
 
 
-destroyGoal : Int -> Model -> Model
-destroyGoal id model =
+destroyObjective : Int -> Model -> Model
+destroyObjective id model =
     let
         data =
             model.data
 
         newData =
-            { data | goals = data.goals |> List.filter (\e -> e.id /= id) }
+            { data | objectives = data.objectives |> List.filter (\e -> e.id /= id) }
     in
     { model | data = newData }
 
@@ -715,11 +763,11 @@ update msg model =
         StandardHistoryWrapper historyMsg ->
             model |> Router.handleStandardHistory historyMsg
 
-        UpdateGoal id customMsg ->
-            ( model |> updateGoal id customMsg, Cmd.none )
+        UpdateObjective id customMsg ->
+            ( model |> updateObjective id customMsg, Cmd.none )
 
-        UpdateGoalAttributes customMsg ->
-            ( model |> updateGoalAttributes customMsg, Cmd.none )
+        UpdateObjectiveAttributes customMsg ->
+            ( model |> updateObjectiveAttributes customMsg, Cmd.none )
 
         UpdateData data ->
             ( { model | data = data }, Cmd.none )
@@ -731,16 +779,16 @@ update msg model =
             in
             update (UpdateData { data | notes = notes }) model
 
-        SaveGoalAttributes ->
+        SaveObjectiveAttributes ->
             model
                 |> update (StandardHistoryWrapper Back)
-                |> addCmd (Task.perform SaveGoalAttributesHelper Time.now)
+                |> addCmd (Task.perform SaveObjectiveAttributesHelper Time.now)
 
-        SaveGoalAttributesHelper time ->
-            ( model |> saveGoalAttributes time, Cmd.none )
+        SaveObjectiveAttributesHelper time ->
+            ( model |> saveObjectiveAttributes time, Cmd.none )
 
-        DestroyGoal id ->
-            ( model |> destroyGoal id, Cmd.none )
+        DestroyObjective id ->
+            ( model |> destroyObjective id, Cmd.none )
 
         Restart ->
             init
@@ -758,13 +806,13 @@ subscriptions model =
         ]
 
 
-initGoals : List Goal
-initGoals =
+initObjectives : List Objective
+initObjectives =
     []
 
 
-initGoalAttributes : GoalAttributes
-initGoalAttributes =
+initObjectiveAttributes : ObjectiveAttributes
+initObjectiveAttributes =
     { title = ""
     , achieved = False
     }
@@ -772,19 +820,19 @@ initGoalAttributes =
 
 initData : Data
 initData =
-    { goals = initGoals
-    , draftGoal = initGoalAttributes
+    { objectives = initObjectives
+    , draftObjective = initObjectiveAttributes
     , notes = ""
     }
 
 
 homePage =
-    GoalsIndex
+    ObjectivesIndex
 
 
 
 -- NotesIndex
--- GoalsCompletionsIndex
+-- ObjectivesCompletionsIndex
 
 
 initModel : Model
@@ -792,17 +840,17 @@ initModel =
     Router.initHistoryAndData homePage initData StandardHistoryWrapper
 
 
-withAGoal =
-    addCmd (Task.perform SaveGoalAttributesHelper Time.now)
+withAObjective =
+    addCmd (Task.perform SaveObjectiveAttributesHelper Time.now)
 
 
-withThreeGoals =
-    withAGoal << withAGoal << withAGoal
+withThreeObjectives =
+    withAObjective << withAObjective << withAObjective
 
 
 init =
     ( initModel, Cmd.none )
-        |> withThreeGoals
+        |> withThreeObjectives
 
 
 main : Program () Model Msg
