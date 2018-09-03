@@ -7,7 +7,7 @@ It is heavily inspired by the way iOS works, but the code is original :)
 I wouldn't have been able to write that without Elm, BodyBuilder and Elegant.
 -}
 
-import BodyBuilder exposing (..)
+import BodyBuilder as Builder exposing (..)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements as Elements
 import BodyBuilder.Events as Events
@@ -95,7 +95,7 @@ gray =
 
 titleView : Contact -> NodeWithStyle Msg
 titleView contact =
-    BodyBuilder.button
+    Builder.button
         [ Events.onClick <| HistoryMsgWrapper <| ContactShow contact.id
         , Attributes.style
             [ Style.block
@@ -133,7 +133,7 @@ commonButtonStyleBox =
 
 navItemGroup : Float -> Display.Alignment -> String -> FlexItem Msg
 navItemGroup width alignment content =
-    BodyBuilder.flexItem
+    Builder.flexItem
         [ Events.onClick <| StandardHistoryWrapper Back
         , Attributes.style
             [ Style.flexItemProperties
@@ -157,8 +157,8 @@ navItemGroup width alignment content =
 
 header : FlexItem Msg
 header =
-    BodyBuilder.flexItem []
-        [ BodyBuilder.flex
+    Builder.flexItem []
+        [ Builder.flex
             [ Attributes.style
                 [ Style.flexContainerProperties
                     [ Flex.direction Flex.row ]
@@ -192,7 +192,7 @@ showView bodyFun data =
             ]
         ]
         [ header
-        , BodyBuilder.flexItem
+        , Builder.flexItem
             [ Attributes.style
                 [ Style.flexItemProperties
                     [ Flex.shrink 1000000 ]
@@ -298,6 +298,16 @@ contactsShow id contacts =
     node [] [ showView contactBodyView { maybeContact = contacts |> find_by .id id } ]
 
 
+contactsIndexToHtml : List Contact -> Node Msg
+contactsIndexToHtml =
+    Builder.stylise contactsIndex
+
+
+contactsShowToHtml : Int -> List Contact -> Node Msg
+contactsShowToHtml =
+    Builder.stylise2 contactsShow
+
+
 insidePageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> NodeWithStyle Msg
 insidePageView data page transition =
     let
@@ -306,10 +316,10 @@ insidePageView data page transition =
     in
     case page.route of
         ContactsIndex ->
-            contactsIndex contacts
+            Builder.lazy contactsIndexToHtml contacts
 
         ContactsShow id ->
-            contactsShow id contacts
+            Builder.lazy2 contactsShowToHtml id contacts
 
 
 view : Model -> NodeWithStyle Msg
