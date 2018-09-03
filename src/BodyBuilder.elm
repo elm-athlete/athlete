@@ -10,7 +10,7 @@ module BodyBuilder exposing
     , staticPage
     , application
     , document
-    , lazy
+    , lazy, lazy2, stylise, stylise2
     )
 
 {-| This module entirely replaces Html, providing a type-safer alternatives.
@@ -172,14 +172,28 @@ br =
     ( Html.br [] [], [] )
 
 
-lazy : (a -> NodeWithStyle msg) -> a -> NodeWithStyle msg
-lazy view_ model =
-    ( Html.Lazy.lazy (styliseNodeWithStyle << view_) model, [] )
+
+-- lazy : (a -> NodeWithStyle msg) -> a -> NodeWithStyle msg
+-- lazy view_ model =
+--     ( Html.Lazy.lazy (styliseNodeWithStyle << view_) model, [] )
+
+
+lazy fun val =
+    ( Html.Lazy.lazy fun val, [] )
+
+
+lazy2 fun val1 val2 =
+    ( Html.Lazy.lazy2 fun val1 val2, [] )
 
 
 stylise : (model -> NodeWithStyle msg) -> model -> Node msg
 stylise view_ e =
     styliseNodeWithStyle (view_ e)
+
+
+stylise2 : (a -> b -> NodeWithStyle msg) -> a -> b -> Node msg
+stylise2 view_ a_ b_ =
+    styliseNodeWithStyle (view_ a_ b_)
 
 
 styliseNodeWithStyle : NodeWithStyle msg -> Node msg

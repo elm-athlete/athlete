@@ -479,11 +479,7 @@ pageView insidePageView_ transition page =
             ]
         , height100StyleBlock
         ]
-        [ BodyBuilder.lazy myInsidePageView ( insidePageView_, page, transition ) ]
-
-
-myInsidePageView ( insidePageView, page, transition ) =
-    insidePageView page transition
+        [ insidePageView_ page transition ]
 
 
 {-| -}
