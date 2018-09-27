@@ -1,23 +1,22 @@
-module Elegant.Border
-    exposing
-        ( Border
-        , BorderStyle
-        , all
-        , borderToCouples
-        , bottom
-        , color
-        , dashed
-        , default
-        , full
-        , horizontal
-        , left
-        , none
-        , right
-        , solid
-        , thickness
-        , top
-        , vertical
-        )
+module Elegant.Border exposing
+    ( Border
+    , BorderStyle
+    , default
+    , thickness
+    , none
+    , solid
+    , dashed
+    , color
+    , top
+    , bottom
+    , left
+    , right
+    , horizontal
+    , vertical
+    , all
+    , borderToCouples
+    , full
+    )
 
 {-| Border contains everything about borders rendering.
 

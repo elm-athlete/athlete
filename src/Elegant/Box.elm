@@ -134,7 +134,7 @@ import Function exposing (callOn)
 import Modifiers exposing (..)
 
 
-{-| Represents a box, handling the properties of blocks. They are automatically
+{-| Represents a box, handling the properties of boxes. They are automatically
 instanciated to avoid to deal with it directly. The focus is on the modifiers, available
 in respective modules.
 

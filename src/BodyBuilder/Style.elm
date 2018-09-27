@@ -1,23 +1,22 @@
-module BodyBuilder.Style
-    exposing
-        ( between
-        , block
-        , blockProperties
-        , box
-        , flexContainerProperties
-        , flexItemProperties
-        , focus
-        , greater
-        , gridContainerProperties
-        , gridItemProperties
-        , hover
-        , lesser
-        , media
-        , pseudoClass
-        , setMedia
-        , setPseudoClass
-        , waitForStyleSelector
-        )
+module BodyBuilder.Style exposing
+    ( box
+    , block
+    , blockProperties
+    , flexContainerProperties
+    , flexItemProperties
+    , gridContainerProperties
+    , gridItemProperties
+    , waitForStyleSelector
+    , media
+    , setMedia
+    , greater
+    , lesser
+    , between
+    , pseudoClass
+    , setPseudoClass
+    , hover
+    , focus
+    )
 
 {-|
 
@@ -56,13 +55,15 @@ box =
     waitForStyleSelector setBox
 
 
-{-| -}
+{-| Transform a node in block and pass a blockdetails modifiers
+-}
 block : Modifiers Display.BlockDetails -> StyleModifier (MaybeBlockContainer a)
 block =
     waitForStyleSelector setMaybeBlock
 
 
-{-| -}
+{-| Change the blockdetails modifiers
+-}
 blockProperties : Modifiers Display.BlockDetails -> StyleModifier (BlockContainer a)
 blockProperties =
     waitForStyleSelector setBlock
