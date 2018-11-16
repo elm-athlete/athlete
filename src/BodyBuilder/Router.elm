@@ -4,6 +4,8 @@ module BodyBuilder.Router exposing
     , Page
     , Transition
     , PageView
+    , Direction(..)
+    , Easing(..)
     , handleStandardHistory
     , maybeTransitionSubscription
     , initHistory
@@ -25,12 +27,13 @@ module BodyBuilder.Router exposing
     , afterTransition
     , visiblePages
     , focusedElement
+    , basicDuration
+    , slideUpView
     , headerElement
     , pageWithHeader
     , headerButton
     , historyView
     , mobileMeta
-    , Direction(..), Easing(..), basicDuration, slideUpView
     )
 
 {-| Router based on BodyBuilder and Elegant implementing transitions between
@@ -41,6 +44,8 @@ pages and history (backward and forward)
 @docs Page
 @docs Transition
 @docs PageView
+@docs Direction
+@docs Easing
 
 @docs handleStandardHistory
 @docs maybeTransitionSubscription
@@ -63,6 +68,8 @@ pages and history (backward and forward)
 @docs afterTransition
 @docs visiblePages
 @docs focusedElement
+@docs basicDuration
+@docs slideUpView
 
 @docs headerElement
 @docs pageWithHeader
