@@ -29,6 +29,7 @@ module BodyBuilder.Router exposing
     , focusedElement
     , basicDuration
     , slideUpView
+    , slideLeftView
     , headerElement
     , pageWithHeader
     , headerButton
@@ -70,6 +71,7 @@ pages and history (backward and forward)
 @docs focusedElement
 @docs basicDuration
 @docs slideUpView
+@docs slideLeftView
 
 @docs headerElement
 @docs pageWithHeader
@@ -559,6 +561,7 @@ slideUpView history insidePageView_ =
         ]
 
 
+{-| -}
 slideLeftView :
     History route msg
     -> PageView route msg
