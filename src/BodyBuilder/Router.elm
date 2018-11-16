@@ -30,6 +30,7 @@ module BodyBuilder.Router exposing
     , headerButton
     , historyView
     , mobileMeta
+    , Direction(..), Easing(..), basicDuration, slideUpView
     )
 
 {-| Router based on BodyBuilder and Elegant implementing transitions between
@@ -100,6 +101,7 @@ import Modifiers exposing (..)
 import Task
 
 
+{-| -}
 type Easing
     = EaseInOut
     | Linear
@@ -165,6 +167,7 @@ type alias PageView route msg =
     -> NodeWithStyle msg
 
 
+{-| -}
 type Direction
     = Forward
     | Backward
@@ -264,6 +267,7 @@ timeDiff diff ({ timer } as transition) =
     { transition | timer = newTimer }
 
 
+{-| -}
 basicDuration : number
 basicDuration =
     250
@@ -512,6 +516,7 @@ mainElement html =
         ]
 
 
+{-| -}
 slideUpView : History route msg -> PageView route msg -> NodeWithStyle msg
 slideUpView history insidePageView_ =
     let
