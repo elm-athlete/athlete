@@ -197,6 +197,27 @@ lazy2 fun val1 val2 =
     ( Html.Lazy.lazy3 stylise2 fun val1 val2, [] )
 
 
+{-| Same as lazy, but with 3 arguments
+-}
+lazy3 : (a -> b -> c -> NodeWithStyle msg) -> a -> b -> c -> NodeWithStyle msg
+lazy3 fun val1 val2 val3 =
+    ( Html.Lazy.lazy4 stylise3 fun val1 val2 val3, [] )
+
+
+{-| Same as lazy, but with 4 arguments
+-}
+lazy4 : (a -> b -> c -> d -> NodeWithStyle msg) -> a -> b -> c -> d -> NodeWithStyle msg
+lazy4 fun val1 val2 val3 val4 =
+    ( Html.Lazy.lazy5 stylise4 fun val1 val2 val3 val4, [] )
+
+
+{-| Same as lazy, but with 5 arguments
+-}
+lazy5 : (a -> b -> c -> d -> e -> NodeWithStyle msg) -> a -> b -> c -> d -> e -> NodeWithStyle msg
+lazy5 fun val1 val2 val3 val4 val5 =
+    ( Html.Lazy.lazy6 stylise5 fun val1 val2 val3 val4 val5, [] )
+
+
 {-| resulting html of a parameterized athlete structure
 -}
 stylise : (a -> NodeWithStyle msg) -> a -> Node msg
@@ -209,6 +230,27 @@ stylise view_ e =
 stylise2 : (a -> b -> NodeWithStyle msg) -> a -> b -> Node msg
 stylise2 view_ a_ b_ =
     styliseNodeWithStyle (view_ a_ b_)
+
+
+{-| resulting html of a parameterized athlete structure (with three arguments)
+-}
+stylise3 : (a -> b -> c -> NodeWithStyle msg) -> a -> b -> c -> Node msg
+stylise3 view_ a_ b_ c_ =
+    styliseNodeWithStyle (view_ a_ b_ c_)
+
+
+{-| resulting html of a parameterized athlete structure (with four arguments)
+-}
+stylise4 : (a -> b -> c -> d -> NodeWithStyle msg) -> a -> b -> c -> d -> Node msg
+stylise4 view_ a_ b_ c_ d_ =
+    styliseNodeWithStyle (view_ a_ b_ c_ d_)
+
+
+{-| resulting html of a parameterized athlete structure (with five arguments)
+-}
+stylise5 : (a -> b -> c -> d -> e -> NodeWithStyle msg) -> a -> b -> c -> d -> e -> Node msg
+stylise5 view_ a_ b_ c_ d_ e_ =
+    styliseNodeWithStyle (view_ a_ b_ c_ d_ e_)
 
 
 styliseNodeWithStyle : NodeWithStyle msg -> Node msg
