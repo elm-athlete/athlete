@@ -158,8 +158,8 @@ type alias History route msg =
     , current : Page route msg
     , after : List (Page route msg)
     , transition : Maybe (Transition route msg)
-    , currentPageHasFocusElement : Bool
     , standardHistoryWrapper : StandardHistoryMsg -> msg
+    , firstFrameHasBeenPainted : Bool
     }
 
 
@@ -301,7 +301,6 @@ push el ({ transition, before, current, after } as history) =
             , current = el
             , after = []
             , transition = el.maybeTransition
-            , currentPageHasFocusElement = Maybe.withDefault False (Maybe.map (always True) el.maybeFocusedId)
         }
 
 
@@ -653,8 +652,8 @@ initHistory currentPage standardHistoryMsg =
     , current = pageWithoutTransition currentPage
     , after = []
     , transition = Nothing
-    , currentPageHasFocusElement = False
     , standardHistoryWrapper = standardHistoryMsg
+    , firstFrameHasBeenPainted = False
     }
 
 
@@ -681,29 +680,31 @@ standardHandleHistory historyMsg history =
                     ( history, Cmd.none )
 
                 Just transition ->
-                    let
-                        newTransition =
-                            transition |> timeDiff diff
-                    in
-                    if newTransition.timer > 0 then
-                        ( { history | transition = Just newTransition }, Cmd.none )
+                    if not history.firstFrameHasBeenPainted then
+                        ( { history | firstFrameHasBeenPainted = True }, Cmd.none )
 
                     else
-                        ( { history | transition = Nothing }
-                        , case history.currentPageHasFocusElement of
-                            False ->
-                                Cmd.none
+                        let
+                            newTransition =
+                                transition |> timeDiff diff
+                        in
+                        if newTransition.timer > 0 then
+                            ( { history | transition = newTransition |> Just }, Cmd.none )
 
-                            True ->
-                                case history.current.maybeFocusedId of
-                                    Nothing ->
-                                        Cmd.none
+                        else
+                            ( { history
+                                | transition = Nothing
+                                , firstFrameHasBeenPainted = False
+                              }
+                            , case history.current.maybeFocusedId of
+                                Nothing ->
+                                    Cmd.none
 
-                                    Just maybeFocusedId_ ->
-                                        Task.attempt
-                                            (FocusMsg >> history.standardHistoryWrapper)
-                                            (Browser.Dom.focus maybeFocusedId_)
-                        )
+                                Just maybeFocusedId_ ->
+                                    Task.attempt
+                                        (FocusMsg >> history.standardHistoryWrapper)
+                                        (Browser.Dom.focus maybeFocusedId_)
+                            )
 
 
 {-| handle model's history update using historyMsg

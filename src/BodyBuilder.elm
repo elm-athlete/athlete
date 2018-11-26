@@ -185,21 +185,21 @@ br =
 
 {-| Allows app developers to use the power of easy directly inside athlete programs
 -}
-lazy : (a -> Html msg) -> a -> NodeWithStyle msg
+lazy : (a -> NodeWithStyle msg) -> a -> NodeWithStyle msg
 lazy fun val =
-    ( Html.Lazy.lazy fun val, [] )
+    ( Html.Lazy.lazy2 stylise fun val, [] )
 
 
 {-| Same as lazy, but with 2 arguments
 -}
-lazy2 : (a -> b -> Html msg) -> a -> b -> NodeWithStyle msg
+lazy2 : (a -> b -> NodeWithStyle msg) -> a -> b -> NodeWithStyle msg
 lazy2 fun val1 val2 =
-    ( Html.Lazy.lazy2 fun val1 val2, [] )
+    ( Html.Lazy.lazy3 stylise2 fun val1 val2, [] )
 
 
 {-| resulting html of a parameterized athlete structure
 -}
-stylise : (model -> NodeWithStyle msg) -> model -> Node msg
+stylise : (a -> NodeWithStyle msg) -> a -> Node msg
 stylise view_ e =
     styliseNodeWithStyle (view_ e)
 

@@ -298,16 +298,6 @@ contactsShow id contacts =
     node [] [ showView contactBodyView { maybeContact = contacts |> find_by .id id } ]
 
 
-contactsIndexToHtml : List Contact -> Node Msg
-contactsIndexToHtml =
-    Builder.stylise contactsIndex
-
-
-contactsShowToHtml : Int -> List Contact -> Node Msg
-contactsShowToHtml =
-    Builder.stylise2 contactsShow
-
-
 insidePageView : Data -> Page Route Msg -> Maybe (Transition Route Msg) -> NodeWithStyle Msg
 insidePageView data page transition =
     let
@@ -316,10 +306,10 @@ insidePageView data page transition =
     in
     case page.route of
         ContactsIndex ->
-            Builder.lazy contactsIndexToHtml contacts
+            Builder.lazy contactsIndex contacts
 
         ContactsShow id ->
-            Builder.lazy2 contactsShowToHtml id contacts
+            Builder.lazy2 contactsShow id contacts
 
 
 view : Model -> NodeWithStyle Msg
@@ -405,7 +395,7 @@ pokemons =
 
 initContacts : List Contact
 initContacts =
-    pokemons
+    List.concat (List.repeat 10 pokemons)
 
 
 initData : Data
