@@ -23,6 +23,33 @@ module BodyBuilder.Elements.Page exposing
     , verticallyCenteredPageQ
     )
 
+{-|
+
+@docs backButton
+@docs headerButtonStyle
+@docs headerButtonStyleCenter
+@docs headerButtonStyleLeft
+@docs headerButtonStyleRight
+@docs headerElement
+@docs limitedPage
+@docs limitedPageQ
+@docs menuLinkTo
+@docs menuLinkToHref
+@docs menuLinkToWithIcon
+@docs namedPage
+@docs namedPageQ
+@docs namedPageWithAction
+@docs namedPageWithoutBack
+@docs pageTitle
+@docs pageView
+@docs pageWithAutoMargin
+@docs pageWithMargin
+@docs title
+@docs verticallyCenteredPage
+@docs verticallyCenteredPageQ
+
+-}
+
 import BodyBuilder as B exposing (FlexItem, NodeWithStyle)
 import BodyBuilder.Attributes as A
 import BodyBuilder.Events as E
@@ -55,6 +82,7 @@ import Modifiers exposing (..)
 import Time exposing (Month(..), Posix)
 
 
+{-| -}
 title : B.NodeWithStyle msg -> B.NodeWithStyle msg
 title content =
     B.div
@@ -65,6 +93,15 @@ title content =
         [ content ]
 
 
+{-| -}
+pageView :
+    { a
+        | center : NodeWithStyle msg
+        , left : NodeWithStyle msg
+        , right : NodeWithStyle msg
+    }
+    -> NodeWithStyle msg
+    -> NodeWithStyle msg
 pageView topMenu content =
     B.grid
         [ A.style
@@ -122,6 +159,7 @@ headerElement { left, center, right } =
         ]
 
 
+{-| -}
 headerButtonStyle :
     Elegant.SizeUnit
     -> Modifier Display.BlockDetails
@@ -142,22 +180,31 @@ headerButtonStyle width align =
         ]
 
 
+{-| -}
+headerButtonStyleLeft : Modifier (A.FlexItemAttributes msg)
 headerButtonStyleLeft =
     headerButtonStyle (percent 28) (Display.alignment Display.left)
 
 
+{-| -}
+headerButtonStyleCenter : Modifier (A.FlexItemAttributes msg)
 headerButtonStyleCenter =
     headerButtonStyle (percent 44) Block.alignCenter
 
 
+{-| -}
+headerButtonStyleRight : Modifier (A.FlexItemAttributes msg)
 headerButtonStyleRight =
     headerButtonStyle (percent 28) (Display.alignment Display.right)
 
 
+{-| -}
 touchOrClick msg =
     [ A.rawAttribute (Touch.onEnd (\_ -> msg)), E.onClick msg ]
 
 
+{-| -}
+menuLinkTo : msg -> String -> NodeWithStyle msg
 menuLinkTo msg label =
     B.div
         ([ A.style
@@ -172,6 +219,8 @@ menuLinkTo msg label =
         [ title (B.text label) ]
 
 
+{-| -}
+pageTitle : String -> NodeWithStyle msg
 pageTitle text =
     B.div
         [ paddingVertical (px 18)
@@ -180,6 +229,8 @@ pageTitle text =
         [ B.text text ]
 
 
+{-| -}
+menuLinkToWithIcon : msg -> { icon : Int -> RGBA -> Html.Html msg, size : Int, color : RGBA } -> String -> NodeWithStyle msg
 menuLinkToWithIcon msg { icon, size, color } label =
     B.div
         ([ A.style
@@ -223,6 +274,8 @@ menuLinkToWithIcon msg { icon, size, color } label =
         ]
 
 
+{-| -}
+namedPageWithAction : NodeWithStyle msg -> String -> ( String, msg ) -> NodeWithStyle msg -> NodeWithStyle msg
 namedPageWithAction backButton_ title_ ( actionLabel, actionMsg ) =
     pageView
         { left = backButton_
@@ -231,6 +284,8 @@ namedPageWithAction backButton_ title_ ( actionLabel, actionMsg ) =
         }
 
 
+{-| -}
+namedPage : NodeWithStyle msg -> NodeWithStyle msg -> String -> NodeWithStyle msg -> NodeWithStyle msg
 namedPage defaultRight_ backButton_ title_ =
     pageView
         { left = backButton_
@@ -239,6 +294,8 @@ namedPage defaultRight_ backButton_ title_ =
         }
 
 
+{-| -}
+namedPageQ : NodeWithStyle msg -> NodeWithStyle msg -> Bool -> String -> NodeWithStyle msg -> NodeWithStyle msg
 namedPageQ defaultRight_ backButton_ hasBack title_ =
     pageView
         { left =
@@ -252,6 +309,8 @@ namedPageQ defaultRight_ backButton_ hasBack title_ =
         }
 
 
+{-| -}
+namedPageWithoutBack : NodeWithStyle msg -> String -> NodeWithStyle msg -> NodeWithStyle msg
 namedPageWithoutBack defaultRight_ title_ =
     pageView
         { left = B.none
@@ -260,22 +319,31 @@ namedPageWithoutBack defaultRight_ title_ =
         }
 
 
+{-| -}
+limitedPage : NodeWithStyle msg -> NodeWithStyle msg -> String -> List (NodeWithStyle msg) -> NodeWithStyle msg
 limitedPage defaultRight_ backButton_ title_ content =
     namedPage defaultRight_ backButton_ title_ (limitedWidth380WithPadding content)
 
 
+{-| -}
+limitedPageQ : NodeWithStyle msg -> NodeWithStyle msg -> Bool -> String -> List (NodeWithStyle msg) -> NodeWithStyle msg
 limitedPageQ defaultRight_ backButton_ q title_ content =
     namedPageQ defaultRight_ backButton_ q title_ (limitedWidth380WithPadding content)
 
 
+{-| -}
+verticallyCenteredPage : NodeWithStyle msg -> NodeWithStyle msg -> String -> List (NodeWithStyle msg) -> NodeWithStyle msg
 verticallyCenteredPage defaultRight_ backButton_ title_ content =
     namedPage defaultRight_ backButton_ title_ (limitedAndCentered content)
 
 
+{-| -}
+verticallyCenteredPageQ : NodeWithStyle msg -> NodeWithStyle msg -> Bool -> String -> List (NodeWithStyle msg) -> NodeWithStyle msg
 verticallyCenteredPageQ defaultRight_ backButton_ q title_ content =
     namedPageQ defaultRight_ backButton_ q title_ (limitedAndCentered content)
 
 
+{-| -}
 type alias RGBA =
     { red : Float
     , green : Float
@@ -284,12 +352,16 @@ type alias RGBA =
     }
 
 
+{-| -}
+backButton : (Router.StandardHistoryMsg -> msg) -> NodeWithStyle msg
 backButton wrapper =
     menuLinkToWithIcon (wrapper Router.Back)
         { icon = Ios.arrowLeft, size = 32, color = RGBA 0 0 0 1 }
         "Back"
 
 
+{-| -}
+pageWithAutoMargin : Int -> NodeWithStyle msg -> NodeWithStyle msg
 pageWithAutoMargin pxNumber content =
     B.div
         [ box [ Box.marginAuto ]
@@ -299,11 +371,14 @@ pageWithAutoMargin pxNumber content =
         [ content ]
 
 
+{-| -}
 pageWithMargin : NodeWithStyle msg -> NodeWithStyle msg
 pageWithMargin =
     pageWithAutoMargin 700
 
 
+{-| -}
+menuLinkToHref : String -> String -> NodeWithStyle msg
 menuLinkToHref href label =
     B.a
         [ A.style

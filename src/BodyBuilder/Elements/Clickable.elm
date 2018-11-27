@@ -11,6 +11,21 @@ module BodyBuilder.Elements.Clickable exposing
     , removeButtonStyle
     )
 
+{-|
+
+@docs blackButton
+@docs fullSizeButton
+@docs fullWidthButton
+@docs greyButton
+@docs hyperDarkerBlue
+@docs link
+@docs mailtoLink
+@docs monochromeBox
+@docs monochromeSquaredButton
+@docs removeButtonStyle
+
+-}
+
 import BodyBuilder as B exposing (FlexItem, NodeWithStyle)
 import BodyBuilder.Attributes as A
 import BodyBuilder.Events as E
@@ -43,20 +58,23 @@ import Modifiers exposing (..)
 import Time exposing (Month(..), Posix)
 
 
+{-| -}
 touchOrClick msg =
     [ A.rawAttribute (Touch.onEnd (\_ -> msg)), E.onClick msg ]
 
 
+{-| -}
 hyperDarkerBlue : Color.Color
 hyperDarkerBlue =
     Color.rgb 43 143 208
 
 
-borderColor : Color.Color
-borderColor =
-    Color.grayscale 0.1
-
-
+{-| -}
+link :
+    Modifiers (A.AAttributes msg)
+    -> String
+    -> msg
+    -> NodeWithStyle msg
 link otherAttributes content msg =
     B.a
         ([ A.style
@@ -70,10 +88,14 @@ link otherAttributes content msg =
         [ B.text content ]
 
 
+{-| -}
+mailtoLink : String -> NodeWithStyle msg
 mailtoLink address =
     B.a [ A.href ("mailto:" ++ address) ] [ B.text address ]
 
 
+{-| -}
+removeButtonStyle : Modifiers Box.Box
 removeButtonStyle =
     [ Box.borderNone
     , Box.backgroundColor (Color.rgba 0 0 0 0)
@@ -83,6 +105,8 @@ removeButtonStyle =
     ]
 
 
+{-| -}
+monochromeBox : ColorTheme -> Modifiers Box.Box
 monochromeBox colors =
     [ Box.border
         [ Border.all
@@ -103,19 +127,26 @@ monochromeBox colors =
     ]
 
 
+type alias ColorTheme =
+    { background : Color.Color
+    , text : Color.Color
+    , border : Color.Color
+    }
+
+
+{-| -}
+monochromeSquaredButton : ColorTheme -> String -> msg -> NodeWithStyle msg
 monochromeSquaredButton colors content msg =
     B.button
-        [ A.style
-            [ Style.box
-                (monochromeBox colors)
-            , Style.block
-                [ Block.width (percent 100) ]
-            ]
+        [ box (monochromeBox colors)
+        , block [ Block.width (percent 100) ]
         , E.onClick msg
         ]
         [ B.text content ]
 
 
+{-| -}
+greyButton : String -> msg -> NodeWithStyle msg
 greyButton =
     monochromeSquaredButton
         { background = Color.grey
@@ -124,6 +155,8 @@ greyButton =
         }
 
 
+{-| -}
+blackButton : String -> msg -> NodeWithStyle msg
 blackButton =
     monochromeSquaredButton
         { background = Color.black
@@ -132,42 +165,46 @@ blackButton =
         }
 
 
+{-| -}
 fullWidthButton : String -> msg -> NodeWithStyle msg
 fullWidthButton content msg =
     B.button
-        [ A.style
-            [ Style.box
-                [ Box.borderSolid
-                , Box.borderColor borderColor
-                , Box.backgroundColor hyperDarkerBlue
-                , Box.typography
-                    [ Typography.color Color.white
-                    , Typography.size (px 14)
-                    , Typography.weight boldVal
-                    ]
-                ]
-            , Style.block
-                [ Block.width (percent 100), Block.height (percent 100) ]
+        [ box
+            [ Box.borderSolid
+            , Box.borderColor (Color.grayscale 0.1)
+            , Box.backgroundColor hyperDarkerBlue
+            ]
+        , typography
+            [ Typography.color Color.white
+            , Typography.size (px 14)
+            , Typography.weight boldVal
+            ]
+        , block
+            [ Block.width (percent 100)
+            , Block.height (percent 100)
             ]
         , E.onClick msg
         ]
         [ B.text content ]
 
 
+{-| -}
+fullSizeButton : String -> msg -> NodeWithStyle msg
 fullSizeButton text msg =
     B.button
-        [ A.style
-            [ Style.block [ Block.height (percent 100), Block.width (percent 100) ]
-            , Style.box
-                [ Box.margin
-                    [ Margin.all
-                        (Margin.width Constants.zero)
-                    ]
-                , Box.paddingAll Constants.zero
-                , typoSize 14
-                , Box.backgroundColor Color.white
-                , Box.borderNone
+        [ block
+            [ Block.height (percent 100)
+            , Block.width (percent 100)
+            ]
+        , box
+            [ Box.margin
+                [ Margin.all
+                    (Margin.width Constants.zero)
                 ]
+            , Box.paddingAll Constants.zero
+            , typoSize 14
+            , Box.backgroundColor Color.white
+            , Box.borderNone
             ]
         , cursorPointer
         , E.onClick msg

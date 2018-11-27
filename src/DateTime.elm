@@ -7,9 +7,21 @@ module DateTime exposing
     , posixToMyDate
     )
 
+{-|
+
+@docs DateBetween
+@docs DateMsg
+@docs MyDate
+@docs monthToString
+@docs myDateToIso8601
+@docs posixToMyDate
+
+-}
+
 import Time exposing (Month, Posix)
 
 
+{-| -}
 type DateMsg
     = Day Int
     | Month Int
@@ -18,6 +30,7 @@ type DateMsg
     | RemoveDate
 
 
+{-| -}
 type alias MyDate =
     { day : Int
     , month : Int
@@ -25,6 +38,7 @@ type alias MyDate =
     }
 
 
+{-| -}
 type DateBetween
     = DateBetween MyDate MyDate
 
@@ -71,6 +85,8 @@ monthToInt month =
             12
 
 
+{-| -}
+posixToMyDate : Time.Posix -> MyDate
 posixToMyDate posix =
     { year = posix |> Time.toYear Time.utc
     , month = posix |> Time.toMonth Time.utc |> monthToInt
@@ -78,10 +94,13 @@ posixToMyDate posix =
     }
 
 
+{-| -}
+monthToString : Time.Month -> String
 monthToString =
     monthToInt >> addZeroForUnits
 
 
+{-| -}
 addZeroForUnits : Int -> String
 addZeroForUnits value =
     if value < 10 && value > -1 then
@@ -91,6 +110,7 @@ addZeroForUnits value =
         String.fromInt value
 
 
+{-| -}
 myDateToIso8601 : MyDate -> String
 myDateToIso8601 { day, month, year } =
     String.join "T"

@@ -1,4 +1,18 @@
-module BodyBuilder.Elements.Card exposing (field, header, headerElement, headerWithText)
+module BodyBuilder.Elements.Card exposing
+    ( field
+    , header
+    , headerElement
+    , headerWithText
+    )
+
+{-|
+
+@docs field
+@docs header
+@docs headerElement
+@docs headerWithText
+
+-}
 
 import BodyBuilder as B exposing (FlexItem, NodeWithStyle)
 import BodyBuilder.Attributes as A
@@ -31,21 +45,25 @@ import Modifiers exposing (..)
 import Time exposing (Month(..), Posix)
 
 
+{-| -}
 lightBlack : Color.Color
 lightBlack =
     Color.grayscale 0.8
 
 
+{-| -}
 darkerBlue : Color.Color
 darkerBlue =
     Color.rgba 43 143 208 0.1
 
 
+{-| -}
 headerWithText : String -> NodeWithStyle msg
 headerWithText =
     header << B.text
 
 
+{-| -}
 header : NodeWithStyle msg -> NodeWithStyle msg
 header content =
     B.flex
@@ -67,6 +85,7 @@ header content =
         [ headerElement content ]
 
 
+{-| -}
 headerElement : NodeWithStyle msg -> FlexItem msg
 headerElement content =
     B.flexItem
@@ -83,6 +102,7 @@ headerElement content =
         [ content ]
 
 
+{-| -}
 field : String -> String -> NodeWithStyle msg
 field label content =
     B.div

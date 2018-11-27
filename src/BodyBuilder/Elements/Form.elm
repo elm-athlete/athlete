@@ -4,7 +4,6 @@ module BodyBuilder.Elements.Form exposing
     , InputCheckboxContent
     , InputNumberContent
     , InputTextContent
-    , InputType(..)
     , buildCheckbox
     , buildDate
     , buildInput
@@ -25,14 +24,46 @@ module BodyBuilder.Elements.Form exposing
     , inputSurround
     , inputTextStyle
     , labelizedInput
-    , maybeError
+    , InputType(..)
     )
+
+{-|
+
+@docs CommonParams
+@docs FullInputType
+@docs InputCheckboxContent
+@docs InputNumberContent
+@docs InputTextContent
+@docs InputType(..)
+@docs buildCheckbox
+@docs buildDate
+@docs buildInput
+@docs buildInputFile
+@docs buildInputNumber
+@docs buildInputPassword
+@docs buildInputText
+@docs buildSelect
+@docs buildTextArea
+@docs checkBoxSurround
+@docs errorMessage
+@docs generateOptions
+@docs inputField
+@docs inputLabel
+@docs inputLabelPlaceholder
+@docs inputLabelPlaceholderWithError
+@docs inputLabelWithError
+@docs inputSurround
+@docs inputTextStyle
+@docs labelizedInput
+
+-}
 
 import BodyBuilder as B exposing (FlexItem, NodeWithStyle)
 import BodyBuilder.Attributes as A
 import BodyBuilder.Elements.Clickable exposing (..)
 import BodyBuilder.Events as E
 import BodyBuilder.Extra exposing (..)
+import BodyBuilder.Internals.Shared
 import BodyBuilder.Router as Router
 import BodyBuilder.Style as Style
 import Color
@@ -60,6 +91,7 @@ import Ionicon.Ios as Ios
 import Json.Decode as Decode
 import Modifiers exposing (..)
 import Time exposing (Month(..), Posix)
+import VirtualDom
 
 
 borderColor : Color.Color
@@ -67,6 +99,8 @@ borderColor =
     Color.grayscale 0.1
 
 
+{-| -}
+buildDate : CommonParams -> Maybe MyDate -> DateBetween -> (DateMsg -> msg) -> NodeWithStyle msg
 buildDate { label } maybeDate between msg =
     let
         years =
@@ -123,6 +157,7 @@ buildDate { label } maybeDate between msg =
                     )
 
 
+{-| -}
 buildInput : FullInputType msg -> NodeWithStyle msg
 buildInput object =
     case object.value of
@@ -151,12 +186,14 @@ buildInput object =
             buildInputFile object.commonParams id msg
 
 
+{-| -}
 type alias FullInputType msg =
     { value : InputType msg
     , commonParams : CommonParams
     }
 
 
+{-| -}
 type alias CommonParams =
     { label : String
     , placeholder : Maybe String
@@ -164,22 +201,25 @@ type alias CommonParams =
     }
 
 
+{-| -}
 type InputType msg
     = Text String (String -> msg)
     | TextArea String (String -> msg)
     | Password String (String -> msg)
     | Date (Maybe MyDate) DateBetween (DateMsg -> msg)
-    | Select (List { id : String, value : String, active : Bool }) (String -> msg)
+    | Select (List Option) (String -> msg)
     | Int Int (Int -> msg)
     | Bool Bool (Bool -> msg)
     | File String msg
 
 
+{-| -}
 inputField : CommonParams -> InputType msg -> FullInputType msg
 inputField commonParams value =
     { commonParams = commonParams, value = value }
 
 
+{-| -}
 type alias InputNumberContent msg =
     { label : String
     , value : Int
@@ -187,6 +227,7 @@ type alias InputNumberContent msg =
     }
 
 
+{-| -}
 type alias InputCheckboxContent msg =
     { label : String
     , msg : Bool -> msg
@@ -194,6 +235,7 @@ type alias InputCheckboxContent msg =
     }
 
 
+{-| -}
 type alias InputTextContent msg =
     { label : String
     , placeholder : String
@@ -202,6 +244,8 @@ type alias InputTextContent msg =
     }
 
 
+{-| -}
+inputLabel : String -> CommonParams
 inputLabel labelVal =
     { label = labelVal
     , placeholder = Nothing
@@ -209,6 +253,8 @@ inputLabel labelVal =
     }
 
 
+{-| -}
+inputLabelPlaceholder : String -> String -> CommonParams
 inputLabelPlaceholder labelVal placeholder =
     { label = labelVal
     , placeholder = Just placeholder
@@ -216,6 +262,8 @@ inputLabelPlaceholder labelVal placeholder =
     }
 
 
+{-| -}
+inputLabelPlaceholderWithError : String -> String -> Maybe String -> CommonParams
 inputLabelPlaceholderWithError labelVal placeholder error =
     { label = labelVal
     , placeholder = Just placeholder
@@ -223,6 +271,8 @@ inputLabelPlaceholderWithError labelVal placeholder error =
     }
 
 
+{-| -}
+inputLabelWithError : String -> Maybe String -> CommonParams
 inputLabelWithError labelVal error =
     { label = labelVal
     , placeholder = Nothing
@@ -230,10 +280,21 @@ inputLabelWithError labelVal error =
     }
 
 
+type alias Option =
+    { id : String
+    , value : String
+    , active : Bool
+    }
+
+
+{-| -}
+generateOptions : String -> List String -> List Option
 generateOptions activeText =
     List.map (\e -> { id = e, value = e, active = e == activeText })
 
 
+{-| -}
+errorMessage : String -> NodeWithStyle msg
 errorMessage err =
     B.div
         [ A.style
@@ -246,6 +307,7 @@ errorMessage err =
         [ B.text err ]
 
 
+{-| -}
 inputSurround : Maybe String -> String -> NodeWithStyle msg -> NodeWithStyle msg
 inputSurround error label content =
     B.node
@@ -269,6 +331,7 @@ inputSurround error label content =
         ]
 
 
+{-| -}
 checkBoxSurround : String -> Bool -> (Bool -> msg) -> NodeWithStyle msg
 checkBoxSurround label value msg =
     B.node
@@ -296,6 +359,7 @@ checkBoxSurround label value msg =
         ]
 
 
+{-| -}
 buildInputNumber : CommonParams -> Int -> (Int -> msg) -> NodeWithStyle msg
 buildInputNumber { label, error, placeholder } value msg =
     inputSurround error label <|
@@ -315,6 +379,7 @@ buildInputNumber { label, error, placeholder } value msg =
             ]
 
 
+{-| -}
 buildCheckbox : CommonParams -> Bool -> (Bool -> msg) -> NodeWithStyle msg
 buildCheckbox { label, placeholder } =
     checkBoxSurround label
@@ -326,6 +391,25 @@ maybeError error =
         |> Maybe.withDefault B.none
 
 
+{-| -}
+labelizedInput :
+    (Modifiers
+        (A.BoxContainer
+            { a
+                | block :
+                    Maybe (List ( Modifiers Display.BlockDetails, A.StyleSelector ))
+                , fromStringInput : String -> String
+                , onInputEvent : Maybe (String -> msg)
+                , placeholder : Maybe String
+                , value : Maybe String
+            }
+        )
+     -> NodeWithStyle msg
+    )
+    -> CommonParams
+    -> String
+    -> (String -> msg)
+    -> NodeWithStyle msg
 labelizedInput inputFunction { label, placeholder, error } value msg =
     inputSurround error label <|
         B.div []
@@ -345,21 +429,25 @@ labelizedInput inputFunction { label, placeholder, error } value msg =
             ]
 
 
+{-| -}
 buildInputText : CommonParams -> String -> (String -> msg) -> NodeWithStyle msg
 buildInputText =
     labelizedInput B.inputText
 
 
+{-| -}
 buildInputPassword : CommonParams -> String -> (String -> msg) -> NodeWithStyle msg
 buildInputPassword =
     labelizedInput B.inputPassword
 
 
+{-| -}
 buildTextArea : CommonParams -> String -> (String -> msg) -> NodeWithStyle msg
 buildTextArea =
     labelizedInput B.textarea
 
 
+{-| -}
 buildInputFile : CommonParams -> String -> msg -> NodeWithStyle msg
 buildInputFile { label, error } inputFileId msg =
     inputSurround error label <|
@@ -369,6 +457,7 @@ buildInputFile { label, error } inputFileId msg =
             ]
 
 
+{-| -}
 buildSelect : CommonParams -> List { a | active : Bool, id : String, value : String } -> (String -> msg) -> NodeWithStyle msg
 buildSelect { label, error } options msg =
     inputSurround error label <|
@@ -394,6 +483,7 @@ buildSelect { label, error } options msg =
             (options |> List.map (\e -> B.option e.id e.value e.active))
 
 
+{-| -}
 inputTextStyle : Modifiers.Modifier (A.BoxContainer { a | block : Maybe (List ( Modifiers.Modifiers Display.BlockDetails, A.StyleSelector )) })
 inputTextStyle =
     A.style
