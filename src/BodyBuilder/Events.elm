@@ -1,40 +1,39 @@
-module BodyBuilder.Events
-    exposing
-        ( OnBlurEvent
-        , OnCheckEvent
-        , OnColorInputEvent
-        , OnEvent
-        , OnFocusEvent
-        , OnInputEvent
-        , OnIntInputEvent
-        , OnMouseEvents
-        , OnMouseEventsInside
-        , OnStringInputEvent
-        , OnSubmitEvent
-        , checkEventToHtmlEvent
-        , focusEventToHtmlAttributes
-        , inputEventToHtmlEvent
-        , mouseEventsToHtmlAttributes
-        , on
-        , onBlur
-        , onBlurEventToHtmlAttributes
-        , onCheck
-        , onClick
-        , onContextMenu
-        , onCustom
-        , onDoubleClick
-        , onEventToHtmlAttributes
-        , onFocus
-        , onInput
-        , onMouseDown
-        , onMouseEnter
-        , onMouseLeave
-        , onMouseOut
-        , onMouseOver
-        , onMouseUp
-        , onSubmit
-        , submitEventToHtmlEvent
-        )
+module BodyBuilder.Events exposing
+    ( checkEventToHtmlEvent
+    , focusEventToHtmlAttributes
+    , inputEventToHtmlEvent
+    , mouseEventsToHtmlAttributes
+    , on
+    , onCustom
+    , onBlur
+    , OnBlurEvent
+    , onBlurEventToHtmlAttributes
+    , onCheck
+    , OnCheckEvent
+    , onClick
+    , OnColorInputEvent
+    , onDoubleClick
+    , onContextMenu
+    , OnEvent
+    , onEventToHtmlAttributes
+    , onFocus
+    , OnFocusEvent
+    , onInput
+    , OnInputEvent
+    , OnIntInputEvent
+    , onMouseDown
+    , onMouseEnter
+    , OnMouseEvents
+    , OnMouseEventsInside
+    , onMouseLeave
+    , onMouseOut
+    , onMouseOver
+    , onMouseUp
+    , OnStringInputEvent
+    , onSubmit
+    , OnSubmitEvent
+    , submitEventToHtmlEvent
+    )
 
 {-| This module entirely replaces Html.Events, providing a type-safer alternative.
 This is designed to work with BodyBuilder.
@@ -328,7 +327,7 @@ onCustom event decoder attrs =
             , preventDefault = preventDefault
             }
     in
-        { attrs | onEvent = Just ( event, VirtualDom.Custom (Json.Decode.map syncRecord decoder) ) }
+    { attrs | onEvent = Just ( event, VirtualDom.Custom (Json.Decode.map syncRecord decoder) ) }
 
 
 {-| -}
