@@ -96,7 +96,6 @@ It is possible to style those elements using `Style.blockProperties`.
 @docs stylise3
 @docs stylise4
 @docs stylise5
-@docs stylise6
 
 -}
 
