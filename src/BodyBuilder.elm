@@ -12,8 +12,14 @@ module BodyBuilder exposing
     , document
     , lazy
     , lazy2
+    , lazy3
+    , lazy4
+    , lazy5
     , stylise
     , stylise2
+    , stylise3
+    , stylise4
+    , stylise5
     )
 
 {-| This module entirely replaces Html, providing a type-safer alternatives.
@@ -82,8 +88,15 @@ It is possible to style those elements using `Style.blockProperties`.
 
 @docs lazy
 @docs lazy2
+@docs lazy3
+@docs lazy4
+@docs lazy5
 @docs stylise
 @docs stylise2
+@docs stylise3
+@docs stylise4
+@docs stylise5
+@docs stylise6
 
 -}
 
