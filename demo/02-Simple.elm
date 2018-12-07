@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (main, theFontSize, view)
 
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes

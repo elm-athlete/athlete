@@ -164,6 +164,9 @@ buildInput object =
         Text val msg ->
             buildInputText object.commonParams val msg
 
+        Email val msg ->
+            buildInputEmail object.commonParams val msg
+
         TextArea val msg ->
             buildTextArea object.commonParams val msg
 
@@ -204,6 +207,7 @@ type alias CommonParams =
 {-| -}
 type InputType msg
     = Text String (String -> msg)
+    | Email String (String -> msg)
     | TextArea String (String -> msg)
     | Password String (String -> msg)
     | Date (Maybe MyDate) DateBetween (DateMsg -> msg)
@@ -433,6 +437,11 @@ labelizedInput inputFunction { label, placeholder, error } value msg =
 buildInputText : CommonParams -> String -> (String -> msg) -> NodeWithStyle msg
 buildInputText =
     labelizedInput B.inputText
+
+
+buildInputEmail : CommonParams -> String -> (String -> msg) -> NodeWithStyle msg
+buildInputEmail =
+    labelizedInput B.inputEmail
 
 
 {-| -}

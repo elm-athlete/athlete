@@ -58,6 +58,7 @@ module BodyBuilder.Attributes exposing
     , InputColorAttributes, defaultInputColorAttributes, inputColorAttributesToHtmlAttributes
     , InputFileAttributes, defaultInputFileAttributes, inputFileAttributesToHtmlAttributes
     , TextareaAttributes, placeholder, defaultTextareaAttributes, textareaAttributesToHtmlAttributes
+    , defaultInputEmailAttributes
     )
 
 {-| This module entirely replaces Html.Attributes, providing a type-safer alternatives.
@@ -1378,6 +1379,29 @@ defaultInputTextAttributes =
     , label = Nothing
     , name = Nothing
     , type_ = "text"
+    , value = Nothing
+    , onMouseEvents = Nothing
+    , onInputEvent = Nothing
+    , fromStringInput = identity
+    , onEvent = Nothing
+    , onBlurEvent = Nothing
+    , onFocusEvent = Nothing
+    , placeholder = Nothing
+    , autocomplete = True
+    , rawStyle = Nothing
+    , rawAttributes = []
+    }
+
+
+{-| -}
+defaultInputEmailAttributes : InputTextAttributes msg
+defaultInputEmailAttributes =
+    { universal = defaultUniversalAttributes
+    , box = []
+    , block = Nothing
+    , label = Nothing
+    , name = Nothing
+    , type_ = "email"
     , value = Nothing
     , onMouseEvents = Nothing
     , onInputEvent = Nothing

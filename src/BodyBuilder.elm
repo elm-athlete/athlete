@@ -20,6 +20,7 @@ module BodyBuilder exposing
     , stylise3
     , stylise4
     , stylise5
+    , inputEmail
     )
 
 {-| This module entirely replaces Html, providing a type-safer alternatives.
@@ -701,6 +702,29 @@ inputText =
         BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
 
 
+{-| Generates a email input in the DOM. A email input is inline by default, but
+changes its behavior when specifically set as block. You don't have to worry about
+the display: use an inputEmail whenever you want, style like you want, it will adapt to
+what you wrote.
+
+    inlineTextInput : NodeWithStyle msg
+    inlineTextInput =
+        -- This produces an inline text input in the DOM.
+        BodyBuilder.inputEmail []
+
+    blockTextInput : NodeWithStyle msg
+    blockTextInput =
+        -- This produces a block text input in the DOM.
+        BodyBuilder.inputEmail [ BodyBuilder.Attributes.style [ Style.block [] ] ]
+
+-}
+inputEmail : Modifiers (InputTextAttributes msg) -> NodeWithStyle msg
+inputEmail =
+    inputAndLabel
+        BodyBuilder.Attributes.defaultInputEmailAttributes
+        BodyBuilder.Attributes.inputTextAttributesToHtmlAttributes
+
+
 {-| Generates a tel input in the DOM. A tel input is inline by default, but
 changes its behavior when specifically set as block. You don't have to worry about
 the display: use an inputTel whenever you want, style like you want, it will adapt to
@@ -709,12 +733,12 @@ what you wrote.
     inlineTelInput : NodeWithStyle msg
     inlineTelInput =
         -- This produces an inline tel input in the DOM.
-        BodyBuilder.inputTel [] []
+        BodyBuilder.inputTel []
 
     blockTelInput : NodeWithStyle msg
     blockTelInput =
         -- This produces a block tel input in the DOM.
-        BodyBuilder.inputTel [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputTel [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputTel : Modifiers (InputTextAttributes msg) -> NodeWithStyle msg
@@ -732,12 +756,12 @@ what you wrote.
     inlinePasswordInput : NodeWithStyle msg
     inlinePasswordInput =
         -- This produces an inline password input in the DOM.
-        BodyBuilder.inputPassword [] []
+        BodyBuilder.inputPassword []
 
     blockPasswordInput : NodeWithStyle msg
     blockPasswordInput =
         -- This produces a block password input in the DOM.
-        BodyBuilder.inputPassword [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputPassword [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputPassword : Modifiers (InputPasswordAttributes msg) -> NodeWithStyle msg
@@ -755,12 +779,12 @@ what you wrote.
     inlineRangeInput : NodeWithStyle msg
     inlineRangeInput =
         -- This produces an inline range input in the DOM.
-        BodyBuilder.inputRange [] []
+        BodyBuilder.inputRange []
 
     blockRangeInput : NodeWithStyle msg
     blockRangeInput =
         -- This produces a block range input in the DOM.
-        BodyBuilder.inputRange [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputRange [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputRange : Modifiers (InputRangeAttributes msg) -> NodeWithStyle msg
@@ -778,12 +802,12 @@ what you wrote.
     inlineNumberInput : NodeWithStyle msg
     inlineNumberInput =
         -- This produces an inline number input in the DOM.
-        BodyBuilder.inputNumber [] []
+        BodyBuilder.inputNumber []
 
     blockNumberInput : NodeWithStyle msg
     blockNumberInput =
         -- This produces a block number input in the DOM.
-        BodyBuilder.inputNumber [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputNumber [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputNumber : Modifiers (InputNumberAttributes msg) -> NodeWithStyle msg
@@ -801,12 +825,12 @@ what you wrote.
     inlineRadioInput : NodeWithStyle msg
     inlineRadioInput =
         -- This produces an inline radio input in the DOM.
-        BodyBuilder.inputRadio [] []
+        BodyBuilder.inputRadio []
 
     blockRadioInput : NodeWithStyle msg
     blockRadioInput =
         -- This produces a block radio input in the DOM.
-        BodyBuilder.inputRadio [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputRadio [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputRadio : Modifiers (InputRadioAttributes msg) -> NodeWithStyle msg
@@ -824,12 +848,12 @@ what you wrote.
     inlineCheckboxInput : NodeWithStyle msg
     inlineCheckboxInput =
         -- This produces an inline checkbox input in the DOM.
-        BodyBuilder.inputCheckbox [] []
+        BodyBuilder.inputCheckbox []
 
     blockCheckboxInput : NodeWithStyle msg
     blockCheckboxInput =
         -- This produces a block checkbox input in the DOM.
-        BodyBuilder.inputCheckbox [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputCheckbox [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputCheckbox : Modifiers (InputCheckboxAttributes msg) -> NodeWithStyle msg
@@ -847,12 +871,12 @@ what you wrote.
     inlineSubmitInput : NodeWithStyle msg
     inlineSubmitInput =
         -- This produces an inline submit input in the DOM.
-        BodyBuilder.inputSubmit [] []
+        BodyBuilder.inputSubmit []
 
     blockSubmitInput : NodeWithStyle msg
     blockSubmitInput =
         -- This produces a block submit input in the DOM.
-        BodyBuilder.inputSubmit [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputSubmit [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputSubmit : Modifiers (InputSubmitAttributes msg) -> NodeWithStyle msg
@@ -870,12 +894,12 @@ what you wrote.
     inlineUrlInput : NodeWithStyle msg
     inlineUrlInput =
         -- This produces an inline url input in the DOM.
-        BodyBuilder.inputUrl [] []
+        BodyBuilder.inputUrl []
 
     blockUrlInput : NodeWithStyle msg
     blockUrlInput =
         -- This produces a block url input in the DOM.
-        BodyBuilder.inputUrl [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputUrl [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputUrl : Modifiers (InputUrlAttributes msg) -> NodeWithStyle msg
@@ -893,12 +917,12 @@ what you wrote.
     inlineColorInput : NodeWithStyle msg
     inlineColorInput =
         -- This produces an inline color input in the DOM.
-        BodyBuilder.inputColor [] []
+        BodyBuilder.inputColor []
 
     blockColorInput : NodeWithStyle msg
     blockColorInput =
         -- This produces a block color input in the DOM.
-        BodyBuilder.inputColor [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputColor [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputColor : Modifiers (InputColorAttributes msg) -> NodeWithStyle msg
@@ -916,12 +940,12 @@ what you wrote.
     inlineFileInput : NodeWithStyle msg
     inlineFileInput =
         -- This produces an inline file input in the DOM.
-        BodyBuilder.inputFile [] []
+        BodyBuilder.inputFile []
 
     blockFileInput : NodeWithStyle msg
     blockFileInput =
         -- This produces a block file input in the DOM.
-        BodyBuilder.inputFile [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.inputFile [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 inputFile : Modifiers (InputFileAttributes msg) -> NodeWithStyle msg
@@ -939,12 +963,12 @@ what you wrote.
     inlineTextarea : NodeWithStyle msg
     inlineTextarea =
         -- This produces an inline textarea in the DOM.
-        BodyBuilder.textarea [] []
+        BodyBuilder.textarea []
 
     blockTextarea : NodeWithStyle msg
     blockTextarea =
         -- This produces a block textarea in the DOM.
-        BodyBuilder.textarea [ BodyBuilder.Attributes.style [ Style.block [] ] ] []
+        BodyBuilder.textarea [ BodyBuilder.Attributes.style [ Style.block [] ] ]
 
 -}
 textarea : Modifiers (TextareaAttributes msg) -> NodeWithStyle msg
