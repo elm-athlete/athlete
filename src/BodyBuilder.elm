@@ -3,7 +3,7 @@ module BodyBuilder exposing
     , Document
     , BlockAttributes
     , text, none, flexItem, gridItem, option, br
-    , node, span, flex, grid, a, button, img, audio, inputColor, inputFile, inputHidden, inputNumber, inputCheckbox, inputPassword, inputRadio, inputRange, inputSubmit, inputTel, inputText, inputUrl, progress, select, textarea
+    , node, span, flex, grid, a, button, img, audio, inputColor, inputFile, inputHidden, inputNumber, inputCheckbox, inputPassword, inputRadio, inputRange, inputSubmit, inputTel, inputText, inputEmail, inputUrl, progress, select, textarea
     , div, header, footer, nav, section, article, aside, h1, h2, h3, h4, h5, h6, p
     , element
     , sandbox
@@ -20,7 +20,6 @@ module BodyBuilder exposing
     , stylise3
     , stylise4
     , stylise5
-    , inputEmail
     )
 
 {-| This module entirely replaces Html, providing a type-safer alternatives.
@@ -65,7 +64,7 @@ It is perfectly compatible with Html, though.
 Those elements are inline by default. However, their behavior can be overrided by
 using `Style.block []`. They become block, and behaves like this.
 
-@docs node, span, flex, grid, a, button, img, audio, inputColor, inputFile, inputHidden, inputNumber, inputCheckbox, inputPassword, inputRadio, inputRange, inputSubmit, inputTel, inputText, inputUrl, progress, select, textarea
+@docs node, span, flex, grid, a, button, img, audio, inputColor, inputFile, inputHidden, inputNumber, inputCheckbox, inputPassword, inputRadio, inputRange, inputSubmit, inputTel, inputText, inputEmail, inputUrl, progress, select, textarea
 
 
 ## Block
