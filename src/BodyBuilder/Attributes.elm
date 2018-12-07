@@ -50,7 +50,7 @@ module BodyBuilder.Attributes exposing
     , InputRangeAttributes, step, defaultInputRangeAttributes, inputRangeAttributesToHtmlAttributes
     , InputRadioAttributes, defaultInputRadioAttributes, inputRadioAttributesToHtmlAttributes
     , InputCheckboxAttributes, checked, defaultInputCheckboxAttributes, inputCheckboxAttributesToHtmlAttributes
-    , InputTextAttributes, autocomplete, defaultInputTextAttributes, inputTextAttributesToHtmlAttributes
+    , InputTextAttributes, autocomplete, defaultInputTextAttributes, defaultInputEmailAttributes, inputTextAttributesToHtmlAttributes
     , InputTelAttributes, defaultInputTelAttributes
     , InputSubmitAttributes, defaultInputSubmitAttributes, inputSubmitAttributesToHtmlAttributes
     , InputUrlAttributes, defaultInputUrlAttributes, inputUrlAttributesToHtmlAttributes
@@ -58,7 +58,6 @@ module BodyBuilder.Attributes exposing
     , InputColorAttributes, defaultInputColorAttributes, inputColorAttributesToHtmlAttributes
     , InputFileAttributes, defaultInputFileAttributes, inputFileAttributesToHtmlAttributes
     , TextareaAttributes, placeholder, defaultTextareaAttributes, textareaAttributesToHtmlAttributes
-    , defaultInputEmailAttributes
     )
 
 {-| This module entirely replaces Html.Attributes, providing a type-safer alternatives.
@@ -116,7 +115,7 @@ It is not compatible with Html.Attributes, though.
 @docs InputRangeAttributes, step, defaultInputRangeAttributes, inputRangeAttributesToHtmlAttributes
 @docs InputRadioAttributes, defaultInputRadioAttributes, inputRadioAttributesToHtmlAttributes
 @docs InputCheckboxAttributes, checked, defaultInputCheckboxAttributes, inputCheckboxAttributesToHtmlAttributes
-@docs InputTextAttributes, autocomplete, defaultInputTextAttributes, inputTextAttributesToHtmlAttributes
+@docs InputTextAttributes, autocomplete, defaultInputTextAttributes, defaultInputEmailAttributes, inputTextAttributesToHtmlAttributes
 @docs InputTelAttributes, defaultInputTelAttributes
 @docs InputSubmitAttributes, defaultInputSubmitAttributes, inputSubmitAttributesToHtmlAttributes
 @docs InputUrlAttributes, defaultInputUrlAttributes, inputUrlAttributesToHtmlAttributes
