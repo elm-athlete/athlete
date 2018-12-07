@@ -11,6 +11,7 @@ module BodyBuilder.Elements.Form exposing
     , buildInputNumber
     , buildInputPassword
     , buildInputText
+    , buildInputEmail
     , buildSelect
     , buildTextArea
     , checkBoxSurround
@@ -42,6 +43,7 @@ module BodyBuilder.Elements.Form exposing
 @docs buildInputNumber
 @docs buildInputPassword
 @docs buildInputText
+@docs buildInputEmail
 @docs buildSelect
 @docs buildTextArea
 @docs checkBoxSurround
@@ -439,6 +441,7 @@ buildInputText =
     labelizedInput B.inputText
 
 
+{-| -}
 buildInputEmail : CommonParams -> String -> (String -> msg) -> NodeWithStyle msg
 buildInputEmail =
     labelizedInput B.inputEmail
