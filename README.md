@@ -2,6 +2,9 @@
 
 Athlete is a **native looking** app builder for elm !
 
+👉 I gave [a talk](https://www.youtube.com/watch?v=nal1MUgZ8Tc)
+to explain why and how I built this. I highly recommend watching it !
+
 `Elegant.elm` and `Bodybuilder.elm` are the underlying parts of Athlete.
 
 They use the best parts of HTML and CSS under the hood to let you create stunning apps.
