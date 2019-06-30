@@ -1,42 +1,15 @@
-# Athlete
+# `elm-html-css-builder`
 
-Athlete is a **native looking** app builder for elm !
+Type-safe CSS in elm is great, but it doesn't prevent a lot of invalid HTML
+trees. For example, if you add width to a span, it won't have any effect. But
+adding type-safety to CSS has no context of which HTML element you are in, so
+it can't prevent you from expressing that.
 
-👉 I gave [a talk](https://www.youtube.com/watch?v=nal1MUgZ8Tc)
-to explain why and how I built this. I highly recommend watching it !
+Similarly for flex-box, since a type-safe CSS library doesn't have context on
+what the parent-child relationships need to be so it can't enforce that the
+parent and children are set with the appropriate flex attributes.
+But `elm-html-css-builder` can!
 
-`Elegant.elm` and `Bodybuilder.elm` are the underlying parts of Athlete.
-
-They use the best parts of HTML and CSS under the hood to let you create stunning apps.
-
-The key idea is to let you control the exact graphical path you want take, without compromises. We dreamt for years about creating this framework, but we finally did it.
-
-A simple example being a lot better than tons of explanations, let's begin with an app we want to build with Athlete.
-
-Let's create a cat browsing app (everybody knows that it's the next Facebook in terms of ROI).
-
-## Athlete - build your app, **one function at a time ™**
-
-Start with 2 bodybuilder views
-
-![Bodybuilder](readme/bodybuilder.png)
-
-Add some elegant styles (almost all the css spec is built in, in a type safe way)
-
-![Elegant](readme/elegant.png)
-
-Create your router : your views are now part of an app !
-
-``` elm
-type CatRouter
-  = CatsIndex
-  | CatShow Id
-```
-
-Use (or implement) transitions between your views !
-
-![Transitions](readme/transitions.png)
-
-**You are done !** You can know deploy your app on the app store and the android store (and even the web)
-
-But there's more, far more... you can create so many other [things](https://elm-athlete.github.io/athlete) with Athlete.
+No more changing properties and then checking the browser to see if anything changed!
+`elm-html-css-builder` will give you compiler errors if you try to write CSS
+that wouldn't end up having an effect, so it eliminates a whole class of impossible states!
