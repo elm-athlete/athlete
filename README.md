@@ -13,3 +13,7 @@ But `elm-html-css-builder` can!
 No more changing properties and then checking the browser to see if anything changed!
 `elm-html-css-builder` will give you compiler errors if you try to write CSS
 that wouldn't end up having an effect, so it eliminates a whole class of impossible states!
+
+In other words, you won't have to look through your browser dev tools for messages like this anymore!
+
+![https://raw.githubusercontent.com/dillonkearns/athlete/master/noop-css-tweet.png](https://twitter.com/patrickbrosset/status/1118889616952766466)
