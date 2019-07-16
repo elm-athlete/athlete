@@ -69,7 +69,7 @@ import BodyBuilder.Internals.Shared
 import BodyBuilder.Router as Router
 import BodyBuilder.Style as Style
 import Color
-import DateTime exposing (..)
+import DateTime
 import Elegant exposing (percent, px)
 import Elegant.Block as Block
 import Elegant.Border as Border
@@ -101,16 +101,56 @@ borderColor =
     Color.grayscale 0.1
 
 
+monthToInt : Time.Month -> Int
+monthToInt month =
+    case month of
+        Time.Jan ->
+            1
+
+        Time.Feb ->
+            2
+
+        Time.Mar ->
+            3
+
+        Time.Apr ->
+            4
+
+        Time.May ->
+            5
+
+        Time.Jun ->
+            6
+
+        Time.Jul ->
+            7
+
+        Time.Aug ->
+            8
+
+        Time.Sep ->
+            9
+
+        Time.Oct ->
+            10
+
+        Time.Nov ->
+            11
+
+        Time.Dec ->
+            12
+
+
 {-| -}
-buildDate : CommonParams -> Maybe MyDate -> DateBetween -> (DateMsg -> msg) -> NodeWithStyle msg
+buildDate : CommonParams -> Maybe DateTime.DateTime -> DateBetween -> (DateMsg -> msg) -> NodeWithStyle msg
 buildDate { label } maybeDate between msg =
     let
         years =
             case between of
                 DateBetween after before ->
                     List.range
-                        after.year
-                        before.year
+                        (after |> DateTime.getYear)
+                        (before |> DateTime.getYear)
 
         days =
             List.range 1 31
@@ -145,13 +185,13 @@ buildDate { label } maybeDate between msg =
                 B.flex [ displayBlock, spaceBetween ]
                     ([ inputField
                         (inputLabel "Year")
-                        (Select (generateOptions (date.year |> String.fromInt) (years |> List.map String.fromInt)) (msg << Year << (Maybe.withDefault defaultYear << String.toInt)))
+                        (Select (generateOptions ((date |> DateTime.getYear) |> String.fromInt) (years |> List.map String.fromInt)) (msg << Year << (Maybe.withDefault defaultYear << String.toInt)))
                      , inputField
                         (inputLabel "Month")
-                        (Select (generateOptions (date.month |> String.fromInt) (months |> List.map String.fromInt)) (msg << Month << (Maybe.withDefault defaultMonth << String.toInt)))
+                        (Select (generateOptions ((date |> DateTime.getMonth) |> monthToInt |> String.fromInt) (months |> List.map String.fromInt)) (msg << Month << (Maybe.withDefault defaultMonth << String.toInt)))
                      , inputField
                         (inputLabel "Day")
-                        (Select (generateOptions (date.day |> String.fromInt) (days |> List.map String.fromInt)) (msg << Day << (Maybe.withDefault defaultDay << String.toInt)))
+                        (Select (generateOptions ((date |> DateTime.getDay) |> String.fromInt) (days |> List.map String.fromInt)) (msg << Day << (Maybe.withDefault defaultDay << String.toInt)))
                      ]
                         |> List.map buildInput
                         |> List.map (\e -> fi [ grow ] [ e ])
@@ -212,11 +252,24 @@ type InputType msg
     | Email String (String -> msg)
     | TextArea String (String -> msg)
     | Password String (String -> msg)
-    | Date (Maybe MyDate) DateBetween (DateMsg -> msg)
+    | Date (Maybe DateTime.DateTime) DateBetween (DateMsg -> msg)
     | Select (List Option) (String -> msg)
     | Int Int (Int -> msg)
     | Bool Bool (Bool -> msg)
     | File String msg
+
+
+type DateBetween
+    = DateBetween DateTime.DateTime DateTime.DateTime
+
+
+{-| -}
+type DateMsg
+    = Day Int
+    | Month Int
+    | Year Int
+    | SetDefaultDate
+    | RemoveDate
 
 
 {-| -}
