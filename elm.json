@@ -3,7 +3,7 @@
     "name": "elm-athlete/athlete",
     "summary": "Native looking apps builder on the web",
     "license": "BSD-3-Clause",
-    "version": "5.0.0",
+    "version": "5.0.1",
     "exposed-modules": [
         "Modifiers",
         "Elegant",
@@ -41,7 +41,6 @@
         "BodyBuilder.Elements.Clickable",
         "BodyBuilder.Elements.Form",
         "BodyBuilder.Elements.Page",
-        "DateTime",
         "Color",
         "Color.Convert",
         "Color.Interpolate",
