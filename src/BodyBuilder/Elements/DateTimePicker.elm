@@ -266,7 +266,7 @@ pickerLabelView text =
     Builder.flexItem []
         [ Builder.div
             [ Attributes.style
-                [ Style.box [ Box.typography [ Typography.size (px 31) ] ] ]
+                [ Style.box [ Box.typography [ Typography.size (px 30) ] ] ]
             ]
             [ Builder.text text ]
         ]
