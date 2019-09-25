@@ -4,7 +4,6 @@ import BodyBuilder as B exposing (NodeWithStyle)
 import Color
 import Elegant.Constants as Constants
 import Elegant.Extra exposing (..)
-import ViewHelpers exposing (..)
 
 
 view : NodeWithStyle msg
