@@ -1,6 +1,7 @@
 module Elegant.Extra exposing
     ( alignCenter
     , alignItemsCenter
+    , fillHeight
     , backgroundColor
     , block
     , blockProperties
@@ -11,40 +12,48 @@ module Elegant.Extra exposing
     , borderBottomBlack
     , borderTopBlack
     , box
+    , overflowHidden
+    , cornerRadius
     , cursorPointer
     , displayBlock
     , flexContainerProperties
+    , flexItemProperties
     , fontSize
     , goodTypo
     , goodTypoStyle
     , gray
+    , gridContainerProperties
     , grow
     , italic
     , margin
     , marginAuto
+    , noDecoration
     , noMargin
     , padding
     , paddingAll
     , paddingBottom
     , paddingBottomLarge
     , paddingHorizontal
+    , paddingLeft
+    , paddingRight
     , paddingTop
     , paddingVertical
     , regular
     , spaceBetween
     , standardCellStyle
     , textCenter
+    , textColor
     , thinTypo
-    , typoSize
     , typography
+    , typoSize
     , underline
-    , flexItemProperties
     )
 
 {-|
 
 @docs alignCenter
 @docs alignItemsCenter
+@docs fillHeight
 @docs backgroundColor
 @docs block
 @docs blockProperties
@@ -55,34 +64,41 @@ module Elegant.Extra exposing
 @docs borderBottomBlack
 @docs borderTopBlack
 @docs box
+@docs overflowHidden
+@docs cornerRadius
 @docs cursorPointer
 @docs displayBlock
 @docs flexContainerProperties
+@docs flexItemProperties
 @docs fontSize
 @docs goodTypo
 @docs goodTypoStyle
 @docs gray
+@docs gridContainerProperties
 @docs grow
 @docs italic
 @docs margin
 @docs marginAuto
+@docs noDecoration
 @docs noMargin
 @docs padding
 @docs paddingAll
 @docs paddingBottom
 @docs paddingBottomLarge
 @docs paddingHorizontal
+@docs paddingLeft
+@docs paddingRight
 @docs paddingTop
 @docs paddingVertical
 @docs regular
 @docs spaceBetween
 @docs standardCellStyle
 @docs textCenter
+@docs textColor
 @docs thinTypo
-@docs typoSize
 @docs typography
+@docs typoSize
 @docs underline
-@docs flexItemProperties
 
 -}
 
@@ -164,6 +180,12 @@ fontSize fSize =
 
 
 {-| -}
+noDecoration : BoxContainerModifier a
+noDecoration =
+    typography [ Typography.noDecoration ]
+
+
+{-| -}
 underline : BoxContainerModifier a
 underline =
     typography [ Typography.underline ]
@@ -208,6 +230,18 @@ cursorPointer =
 paddingAll : Elegant.SizeUnit -> BoxContainerModifier a
 paddingAll val =
     padding [ Padding.all val ]
+
+
+{-| -}
+paddingRight : Elegant.SizeUnit -> BoxContainerModifier a
+paddingRight val =
+    padding [ Padding.right val ]
+
+
+{-| -}
+paddingLeft : Elegant.SizeUnit -> BoxContainerModifier a
+paddingLeft val =
+    padding [ Padding.left val ]
 
 
 {-| -}
@@ -277,6 +311,17 @@ blockProperties e =
 
 
 {-| -}
+fillHeight : Modifier (A.MaybeBlockContainer a)
+fillHeight =
+    block [ Block.height (Elegant.percent 100) ]
+
+
+overflowHidden : Modifiers.Modifier (A.MaybeBlockContainer a)
+overflowHidden =
+    block [ Block.overflowHidden ]
+
+
+{-| -}
 textCenter : Modifier (A.BlockContainer a)
 textCenter =
     blockProperties
@@ -309,11 +354,14 @@ standardCellStyle =
         ]
 
 
-{-| returns a background with a color
--}
-backgroundColor : Color.Color -> Modifier Box.Box
-backgroundColor color =
-    Box.background [ Elegant.color color ]
+backgroundColor : Color.Color -> BoxContainerModifier a
+backgroundColor val =
+    box [ Box.backgroundColor val ]
+
+
+textColor : Color.Color -> BoxContainerModifier a
+textColor val =
+    box [ Box.textColor val ]
 
 
 {-| -}
@@ -364,6 +412,11 @@ border e =
     box [ Box.border e ]
 
 
+cornerRadius : Int -> BoxContainerModifier a
+cornerRadius val =
+    box [ Box.cornerRadius val ]
+
+
 {-| -}
 grow : Modifier (A.FlexItemAttributes a)
 grow =
@@ -405,3 +458,8 @@ flexContainerProperties e =
         [ Style.flexContainerProperties
             e
         ]
+
+
+gridContainerProperties : Modifiers Grid.GridContainerDetails -> Modifier (A.GridContainerAttributes msg)
+gridContainerProperties a =
+    A.style [ Style.gridContainerProperties a ]
