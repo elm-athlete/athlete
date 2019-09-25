@@ -1,13 +1,17 @@
 module Main exposing (main)
 
-import BodyBuilder as Builder exposing (NodeWithStyle)
+import BodyBuilder as B exposing (NodeWithStyle)
+import Color
+import Elegant.Constants as Constants
+import Elegant.Extra exposing (..)
+import ViewHelpers exposing (..)
 
 
 view : NodeWithStyle msg
 view =
-    Builder.node [] [ Builder.text "I'm a node and I like it!" ]
+    B.div [ paddingAll Constants.medium, backgroundColor Color.blue ] [ B.text "Hello world" ]
 
 
 main : Program () () msg
 main =
-    Builder.staticPage view
+    B.staticPage view
