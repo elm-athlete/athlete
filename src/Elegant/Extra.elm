@@ -316,6 +316,7 @@ fillHeight =
     block [ Block.height (Elegant.percent 100) ]
 
 
+{-| -}
 overflowHidden : Modifiers.Modifier (A.MaybeBlockContainer a)
 overflowHidden =
     block [ Block.overflowHidden ]
@@ -354,11 +355,13 @@ standardCellStyle =
         ]
 
 
+{-| -}
 backgroundColor : Color.Color -> BoxContainerModifier a
 backgroundColor val =
     box [ Box.backgroundColor val ]
 
 
+{-| -}
 textColor : Color.Color -> BoxContainerModifier a
 textColor val =
     box [ Box.textColor val ]
@@ -460,6 +463,7 @@ flexContainerProperties e =
         ]
 
 
+{-| -}
 gridContainerProperties : Modifiers Grid.GridContainerDetails -> Modifier (A.GridContainerAttributes msg)
 gridContainerProperties a =
     A.style [ Style.gridContainerProperties a ]
