@@ -16,6 +16,4 @@ that wouldn't end up having an effect, so it eliminates a whole class of impossi
 
 In other words, you won't have to look through your browser dev tools for messages like this anymore!
 
-![Tweet](https://raw.githubusercontent.com/dillonkearns/athlete/master/noop-css-tweet.png)
-
 [Tweet](https://twitter.com/patrickbrosset/status/1118889616952766466)
