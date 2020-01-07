@@ -18,12 +18,14 @@ module BodyBuilder.Elements.DateTimePicker exposing
 
 -}
 
+-- import Date.RataDie as Date exposing (RataDie)
+
 import BodyBuilder as Builder exposing (NodeWithStyle)
 import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements.WheelPicker as Picker
 import BodyBuilder.Style as Style
 import Browser.Events
-import Date.RataDie as Date exposing (RataDie)
+import Date
 import DateFormat
 import Elegant exposing (px)
 import Elegant.Block as Block
@@ -117,6 +119,10 @@ init dayLimits =
     in
     initialModel
         |> setDate (dateFromPickers initialModel)
+
+
+type alias RataDie =
+    Int
 
 
 {-| Model of the DateTime Picker
