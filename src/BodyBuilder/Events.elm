@@ -58,7 +58,6 @@ It is not compatible with Html, though.
 @docs onFocus
 @docs OnFocusEvent
 @docs onInput
-@docs OnInputEvent
 @docs OnIntInputEvent
 @docs onMouseDown
 @docs onMouseEnter
