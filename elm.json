@@ -3,7 +3,7 @@
     "name": "elm-athlete/athlete",
     "summary": "Native looking apps builder on the web",
     "license": "BSD-3-Clause",
-    "version": "6.0.2",
+    "version": "6.0.3",
     "exposed-modules": [
         "Modifiers",
         "Elegant",
@@ -61,8 +61,8 @@
         "elm-community/dict-extra": "2.3.1 <= v < 3.0.0",
         "elm-community/list-extra": "8.0.0 <= v < 9.0.0",
         "j-panasiuk/elm-ionicons": "2.0.0 <= v < 3.0.0",
-        "justinmimbs/date": "3.2.0 <= v < 4.0.0",
-        "mpizenberg/elm-pointer-events": "3.0.0 <= v < 4.0.0",
+        "justinmimbs/date": "4.1.0 <= v < 5.0.0",
+        "mpizenberg/elm-pointer-events": "5.0.0 <= v < 6.0.0",
         "toastal/either": "3.5.0 <= v < 4.0.0"
     },
     "test-dependencies": {}
