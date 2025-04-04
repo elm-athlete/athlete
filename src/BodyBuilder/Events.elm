@@ -195,18 +195,21 @@ type alias OnMouseEventsInside msg =
     , mouseOut : Maybe msg
     }
 
+{-| -}
 type alias OnStringInputEvent msg a =
     { a
         | onInputEvent : Maybe (String -> msg)
         , fromStringInput : String -> String
     }
 
+{-| -}
 type alias OnIntInputEvent msg a =
     { a
         | onInputEvent : Maybe (Int -> msg)
         , fromStringInput : String -> Int
     }
 
+{-| -}
 type alias OnColorInputEvent msg a =
     { a
         | onInputEvent : Maybe (Color -> msg)
@@ -238,6 +241,7 @@ type alias OnEvent msg a =
 
 
 {-| -}
+onInput : a -> { b | onInputEvent : Maybe a } -> { b | onInputEvent : Maybe a }
 onInput val attrs =
     { attrs | onInputEvent = Just val }
 
