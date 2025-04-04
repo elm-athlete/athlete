@@ -25,7 +25,6 @@ import BodyBuilder.Attributes as Attributes
 import BodyBuilder.Elements.WheelPicker as Picker
 import BodyBuilder.Style as Style
 import Browser.Events
-import Date
 import DateFormat
 import Elegant exposing (px)
 import Elegant.Block as Block

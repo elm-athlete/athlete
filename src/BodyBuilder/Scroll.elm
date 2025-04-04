@@ -4,10 +4,6 @@ import BodyBuilder exposing (..)
 import Json.Decode as Decode
 
 
-onScroll : (ScrollEvent -> value) -> OnEvent value a -> OnEvent value a
-onScroll tagger =
-    on "scroll" (Decode.map tagger onScrollJsonParser)
-
 
 onScrollJsonParser : Decode.Decoder ScrollEvent
 onScrollJsonParser =
@@ -16,24 +12,6 @@ onScrollJsonParser =
         (Decode.at [ "target", "scrollTop" ] Decode.int)
         (Decode.at [ "target", "clientHeight" ] Decode.int)
 
-
-verticalParallax :
-    Float
-    -> { a | scrollPos : Int }
-    -> Node msg
-    -> Node msg
-verticalParallax speed scrollEvent el =
-    let
-        toto =
-            Basics.max ((scrollEvent.scrollPos |> toFloat) * speed |> round) 0
-    in
-    div [ style [ Elegant.positionAbsolute ] ]
-        [ div [ style [ Elegant.marginTop (Px -toto) ] ] []
-        , el
-        , div
-            [ style [ Elegant.marginTop (Px toto) ] ]
-            []
-        ]
 
 
 type alias ScrollEvent =

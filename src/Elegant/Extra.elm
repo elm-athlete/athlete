@@ -126,16 +126,13 @@ import Elegant.Surrounded as Surrounded exposing (Surrounded)
 import Elegant.Typography as Typography
 import Html
 import Html.Events.Extra.Touch as Touch
-import Ionicon
-import Ionicon.Ios as Ios
 import Json.Decode as Decode
 import Modifiers exposing (..)
 import Time exposing (Month(..), Posix)
 
 
 type alias BoxContainerModifier a =
-    Modifier (A.BoxContainer a)
-
+    A.BoxContainer a -> A.BoxContainer a
 
 {-| -}
 boldVal : Int

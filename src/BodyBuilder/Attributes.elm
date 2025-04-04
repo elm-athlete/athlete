@@ -5,7 +5,6 @@ module BodyBuilder.Attributes exposing
     , rawAttribute
     , AutocompleteAttribute, WidthAttribute
     , HeightAttribute
-    , ValueAttribute
     , StepAttribute
     , MaxAttribute
     , MinAttribute
@@ -70,7 +69,6 @@ It is not compatible with Html.Attributes, though.
 @docs rawAttribute
 @docs AutocompleteAttribute, WidthAttribute
 @docs HeightAttribute
-@docs ValueAttribute
 @docs StepAttribute
 @docs MaxAttribute
 @docs MinAttribute
@@ -145,7 +143,7 @@ import Json.Decode exposing (Decoder)
 import Modifiers exposing (..)
 import VirtualDom
 
-
+toto = 1
 {-| -}
 type alias StyleSelector =
     { media : Maybe MediaQuery
@@ -189,11 +187,6 @@ rawStyle theStyle attrs =
 rawAttribute : a -> { c | rawAttributes : List a } -> { c | rawAttributes : List a }
 rawAttribute theAttr attrs =
     { attrs | rawAttributes = theAttr :: attrs.rawAttributes }
-
-
-{-| -}
-type alias ValueAttribute b a =
-    { a | value : Maybe b }
 
 
 {-| -}
@@ -343,19 +336,20 @@ type alias VisibleAttributes a =
     }
 
 
+
 {-| -}
 type alias StringValue a =
-    ValueAttribute String a
+    {a | value : Maybe String}
 
 
 {-| -}
 type alias IntValue a =
-    ValueAttribute Int a
+    {a | value : Maybe Int}
 
 
 {-| -}
 type alias ColorValue a =
-    ValueAttribute Color a
+    {a | value : Maybe Color}
 
 
 {-| OnEvent msg (OnFocusEvent msg (OnBlurEvent msg (OnMouseEvents msg (VisibleAttributes a))))
@@ -372,15 +366,6 @@ type alias VisibleAttributesAndEvents msg a =
         , rawAttributes : List (Html.Attribute msg)
     }
 
-
-{-| -}
-type alias InputPasswordAttributes msg =
-    InputTextAttributes msg
-
-
-{-| -}
-type alias InputRangeAttributes msg =
-    InputNumberAttributes msg
 
 
 {-| Computed : -- MaybeBlockContainer (StringValue (FlowAttributes msg))
@@ -735,6 +720,26 @@ type alias InputTextAttributes msg =
     }
 
 
+type alias InputPasswordAttributes msg =
+    { name : Maybe String
+    , type_ : String
+    , universal : UniversalAttributes
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , value : Maybe String
+    , label : Maybe (Shared.Label msg)
+    , placeholder : Maybe String
+    , autocomplete : Bool
+    , onInputEvent : Maybe (String -> msg)
+    , fromStringInput : String -> String
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    , rawStyle : Maybe Elegant.CommonStyle
+    , rawAttributes : List (Html.Attribute msg)
+    }
+
 {-| -}
 type alias InputTelAttributes msg =
     InputTextAttributes msg
@@ -762,6 +767,29 @@ type alias InputSubmitAttributes msg =
 type alias InputUrlAttributes msg =
     InputTextAttributes msg
 
+
+{-| -}
+type alias InputRangeAttributes msg =
+    { name : Maybe String
+    , type_ : String
+    , universal : UniversalAttributes
+    , box : List ( Modifiers Box.Box, StyleSelector )
+    , onMouseEvents : Maybe (OnMouseEventsInside msg)
+    , onEvent : Maybe ( String, VirtualDom.Handler msg )
+    , onBlurEvent : Maybe msg
+    , onFocusEvent : Maybe msg
+    , label : Maybe (Shared.Label msg)
+    , rawStyle : Maybe Elegant.CommonStyle
+    , rawAttributes : List (Html.Attribute msg)
+    , value : Maybe Int
+    , onInputEvent : Maybe (Int -> msg)
+    , fromStringInput : String -> Int
+    , step : Maybe Int
+    , max : Maybe Int
+    , min : Maybe Int
+    , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
+    , disabled : Bool
+    }
 
 {-| -}
 type alias InputNumberAttributes msg =
@@ -822,7 +850,6 @@ type alias InputFileAttributes msg =
     , rawAttributes : List (Html.Attribute msg)
     , block : Maybe (List ( Modifiers BlockDetails, StyleSelector ))
     }
-
 
 {-| -}
 label : Position -> List (Html msg) -> { c | label : Maybe (Shared.Label msg) } -> { c | label : Maybe (Shared.Label msg) }
@@ -1770,3 +1797,8 @@ selectAttributesToHtmlAttributes attributes =
     unwrapMaybeAttribute Html.Attributes.value attributes.value
         |> List.append (visibleAttributesToHtmlAttributes attributes)
         |> List.append (inputEventToHtmlEvent ( attributes.onInputEvent, attributes.fromStringInput ))
+
+
+
+
+

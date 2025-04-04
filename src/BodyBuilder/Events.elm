@@ -19,7 +19,6 @@ module BodyBuilder.Events exposing
     , onFocus
     , OnFocusEvent
     , onInput
-    , OnInputEvent
     , OnIntInputEvent
     , onMouseDown
     , onMouseEnter
@@ -197,30 +196,23 @@ type alias OnMouseEventsInside msg =
     , mouseOut : Maybe msg
     }
 
-
-{-| -}
-type alias OnInputEvent b msg a =
+type alias OnStringInputEvent msg a =
     { a
-        | onInputEvent : Maybe (b -> msg)
-        , fromStringInput : String -> b
+        | onInputEvent : Maybe (String -> msg)
+        , fromStringInput : String -> String
     }
 
-
-{-| -}
-type alias OnStringInputEvent msg a =
-    OnInputEvent String msg a
-
-
-{-| -}
 type alias OnIntInputEvent msg a =
-    OnInputEvent Int msg a
+    { a
+        | onInputEvent : Maybe (Int -> msg)
+        , fromStringInput : String -> Int
+    }
 
-
-{-| -}
 type alias OnColorInputEvent msg a =
-    OnInputEvent Color msg a
-
-
+    { a
+        | onInputEvent : Maybe (Color -> msg)
+        , fromStringInput : String -> Color
+    }
 {-| -}
 type alias OnCheckEvent msg a =
     { a | onCheckEvent : Maybe (Bool -> msg) }
@@ -247,7 +239,6 @@ type alias OnEvent msg a =
 
 
 {-| -}
-onInput : (a -> msg) -> Modifier (OnInputEvent a msg b)
 onInput val attrs =
     { attrs | onInputEvent = Just val }
 

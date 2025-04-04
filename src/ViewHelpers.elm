@@ -53,9 +53,6 @@ import Elegant.Position as Position
 import Elegant.Shadow as Shadow
 import Elegant.Typography as Typography
 import Html
-import Ionicon.Android
-import Ionicon.Ios
-import Ionicon.Social
 import Json.Decode
 import Json.Encode
 import List.Extra

@@ -75,8 +75,6 @@ import Elegant.Padding as Padding
 import Elegant.Typography as Typography
 import Html
 import Html.Events.Extra.Touch as Touch
-import Ionicon
-import Ionicon.Ios as Ios
 import Json.Decode as Decode
 import Modifiers exposing (..)
 import Time exposing (Month(..), Posix)
@@ -355,9 +353,7 @@ type alias RGBA =
 {-| -}
 backButton : (Router.StandardHistoryMsg -> msg) -> NodeWithStyle msg
 backButton wrapper =
-    menuLinkToWithIcon (wrapper Router.Back)
-        { icon = Ios.arrowLeft, size = 32, color = RGBA 0 0 0 1 }
-        "Back"
+    B.div [] [ B.text "back" ]
 
 
 {-| -}

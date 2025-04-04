@@ -84,8 +84,6 @@ import Elegant.Padding as Padding
 import Elegant.Typography as Typography
 import Html
 import Html.Events.Extra.Touch as Touch
-import Ionicon
-import Ionicon.Ios as Ios
 import Json.Decode as Decode
 import Modifiers exposing (..)
 import Time exposing (Month(..), Posix)
