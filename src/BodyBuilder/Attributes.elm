@@ -720,6 +720,7 @@ type alias InputTextAttributes msg =
     }
 
 
+{-| -}
 type alias InputPasswordAttributes msg =
     { name : Maybe String
     , type_ : String
